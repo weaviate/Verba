@@ -1,0 +1,115 @@
+
+title: The ChatGPT Retrieval Plugin - Weaviate as a Long-term Memory Store for Generative AI
+
+
+## Overview of ChatGPT plugins
+
+Last week OpenAI announced plugins for ChatGPT and all of a sudden everyone’s favorite chatbot can now interact with the world of other apps we use in our everyday lives! The plugins announcement is a game-changer, arguably even more important than the 4.0 upgrade to the underlying GPT model itself.
+
+So what are ChatGPT plugins? Some are explaining plugins as the “eyes and ears” of LLMs to help products like ChatGPT interact more naturally with users by knowing of and integrating with other apps such as Zapier, Uber Eats, Duolingo, and many more. I would argue that plugins are much more than just the “eyes and ears” of ChatGPT.  Hear me out.
+
+Until now ChatGPT was a tool that we could converse with and it would “imagine” creative stories, help us learn, summarize for us, write for us, and explain to us. The interface ChatGPT could use to interact with us was limited to a tab on our browser. But now, imbued with the power of plugins, ChatGPT can actually do much more than just “talk”, it can actually “do” things in the real world!
+
+For example, if you have the Instacart plugin enabled, not only can you ask ChatGPT to generate recipes, but also order groceries to be delivered to your door to help put together your next meal! Or if you don't feel like cooking, it’ll book you a seat at a restaurant that serves similar food using OpenTable! People were astounded by ChatGPT’s ability to put together great vacations, but now through plugin integrations with Expedia, it can actually buy your tickets for you, book your hotels and even book you a ride to and from the airport! Though we can still only interact with ChatGPT through a tab on our browser, it can now interact with us through any one of the thousands of integrations, from Google Sheets to Salesforce, that the [Zapier plugin](https://zapier.com/blog/announcing-zapier-chatgpt-plugin/) connects to.
+
+In short, plugins give ChatGPT the ability to leverage third-party resources to act upon the conversations that you have with it! Not only can ChatGPT call upon the wealth of Apps currently available to actually perform and impact things in the real world but also use the strengths of this App network to make up for some of its own shortcomings.
+
+What we’re most excited about is **the Retrieval Plugin**, which allows you to use ChatGPT with a Vector Database like Weaviate to overcome one of the biggest challenges that ChatGPT has struggled with: its lack of long-term memory, as well as its inability to provide responses based on internal documents and data. 🧠🔌
+
+This has the potential to be the most widely used plugin as it will allow users to create customized versions of ChatGPT catered to their own data. Don’t just take it from me, take it [from Greg](https://twitter.com/gdb/status/1640006228930867200), the Co-founder of OpenAI and the fact that the plugin was trending on Github!
+
+![gdbtweet](./img/gdbtweet.png)
+
+::::note
+Plugins for ChatGPT, including the Weaviate Retrieval Plugin, are currently in Alpha and thus not available to the public.
+::::
+
+## The ChatGPT Retrieval Plugin
+
+![plugin](./img/plugin-light.png#gh-light-mode-only)
+![plugin](./img/plugin-dark.png#gh-dark-mode-only)
+
+The [ChatGPT retrieval plugin](https://github.com/openai/chatgpt-retrieval-plugin) allows you to connect ChatGPT to an instance of a [vector database](/developers/weaviate). Anything stored in a connected vector database can then be used to answer questions to prompts, thus allowing ChatGPT to “know” your custom data and answer questions based on the details stored in the vector database! Not only that but the vector database can also be used as a *long-term storage* of memory for ChatGPT to persist and store portions of your conversations from the short-lived memory of a tab to the long-term storage capabilities of a vector database. A vector database once connected via the retrieval plugin acts as the cortex of ChatGPT! 🧠
+
+The retrieval plugin can be used to get ChatGPT to accomplish tasks grounded in the context of knowledge stored in a connected vector database such as Weaviate. This process consists of two steps: first, we prompt ChatGPT with a question that it uses to craft a query that can be sent to the vector database as demonstrated below.
+
+![diagram](./img/diagram-light.png#gh-light-mode-only)
+![diagram](./img/diagram-dark.png#gh-dark-mode-only)
+
+This is what would happen if you used ChatGPT without the Weaviate Retrieval Plugin.
+
+![pic1](./img/pic1.png)
+
+As expected, the model does not have any specific information with which to answer the question! Now let's say we enable the Weaviate Retrieval Plugin as shown below:
+
+![pic2](./img/pic2.png)
+
+The example below demonstrates the plugin in action. Notice how the prompt `What is my cat’s name?` is used to create the query `cat’s name`, which is then sent to the vector database to conduct a search over the stored documents.
+
+![pic3](./img/pic3.png)
+
+The connected vector database then responds with relevant information and context by searching and filtering a subset of your data. This is shown below:
+
+![pic4](./img/pic4.png)
+
+The second step involves this information being passed to ChatGPT so that it can formulate its answer to accomplish the task specified in the prompt. This step is shown below:
+
+![pic5](./img/pic5.png)
+
+In short, you can update the knowledge that ChatGPT knows about without having to go through the costly and time-consuming process of retraining the weights. The main functionality this plugin enables is:
+
+- It allows you to attach a vector database, to ChatGPT, that has proprietary data that can be used by ChatGPT when answering very specific questions
+- It allows you to persist personal documents and details to give ChatGPT a personal touch so that answers are not just general but can be catered to you (based on details specified in the vector database)
+- You can persist conversations with ChatGPT in the attached vector database to carry on conversations between turning on and shutting off ChatGPT tabs
+
+The advantage is that we can now schedule small and regular updates to content stored in connected vector databases to give the model awareness of new information and reducing the need to retrain the LLM model and update frequently - this ensures the LLM provides robust and up-to-date custom answers even in-between time-consuming retrained weight updates.
+
+We’ll now provide some more examples of how you can leverage the ChatGPT retrieval plugin with Weaviate - an open-source vector database. So without further ado, let's get into it!
+
+## The Weaviate Retrieval Plugin in Action
+
+### Using ChatGPT on Proprietary Company Documents
+
+In order to benefit from the capabilities of LLMs like ChatGPT's GPT4.0 in real-life use cases, it would be ideal if we could apply its generative power to new or custom data. For example, this would enable a private customized version of ChatGPT that's been trained on your company's internal documents and could act as a human resources chatbot. Wondering what the onboarding process for new employees looks like or how you can sign up for health benefits? You can simply ask your customized ChatGPT! The applications of a customized ChatGPT are limitless and quite exciting!
+
+Below I show you what this HR chatbot could look like!
+
+![pic6](./img/pic6.png)
+![pic7](./img/pic7.png)
+
+TaDaaaa!🎉
+
+This is just one example where I packaged a company policy and benefits documents and stored them in Weaviate and then used ChatGPT to conduct generative search over these documents. The possibilities are endless!
+
+### Personalizing ChatGPT
+
+Another great application that the Weaviate Retrieval Plugin enables is customization of ChatGPT around your personal details.
+
+Below I add details about my friends into Weaviate and get it to plan the menu for my upcoming party!
+
+![pic8](./img/pic8.png)
+![pic9](./img/pic9.png)
+
+Another way you could personalize ChatGPT to yourself is by giving it an understanding of who you are. For example, below I tell ChatGPT the languages I understand and customize its responses around its knowledge of me.
+
+![pic10](./img/pic10.png)
+![pic11](./img/pic11.png)
+
+### Helping ChatGPT Remember
+
+For the last example I'll share what I think is one of the most exciting and scary applications of the Weaviate Retrieval Plugin: **to use it to persist the memory of previous conversations you have with ChatGPT into Weaviate**, so that it can refer to them in a later conversation. Currently it is not possible to tell ChatGPT to persist something in the attached vector database through the chat UI, so I have replicated this by manually adding the chat content to Weaviate in between conversations.
+
+First I launched a chat session and gave ChatGPT these details about my pets:
+
+![pic12](./img/pic12.png)
+
+Then I completely close ChatGPT, insert the contents of the chat into Weaviate and then intialize a completely new chat and ask:
+
+![pic13](./img/pic13.png)
+
+Voilà! ChatGPT now remembers its previous conversations with you - persisting them in the attached instance of Weaviate!
+
+
+import StayConnected from '/_includes/stay-connected.mdx'
+
+<StayConnected />

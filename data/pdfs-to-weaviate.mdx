@@ -1,0 +1,387 @@
+
+title: Ingesting PDFs into Weaviate
+
+Since the release of ChatGPT, and the subsequent realization of pairing Vector DBs with ChatGPT, one of the most compelling applications has been chatting with your PDFs (i.e. [ChatPDF](https://www.chatpdf.com/) or [ChatDOC](https://chatdoc.com/)). Why PDFs? PDFs are fairly universal for visual documents, encompassing research papers, resumes, powerpoints, letters, and many more. In our [latest Weaviate Podcast](https://www.youtube.com/watch?v=b84Q2cJ6po8) with Unstructured Founder Brian Raymond, Brian motivates this kind of data by saying “Imagine you have a non-disclosure agreement in a PDF and want to train a classifier”. Although PDFs are great for human understanding, they have been very hard to process with computers. PDF documents contain valuable insights and information that are key to unlocking text information for businesses. With the latest advancements in multimodal deep learning (models that process both images and text), it is now possible to extract high quality data from PDF documents and add it to your Weaviate workflow.
+
+[Optical Character Recognition](https://en.wikipedia.org/wiki/Optical_character_recognition) (OCR) describes technology that converts different types of visual documents (research papers, letters, etc.) into a machine readable format. [RVL-CDIP](https://huggingface.co/datasets/aharley/rvl_cdip) is a benchmark that tests the performance of classifying document images. New models like [LayoutLMv3](https://huggingface.co/docs/transformers/main/en/model_doc/layoutlmv3) and [Donut](https://huggingface.co/docs/transformers/model_doc/donut) leverage both the text and visual information by using a multimodal transformer. These models are reaching new heights in performance because they leverage visual information, not just text.
+
+<figure>
+
+![Donut pipeline](./img/donut.png)
+<figcaption> Pipeline of Donut from Kim, G. et al (2022) </figcaption>
+</figure>
+
+
+## About Unstructured
+[Unstructured](https://www.unstructured.io/) is an open-source company working at the cutting edge of PDF processing and more. They allow businesses to ingest their diverse data sources, whether this be a `PDF`, `JPEG`, or `PPT`, and convert it into data that can be passed to a LLM. This means that you could take private documents from your company and pass it to a LLM to chat with your PDFs.
+
+Unstructured’s open-source [core library](https://github.com/Unstructured-IO/unstructured) is powered by document understanding models. Document understanding techniques use an encoder-decoder pipeline that leverages the power of both computer vision and natural language processing methods.
+
+On the Weaviate Podcast, Brian Raymond described one of the founding motivations of Unstructured as follows: “Hey, HuggingFace is exploding over here with 10s of thousands of models and an incredible community. What if we did something similar to the left of HuggingFace, and we made it cheap, fast, and easy for data scientists to get through that data engineering step, so they can consume more of that!” Now that the stage is set, let’s explore how Unstructured works.
+
+Unstructured simplifies the process of importing a PDF and converting it into text. The core abstraction of Unstructured are their [API bricks](https://unstructured-io.github.io/unstructured/bricks.html) for document pre-processing: 1. Partitioning 2. Cleaning, 3. Staging. Partitioning bricks take an unstructured document and extract structured content from it. It takes the document and breaks it down into elements like `Title`, `Abstract`, and `Introduction`. Later on you will see an example of how the partitioning bricks identified the elements in a research paper. Cleaning the data is an important step before passing it to an NLP model. The cleaning brick can ‘sanitize’ your text data by removing bullet points, extra whitespaces, and more. Staging is the last brick and it helps to prepare your data as input into downstream systems. It takes a list of document elements as input and returns a formatted dictionary as output.
+
+In this blog post, we will show you how to ingest PDF documents with Unstructured and query in Weaviate.
+
+:::info
+To follow along with this blog post, check out this [repository](https://github.com/weaviate-tutorials/how-to-ingest-pdfs-with-unstructured).
+:::
+
+## The Basics
+The data we’re using are two research papers that are publicly available. We first want to convert the PDF to text in order to load it into Weaviate. Starting with the first brick (partitioning), we need to partition the document into text. This is done with:
+
+```python
+from unstructured.partition.pdf import partition_pdf
+
+elements = partition_pdf(filename="../data/paper01.pdf")
+```
+
+Now, if we want to see all of the elements that Unstructured found, we run:
+
+```python
+titles = [elem for elem in elements if elem.category == "Title"]
+
+for title in titles:
+    print(title.text)
+```
+
+<details>
+  <summary>Response from Unstructured</summary>
+
+A survey on Image Data Augmentation for Deep Learning
+Abstract
+Introduction
+Background
+Image Data Augmentation techniques
+Data Augmentations based on basic image manipulations
+Flipping
+Color space
+Cropping
+Rotation
+Translation
+Noise injection
+Color space transformations
+Geometric versus photometric transformations
+Kernel filters
+Mixing images
+Random erasing
+A note on combining augmentations
+Data Augmentations based on Deep Feature space augmentation
+Data Augmentations based on Deep Learning
+Feature space augmentation
+Adversarial training
+GAN‑based Data Augmentation
+Generated images
+Neural Style Transfer
+Meta learning Data Augmentations
+Comparing Augmentations
+Design considerations for image Data Augmentation
+Test-time augmentation
+Curriculum learning
+Resolution impact
+Final dataset size
+Alleviating class imbalance with Data Augmentation
+Discussion
+Future work
+Conclusion
+Abbreviations
+Acknowledgements
+Authors’ contributions
+Funding
+References
+Publisher’s Note
+
+</details>
+
+If we want to store the elements along with the content, you run:
+
+```python
+import textwrap
+
+narrative_texts = [elem for elem in elements if elem.category == "NarrativeText"]
+
+for index, elem in enumerate(narrative_texts[:5]):
+    print(f"Narrative text {index + 1}:")
+    print("\n".join(textwrap.wrap(elem.text, width=70)))
+    print("\n" + "-" * 70 + "\n")
+```
+
+You can then take this data, vectorize it and store it in Weaviate.
+
+![PDFs to Weaviate](./img/Weaviate-ingesting-dark.png#gh-dark-mode-only)
+![PDFs to Weaviate](./img/Weaviate-ingesting-light.png#gh-light-mode-only)
+
+## End-to-End Example
+Now that we’ve introduced the basics of using Unstructured, we want to provide an end-to-end example. We’ll read a folder containing the two research papers, extract their abstracts and store them in Weaviate.
+
+Starting with importing the necessary libraries:
+
+```python
+from pathlib import Path
+import weaviate
+from weaviate.embedded import EmbeddedOptions
+import os
+```
+
+In this example, we are using [Embedded Weaviate](/developers/weaviate/installation/embedded). You can also run it on [WCS](https://console.weaviate.cloud) or [docker](/developers/weaviate/installation/docker-compose). This demo is also using OpenAI for vectorization; you can choose another `text2vec` module [here](/developers/weaviate/modules/retriever-vectorizer-modules).
+
+```python
+client = weaviate.Client(
+    embedded_options=EmbeddedOptions(
+        additional_env_vars={"OPENAI_APIKEY": os.environ["OPENAI_APIKEY"]}
+    )
+)
+```
+
+### Configure the Schema
+
+Now we need to configure our schema. We have the `document` class along with the `abstract` property.
+
+```python
+client.schema.delete_all()
+
+schema = {
+    "class": "Document",
+    "vectorizer": "text2vec-openai",
+    "properties": [
+        {
+            "name": "source",
+            "dataType": ["text"],
+        },
+        {
+            "name": "abstract",
+            "dataType": ["text"],
+            "moduleConfig": {
+                "text2vec-openai": {"skip": False, "vectorizePropertyName": False}
+            },
+        },
+    ],
+    "moduleConfig": {
+        "generative-openai": {},
+        "text2vec-openai": {"model": "ada", "modelVersion": "002", "type": "text"},
+    },
+}
+
+client.schema.create_class(schema)
+```
+
+### Read/Import the documents
+
+Now that our schema is defined, we want to build the objects that we want to store in Weaviate. We wrote a helper class,  `AbstractExtractor` to aggregate the element class. We will call this in order to grab the abstract element along with the content.
+
+<details>
+  <summary>AbstractExtractor</summary>
+
+```python
+import logging
+
+logging.basicConfig(level=logging.INFO)
+
+
+class AbstractExtractor:
+    def __init__(self):
+        self.current_section = None  # Keep track of the current section being processed
+        self.have_extracted_abstract = (
+            False  # Keep track of whether the abstract has been extracted
+        )
+        self.in_abstract_section = (
+            False  # Keep track of whether we're inside the Abstract section
+        )
+        self.texts = []  # Keep track of the extracted abstract text
+
+    def process(self, element):
+        if element.category == "Title":
+            self.set_section(element.text)
+
+            if self.current_section == "Abstract":
+                self.in_abstract_section = True
+                return True
+
+            if self.in_abstract_section:
+                return False
+
+        if self.in_abstract_section and element.category == "NarrativeText":
+            self.consume_abstract_text(element.text)
+            return True
+
+        return True
+
+    def set_section(self, text):
+        self.current_section = text
+        logging.info(f"Current section: {self.current_section}")
+
+    def consume_abstract_text(self, text):
+        logging.info(f"Abstract part extracted: {text}")
+        self.texts.append(text)
+
+    def consume_elements(self, elements):
+        for element in elements:
+            should_continue = self.process(element)
+
+            if not should_continue:
+                self.have_extracted_abstract = True
+                break
+
+        if not self.have_extracted_abstract:
+            logging.warning("No abstract found in the given list of objects.")
+
+    def abstract(self):
+        return "\n".join(self.texts)
+```
+</details>
+
+```python
+data_folder = "../data"
+
+data_objects = []
+
+for path in Path(data_folder).iterdir():
+    if path.suffix != ".pdf":
+        continue
+
+    print(f"Processing {path.name}...")
+
+    elements = partition_pdf(filename=path)
+
+    abstract_extractor = AbstractExtractor()
+    abstract_extractor.consume_elements(elements)
+
+    data_object = {"source": path.name, "abstract": abstract_extractor.abstract()}
+
+    data_objects.append(data_object)
+```
+
+The next step is to import the objects into Weaviate.
+
+```python
+with client.batch as batch:
+    for data_object in data_objects:
+        batch.add_data_object(data_object, "Document")
+```
+
+### Query Time
+
+Now that we have imported our two documents, we can run some queries! Starting with a simple BM25 search. We want to find a document that discusses house prices.
+
+
+```python
+client.query.get("Document", "source").with_bm25(
+    query="some paper about housing prices"
+).with_additional("score").do()
+```
+
+<details>
+  <summary>Output</summary>
+
+```
+{'data': {'Get': {'Document': [{'_additional': {'score': '0.8450042'},
+     'source': 'paper02.pdf'},
+    {'_additional': {'score': '0.26854637'}, 'source': 'paper01.pdf'}]}}}
+```
+
+</details>
+
+We can take this one step further by using the generative search module. The prompt is to summarize the abstract of the two papers in one sentence. This type of summarization is very useful when scouting out new research papers. This enables us to get a quick summary of the abstract and ask questions specific to the paper.
+
+```python
+prompt = """
+Please summarize the following academic abstract in a one-liner for a layperson:
+
+{abstract}
+"""
+
+results = (
+    client.query.get("Document", "source").with_generate(single_prompt=prompt).do()
+)
+
+docs = results["data"]["Get"]["Document"]
+
+for doc in docs:
+    source = doc["source"]
+    abstract = doc["_additional"]["generate"]["singleResult"]
+    wrapped_abstract = textwrap.fill(abstract, width=80)
+    print(f"Source: {source}\nSummary:\n{wrapped_abstract}\n")
+```
+
+<details>
+  <summary>Output</summary>
+
+```
+Source: paper01.pdf
+Summary:
+Data Augmentation is a technique that enhances the size and quality of training
+datasets for Deep Learning models, particularly useful in domains with limited
+data such as medical image analysis.
+```
+```
+Source: paper02.pdf
+Summary:
+Using machine learning techniques, researchers explore predicting house prices
+with structured and unstructured data, finding that the best predictive
+performance is achieved with term frequency-inverse document frequency (TF-IDF)
+representations of house descriptions.
+```
+
+</details>
+
+## Limitations
+There are a few limitations when it comes to a document that has two columns. For example, if a document is structured with two columns, then the text doesn’t extract perfectly. The workaround for this is to set `strategy="ocr_only"` or `strategy="fast"` into `partition_pdf`. There is a [GitHub issue](https://github.com/Unstructured-IO/unstructured/issues/356) on fixing multi-column documents, give it a 👍 up!
+
+<details>
+  <summary>strategy="ocr_only"</summary>
+
+```python
+elements = partition_pdf(filename="../data/paper02.pdf", strategy="ocr_only")
+abstract_extractor = AbstractExtractor()
+abstract_extractor.consume_elements(elements)
+```
+
+</details>
+
+<details>
+  <summary>strategy=”fast”</summary>
+
+```python
+elements = partition_pdf(filename="../data/paper02.pdf", strategy="fast")
+abstract_extractor = AbstractExtractor()
+abstract_extractor.consume_elements(elements)
+```
+
+</details>
+
+## Weaviate Brick in Unstructured
+There is a [GitHub issue](https://github.com/Unstructured-IO/unstructured/issues/566) to add a Weaviate staging brick! The goal of this integration is to add a Weaviate section to the documentation and show how to load unstructured outputs into Weaviate. Make sure to give this issue a 👍 up!
+
+## Last Thought
+This demo introduced how you can ingest PDFs into Weaviate. In this example we used two research papers; however, there is the possibility to add Powerpoint presentations or even scanned letters to your Weaviate instance. Unstructured has really simplified the process of using visual document parsing for diverse document types.
+
+We tested a few queries above, but we can take this one step further by using [LangChain](https://github.com/hwchase17/langchain/blob/master/langchain/vectorstores/weaviate.py). Once the documents are imported into Weaviate, you can build a simple chatbot to chat with your pdfs by using LangChain’s vectorstore.
+
+```python
+from langchain.vectorstores.weaviate import Weaviate
+from langchain.llms import OpenAI
+from langchain.chains import ChatVectorDBChain
+import weaviate
+
+client = weaviate.Client("http://localhost:8080")
+
+vectorstore = Weaviate(client, "NAME_OF_CLASS", "NAME_OF_PROPERTY")
+
+MyOpenAI = OpenAI(temperature=0.2,
+    openai_api_key="ENTER YOUR OPENAI KEY HERE")
+
+qa = ChatVectorDBChain.from_llm(MyOpenAI, vectorstore)
+
+chat_history = []
+
+while True:
+    query = input("")
+    result = qa({"question": query, "chat_history": chat_history})
+    print(result["answer"])
+    chat_history = [(query, result["answer"])]
+```
+
+import WhatNext from '/_includes/what-next.mdx'
+
+<WhatNext />
+
