@@ -1,0 +1,28 @@
+
+title: Weaviate 1.2 release - transformer models
+
+### Weaviate v1.2 introduction video
+
+<div className="youtube">
+    <iframe src="//www.youtube.com/embed/S4lXPPZvGPQ" frameBorder="0" allowFullScreen></iframe>
+</div>
+
+## What are transformers?
+A [transformer](https://en.wikipedia.org/wiki/Transformer_(machine_learning_model)) (e.g., [BERT](https://en.wikipedia.org/wiki/BERT_(language_model))) is a deep learning model that is used for NLP tasks. Within Weaviate the transformer module can be used to vectorize and query your data.
+
+## Getting started with out-of-the-box transformers in Weaviate
+By selecting the text-module in the [Weaviate configuration tool](/developers/weaviate/installation/docker-compose#configurator), you can run Weaviate with transformers in one command. You can learn more about the Weaviate transformer module [here](/developers/weaviate/modules/retriever-vectorizer-modules/text2vec-transformers).
+
+![Weaviate configurator — selecting the Transformers module](./img/configurator-demo.gif)
+*Weaviate configurator — selecting the Transformers module*
+
+## Custom transformer models
+You can also use custom transformer models that are compatible with Hugging Face's `AutoModel` and `AutoTokenzier`. Learn more about using custom models in Weaviate [here](/developers/weaviate/modules/retriever-vectorizer-modules/text2vec-transformers).
+
+## Q&A style questions on your own dataset answered in milliseconds
+Weaviate now allows you to get to sub-50ms results by using transformers on your own data. You can learn more about Weaviate’s speed in combination with transformers in [this article](https://towardsdatascience.com/a-sub-50ms-neural-search-with-distilbert-and-weaviate-4857ae390154).
+
+
+import WhatNext from '/_includes/what-next.mdx'
+
+<WhatNext />
