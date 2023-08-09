@@ -1,9 +1,15 @@
 from llama_index import SimpleDirectoryReader
 from llama_index.node_parser import SimpleNodeParser
 import weaviate
+import os
+from dotenv import load_dotenv
 
-# connect to your weaviate instance
-client = weaviate.Client("https://verba-demo-q86cpjhs.weaviate.network")
+load_dotenv() 
+
+client = weaviate.Client(
+    url=os.environ.get("WEAVIATE_URL"),
+    auth_client_secret=weaviate.AuthApiKey(api_key=os.environ.get("WEAVIATE_API_KEY"))
+)
 
 # load the blogs in using the reader
 blogs = SimpleDirectoryReader('./data').load_data()

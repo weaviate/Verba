@@ -1,6 +1,13 @@
-import weaviate 
+import weaviate
+import os
+from dotenv import load_dotenv
 
-client = weaviate.Client("https://verba-demo-q86cpjhs.weaviate.network")
+load_dotenv() 
+
+client = weaviate.Client(
+    url=os.environ.get("WEAVIATE_URL"),
+    auth_client_secret=weaviate.AuthApiKey(api_key=os.environ.get("WEAVIATE_API_KEY"))
+)
 
 schema = {
    "classes": [
