@@ -1,6 +1,0 @@
-weaviate-client
-llama-index
-python-dotenv
-openai
-black
-wasabi

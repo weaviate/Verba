@@ -1,0 +1,10 @@
+weaviate-client
+python-dotenv
+openai
+black
+wasabi
+typer
+farm-haystack
+nltk
+fastapi
+uvicorn
