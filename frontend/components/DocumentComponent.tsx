@@ -44,7 +44,7 @@ export function DocumentComponent({ title, text, extract }: DocumentComponentPro
     const end = start + extract.length;
 
     return (
-        <div className="w-1/2 border-2 border-gray-900 shadow-lg rounded-xl bg-gray-200 p-2 animate-pop-in overflow-y-auto max-h-[469px] document-container">
+        <div className="w-1/2 border-2 border-gray-900 shadow-lg rounded-xl bg-gray-200 p-2 animate-pop-in overflow-y-auto max-h-[548px] document-container">
             <div className="bg-green-300 text-black p-4 rounded-t-xl">
                 {title || "Placeholder Title"}
             </div>
