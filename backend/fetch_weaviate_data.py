@@ -1,6 +1,5 @@
 import requests
 import base64
-import os
 
 from dotenv import load_dotenv
 
@@ -8,6 +7,14 @@ load_dotenv()
 
 
 def fetch_docs(owner, repo, folder_path, token=None) -> list:
+    """Fetch filenames from Github
+    @parameter owner : str - Repo owner
+    @parameter repo : str - Repo name
+    @parameter folder_path : str - Directory in repo to fetch from
+    @parameter token : str - Github token
+    @returns list - List of document names
+    """
+
     url = f"https://api.github.com/repos/{owner}/{repo}/git/trees/main?recursive=1"
     headers = {
         "Authorization": f"token {token}" if token else None,
@@ -26,6 +33,13 @@ def fetch_docs(owner, repo, folder_path, token=None) -> list:
 
 
 def download_file(owner, repo, file_path, token=None) -> str:
+    """Download files from Github based on filename
+    @parameter owner : str - Repo owner
+    @parameter repo : str - Repo name
+    @parameter file_path : str - Path of the file in repo
+    @parameter token : str - Github token
+    @returns str - Content of the file
+    """
     url = f"https://api.github.com/repos/{owner}/{repo}/contents/{file_path}"
     headers = {
         "Authorization": f"token {token}" if token else None,
