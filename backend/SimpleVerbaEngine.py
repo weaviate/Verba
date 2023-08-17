@@ -10,9 +10,9 @@ class SimpleVerbaQueryEngine(VerbaQueryEngine):
             )
             .with_near_text(content={"concepts": [query_string]})
             .with_generate(
-                grouped_task=f"Can you answer the query {query_string} with the given snippets of documentation? If yes, answer the query, if no then say the data is not sufficient, only use knowledge and context provided"
+                grouped_task=f"Answer the query {query_string} with the given snippets of documentation in 2-3 sentences or if needed give code examples. If the data is not sufficient say that you need more data."
             )
-            .with_limit(10)
+            .with_limit(6)
             .do()
         )
 

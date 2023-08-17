@@ -28,7 +28,7 @@ export function ChatComponent({ onUserMessageSubmit }: ChatComponentProps) {
     }, [messageHistory]);
 
     return (
-        <div className="bg-gray-100 p-4 overflow-y-auto h-80">
+        <div className="bg-gray-100 p-4 overflow-y-auto h-[400px]">
             {messageHistory.map((message, index) => (
                 <div
                     ref={index === messageHistory.length - 1 ? lastMessageRef : null}

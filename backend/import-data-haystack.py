@@ -13,6 +13,8 @@ from haystack.nodes import TextConverter
 from haystack.nodes import PreProcessor
 from haystack.schema import Document
 
+from fetch_weaviate_data import fetch_docs, download_file
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -57,6 +59,40 @@ def clean_mdx(document_str: str) -> str:
     return text
 
 
+def download_mdx(
+    owner: str,
+    repo: str,
+    folder_path: str,
+    token: str = None,
+    doc_type: str = "Documentation",
+) -> list[Document]:
+    """Downloads .mdx files from Github
+    @parameter owner : str - Repo owner
+    @parameter repo : str - Repo name
+    @parameter folder_path : str - Directory in repo to fetch from
+    @parameter token : str - Github token
+    @parameter doc_type : str - Document type (code, blogpost, podcast)
+    @returns list[Document] - A list of haystack documents
+    """
+    msg.divider(
+        f"Starting data type {doc_type} loading from {owner}/{repo}/{folder_path}"
+    )
+    doc_names = fetch_docs(owner, repo, folder_path, token)
+    raw_docs = []
+    for doc_name in doc_names:
+        fetched_text, link, path = download_file(owner, repo, doc_name, token)
+        doc = Document(
+            content=clean_mdx(fetched_text),
+            meta={"doc_name": str(path), "doc_type": doc_type, "doc_link": link},
+        )
+        msg.info(f"Loaded {str(path)}")
+        raw_docs.append(doc)
+
+    msg.good(f"All {len(raw_docs)} files successfully loaded")
+
+    return raw_docs
+
+
 def load_mdx(dir_path: Path, doc_type: str = "Documentation") -> list[Document]:
     """Load .mdx files from a directory
     @parameter dir_path : Path - Directory path
@@ -73,7 +109,11 @@ def load_mdx(dir_path: Path, doc_type: str = "Documentation") -> list[Document]:
                 doc = reader.read()
             doc = Document(
                 content=clean_mdx(doc),
-                meta={"doc_name": str(file), "doc_type": doc_type},
+                meta={
+                    "doc_name": str(file),
+                    "doc_type": doc_type,
+                    "doc_link": str(file),
+                },
             )
             msg.info(f"Loaded {str(file)}")
             raw_docs.append(doc)
@@ -103,7 +143,7 @@ def processing_data(raw_docs: list[Document]) -> list[Document]:
     return chunked_docs
 
 
-def main(data_path: Path, doc_type: str) -> None:
+def main() -> None:
     download_nltk()
 
     msg.divider("Starting data import")
@@ -131,7 +171,13 @@ def main(data_path: Path, doc_type: str) -> None:
 
     msg.good("Client connected to Weaviate Instance")
 
-    raw_docs = load_mdx(data_path, doc_type)
+    raw_docs = download_mdx(
+        "weaviate",
+        "weaviate-io",
+        "developers/",
+        os.environ.get("GITHUB_TOKEN", ""),
+        "Code Documentation",
+    )
     chunked_docs = processing_data(raw_docs)
 
     doc_uuid_map = {}
@@ -146,7 +192,7 @@ def main(data_path: Path, doc_type: str) -> None:
                 "text": str(d.content),
                 "doc_name": str(d.meta["doc_name"]),
                 "doc_type": str(d.meta["doc_type"]),
-                "doc_link": "",
+                "doc_link": str(d.meta["doc_link"]),
             }
 
             uuid = client.batch.add_data_object(properties, "Document")
