@@ -75,16 +75,8 @@ async def root():
 @app.post("/query")
 async def query(payload: QueryPayload):
     try:
-        results = verba_engine.query(payload.query)
+        system_msg, results = verba_engine.query(payload.query)
         msg.good(f"Succesfully processed query: {payload.query}")
-
-        if results[0]["_additional"]["generate"]["error"]:
-            system_msg = results[0]["_additional"]["generate"]["error"]
-        else:
-            system_msg = results[0]["_additional"]["generate"]["groupedResult"]
-
-        if system_msg == None:
-            msg.warn(results[0])
 
         return JSONResponse(
             content={

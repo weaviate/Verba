@@ -16,10 +16,10 @@ class VerbaQueryEngine:
             additional_headers={"X-OpenAI-Api-Key": openai_key},
         )
 
-    def query_chunks(self, query_string: str) -> list:
+    def query_chunks(self, query_string: str) -> tuple:
         """Execute a query to a receive specific chunks from Weaviate
         @parameter query_string : str - Search query
-        @returns list - Iterable list with the chunk results
+        @returns tuple - (system message, iterable list of results)
         """
         raise NotImplementedError("query must be implemented by a subclass.")
 

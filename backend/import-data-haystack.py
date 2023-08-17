@@ -94,7 +94,7 @@ def download_mdx(
 
 
 def load_mdx(dir_path: Path, doc_type: str = "Documentation") -> list[Document]:
-    """Load .mdx files from a directory
+    """Load .mdx files from a local directory
     @parameter dir_path : Path - Directory path
     @parameter doc_type : str - Document type (code, blogpost, podcast)
     @returns list[Document] - A list of haystack documents
