@@ -14,9 +14,9 @@ class SimpleVerbaQueryEngine(VerbaQueryEngine):
             )
             .with_near_text(content={"concepts": [query_string]})
             .with_generate(
-                grouped_task=f"Answer the query {query_string} with the given snippets of documentation in 2-3 sentences or if needed give code examples. If the data is not sufficient say that you need more data."
+                grouped_task=f"You are a chatbot for Weaviate, a vector database, answer the query {query_string} with the given snippets of documentation in 2-3 sentences and if needed give code examples at the end of the answer encapsulated with ```programming-language ```"
             )
-            .with_limit(6)
+            .with_limit(8)
             .do()
         )
 

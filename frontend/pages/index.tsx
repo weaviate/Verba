@@ -15,9 +15,12 @@ export default function Home() {
   const [userInput, setUserInput] = useState('');
   const [documentTitle, setDocumentTitle] = useState("Weaviate Blogpost");
   const [documentText, setDocumentText] = useState("This is an example blogpost");
+  const [documentLink, setDocumentLink] = useState("#");
   const [documentChunks, setDocumentChunks] = useState<DocumentChunk[]>([]);
   const [focusedDocument, setFocusedDocument] = useState<DocumentChunk | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [isFetching, setIsFetching] = useState(false);
+
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,7 +30,9 @@ export default function Home() {
       const sendInput = userInput
       setUserInput('');
 
-      // Make the API call
+      // Start the API call
+      setIsFetching(true);
+
       try {
         const response = await fetch("http://localhost:8000/query", {
           method: "POST",
@@ -46,8 +51,9 @@ export default function Home() {
         }
       } catch (error) {
         console.error("Failed to fetch from API:", error);
+      } finally {
+        setIsFetching(false);
       }
-
     }
   };
 
@@ -74,6 +80,7 @@ export default function Home() {
           // Update the document title and text
           setDocumentTitle(documentData.document.properties.doc_name);
           setDocumentText(documentData.document.properties.text);
+          setDocumentLink(documentData.document.properties.doc_link);
         } catch (error) {
           console.error("Failed to fetch document:", error);
         }
@@ -84,9 +91,9 @@ export default function Home() {
   }, [focusedDocument]);
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24 text-gray-900">
+    <main className="flex min-h-screen flex-col items-center justify-between p-12 text-gray-900">
       <div className="flex flex-col w-full items-start">
-        <div className="mb-8">
+        <div className="mb-4">
           <div className="flex text-lg">
             <span className="bg-opacity-0 rounded px-2 py-1 hover-container animate-pop-in">search,</span>
             <span className="bg-opacity-0 rounded px-2 py-1 hover-container animate-pop-in-late">find,</span>
@@ -95,7 +102,17 @@ export default function Home() {
           <h1 className="text-8xl font-bold mt-2">Verba</h1>
           <p className="text-md mt-1 text-gray-400">Retrieval Augmented Generation system powered by Weaviate</p>
         </div>
-
+        <div className="p-1 flex overflow-x-auto justify-center shadow-lg rounded-lg w-full"> {/* Removed max-width and added w-full to span the full width */}
+          {documentChunks.map((chunk, index) => (
+            <button
+              key={chunk.chunk_id}
+              onClick={() => setFocusedDocument(chunk)}
+              className="bg-green-300 hover:bg-green-400 text-xs font-bold py-2 px-4 m-2 w-1/2 rounded animate-pop-in" // Added w-1/2 for width, and text-xs for smaller text
+            >
+              {index}.  {chunk.doc_name} {/* Display the index number followed by the document name */}
+            </button>
+          ))}
+        </div>
         <div className="flex w-full space-x-4">
           <div className="w-1/2 p-2 border-2 shadow-lg h-2/3 border-gray-900 rounded-xl animate-pop-in">
             {/* Header */}
@@ -142,7 +159,7 @@ export default function Home() {
             )}
 
             {/* ChatComponent */}
-            <ChatComponent onUserMessageSubmit={messages} />
+            <ChatComponent onUserMessageSubmit={messages} isFetching={isFetching} />
 
             {/* Input area */}
             <form className="rounded-b-xl bg-gray-800 p-4" onSubmit={handleSendMessage}>
@@ -155,7 +172,9 @@ export default function Home() {
               />
             </form>
           </div>
-          <DocumentComponent title={documentTitle} text={documentText} extract={focusedDocument?.text} />
+          <div className="w-1/2 space-y-4">
+            <DocumentComponent title={documentTitle} text={documentText} extract={focusedDocument?.text} docLink={documentLink} />
+          </div>
         </div>
       </div>
     </main>

@@ -20,7 +20,7 @@ chunk_schema = {
             "class": "Chunk",
             "description": "Chunks of Documentations",
             "vectorizer": "text2vec-openai",
-            "moduleConfig": {"generative-openai": {"model": "gpt-3.5-turbo"}},
+            "moduleConfig": {"generative-openai": {"model": "gpt-4"}},
             "properties": [
                 {
                     "name": "text",
