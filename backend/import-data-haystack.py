@@ -2,6 +2,8 @@ import weaviate  # type: ignore[import]
 import typer
 import os
 
+import hashlib
+
 import openai
 
 from pathlib import Path
@@ -35,6 +37,46 @@ def download_nltk() -> None:
         ssl._create_default_https_context = _create_unverified_https_context
 
     nltk.download("punkt")
+
+
+def clean_filename(file_path: str):
+    # Split the path into its components
+    parts = file_path.split(os.sep)
+
+    # Check if there are at least two parts to extract
+    if len(parts) < 2:
+        return None
+
+    # Extract the last two parts
+    last_two = parts[-2:]
+
+    # Remove the file extension from the last part
+    last_two[-1] = os.path.splitext(last_two[-1])[0]
+
+    return os.sep.join(last_two)
+
+
+def transform_to_url(file_path):
+    base_url = "https://weaviate.io/"
+
+    # Remove the file extension
+    without_extension = os.path.splitext(file_path)[0]
+
+    # Concatenate the base_url with the modified path
+    full_url = os.path.join(base_url, without_extension)
+
+    return full_url
+
+
+def hash_filepath(filepath) -> str:
+    # Create a new sha256 hash object
+    sha256 = hashlib.sha256()
+
+    # Update the hash object with the bytes-like object (filepath)
+    sha256.update(filepath.encode())
+
+    # Return the hexadecimal representation of the hash
+    return str(sha256.hexdigest())
 
 
 def clean_mdx(document_str: str) -> str:
@@ -83,9 +125,14 @@ def download_mdx(
         fetched_text, link, path = download_file(owner, repo, doc_name, token)
         doc = Document(
             content=clean_mdx(fetched_text),
-            meta={"doc_name": str(path), "doc_type": doc_type, "doc_link": link},
+            meta={
+                "doc_name": clean_filename(str(path)),
+                "doc_hash": hash_filepath(str(path)),
+                "doc_type": doc_type,
+                "doc_link": transform_to_url(str(path)),
+            },
         )
-        msg.info(f"Loaded {str(path)}")
+        msg.info(f"Loaded {doc.meta['doc_name']}")
         raw_docs.append(doc)
 
     msg.good(f"All {len(raw_docs)} files successfully loaded")
@@ -123,9 +170,19 @@ def load_mdx(dir_path: Path, doc_type: str = "Documentation") -> list[Document]:
     return raw_docs
 
 
-def processing_data(raw_docs: list[Document]) -> list[Document]:
+def processing_data(
+    raw_docs: list[Document],
+    split_by: str = "word",
+    split_length: int = 200,
+    split_overlap: int = 100,
+    sentence_boundaries: bool = True,
+) -> list[Document]:
     """Splits a list of docs into smaller chunks
     @parameter raw_docs : list[Document] - List of docs
+    @parameter split_by : str - Chunk by words, sentences, or paragrapggs
+    @parameter split_length : int - Chunk length (words, sentences, paragraphs)
+    @parameter split_overlap : int - Overlapping words, sentences, paragraphs
+    @parameter sentence_boundaries : bool - Respect sentence boundaries
     @returns list[Document] - List of splitted docs
     """
     msg.info("Starting splitting process")
@@ -133,10 +190,10 @@ def processing_data(raw_docs: list[Document]) -> list[Document]:
         clean_empty_lines=False,
         clean_whitespace=False,
         clean_header_footer=False,
-        split_by="sentence",
-        split_length=12,
-        split_overlap=4,
-        split_respect_sentence_boundary=False,
+        split_by=split_by,
+        split_length=split_length,
+        split_overlap=split_overlap,
+        split_respect_sentence_boundary=sentence_boundaries,
     )
     chunked_docs = preprocessor.process(raw_docs)
     msg.good(f"Successful splitting (total {len(chunked_docs)})")
@@ -176,17 +233,27 @@ def main() -> None:
         "weaviate-io",
         "developers/",
         os.environ.get("GITHUB_TOKEN", ""),
-        "Code Documentation",
+        "Documentation",
     )
-    chunked_docs = processing_data(raw_docs)
+    raw_blogs = download_mdx(
+        "weaviate",
+        "weaviate-io",
+        "blog/",
+        os.environ.get("GITHUB_TOKEN", ""),
+        "Blog",
+    )
+
+    raw_data = raw_docs + raw_blogs
+
+    chunked_docs = processing_data(raw_data)
 
     doc_uuid_map = {}
 
     # Insert whole docs
     with client.batch as batch:
-        batch.batch_size = 5
-        for i, d in enumerate(raw_docs):
-            msg.info(f"({i+1}/{len(raw_docs)}) Importing document {d.meta['doc_name']}")
+        batch.batch_size = 100
+        for i, d in enumerate(raw_data):
+            msg.info(f"({i+1}/{len(raw_data)}) Importing document {d.meta['doc_name']}")
 
             properties = {
                 "text": str(d.content),
@@ -196,7 +263,7 @@ def main() -> None:
             }
 
             uuid = client.batch.add_data_object(properties, "Document")
-            uuid_key = str(d.meta["doc_name"]).strip().lower()
+            uuid_key = str(d.meta["doc_hash"]).strip().lower()
             doc_uuid_map[uuid_key] = uuid
 
     msg.good("Imported all docs")
@@ -208,7 +275,7 @@ def main() -> None:
                 f"({i+1}/{len(chunked_docs)}) Importing chunk of {d.meta['doc_name']} ({d.meta['_split_id']})"
             )
 
-            uuid_key = str(d.meta["doc_name"]).strip().lower()
+            uuid_key = str(d.meta["doc_hash"]).strip().lower()
             uuid = doc_uuid_map[uuid_key]
 
             properties = {
