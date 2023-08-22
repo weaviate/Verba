@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Typewriter from 'typewriter-effect';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/cjs/styles/prism';
+import { oneLight } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 
 
 interface ChatComponentProps {
@@ -79,7 +79,7 @@ export function ChatComponent({ onUserMessageSubmit, isFetching }: ChatComponent
                     ref={index === messageHistory.length - 1 ? lastMessageRef : null}
                     key={index}
                     className={`mb-4 ${message.type === 'user' ? 'text-right' : ''}`}>
-                    <span className={`inline-block p-3 rounded-xl animate-press-in shadow-md ${message.type === 'user' ? 'bg-yellow-200' : 'bg-white'}`}>
+                    <span className={`inline-block p-3 rounded-xl animate-press-in shadow-md font-mono text-sm ${message.type === 'user' ? 'bg-yellow-200' : 'bg-white'}`}>
                         {message.type === 'system' ? (
                             parseMessage(message.content).map((segment, segIndex) => {
                                 if (segment.type === "text") {
@@ -91,7 +91,7 @@ export function ChatComponent({ onUserMessageSubmit, isFetching }: ChatComponent
                                                     .typeString(segment.content || 'N/A')
                                                     .start();
                                             }}
-                                            options={{ delay: 25 }}
+                                            options={{ delay: 15 }}
                                         />
                                     );
                                 } else if (segment.type === "code") {
@@ -99,7 +99,7 @@ export function ChatComponent({ onUserMessageSubmit, isFetching }: ChatComponent
                                         <SyntaxHighlighter
                                             key={segIndex}
                                             language={segment.language}
-                                            style={vscDarkPlus}
+                                            style={oneLight}
                                             className="rounded p-2"
                                         >
                                             {segment.content}
