@@ -107,7 +107,7 @@ async def get_document(payload: GetDocumentPayload):
             }
         )
     except Exception as e:
-        msg.fail(f"Query failed: {str(e)}")
+        msg.fail(f"Document retrieval failed: {str(e)}")
         return JSONResponse(
             content={
                 "document": {},

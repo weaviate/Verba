@@ -23,7 +23,13 @@ class VerbaQueryEngine:
         """
         raise NotImplementedError("query must be implemented by a subclass.")
 
-    def retrieve_document(self, doc_id: str) -> dict:
+    def change_generative_model(self, generative_model: str) -> dict:
+        """Change schema to another generative module model"""
+        raise NotImplementedError(
+            "retrieve_document must be implemented by a subclass."
+        )
+
+    def retrieve_document(self, doc_id: str) -> None:
         """Return a document by it's ID (UUID format) from Weaviate
         @parameter doc_id : str - Document ID
         @returns dict - Document dict

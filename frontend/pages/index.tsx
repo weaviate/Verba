@@ -117,46 +117,10 @@ export default function Home() {
           <div className="w-1/2 p-2 border-2 shadow-lg h-2/3 border-gray-900 rounded-xl animate-pop-in">
             {/* Header */}
             <div className="rounded-t-xl bg-yellow-200 p-4 flex justify-between items-center">
-              Verba Chat
-              <button onClick={() => setSettingsOpen(!settingsOpen)}>
-                Settings
-              </button>
+              Using generative-module: GPT4
             </div>
 
-            {settingsOpen && (
-              <div className="bg-yellow-100 p-4">
-                {/* Dropdowns */}
-                <div className="flex space-x-4 mb-4">
-                  <select className="border rounded-md p-2" placeholder="Dropdown 1">
-                    <option value="" disabled selected>Select an option</option>
-                    {/* Example options */}
-                    <option value="option1">gpt3.5</option>
-                  </select>
 
-                  <select className="border rounded-md p-2" placeholder="Dropdown 2">
-                    <option value="" disabled selected>Select another option</option>
-                    {/* Example options */}
-                    <option value="optionA">BM25 Search</option>
-                    <option value="optionB">Vector Search</option>
-                    <option value="optionB">Hybrid Search</option>
-                  </select>
-                </div>
-
-                {/* Slider */}
-                <div className="flex items-center mb-4">
-                  <input type="range" min="1" max="10" className="flex-grow mr-2" />
-                  <span>5</span>
-                </div>
-
-                {/* Checkbox */}
-                <div>
-                  <label className="flex items-center">
-                    <input type="checkbox" className="mr-2" />
-                    Generative Search
-                  </label>
-                </div>
-              </div>
-            )}
 
             {/* ChatComponent */}
             <ChatComponent onUserMessageSubmit={messages} isFetching={isFetching} />
