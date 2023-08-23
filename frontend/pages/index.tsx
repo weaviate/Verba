@@ -13,8 +13,8 @@ export default function Home() {
 
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [userInput, setUserInput] = useState('');
-  const [documentTitle, setDocumentTitle] = useState("Weaviate Blogpost");
-  const [documentText, setDocumentText] = useState("This is an example blogpost");
+  const [documentTitle, setDocumentTitle] = useState("");
+  const [documentText, setDocumentText] = useState("");
   const [documentLink, setDocumentLink] = useState("#");
   const [documentChunks, setDocumentChunks] = useState<DocumentChunk[]>([]);
   const [focusedDocument, setFocusedDocument] = useState<DocumentChunk | null>(null);
@@ -44,6 +44,7 @@ export default function Home() {
 
         const data = await response.json();
 
+        setDocumentChunks([]);
         setDocumentChunks(data.documents);
 
         if (data.system) {
@@ -95,21 +96,22 @@ export default function Home() {
       <div className="flex flex-col w-full items-start">
         <div className="mb-4">
           <div className="flex text-lg">
-            <span className="bg-opacity-0 rounded px-2 py-1 hover-container animate-pop-in">search,</span>
-            <span className="bg-opacity-0 rounded px-2 py-1 hover-container animate-pop-in-late">find,</span>
-            <span className="bg-yellow-200 rounded px-2 py-1 hover-container animate-pop-more-late">generate</span>
+            <span className="bg-opacity-0 rounded px-2 py-1 hover-container animate-pop-in">The</span>
+            <span className="bg-opacity-0 rounded font-bold px-2 py-1 hover-container animate-pop-in-late">Golden</span>
+            <span className="bg-yellow-200 rounded px-2 py-1 hover-container animate-pop-more-late">RAGtriever</span>
           </div>
+
           <h1 className="text-8xl font-bold mt-2">Verba</h1>
-          <p className="text-md mt-1 text-gray-400">Retrieval Augmented Generation system powered by Weaviate</p>
+          <p className="text-sm mt-1 text-gray-400">Retrieval Augmented Generation system powered by Weaviate</p>
         </div>
-        <div className="p-1 flex overflow-x-auto justify-center shadow-lg rounded-lg w-full"> {/* Removed max-width and added w-full to span the full width */}
+        <div className="p-1 flex overflow-x-auto justify-center shadow-lg rounded-lg w-full mb-2"> {/* Removed max-width and added w-full to span the full width */}
           {documentChunks.map((chunk, index) => (
             <button
-              key={chunk.chunk_id}
+              key={chunk.doc_name + index}
               onClick={() => setFocusedDocument(chunk)}
-              className="bg-green-300 hover:bg-green-400 text-xs font-bold py-2 px-4 m-2 w-1/2 rounded animate-pop-in" // Added w-1/2 for width, and text-xs for smaller text
+              className="bg-green-300 hover:bg-green-400 text-xs font-bold py-2 px-4 mx-2 w-1/2 rounded animate-pop-in" // Added w-1/2 for width, and text-xs for smaller text
             >
-              {index}.  {chunk.doc_name} {/* Display the index number followed by the document name */}
+              {index + 1}.  {chunk.doc_name} {/* Display the index number followed by the document name */}
             </button>
           ))}
         </div>
@@ -117,7 +119,7 @@ export default function Home() {
           <div className="w-1/2 p-2 border-2 shadow-lg h-2/3 border-gray-900 rounded-xl animate-pop-in">
             {/* Header */}
             <div className="rounded-t-xl bg-yellow-200 p-4 flex justify-between items-center">
-              Using generative-module: GPT4
+              Verba Chat
             </div>
 
 
