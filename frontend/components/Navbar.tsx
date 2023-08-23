@@ -8,7 +8,7 @@ const Navbar = () => {
 
     const links = [
         { name: 'Search', path: '/' },
-        { name: 'About', path: '/about' },
+        { name: 'Documents', path: '/document_explorer' },
     ];
 
     return (
@@ -17,7 +17,7 @@ const Navbar = () => {
                 const isActive = router.pathname === link.path;
                 return (
                     <Link legacyBehavior key={link.name} href={link.path}>
-                        <a className={`mx-12 text-zinc-700 font-thin text-opacity-50 hover:scale-110 transform transition-all duration-500 hover:text-white hover:text-opacity-100 ${isActive ? 'text-white' : ''}`}>
+                        <a className={`mx-12 text-zinc-700 font-thin text-opacity-50 hover:scale-110 transform transition-all duration-500 hover:text-yellow-400 hover:text-opacity-100 ${isActive ? 'text-white' : ''}`}>
                             {link.name}
                         </a>
                     </Link>

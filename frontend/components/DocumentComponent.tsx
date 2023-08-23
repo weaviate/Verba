@@ -21,14 +21,29 @@ export function DocumentComponent({ title, text, extract, docLink }: DocumentCom
         }
     }, [text, extract]);
 
+    if (!title) {
+        return (
+            <div className="">
+
+            </div>
+        );
+    }
+
     // If extract is not provided, just render the text as-is
     if (!extract) {
+        // Render the full text if the extract doesn't match
         return (
-            <div className="... document-container">
-                <div className="...">
+            <div className="border-2 border-gray-900 shadow-lg rounded-xl bg-gray-200 p-2 animate-pop-in overflow-y-auto max-h-[548px] document-container">
+                <div className="bg-green-300 text-black p-4 rounded-t-xl w-full sticky top-0 z-10 shadow-md">
+                    <a href={docLink || '#'} target="_blank" rel="noopener noreferrer">
+                        {title || "Placeholder Title"}
+                    </a>
                 </div>
-                <p className="...">
-                </p>
+                <div className="p-4">
+                    <ReactMarkdown className="pb-3 text-sm my-markdown-styles">
+                        {text}
+                    </ReactMarkdown>
+                </div>
             </div>
         );
     }
