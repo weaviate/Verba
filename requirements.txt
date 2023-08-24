@@ -1,2 +1,0 @@
-weaviate-client
-llama-index
