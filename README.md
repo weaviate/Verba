@@ -1,6 +1,8 @@
 # Verba (WIP)
 
-Welcome to the Verba, an open-source project aimed at providing an easy usable retrieval augmented generation (RAG) system. Use it to interact with your data in just a handful of steps! 
+Welcome to the Verba, an open-source project aimed at providing an easy usable retrieval augmented generation (RAG) app. Use it to interact with your data in just a handful of steps!
+
+> Currently this repo only supports the data processing pipeline for Weaviate documentation, supporting custom data is WIP.
 
 [![Weaviate](https://img.shields.io/static/v1?label=%E2%9D%A4%20made%20with&message=Weaviate&color=green&style=flat-square)](https://weaviate.io/) 
 
@@ -14,23 +16,18 @@ It leverages Weaviate together with Generative Search to retrieve relevant docum
 
 Verba provides an interface to load different data types (.txt, .md, .pdf, etc.) into Weaviate, cleaning, chunking and vectorizing them beforehand.
 
+### 💥 Generative Search to answer your queries 
 
-### 🔎 Semantic Search and more on your documents (WIP)
+Verba uses Weaviate's `generate` module to look at the retrieved document pieces and form an answer to your query. 
 
-Verba supports all Weaviate search techniques such as BM25-, Vector-, and Hybrid Search to browse through your documents and ask questions.
-
-### 💥 Generative Search to answer your queries (WIP)
-
-Verba uses Weaviate's generate module to look at the retrieved document pieces and form an answer to your query. 
-
-### 🔥 Semantic Cache to speed up your process (WIP)
+### 🔥 Semantic Cache to speed up your process
 
 We embed the generated results and queries to Weaviate, and use it as a `Semantic Cache`.
 This method is advantageous as it enables Verba to return results from queries that are semantically equal to the new query. This method allows us to gain much more from generated results than traditional string matching would permit. It's a simple yet potent solution that enhances the efficiency of the search process.
 
 ## 💰 Large Language Model (LLM) Costs
 
-Verba supports multiple LLM providers such as OpenAI, Cohere, Huggingface, and more. By default, any costs associated with using these services will be billed to the access key that you provide. Processes that will cost will be data embedding and answer generation.
+Verba currently only supports OpenAI's GPT4 model. By default, any costs associated with using this service will be billed to the access key that you provide. Processes that will generate cost are the data embedding and answer generation part.
 
 ## 🛠️ Project Structure
 
@@ -51,7 +48,7 @@ To kick-start with the Healthsearch Demo, please refer to the READMEs in the `Fr
 
 ## 💡 Usage
 
-Follow these steps to use the Healthsearch Demo:
+Follow these steps to use Verba:
 
 1. Set up the Weaviate database, FastAPI backend, and the React frontend by following the instructions in their respective READMEs.
 2. Launch the database, backend server, and the frontend application.

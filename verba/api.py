@@ -94,6 +94,24 @@ async def query(payload: QueryPayload):
         )
 
 
+@app.post("/suggestions")
+async def suggestions(payload: QueryPayload):
+    try:
+        suggestions = verba_engine.get_suggestions(payload.query)
+
+        return JSONResponse(
+            content={
+                "suggestions": suggestions,
+            }
+        )
+    except Exception as e:
+        return JSONResponse(
+            content={
+                "suggestions": [],
+            }
+        )
+
+
 @app.post("/get_document")
 async def get_document(payload: GetDocumentPayload):
     msg.info(f"Document ID received: {payload.document_id}")
