@@ -195,6 +195,10 @@ def document_cleaning(document_str: str) -> str:
     text = re.sub(r":::.*?\n", "", text)
     text = re.sub(r":::\n?", "", text)
 
+    # Step 5: Replace markdown image and link references with their text
+    text = re.sub(r"!\[(.*?)\]\(.*?\)", r"\1", text)  # Image links
+    text = re.sub(r"\[(.*?)\]\(.*?\)", r"\1", text)  # Normal links
+
     return text
 
 
