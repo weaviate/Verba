@@ -8,5 +8,6 @@ farm-haystack
 nltk
 fastapi
 uvicorn
+gunicorn
 pytest
 mypy
