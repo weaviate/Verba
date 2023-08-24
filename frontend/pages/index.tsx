@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { ChatComponent, Message } from "../components/ChatComponent";
 import { DocumentComponent } from "../components/DocumentComponent";
-import { FaFileAlt } from "react-icons/fa";
+
+export const apiHost = process.env['VERBA_ENDPOINT'] || 'http://localhost:8000';
 
 type DocumentChunk = {
   text: string;
@@ -45,12 +46,14 @@ export default function Home() {
       setMessages((prev) => [...prev, { type: "user", content: sendInput }]);
 
       setUserInput("");
+      // Clear the suggestions list
+      setSuggestions([]);
 
       // Start the API call
       setIsFetching(true);
 
       try {
-        const response = await fetch("http://localhost:8000/query", {
+        const response = await fetch(apiHost + "/query", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -88,7 +91,7 @@ export default function Home() {
     const fetchDocument = async () => {
       if (focusedDocument && focusedDocument.doc_uuid) {
         try {
-          const response = await fetch("http://localhost:8000/get_document", {
+          const response = await fetch(apiHost + "/get_document", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -156,10 +159,6 @@ export default function Home() {
   const handleSuggestionClick = async (suggestion: string) => {
     // Update the userInput with the clicked suggestion
     setUserInput(suggestion);
-
-    // Clear the suggestions list
-    setSuggestions([]);
-
     handleSendMessage(undefined, suggestion);
   };
 
@@ -191,11 +190,9 @@ export default function Home() {
               onClick={() => setFocusedDocument(chunk)}
             >
               <div
-                className={`${
-                  DOC_TYPE_COLORS[chunk.doc_type]
-                } rounded-lg text-xs hover-container shadow-lg border-2 hover:border-white border-black mx-2 p-4 ${
-                  DOC_TYPE_COLOR_HOVER[chunk.doc_type]
-                } animate-pop-in`}
+                className={`${DOC_TYPE_COLORS[chunk.doc_type]
+                  } rounded-lg text-xs hover-container shadow-lg border-2 hover:border-white border-black mx-2 p-4 ${DOC_TYPE_COLOR_HOVER[chunk.doc_type]
+                  } animate-pop-in`}
               >
                 <div className="flex items-center">
                   <span className="font-bold">{chunk.doc_name}</span>
