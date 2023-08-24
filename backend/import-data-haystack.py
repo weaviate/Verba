@@ -39,21 +39,34 @@ def download_nltk() -> None:
     nltk.download("punkt")
 
 
-def clean_filename(file_path: str):
-    # Split the path into its components
-    parts = file_path.split(os.sep)
+def clean_filename(file_path: str, document_type: str):
+    if document_type == "Documentation":
+        # Split the path into its components
+        parts = file_path.split(os.sep)
 
-    # Check if there are at least two parts to extract
-    if len(parts) < 2:
-        return None
+        # Check if there are at least two parts to extract
+        if len(parts) < 2:
+            return None
 
-    # Extract the last two parts
-    last_two = parts[-2:]
+        # Extract the last two parts
+        last_two = parts[-2:]
 
-    # Remove the file extension from the last part
-    last_two[-1] = os.path.splitext(last_two[-1])[0]
+        # Remove the file extension from the last part
+        filename_without_extension = os.path.splitext(last_two[-1])[0]
 
-    return os.sep.join(last_two)
+        # If the filename is "index", use the last two directories as filename
+        if filename_without_extension == "index":
+            cleaned_name = "-".join(last_two)
+        else:
+            last_two[-1] = filename_without_extension
+            cleaned_name = "-".join(last_two)
+
+        # Remove numbers followed by an underscore at the beginning of each part
+        cleaned_parts = [re.sub(r"^\d+_", "", part) for part in cleaned_name.split("-")]
+
+        return "-".join(cleaned_parts)
+    else:
+        return file_path
 
 
 def transform_to_url(file_path):
@@ -79,26 +92,43 @@ def hash_filepath(filepath) -> str:
     return str(sha256.hexdigest())
 
 
-def clean_mdx(document_str: str) -> str:
+def data_cleaning(document_str: str, document_type: str) -> str:
     """Preprocess and clean documents from mdx markings
     @parameter document_str : str - Document text
     @returns str - The preprocessed and cleaned document text
     """
 
-    # Step 1: Remove everything above <!-- truncate -->
-    text = re.sub(r"(?s)^.*?<!-- truncate -->\n?", "", document_str)
+    if document_type == "Documentation":
+        # Step 1: Remove everything above <!-- truncate -->
+        text = re.sub(r"(?s)^.*?<!-- truncate -->\n?", "", document_str)
 
-    # Step 2: Remove import statements
-    text = re.sub(r"import .*?;\n?", "", text)
+        # Step 2: Remove import statements
+        text = re.sub(r"import .*?;\n?", "", text)
 
-    # Remove all HTML-like tags
-    text = re.sub(r"<[^>]+>", "", text)
+        # Remove all HTML-like tags
+        text = re.sub(r"<[^>]+>", "", text)
 
-    # Step 4: Remove tags with three double dots and their corresponding closing tags
-    text = re.sub(r":::.*?\n", "", text)
-    text = re.sub(r":::\n?", "", text)
+        # Step 4: Remove tags with three double dots and their corresponding closing tags
+        text = re.sub(r":::.*?\n", "", text)
+        text = re.sub(r":::\n?", "", text)
 
-    return text
+        return text
+
+    return document_str
+
+
+def data_filtering(document_path: str, document_type: str) -> bool:
+    if document_type == "Documentation":
+        # Split the document path into its components
+        components = document_path.split("/")
+        # Check if any component starts with '_'
+        for component in components:
+            if component.startswith("_"):
+                msg.warn(f"Skipping {document_path}")
+                return False
+        return True
+    else:
+        return True
 
 
 def download_mdx(
@@ -122,18 +152,23 @@ def download_mdx(
     doc_names = fetch_docs(owner, repo, folder_path, token)
     raw_docs = []
     for doc_name in doc_names:
-        fetched_text, link, path = download_file(owner, repo, doc_name, token)
-        doc = Document(
-            content=clean_mdx(fetched_text),
-            meta={
-                "doc_name": clean_filename(str(path)),
-                "doc_hash": hash_filepath(str(path)),
-                "doc_type": doc_type,
-                "doc_link": transform_to_url(str(path)),
-            },
-        )
-        msg.info(f"Loaded {doc.meta['doc_name']}")
-        raw_docs.append(doc)
+        try:
+            fetched_text, link, path = download_file(owner, repo, doc_name, token)
+        except Exception as e:
+            msg.fail(str(e))
+
+        if data_filtering(path, doc_type):
+            doc = Document(
+                content=data_cleaning(fetched_text, doc_type),
+                meta={
+                    "doc_name": clean_filename(str(path), doc_type),
+                    "doc_hash": hash_filepath(str(path)),
+                    "doc_type": doc_type,
+                    "doc_link": transform_to_url(str(path)),
+                },
+            )
+            msg.info(f"Loaded {doc.meta['doc_name']}")
+            raw_docs.append(doc)
 
     msg.good(f"All {len(raw_docs)} files successfully loaded")
 
@@ -170,7 +205,7 @@ def load_mdx(dir_path: Path, doc_type: str = "Documentation") -> list[Document]:
     return raw_docs
 
 
-def processing_data(
+def chunking_data(
     raw_docs: list[Document],
     split_by: str = "word",
     split_length: int = 200,
@@ -200,11 +235,7 @@ def processing_data(
     return chunked_docs
 
 
-def main() -> None:
-    download_nltk()
-
-    msg.divider("Starting data import")
-
+def setup_client():
     # Define OpenAI API key, Weaviate URL, and auth configuration
     openai.api_key = os.environ.get("OPENAI_API_KEY", "")
     url = os.environ.get("WEAVIATE_URL", "")
@@ -219,41 +250,48 @@ def main() -> None:
                 additional_headers={"X-OpenAI-Api-Key": openai.api_key},
                 auth_client_secret=auth_config,
             )
+            return client
         else:
             msg.warn("Server URL not available")
-            return
+            return None
     else:
         msg.warn("Open AI API Key not available")
+        return None
+
+
+def main() -> None:
+    download_nltk()
+
+    msg.divider("Starting data import")
+
+    client = setup_client()
+
+    if client:
+        msg.good("Client connected to Weaviate Instance")
+    else:
         return
 
-    msg.good("Client connected to Weaviate Instance")
-
-    raw_docs = download_mdx(
+    weaviate_documentation = download_mdx(
         "weaviate",
         "weaviate-io",
         "developers/",
         os.environ.get("GITHUB_TOKEN", ""),
         "Documentation",
     )
-    raw_blogs = download_mdx(
-        "weaviate",
-        "weaviate-io",
-        "blog/",
-        os.environ.get("GITHUB_TOKEN", ""),
-        "Blog",
-    )
 
-    raw_data = raw_docs + raw_blogs
+    weaviate_data = weaviate_documentation
 
-    chunked_docs = processing_data(raw_data)
+    chunked_weaviate_data = chunking_data(weaviate_data)
 
     doc_uuid_map = {}
 
     # Insert whole docs
     with client.batch as batch:
         batch.batch_size = 100
-        for i, d in enumerate(raw_data):
-            msg.info(f"({i+1}/{len(raw_data)}) Importing document {d.meta['doc_name']}")
+        for i, d in enumerate(weaviate_data):
+            msg.info(
+                f"({i+1}/{len(weaviate_data)}) Importing document {d.meta['doc_name']}"
+            )
 
             properties = {
                 "text": str(d.content),
@@ -270,9 +308,9 @@ def main() -> None:
 
     with client.batch as batch:
         batch.batch_size = 100
-        for i, d in enumerate(chunked_docs):
+        for i, d in enumerate(chunked_weaviate_data):
             msg.info(
-                f"({i+1}/{len(chunked_docs)}) Importing chunk of {d.meta['doc_name']} ({d.meta['_split_id']})"
+                f"({i+1}/{len(chunked_weaviate_data)}) Importing chunk of {d.meta['doc_name']} ({d.meta['_split_id']})"
             )
 
             uuid_key = str(d.meta["doc_hash"]).strip().lower()
