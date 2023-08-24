@@ -154,8 +154,8 @@
 
 /* Inline code */
 .my-markdown-styles code {
-    background-color: #2c2c2c;
-    color: orange;
+    background-color: #edebeb;
+    color: rgb(44, 161, 58);
     border-radius: 3px;
     padding: 0.2em 0.4em;
 }
@@ -169,10 +169,10 @@
 }
 
 .my-markdown-styles pre code {
-    background-color: transparent;
-    padding: 0;
-    font-size: 0.9em;
-    color: #abb2bf;
+    background-color: #edebeb;
+    color: rgb(44, 161, 58);
+    border-radius: 3px;
+    padding: 0.2em 0.4em;
 }
 
 /* Bold and italic */
