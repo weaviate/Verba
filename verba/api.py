@@ -10,7 +10,7 @@ from pydantic import BaseModel
 
 from dotenv import load_dotenv
 
-from SimpleVerbaEngine import SimpleVerbaQueryEngine
+from VerbaEngine.SimpleVerbaEngine import SimpleVerbaQueryEngine
 
 load_dotenv()
 
@@ -128,7 +128,7 @@ async def get_all_documents():
             }
         )
     except Exception as e:
-        msg.fail(f"Document retrieval failed: {str(e)}")
+        msg.fail(f"All Document retrieval failed: {str(e)}")
         return JSONResponse(
             content={
                 "documents": [],

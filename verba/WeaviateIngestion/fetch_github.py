@@ -54,3 +54,16 @@ def download_file(owner, repo, file_path, token=None) -> str:
     content = base64.b64decode(content_b64).decode("utf-8")
 
     return (content, link, path)
+
+
+def is_link_working(url: str) -> bool:
+    """Validates whether a link is working
+    @parameter url : str - The URL
+    @returns bool - Whether it is a valid url
+    """
+    try:
+        response = requests.get(url, timeout=10)  # Adjust the timeout as needed
+        # Checking if the status code is in the range 200-299 (all success codes)
+        return 200 <= response.status_code < 300
+    except requests.RequestException:
+        return False

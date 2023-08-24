@@ -7,11 +7,23 @@ type DocumentChunk = {
   doc_name: string;
   chunk_id: number;
   doc_uuid: string;
+  doc_type: DocType;
+  _additional: { score: number }
+};
+
+export type DocType = 'Documentation' | 'Blog';
+export const DOC_TYPE_COLORS: Record<DocType, string> = {
+  "Documentation": "bg-green-300",
+  "Blog": "bg-yellow-200"
+};
+
+export const DOC_TYPE_COLOR_HOVER: Record<DocType, string> = {
+  "Documentation": "hover:bg-green-400",
+  "Blog": "hover:bg-yellow-300"
 };
 
 export default function Home() {
 
-  const [settingsOpen, setSettingsOpen] = useState(false);
   const [userInput, setUserInput] = useState('');
   const [documentTitle, setDocumentTitle] = useState("");
   const [documentText, setDocumentText] = useState("");
@@ -104,14 +116,17 @@ export default function Home() {
           <h1 className="text-8xl font-bold mt-2">Verba</h1>
           <p className="text-sm mt-1 text-gray-400">Retrieval Augmented Generation system powered by Weaviate</p>
         </div>
-        <div className="p-1 flex overflow-x-auto justify-center shadow-lg rounded-lg w-full mb-2"> {/* Removed max-width and added w-full to span the full width */}
+        <div className="p-1 flex overflow-x-auto justify-center w-full mb-2">
           {documentChunks.map((chunk, index) => (
             <button
               key={chunk.doc_name + index}
               onClick={() => setFocusedDocument(chunk)}
-              className="bg-green-300 hover:bg-green-400 text-xs font-bold py-2 px-4 mx-2 w-1/2 rounded animate-pop-in" // Added w-1/2 for width, and text-xs for smaller text
             >
-              {index + 1}.  {chunk.doc_name} {/* Display the index number followed by the document name */}
+              <div className={`${DOC_TYPE_COLORS[chunk.doc_type]} rounded-lg text-xs mx-2 p-4 ${DOC_TYPE_COLOR_HOVER[chunk.doc_type]} animate-pop-in`}>
+                <div className='font-bold'>{chunk.doc_name}</div>
+                <div className="text-xs my-2 bg-white bg-opacity-50 p-2 rounded-lg">{chunk.doc_type}</div>
+                <div className="text-xs my-1 bg-white bg-opacity-50 p-2 rounded-lg"> Score {Math.round(chunk._additional.score * 10000)}</div>
+              </div>
             </button>
           ))}
         </div>
@@ -139,7 +154,7 @@ export default function Home() {
             </form>
           </div>
           <div className="w-1/2 space-y-4">
-            <DocumentComponent title={documentTitle} text={documentText} extract={focusedDocument?.text} docLink={documentLink} />
+            <DocumentComponent title={documentTitle} text={documentText} extract={focusedDocument?.text} docLink={documentLink} type={focusedDocument?.doc_type} />
           </div>
         </div>
       </div>

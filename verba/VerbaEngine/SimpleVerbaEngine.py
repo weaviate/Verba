@@ -7,19 +7,16 @@ class SimpleVerbaQueryEngine(VerbaQueryEngine):
         VerbaQueryEngine.client.schema.update_config("Chunk", class_obj)
 
     def query(self, query_string: str) -> tuple:
-        """Execute a query to a receive specific chunks from Weaviate
-        @parameter query_string : str - Search query
-        @returns tuple - (system message, iterable list of results)
-        """
         query_results = (
             VerbaQueryEngine.client.query.get(
                 class_name="Chunk",
-                properties=["text", "doc_name", "chunk_id", "doc_uuid"],
+                properties=["text", "doc_name", "chunk_id", "doc_uuid", "doc_type"],
             )
             .with_hybrid(query=query_string)
             .with_generate(
                 grouped_task=f"You are a chatbot for Weaviate, a vector database, answer the query {query_string} with the given snippets of documentation in 2-3 sentences and if needed give code examples at the end of the answer encapsulated with ```programming-language ```"
             )
+            .with_additional(properties=["score"])
             .with_limit(8)
             .do()
         )
@@ -37,10 +34,6 @@ class SimpleVerbaQueryEngine(VerbaQueryEngine):
         return (system_msg, results)
 
     def retrieve_document(self, doc_id: str) -> dict:
-        """Return a document by it's ID (UUID format) from Weaviate
-        @parameter doc_id : str - Document ID
-        @returns dict - Document dict
-        """
         document = VerbaQueryEngine.client.data_object.get_by_id(
             doc_id,
             class_name="Document",
@@ -48,9 +41,6 @@ class SimpleVerbaQueryEngine(VerbaQueryEngine):
         return document
 
     def retrieve_all_documents(self) -> list:
-        """Return a list of dict of all document names and IDs
-        @returns list - List of dicts
-        """
         query_results = (
             VerbaQueryEngine.client.query.get(
                 class_name="Document", properties=["doc_name", "doc_type", "doc_link"]
