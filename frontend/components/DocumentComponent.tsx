@@ -1,14 +1,44 @@
 import { useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { oneLight } from 'react-syntax-highlighter/dist/cjs/styles/prism';
+import { DocType, DOC_TYPE_COLORS } from '@/pages';
 
 interface DocumentComponentProps {
     title: string;
     text: string;
+    type?: DocType;
     extract?: string;
-    docLink?: string; // Add this line
+    docLink?: string;
 }
 
-export function DocumentComponent({ title, text, extract, docLink }: DocumentComponentProps) {
+const RenderMarkdown = ({ text, type }: { text: string; type: DocType }) => {
+    return (
+        <ReactMarkdown
+            children={text}
+            components={{
+                code({ node, inline, className, children, ...props }) {
+                    const match = /language-(\w+)/.exec(className || '')
+                    return !inline && match ? (
+                        <SyntaxHighlighter
+                            {...props}
+                            children={String(children).replace(/\n$/, '')}
+                            style={oneLight}
+                            language={match[1]}
+                            PreTag="div"
+                        />
+                    ) : (
+                        <code {...props} className={className}>
+                            {children}
+                        </code>
+                    )
+                }
+            }}
+        />
+    );
+}
+
+export function DocumentComponent({ title, text, type = "Documentation", extract, docLink }: DocumentComponentProps) {
     const extractRef = useRef(null);
 
     useEffect(() => {
@@ -21,78 +51,38 @@ export function DocumentComponent({ title, text, extract, docLink }: DocumentCom
         }
     }, [text, extract]);
 
-    if (!title) {
-        return (
-            <div className="">
+    if (!title) return <div className=""></div>;
 
-            </div>
-        );
-    }
-
-    // If extract is not provided, just render the text as-is
-    if (!extract) {
-        // Render the full text if the extract doesn't match
-        return (
-            <div className="border-2 border-gray-900 shadow-lg rounded-xl bg-gray-200 p-2 animate-pop-in overflow-y-auto max-h-[548px] document-container">
-                <div className="bg-green-300 text-black p-4 rounded-t-xl w-full sticky top-0 z-10 shadow-md">
-                    <a href={docLink || '#'} target="_blank" rel="noopener noreferrer">
-                        {title || "Placeholder Title"}
-                    </a>
-                </div>
-                <div className="p-4">
-                    <ReactMarkdown className="pb-3 text-sm my-markdown-styles">
-                        {text}
-                    </ReactMarkdown>
-                </div>
-            </div>
-        );
-    }
-
-    // Find the start and end of the extract within the text
-    const start = text.indexOf(extract);
-    if (start === -1) {
-        console.error("Extract not found within text.");
-        console.log(extract);
-
-        // Render the full text if the extract doesn't match
-        return (
-            <div className="border-2 border-gray-900 shadow-lg rounded-xl bg-gray-200 p-2 animate-pop-in overflow-y-auto max-h-[548px] document-container">
-                <div className="bg-green-300 text-black p-4 rounded-t-xl w-full sticky top-0 z-10 shadow-md">
-                    <a href={docLink || '#'} target="_blank" rel="noopener noreferrer">
-                        {title || "Placeholder Title"}
-                    </a>
-                </div>
-                <div className="p-4">
-                    <ReactMarkdown className="pb-3 text-sm my-markdown-styles">
-                        {text}
-                    </ReactMarkdown>
-                </div>
-            </div>
-        );
-    }
-    const end = start + extract.length;
+    const start = extract ? text.indexOf(extract) : -1;
+    const end = extract ? start + extract.length : -1;
 
     return (
-        <div className="border-2 border-gray-900 shadow-lg rounded-xl bg-gray-200 p-2 animate-pop-in overflow-y-auto max-h-[548px] document-container">
-            <div className="bg-green-300 text-black p-4 rounded-t-xl w-full sticky top-0 z-10 shadow-md">
+        <div className="border-2 border-gray-900 shadow-lg rounded-xl bg-gray-100 p-2 animate-pop-in overflow-y-auto max-h-[548px] document-container">
+            <div className={`${DOC_TYPE_COLORS[type]} text-black p-4 rounded-t-xl w-full sticky top-0 z-10 shadow-md`}>
                 <a href={docLink || '#'} target="_blank" rel="noopener noreferrer">
                     {title || "Placeholder Title"}
                 </a>
             </div>
-            <div className="p-4">
-                <ReactMarkdown className="pb-3 text-sm my-markdown-styles">
-                    {text.slice(0, start)}
-                </ReactMarkdown>
-                <div ref={extractRef} className="bg-green-200 rounded-lg p-3 shadow-lg text-sm">
-                    <ReactMarkdown>
-                        {text.slice(start, end)}
-                    </ReactMarkdown>
-                </div>
-                <ReactMarkdown className="pt-3 text-sm">
-                    {text.slice(end)}
-                </ReactMarkdown>
+            <div className="p-4 my-markdown-styles text-sm font-mono">
+                {start !== -1 && (
+                    <RenderMarkdown text={text.slice(0, start)} type={type} />
+                )}
+                {extract && (
+                    <div ref={extractRef} className={`${DOC_TYPE_COLORS[type]} rounded-lg p-3 shadow-lg text-sm`}>
+                        <RenderMarkdown text={text.slice(start, end)} type={type} />
+                    </div>
+                )}
+                {start !== -1 ? (
+                    <div className='pt-3'>
+                        <RenderMarkdown text={text.slice(end)} type={type} />
+                    </div>
+                ) : (
+                    <RenderMarkdown text={text} type={type} />
+                )}
             </div>
         </div>
     );
 }
+
+
 

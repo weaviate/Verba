@@ -1,17 +1,19 @@
-import weaviate  # type: ignore[import]
 import os
-import openai
 from wasabi import msg  # type: ignore[import]
+
+from util import setup_client
+
 from dotenv import load_dotenv
 
 load_dotenv()
 
 msg.divider("Starting schema creation")
 
-client = weaviate.Client(
-    url=os.environ.get("WEAVIATE_URL"),
-    auth_client_secret=weaviate.AuthApiKey(api_key=os.environ.get("WEAVIATE_API_KEY")),
-    additional_headers={"X-OpenAI-Api-Key": openai.api_key},
+
+client = setup_client(
+    openai_key=os.environ.get("OPENAI_API_KEY", ""),
+    weaviate_url=os.environ.get("WEAVIATE_URL", ""),
+    weaviate_key=os.environ.get("WEAVIATE_API_KEY", ""),
 )
 
 chunk_schema = {
@@ -31,6 +33,11 @@ chunk_schema = {
                     "name": "doc_name",
                     "dataType": ["text"],
                     "description": "Document name",
+                },
+                {
+                    "name": "doc_type",
+                    "dataType": ["text"],
+                    "description": "Document type",
                 },
                 {
                     "name": "doc_uuid",

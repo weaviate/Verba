@@ -8,3 +8,5 @@ farm-haystack
 nltk
 fastapi
 uvicorn
+pytest
+mypy

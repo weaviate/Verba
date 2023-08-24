@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { DocumentComponent } from '../components/DocumentComponent';
 import { FixedSizeList as List } from 'react-window';
+import { DocType, DOC_TYPE_COLORS, DOC_TYPE_COLOR_HOVER } from '@/pages';
 
 type Document = {
     doc_name: string;
-    doc_type: string;
+    doc_type: DocType;
     doc_link: string;
     _additional: { id: string };
 };
@@ -12,6 +13,7 @@ type Document = {
 export default function DocumentOnly() {
     const [documentTitle, setDocumentTitle] = useState("");
     const [documentText, setDocumentText] = useState("");
+    const [documentType, setDocumentType] = useState<DocType>("Documentation");
     const [documentLink, setDocumentLink] = useState("#");
     const [documents, setDocuments] = useState<Document[]>([]);
     const [focusedDocument, setFocusedDocument] = useState<Document | null>(null);
@@ -48,6 +50,7 @@ export default function DocumentOnly() {
                     // Update the document title and text
                     setDocumentTitle(documentData.document.properties.doc_name);
                     setDocumentText(documentData.document.properties.text);
+                    setDocumentType(documentData.document.properties.doc_type)
                     setDocumentLink(documentData.document.properties.doc_link);
                 } catch (error) {
                     console.error("Failed to fetch document:", error);
@@ -73,7 +76,7 @@ export default function DocumentOnly() {
                 </div>
                 <div className="flex w-full space-x-4">
                     {documents.length > 0 && (
-                        <div className="w-1/2 p-2 mt-4 border-2 shadow-lg h-2/3 border-gray-900 rounded-xl animate-pop-in">
+                        <div className="w-1/2 p-2 border-2 shadow-lg h-2/3 border-gray-900 rounded-xl animate-pop-in">
                             <List
                                 height={528}
                                 itemCount={documents.length}
@@ -87,7 +90,7 @@ export default function DocumentOnly() {
                                         className=' w-full p-4 animate-pop-in-late'
                                         onClick={() => setFocusedDocument(documents[index])} // Add click handler
                                     >
-                                        <p className='bg-green-300 p-8 w-full rounded-md shadow-md hover:bg-green-400'>
+                                        <p className={`${DOC_TYPE_COLORS[documents[index].doc_type]} p-8 w-full rounded-md shadow-md ${DOC_TYPE_COLOR_HOVER[documents[index].doc_type]}`}>
                                             {documents[index].doc_name}
                                         </p>
 
@@ -97,7 +100,7 @@ export default function DocumentOnly() {
                         </div>
                     )}
                     <div className="w-1/2 space-y-4">
-                        <DocumentComponent title={documentTitle} text={documentText} extract={''} docLink={documentLink} />
+                        <DocumentComponent title={documentTitle} text={documentText} extract={''} docLink={documentLink} type={documentType} />
                     </div>
                 </div>
             </div>
