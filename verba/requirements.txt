@@ -7,7 +7,7 @@ typer
 farm-haystack
 nltk
 fastapi
-uvicorn
+uvicorn[standard]
 gunicorn
 pytest
 mypy
