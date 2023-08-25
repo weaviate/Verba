@@ -24,7 +24,7 @@ msg.good("Connected to Weaviate Client")
 # FastAPI App
 app = FastAPI()
 
-origins = ["http://localhost:3000"]
+origins = ["http://localhost:3000", "https://verba-o481.onrender.com"]
 
 # Add middleware for handling Cross Origin Resource Sharing (CORS)
 app.add_middleware(
