@@ -2,7 +2,11 @@ import { useState, useEffect, useRef } from "react";
 import { ChatComponent, Message } from "../components/ChatComponent";
 import { DocumentComponent } from "../components/DocumentComponent";
 
-export const apiHost = 'https://verba-private:8001';
+export const apiHost = process.env.NEXT_PUBLIC_VERBA_BACKEND || 'https://localhost:8000';
+
+if (!process.env.VERBA_BACKEND) {
+  console.log("Environment not set")
+}
 
 type DocumentChunk = {
   text: string;
@@ -31,14 +35,39 @@ export default function Home() {
   const [documentText, setDocumentText] = useState("");
   const [documentLink, setDocumentLink] = useState("#");
   const [documentChunks, setDocumentChunks] = useState<DocumentChunk[]>([]);
+  const [apiStatus, setApiStatus] = useState<string>('Offline'); // API status
   const [focusedDocument, setFocusedDocument] = useState<DocumentChunk | null>(
     null
   );
   const [messages, setMessages] = useState<Message[]>([]);
   const [isFetching, setIsFetching] = useState(false);
 
+  // Function for checking the health of the API
+  const checkApiHealth = async () => {
+    try {
+      // Change ENDPOINT based on your setup (Default to localhost:8000)
+      const response = await fetch(apiHost + '/health');
+      const responseData = await response.json();
+
+      if (response.status === 200) {
+        setApiStatus('Online');
+      } else {
+        setApiStatus('Offline');
+      }
+    } catch (error) {
+      setApiStatus('Offline');
+    }
+  };
+
+  // UseEffect hook to check the API health on initial load
+  useEffect(() => {
+    checkApiHealth();
+  }, []);
+
   const handleSendMessage = async (e?: React.FormEvent, message?: string) => {
     e?.preventDefault();
+
+    checkApiHealth()
 
     const sendInput = message || userInput;
 
@@ -89,6 +118,7 @@ export default function Home() {
 
   useEffect(() => {
     const fetchDocument = async () => {
+      checkApiHealth()
       if (focusedDocument && focusedDocument.doc_uuid) {
         try {
           const response = await fetch(apiHost + "/get_document", {
@@ -212,9 +242,20 @@ export default function Home() {
         </div>
         <div className="flex w-full space-x-4">
           <div className="w-1/2 p-2 border-2 shadow-lg h-2/3 border-gray-900 rounded-xl animate-pop-in">
+
             {/* Header */}
             <div className="rounded-t-xl bg-yellow-200 p-4 flex justify-between items-center">
               Verba Chat
+              <div className="text-xs text-white font-mono flex justify-center">
+                <span
+                  className={`rounded-indicator text-white p-2 ${apiStatus === 'Online'
+                    ? 'bg-green-500'
+                    : 'bg-red-500'
+                    }`}
+                >
+                  Demo {apiStatus}
+                </span>
+              </div>
             </div>
 
             {/* ChatComponent */}
@@ -240,7 +281,7 @@ export default function Home() {
               {suggestions.map((suggestion, index) => (
                 <div
                   key={index}
-                  className="p-2 hover:bg-gray-300 cursor-pointer text-sm"
+                  className="p-2 hover:bg-green-200 cursor-pointer text-sm animate-press-in mt-1 hover-container"
                   onClick={() => handleSuggestionClick(suggestion)}
                 >
                   {suggestion}
