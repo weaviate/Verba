@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { ChatComponent, Message } from "../components/ChatComponent";
 import { DocumentComponent } from "../components/DocumentComponent";
 
-export const apiHost = 'verba-private:8001';
+export const apiHost = 'https://verba-private:8001';
 
 type DocumentChunk = {
   text: string;
