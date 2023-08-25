@@ -45,7 +45,7 @@ class GetDocumentPayload(BaseModel):
 
 
 # Define health check endpoint
-@app.get("/health")
+@app.get("/health_verba")
 async def root():
     try:
         if verba_engine.get_client().is_ready():
@@ -71,7 +71,7 @@ async def root():
         )
 
 
-@app.post("/query")
+@app.post("/query_verba")
 async def query(payload: QueryPayload):
     try:
         system_msg, results = verba_engine.query(payload.query)
@@ -93,7 +93,7 @@ async def query(payload: QueryPayload):
         )
 
 
-@app.post("/suggestions")
+@app.post("/suggestions_verba")
 async def suggestions(payload: QueryPayload):
     try:
         suggestions = verba_engine.get_suggestions(payload.query)
@@ -111,7 +111,7 @@ async def suggestions(payload: QueryPayload):
         )
 
 
-@app.post("/get_document")
+@app.post("/get_document_verba")
 async def get_document(payload: GetDocumentPayload):
     msg.info(f"Document ID received: {payload.document_id}")
 
@@ -132,7 +132,7 @@ async def get_document(payload: GetDocumentPayload):
         )
 
 
-@app.get("/get_all_documents")
+@app.get("/get_all_documents_verba")
 async def get_all_documents():
     msg.info(f"Get all documents request received")
 

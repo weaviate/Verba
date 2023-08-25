@@ -46,7 +46,7 @@ export default function Home() {
   const checkApiHealth = async () => {
     try {
       // Change ENDPOINT based on your setup (Default to localhost:8000)
-      const response = await fetch(apiHost + '/health');
+      const response = await fetch(apiHost + '/health_verba');
       const responseData = await response.json();
 
       if (response.status === 200) {
@@ -82,7 +82,7 @@ export default function Home() {
       setIsFetching(true);
 
       try {
-        const response = await fetch(apiHost + "/query", {
+        const response = await fetch(apiHost + "/query_verba", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -121,7 +121,7 @@ export default function Home() {
       checkApiHealth()
       if (focusedDocument && focusedDocument.doc_uuid) {
         try {
-          const response = await fetch(apiHost + "/get_document", {
+          const response = await fetch(apiHost + "/get_document_verba", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -163,7 +163,7 @@ export default function Home() {
 
   const fetchSuggestions = async (query: string) => {
     try {
-      const response = await fetch(apiHost + "/suggestions", {
+      const response = await fetch(apiHost + "/suggestions_verba", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
