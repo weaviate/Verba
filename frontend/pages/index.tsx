@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { ChatComponent, Message } from "../components/ChatComponent";
 import { DocumentComponent } from "../components/DocumentComponent";
 
-export const apiHost = process.env.NEXT_PUBLIC_VERBA_ENDPOINT || 'http://localhost:8000';
+export const apiHost = process.env.VERBA_ENDPOINT || 'http://localhost:8000';
 
 type DocumentChunk = {
   text: string;
@@ -133,7 +133,7 @@ export default function Home() {
 
   const fetchSuggestions = async (query: string) => {
     try {
-      const response = await fetch("http://localhost:8000/suggestions", {
+      const response = await fetch(apiHost + "/suggestions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
