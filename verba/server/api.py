@@ -7,11 +7,13 @@ from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
+
+from pathlib import Path
 from pydantic import BaseModel
 
-from dotenv import load_dotenv
+from verba.retrieval.simple_engine import SimpleVerbaQueryEngine
 
-from verba.retrieval.SimpleVerbaEngine import SimpleVerbaQueryEngine
+from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -41,19 +43,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = Path(__file__).resolve().parent
 
 # Serve the assets (JS, CSS, images, etc.)
 app.mount(
     "/static/_next",
-    StaticFiles(directory=os.path.join(BASE_DIR, "frontend/out/_next")),
+    StaticFiles(directory=BASE_DIR / "frontend/out/_next"),
     name="next-assets",
 )
 
 # Serve the main page and other static files
-app.mount(
-    "/static", StaticFiles(directory=os.path.join(BASE_DIR, "frontend/out")), name="app"
-)
+app.mount("/static", StaticFiles(directory=BASE_DIR / "frontend/out"), name="app")
 
 
 class QueryPayload(BaseModel):
@@ -96,6 +96,7 @@ async def root():
         )
 
 
+# Receive query and return chunks and query answer
 @app.post("/api/query")
 async def query(payload: QueryPayload):
     try:
@@ -118,6 +119,7 @@ async def query(payload: QueryPayload):
         )
 
 
+# Retrieve auto complete suggestions based on user input
 @app.post("/api/suggestions")
 async def suggestions(payload: QueryPayload):
     try:
@@ -136,6 +138,7 @@ async def suggestions(payload: QueryPayload):
         )
 
 
+# Retrieve specific document based on UUID
 @app.post("/api/get_document")
 async def get_document(payload: GetDocumentPayload):
     msg.info(f"Document ID received: {payload.document_id}")
@@ -157,6 +160,7 @@ async def get_document(payload: GetDocumentPayload):
         )
 
 
+## Retrieve all documents imported to Weaviate
 @app.get("/api/get_all_documents")
 async def get_all_documents():
     msg.info(f"Get all documents request received")
