@@ -21,7 +21,7 @@ export default function DocumentOnly() {
     useEffect(() => {
         const fetchAllDocuments = async () => {
             try {
-                const response = await fetch(apiHost + "/get_all_documents_verba");
+                const response = await fetch(apiHost + "/api/get_all_documents");
                 const data = await response.json();
                 console.log(data);
                 // Assuming the data is an array of documents
@@ -38,7 +38,7 @@ export default function DocumentOnly() {
         const fetchDocument = async () => {
             if (focusedDocument && focusedDocument._additional.id) {
                 try {
-                    const response = await fetch(apiHost + "/get_document_verba", {
+                    const response = await fetch(apiHost + "/api/get_document", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",

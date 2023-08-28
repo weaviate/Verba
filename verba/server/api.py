@@ -5,6 +5,8 @@ from wasabi import msg  # type: ignore[import]
 from fastapi import FastAPI, status
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
 from dotenv import load_dotenv
@@ -24,7 +26,11 @@ msg.good("Connected to Weaviate Client")
 # FastAPI App
 app = FastAPI()
 
-origins = ["http://localhost:3000", "https://verba-o481.onrender.com"]
+origins = [
+    "http://localhost:3000",
+    "https://verba-o481.onrender.com",
+    "http://localhost:8000",
+]
 
 # Add middleware for handling Cross Origin Resource Sharing (CORS)
 app.add_middleware(
@@ -33,6 +39,20 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+)
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Serve the assets (JS, CSS, images, etc.)
+app.mount(
+    "/static/_next",
+    StaticFiles(directory=os.path.join(BASE_DIR, "frontend/out/_next")),
+    name="next-assets",
+)
+
+# Serve the main page and other static files
+app.mount(
+    "/static", StaticFiles(directory=os.path.join(BASE_DIR, "frontend/out")), name="app"
 )
 
 
@@ -44,8 +64,13 @@ class GetDocumentPayload(BaseModel):
     document_id: str
 
 
+@app.get("/")
+async def serve_frontend():
+    return FileResponse(os.path.join(BASE_DIR, "frontend/out/index.html"))
+
+
 # Define health check endpoint
-@app.get("/health_verba")
+@app.get("/api/health")
 async def root():
     try:
         if verba_engine.get_client().is_ready():
@@ -71,7 +96,7 @@ async def root():
         )
 
 
-@app.post("/query_verba")
+@app.post("/api/query")
 async def query(payload: QueryPayload):
     try:
         system_msg, results = verba_engine.query(payload.query)
@@ -93,7 +118,7 @@ async def query(payload: QueryPayload):
         )
 
 
-@app.post("/suggestions_verba")
+@app.post("/api/suggestions")
 async def suggestions(payload: QueryPayload):
     try:
         suggestions = verba_engine.get_suggestions(payload.query)
@@ -111,7 +136,7 @@ async def suggestions(payload: QueryPayload):
         )
 
 
-@app.post("/get_document_verba")
+@app.post("/api/get_document")
 async def get_document(payload: GetDocumentPayload):
     msg.info(f"Document ID received: {payload.document_id}")
 
@@ -132,7 +157,7 @@ async def get_document(payload: GetDocumentPayload):
         )
 
 
-@app.get("/get_all_documents_verba")
+@app.get("/api/get_all_documents")
 async def get_all_documents():
     msg.info(f"Get all documents request received")
 

@@ -2,11 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { ChatComponent, Message } from "../components/ChatComponent";
 import { DocumentComponent } from "../components/DocumentComponent";
 
-export const apiHost = process.env.NEXT_PUBLIC_VERBA_BACKEND || 'http://localhost:8000';
-
-if (!process.env.VERBA_BACKEND) {
-  console.log("Environment not set")
-}
+export const apiHost = 'http://localhost:8000';
 
 type DocumentChunk = {
   text: string;
@@ -46,7 +42,7 @@ export default function Home() {
   const checkApiHealth = async () => {
     try {
       // Change ENDPOINT based on your setup (Default to localhost:8000)
-      const response = await fetch(apiHost + '/health_verba');
+      const response = await fetch(apiHost + '/api/health');
 
       if (response.status === 200) {
         setApiStatus('Online');
@@ -81,7 +77,7 @@ export default function Home() {
       setIsFetching(true);
 
       try {
-        const response = await fetch(apiHost + "/query_verba", {
+        const response = await fetch(apiHost + "/api/query", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -120,7 +116,7 @@ export default function Home() {
       checkApiHealth()
       if (focusedDocument && focusedDocument.doc_uuid) {
         try {
-          const response = await fetch(apiHost + "/get_document_verba", {
+          const response = await fetch(apiHost + "/api/get_document", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -162,7 +158,7 @@ export default function Home() {
 
   const fetchSuggestions = async (query: string) => {
     try {
-      const response = await fetch(apiHost + "/suggestions_verba", {
+      const response = await fetch(apiHost + "/api/suggestions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
