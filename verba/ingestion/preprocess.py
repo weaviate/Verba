@@ -1,8 +1,9 @@
+import glob
+import os
+
 from haystack.nodes import PreProcessor
 from haystack.schema import Document
 from verba.ingestion.util import hash_string
-import glob
-import os
 
 from pathlib import Path
 

@@ -1,14 +1,10 @@
-weaviate-client
-python-dotenv
-openai
-black
-wasabi
-typer
-farm-haystack
-nltk
-fastapi
+weaviate-client>=3.23.1
+python-dotenv>=1.0.0
+openai>=0.27.9
+black>=23.7.0
+wasabi>=1.1.2
+farm-haystack>=1.19.0
+nltk>=3.8.1
+fastapi>=0.102.0
 uvicorn[standard]
-gunicorn
-pytest
-mypy
-click
+click>= 8.1.7

@@ -79,6 +79,7 @@ Please note, that importing data will generate cost for your specified OpenAI ac
 **(OPTIONAL) Importing Weaviate:**
 - You can also import all documentation, blog posts, video transcripts, etc from Weaviate. You need to specify your `GITHUB_TOKEN` environment variable to the `.env` file
 - Use `verba weaviate` script to download, process, and import Weaviate data to your cluster.)
+- `verba weaviate --model gpt-4`
 
 ## 💰 Large Language Model (LLM) Costs
 
