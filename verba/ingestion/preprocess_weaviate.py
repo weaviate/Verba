@@ -1,9 +1,7 @@
-import typer
 import os
 
 import re
 
-from haystack.nodes import PreProcessor
 from haystack.schema import Document
 
 from verba.ingestion.fetch_github import (

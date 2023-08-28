@@ -6,11 +6,11 @@ from wasabi import msg
 
 
 class SimpleVerbaQueryEngine(VerbaQueryEngine):
-    def change_generative_model(self, generative_model: str):
-        class_obj = {"moduleConfig": {"generative-openai": {"model": generative_model}}}
-        VerbaQueryEngine.client.schema.update_config("Chunk", class_obj)
-
     def query(self, query_string: str) -> tuple:
+        """Execute a query to a receive specific chunks from Weaviate
+        @parameter query_string : str - Search query
+        @returns tuple - (system message, iterable list of results)
+        """
         # check semantic cache
         results, system_msg = self.retrieve_semantic_cache(query_string)
 
@@ -45,6 +45,10 @@ class SimpleVerbaQueryEngine(VerbaQueryEngine):
         return (system_msg, results)
 
     def retrieve_document(self, doc_id: str) -> dict:
+        """Return a document by it's ID (UUID format) from Weaviate
+        @parameter doc_id : str - Document ID
+        @returns dict - Document dict
+        """
         document = VerbaQueryEngine.client.data_object.get_by_id(
             doc_id,
             class_name="Document",
@@ -52,6 +56,9 @@ class SimpleVerbaQueryEngine(VerbaQueryEngine):
         return document
 
     def retrieve_all_documents(self) -> list:
+        """Return all documents from Weaviate
+        @returns list - Document list
+        """
         query_results = (
             VerbaQueryEngine.client.query.get(
                 class_name="Document", properties=["doc_name", "doc_type", "doc_link"]
@@ -63,7 +70,16 @@ class SimpleVerbaQueryEngine(VerbaQueryEngine):
         results = query_results["data"]["Get"]["Document"]
         return results
 
-    def retrieve_semantic_cache(self, query: str) -> Optional[dict]:
+    # Custom methods
+
+    def retrieve_semantic_cache(
+        self, query: str, dist: float = 0.14
+    ) -> Optional[tuple]:
+        """Retrieve results from semantic cache based on query and distance threshold
+        @parameter query - str - User query
+        @parameter dist - float - Distance threshold
+        @returns Optional[dict] - List of results or None
+        """
         query_results = (
             VerbaQueryEngine.client.query.get(
                 class_name="Cache",
@@ -82,7 +98,7 @@ class SimpleVerbaQueryEngine(VerbaQueryEngine):
 
         result = results[0]
 
-        if query == result["query"] or result["_additional"]["distance"] <= 0.14:
+        if query == result["query"] or result["_additional"]["distance"] <= dist:
             msg.good(f"Retrieved from cache for query {query}")
             return (
                 json.loads(result["results"]),
@@ -93,6 +109,12 @@ class SimpleVerbaQueryEngine(VerbaQueryEngine):
             return None, None
 
     def add_semantic_cache(self, query: str, results: list[dict], system: str) -> None:
+        """Add results to semantic cache
+        @parameter query : str - User query
+        @parameter results : list[dict] - Results from Weaviate
+        @parameter system : str - System message
+        @returns None
+        """
         with VerbaQueryEngine.client.batch as batch:
             batch.batch_size = 1
             properties = {
@@ -104,6 +126,10 @@ class SimpleVerbaQueryEngine(VerbaQueryEngine):
             VerbaQueryEngine.client.batch.add_data_object(properties, "Cache")
 
     def get_suggestions(self, query: str) -> list[str]:
+        """Retrieve suggestions based on user query
+        @parameter query : str - User query
+        @returns list[str] - List of possible autocomplete suggestions
+        """
         query_results = (
             VerbaQueryEngine.client.query.get(
                 class_name="Suggestion",
