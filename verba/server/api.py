@@ -9,7 +9,7 @@ from pydantic import BaseModel
 
 from dotenv import load_dotenv
 
-from VerbaEngine.SimpleVerbaEngine import SimpleVerbaQueryEngine
+from verba.retrieval.SimpleVerbaEngine import SimpleVerbaQueryEngine
 
 load_dotenv()
 

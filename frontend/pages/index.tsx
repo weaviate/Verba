@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { ChatComponent, Message } from "../components/ChatComponent";
 import { DocumentComponent } from "../components/DocumentComponent";
 
-export const apiHost = process.env.NEXT_PUBLIC_VERBA_BACKEND || 'https://localhost:8000';
+export const apiHost = process.env.NEXT_PUBLIC_VERBA_BACKEND || 'http://localhost:8000';
 
 if (!process.env.VERBA_BACKEND) {
   console.log("Environment not set")
@@ -47,7 +47,6 @@ export default function Home() {
     try {
       // Change ENDPOINT based on your setup (Default to localhost:8000)
       const response = await fetch(apiHost + '/health_verba');
-      const responseData = await response.json();
 
       if (response.status === 200) {
         setApiStatus('Online');
@@ -221,7 +220,7 @@ export default function Home() {
             >
               <div
                 className={`${DOC_TYPE_COLORS[chunk.doc_type]
-                  } rounded-lg text-xs hover-container shadow-lg border-2 hover:border-white border-black mx-2 p-4 ${DOC_TYPE_COLOR_HOVER[chunk.doc_type]
+                  } rounded-lg text-xs hover-container shadow-lg border-2 hover:border-white border-black mx-1 h-32 p-3 ${DOC_TYPE_COLOR_HOVER[chunk.doc_type]
                   } animate-pop-in`}
               >
                 <div className="flex items-center">

@@ -6,12 +6,12 @@ import re
 from haystack.nodes import PreProcessor
 from haystack.schema import Document
 
-from verba.WeaviateIngestion.fetch_github import (
+from verba.ingestion.fetch_github import (
     fetch_docs,
     download_file,
     is_link_working,
 )
-from verba.WeaviateIngestion.util import hash_string
+from verba.ingestion.util import hash_string
 
 from wasabi import msg  # type: ignore[import]
 from dotenv import load_dotenv
