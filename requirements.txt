@@ -11,3 +11,4 @@ uvicorn[standard]
 gunicorn
 pytest
 mypy
+click

@@ -11,4 +11,4 @@ python WeaviateIngestion/create-suggestion-schema.py
 python WeaviateIngestion/import_weaviate.py
 
 # Start API
-uvicorn api:app --reload --host 0.0.0.0 --port 8001
+uvicorn api:app --reload --host 0.0.0.0 --port 8000

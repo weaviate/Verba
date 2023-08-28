@@ -1,4 +1,4 @@
-from VerbaEngine.interface import VerbaQueryEngine
+from verba.retrieval.interface import VerbaQueryEngine
 
 from typing import Optional
 import json
@@ -27,7 +27,7 @@ class SimpleVerbaQueryEngine(VerbaQueryEngine):
                 grouped_task=f"You are a chatbot for Weaviate, a vector database, answer the query {query_string} with the given snippets of documentation in 2-3 sentences and if needed give code examples at the end of the answer encapsulated with ```programming-language ```"
             )
             .with_additional(properties=["score"])
-            .with_limit(8)
+            .with_limit(7)
             .do()
         )
 
