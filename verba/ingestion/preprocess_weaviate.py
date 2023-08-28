@@ -12,6 +12,7 @@ from verba.ingestion.fetch_github import (
     is_link_working,
 )
 from verba.ingestion.util import hash_string
+from verba.ingestion.preprocess import chunking_data
 
 from wasabi import msg  # type: ignore[import]
 from dotenv import load_dotenv
@@ -93,39 +94,6 @@ def download_from_github(
     msg.good(f"All {len(raw_docs)} files successfully loaded")
 
     return raw_docs
-
-
-# Chunking
-
-
-def chunking_data(
-    raw_docs: list[Document],
-    split_by: str = "word",
-    split_length: int = 200,
-    split_overlap: int = 100,
-    sentence_boundaries: bool = True,
-) -> list[Document]:
-    """Splits a list of docs into smaller chunks
-    @parameter raw_docs : list[Document] - List of docs
-    @parameter split_by : str - Chunk by words, sentences, or paragrapggs
-    @parameter split_length : int - Chunk length (words, sentences, paragraphs)
-    @parameter split_overlap : int - Overlapping words, sentences, paragraphs
-    @parameter sentence_boundaries : bool - Respect sentence boundaries
-    @returns list[Document] - List of splitted docs
-    """
-    msg.info("Starting splitting process")
-    preprocessor = PreProcessor(
-        clean_empty_lines=False,
-        clean_whitespace=False,
-        clean_header_footer=False,
-        split_by=split_by,
-        split_length=split_length,
-        split_overlap=split_overlap,
-        split_respect_sentence_boundary=sentence_boundaries,
-    )
-    chunked_docs = preprocessor.process(raw_docs)
-    msg.good(f"Successful splitting (total {len(chunked_docs)})")
-    return chunked_docs
 
 
 # Data Filtering

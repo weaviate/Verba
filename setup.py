@@ -7,6 +7,7 @@ setup(
     entry_points={
         "console_scripts": [
             "verba=verba.server.cli_start:cli",
+            "verba-ingest=verba.ingestion.cli:cli",
         ],
     },
     install_requires=[

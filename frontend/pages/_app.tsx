@@ -11,7 +11,7 @@ import "../app/globals.css";
 function MyApp({ Component, pageProps }: AppProps) {
   useEffect(() => {
     const bgUrl = process.env.NODE_ENV === 'production'
-      ? 'public/background.png'
+      ? 'static/background.png'
       : '/background.png';
     document.body.style.backgroundImage = `url('${bgUrl}')`;
     document.body.style.backgroundPosition = "center";
