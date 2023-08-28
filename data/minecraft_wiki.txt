@@ -1,0 +1,821 @@
+
+Main menu
+
+WikipediaThe Free Encyclopedia
+Search Wikipedia
+Search
+Create account
+Log in
+
+Personal tools
+Contents hide
+(Top)
+Gameplay
+Toggle Gameplay subsection
+Development
+Toggle Development subsection
+Reception
+Toggle Reception subsection
+Cultural impact
+Toggle Cultural impact subsection
+Notes
+References
+Toggle References subsection
+External links
+Minecraft
+
+Article
+Talk
+Read
+View source
+View history
+
+Tools
+Page semi-protected
+From Wikipedia, the free encyclopedia
+This article is about the video game. For the franchise, see Minecraft (franchise). For other uses, see Minecraft (disambiguation).
+Minecraft
+The default player skin, Steve, running across a grassy plain while carrying an Iron pickaxe. Alongside him is a tame wolf. In the background, there is a pig, a chicken, a cow, a skeleton, a zombie, and a creeper. Mountains and cliffs fill the background, and the sky is blue, filled with clouds. Hovering over the scene is the Minecraft logo.
+Minecraft: Bedrock Edition box art
+Developer(s)	Mojang Studios[b]
+Publisher(s)	
+Mojang Studios[c]
+Xbox Game Studios[d]
+Sony Interactive Entertainment[e]
+Designer(s)	
+Markus Persson[f]
+Jens Bergensten[g]
+Artist(s)	
+Markus Toivonen
+Jasper Boerstra
+Kristoffer Zetterstrand
+Composer(s)	
+C418
+Lena Raine
+Kumi Tanioka
+Aaron Cherof[h]
+Series	Minecraft
+Engine	Lightweight Java Game Library (Java)
+Render Dragon (Bedrock)
+Platform(s)	
+Windows, macOS, Linux
+Release	
+18 November 2011[a]
+Genre(s)	
+Sandbox, survival
+Mode(s)	
+Single-player, multiplayer
+Minecraft is a 2011 sandbox game developed by Mojang Studios. The game was created by Markus "Notch" Persson in the Java programming language. Following several early private testing versions, it was first made public in May 2009 before being fully released in November 2011, with Notch stepping down and Jens "Jeb" Bergensten taking over development. Minecraft is the best-selling video game in history, with over 238 million copies sold and nearly 140 million monthly active players as of 2021. It has been ported to several platforms.
+
+In Minecraft, players explore a blocky, procedurally generated, three-dimensional world with virtually infinite terrain and may discover and extract raw materials, craft tools and items, and build structures, earthworks, and machines. Depending on their chosen game mode, players can fight hostile mobs, as well as cooperate with or compete against other players in the same world. Game modes include a survival mode (in which players must acquire resources to build in the world and maintain health) and a creative mode (in which players have unlimited resources and access to flight). The game's large community also offers a wide variety of user-generated content, such as modifications, servers, skins, texture packs, and custom maps, which add new game mechanics and possibilities.
+
+Minecraft has received critical acclaim, winning several awards and later being cited as one of the greatest video games ever created. Social media, parodies, adaptations, merchandise, and the annual Minecon conventions played prominent roles in popularizing the game. The game has also been used in educational environments to teach chemistry, computer-aided design, and computer science. In 2014, Mojang and the Minecraft intellectual property were purchased by Microsoft for US$2.5 billion. Several spin-offs have also been made, including Minecraft: Story Mode, Minecraft Earth, Minecraft Dungeons, and the most recent release Minecraft Legends.
+
+Gameplay
+Minecraft is a 3D sandbox game that has no required goals to accomplish, allowing players a large amount of freedom in choosing how to play the game.[17] However, there is an achievement system,[18] known as "advancements" in the Java Edition of the game, "trophies" on the PlayStation ports, and "achievements" in Bedrock Edition and the Xbox ports.[19] Gameplay is in the first-person perspective by default, but players have the option of a third-person perspective.[20] The game world is composed of rough 3D objects—mainly cubes and fluids, and commonly called "blocks"—representing various materials, such as dirt, stone, ores, tree trunks, water, and lava. The core gameplay revolves around picking up and placing these objects. These blocks are arranged in a 3D grid, while players can move freely around the world. Players can "mine" blocks and then place them elsewhere, enabling them to build things.[21] Many commentators have described the game's physics system as unrealistic.[22] The game also contains a material called redstone, which can be used to make primitive mechanical devices, electrical circuits, and logic gates, allowing for the construction of many complex systems.[23]
+
+The default player skin, Steve, stands on a cliffside overlooking a village in a forest. In the distance, there is a small mountain range. The sun is setting to the right, making the sky turn pink and blue.
+An example of Minecraft's procedurally generated terrain, including a village and the default skin Steve
+The game world is virtually infinite and procedurally generated as players explore it, using a map seed that is obtained from the system clock at the time of world creation (or manually specified by the player).[24][25][26] There are limits on vertical movement, but Minecraft allows an infinitely large game world to be generated on the horizontal plane. Due to technical issues when extremely distant locations are reached, however, there is a barrier preventing players from traversing to locations beyond 30 million blocks from the center.[i][obsolete source] The game achieves this by splitting the world data into smaller 16 by 16 sections called "chunks" that are only created or loaded when players are nearby.[24] The world is divided into biomes ranging from deserts to jungles to snowfields;[27][28] the terrain includes plains, mountains, forests, caves, and bodies of water or lava.[26] The in-game time system follows a day and night cycle, with one full cycle lasting for 20 real-time minutes.
+
+Standing on a flat grassy plain against a blue sky, there is a green zombie wearing a blue shirt and purple pants; a large spider with red eyes; a tall, black, slender creature with purple eyes; a green, four-legged creature; and a skeleton.
+Some of Minecraft's monsters, displayed from left to right: a zombie, a spider, an enderman, a creeper, and a skeleton. All are from the Overworld.
+When starting a new world, players must choose one of five game modes, as well as one of four difficulties, ranging from "Peaceful" to "Hard". Increasing the difficulty of the game causes the player to take more damage from mobs (non-player characters), as well as having other difficulty-specific effects. For example, the Peaceful difficulty prevents hostile mobs from spawning, and the Hard difficulty allows players to starve to death if their hunger bar is depleted.[29] Once selected, the difficulty can be changed, but the game mode is locked and can only be changed with cheats.
+
+New players are given a randomly selected default character skin out of 9 possibilities, including Steve or Alex,[30] but the option to create custom skins was made available in 2010.[31] Players encounter various mobs, such as animals, villagers, and hostile creatures.[32] Passive mobs, such as cows, pigs, and chickens, can be hunted for food and crafting materials. They spawn in the daytime, while hostile mobs—including large spiders, skeletons, and zombies—spawn during nighttime or in dark places such as caves.[26] Some hostile mobs, such as zombies, skeletons and drowned (underwater versions of zombies), burn under the sun if they have no headgear.[19] Other creatures unique to Minecraft include the creeper (an exploding creature that sneaks up on the player) and the enderman (a creature with the ability to teleport as well as pick up and place blocks).[33] There are also variants of mobs that spawn in different conditions; for example, zombies have husk and drowned variants that spawn in deserts and oceans, respectively.[34]
+
+Dimensions
+Minecraft has two alternative dimensions besides the Overworld (the main world): the Nether and the End.[33]
+
+The Nether
+The Nether is a hell-like underworld dimension accessed via either a player-built obsidian portal or one of the Ruined Portals randomly generated throughout the world. It contains many unique resources and can be used to travel great distances in the Overworld, due to every block traveled in the Nether being equivalent to 8 blocks traveled in the Overworld.[35] Water cannot exist in the Nether, as it vaporizes instantly.[36] The Nether is mainly populated by pigman-like mobs called piglins and their zombified counterparts, plus floating balloon-like mobs called ghasts.[37] The player can also build an optional boss mob called The Wither out of materials found in the Nether.[38]
+
+The End
+The End is reached by underground portals in the Overworld. It consists of islands floating above a dark, bottomless void. A boss dragon called the Ender Dragon guards the largest, central island.[39] Killing the dragon opens access to an exit portal, which, when entered, cues the game's ending credits and the End Poem, a roughly 1,500-word work written by Irish novelist Julian Gough,[40] which takes about nine minutes to scroll past[41] and is the game's only narrative text[42] and only text of significant length directed at the player.[43]: 10–12  At the conclusion of the credits, the player is teleported back to their respawn point and may continue the game indefinitely.[44]
+
+Game modes
+Survival mode
+The player attempting to make a stone axe by placing the required materials into the crafting grid, a 3x3 block of item spaces hovering over the standard inventory, which is filled with other items.
+The crafting menu in Minecraft, showing the crafting recipe of a stone axe as well as some other blocks and items in the player's inventory
+In survival mode, players have to gather natural resources such as wood and stone found in the environment in order to craft certain blocks and items.[26] Depending on the difficulty, monsters spawn in darker areas outside a certain radius of the character, requiring players to build a shelter at night.[26] The mode also has a health bar which is depleted by attacks from mobs, falls, drowning, falling into lava, suffocation, starvation, and other events.[45] Players also have a hunger bar, which must be periodically refilled by eating food in-game (except in peaceful difficulty).[45][46] If the hunger bar is depleted, automatic healing will stop and eventually health will deplete. Health replenishes when players have a nearly full hunger bar or continuously on peaceful difficulty.[46][47][48]
+
+Players can craft a wide variety of items in Minecraft. Craftable items include armor, which mitigates damage from attacks; weapons (such as swords or axes), which allows monsters and animals to be killed more easily; and tools (such as pickaxes or hoes), which break certain types of blocks more quickly. Some items have multiple tiers depending on the material used to craft them, with higher-tier items being more effective and durable. Players can construct furnaces, which can cook food, process ores, and convert materials into other materials.[49] Players may also exchange goods with a villager (NPC) through a trading system, which involves trading emeralds for different goods and vice versa.[50][32]
+
+The game has an inventory system, allowing players to carry a limited number of items.[51] Upon dying, items in the players' inventories are dropped unless the game is reconfigured not to do so. Players then re-spawn at their spawn point, which by default is where players first spawn in the game and can be reset by sleeping in a bed (in the overworld)[52] or using a respawn anchor (in the Nether).[53] Dropped items can be recovered if players can reach them before they disappear or despawn after 5 minutes. Players may acquire experience points by killing mobs and other players, mining, smelting ores, breeding animals, and cooking food. Experience can then be spent on enchanting tools, armor and weapons.[29] Enchanted items are generally more powerful, last longer, or have other special effects.[29]
+
+Creative mode
+In creative mode, players have access to nearly all resources and items in the game through the inventory menu and can place or remove them instantly.[54] Players can toggle the ability to fly freely around the game world at will, and their characters do not take any damage and are not affected by hunger.[55][56] The game mode helps players focus on building and creating projects of any size without disturbance.[54]
+
+Other game modes
+Minecraft includes other game modes such as spectator mode, which allows players to fly through blocks. Hardcore mode is a survival mode variant in which, upon death, the player may only view the world in spectator mode or return to the game’s menu. This is only available in Java Edition, however.[57] Adventure mode is a survival mode variant with possible restrictions added by a creator of a map.[58][59][60]
+
+Multiplayer
+See also: Minecraft server
+Multiplayer in Minecraft enables multiple players to interact and communicate with each other on a single world. It is available through direct game-to-game multiplayer, LAN play, local split screen (console-only), and servers (player-hosted and business-hosted).[61] Players can run their own servers, use a hosting provider, or connect directly to another player's game via Xbox Live. Single-player worlds have local area network support, allowing players to join a world on locally interconnected computers without a server setup.[62] Minecraft multiplayer servers are guided by server operators, who have access to server commands such as setting the time of day and teleporting players. Operators can also set up restrictions concerning which usernames or IP addresses are allowed or disallowed to enter the server.[61] Multiplayer servers have a wide range of activities, with some servers having their own unique rules and customs. The largest and most popular server is Hypixel, which has been visited by over 14 million unique players.[63][64] Player versus player combat (PvP) can be enabled to allow fighting between players.[65] Many servers have custom plugins that allow actions that are not normally possible.
+
+Minecraft Realms
+In 2013, Mojang announced Minecraft Realms, a server hosting service intended to enable players to run server multiplayer games easily and safely without having to set up their own.[66][67] Unlike a standard server, only invited players can join Realms servers, and these servers do not use IP addresses. Minecraft: Java Edition Realms server owners can invite up to twenty people to play on their server, with up to ten players online at a time. Minecraft Realms server owners can invite up to 3,000 people to play on their server, with up to ten players online at one time.[68] The Minecraft: Java Edition Realms servers do not support user-made plugins, but players can play custom Minecraft maps.[69] Minecraft Realms servers support user-made add-ons, resource packs, behavior packs, and custom Minecraft maps.[68] At Electronic Entertainment Expo 2016, support for cross-platform play between Windows 10, iOS, and Android platforms was added through Realms starting in June 2016,[70] with Xbox One and Nintendo Switch support to come later in 2017,[71] and support for virtual reality devices. On 31 July 2017, Mojang released the beta version of the update allowing cross-platform play.[72] Nintendo Switch support for Realms was released in July 2018.[73]
+
+Customization
+See also: Minecraft modding
+
+A smeltery within the mod Tinkers' Construct
+The modding community consists of fans, users and third-party programmers. Using a variety of application program interfaces that have arisen over time, they have produced a wide variety of downloadable content for Minecraft, such as modifications, texture packs and custom maps. Modifications of the Minecraft code, called mods, add a variety of gameplay changes, ranging from new blocks, items, and mobs to entire arrays of mechanisms.[74][75] The modding community is responsible for a substantial supply of mods from ones that enhance gameplay, such as minimaps,[76] waypoints, and durability counters,[77] to ones that add to the game elements from other video games and media. While a variety of mod frameworks were independently developed by reverse engineering the code, Mojang has also enhanced vanilla Minecraft with official frameworks for modification, allowing the production of community-created resource packs, which alter certain game elements including textures and sounds.[78] Players can also create their own "maps" (custom world save files) which often contain specific rules, challenges, puzzles and quests, and share them for others to play.[79] Mojang added an adventure mode in August 2012[80] and "command blocks" in October 2012,[81] which were created specially for custom maps in Java Edition. Data packs, introduced in version 1.13 of the Java Edition, allow further customization, including the ability to add new advancements, dimensions, functions, loot tables, predicates, recipes, structures, tags, world generation settings, and biomes‌.[82][83]
+
+The Xbox 360 Edition supported downloadable content, which was available to purchase via the Xbox Games Store; these content packs usually contained additional character skins.[84] It later received support for texture packs in its twelfth title update while introducing "mash-up packs", which combined texture packs with skin packs and changes to the game's sounds, music and user interface.[85] The first mash-up pack (and by extension, the first texture pack) for the Xbox 360 Edition was released on 4 September 2013, and was themed after the Mass Effect franchise.[86] Unlike Java Edition, however, the Xbox 360 Edition did not support player-made mods or custom maps.[87] A cross-promotional resource pack based on the Super Mario franchise by Nintendo was released for the Wii U Edition worldwide on 17 May 2016.[88] A mash-up pack based on Fallout was announced for release on the Wii U Edition.[89] In April 2018, malware was discovered in several downloadable user-made Minecraft skins for use with the Java Edition of the game.[90][91] Avast stated that nearly 50,000 accounts were infected, and when activated, the malware would attempt to reformat the user's hard drive.[91][90] Mojang promptly patched the issue, and released a statement stating that "the code would not be run or read by the game itself",[90] and would only run when the image containing the skin itself was opened.[92]
+
+In June 2017, Mojang released an update known as the "Discovery Update" to the Bedrock version of the game.[93] The update includes a new map, a new game mode, the "Marketplace", a catalogue of user-generated content that gives Minecraft creators "another way to make a living from the game", and more.[94][95][96]
+
+Development
+
+Minecraft creator Markus "Notch" Persson at the GDC in 2016
+
+Minecraft lead designer and creative director Jens "Jeb_" Bergensten in 2011
+Java Edition major update release timeline
+Pre-release years in red
+2009	Pre-Classic
+Classic
+Survival Test
+2010	Indev
+Infdev
+Alpha
+Beta
+2011	Beta
+Release 1.0: "Adventure Update"
+2012	1.1
+1.2
+1.3
+1.4: "Pretty Scary Update"
+2013	1.5: "Redstone Update"
+1.6: "Horse Update"
+1.7: "The Update that Changed the World"
+2014	1.8: "Bountiful Update"
+2015
+2016	1.9: "Combat Update"
+1.10: "Frostburn Update"
+1.11: "Exploration Update"
+2017	1.12: "World of Color Update"
+2018	1.13: "Update Aquatic"
+2019	1.14: "Village & Pillage"
+1.15: "Buzzy Bees"
+2020	1.16: "Nether Update"
+2021	1.17: "Caves & Cliffs: Part I"
+1.18: "Caves & Cliffs: Part II"
+2022	1.19: "The Wild Update"
+2023	1.20: "Trails & Tales"
+Before coming up with Minecraft, Markus "Notch" Persson was a game developer with King through March 2009, at the time serving mostly browser games, during which he learnt a number of different programming languages.[97] He would prototype his own games during his off-hours at home, often based on inspiration he found from other games, and participated frequently on the TIGSource forums for independent developers.[97] One of these personal projects was called "RubyDung", a base-building game inspired by Dwarf Fortress, but as an isometric three dimensional game like RollerCoaster Tycoon.[98] He had already made a 3D texture mapper for another zombie game prototype he had started to try to emulate the style of Grand Theft Auto: Chinatown Wars.[99] Among the features in "RubyDung" he explored was a first-person view similar to Dungeon Keeper but at the time, felt the graphics were too pixelated and omitted this mode.[99][100] Around March 2009, Persson left King and joined jAlbum, but otherwise kept working on his prototypes.[101][100][102]
+
+Infiniminer, a block-based open-ended mining game first released in April 2009, sparked Persson's inspiration for how to take "RubyDung" forward.[99] Infiniminer heavily influenced the visual style of gameplay, including bringing back the first-person mode, the "blocky" visual style and the block-building fundamentals.[99] However, unlike Infiniminer, Persson wanted Minecraft to have RPG elements.[103]
+
+The original edition of Minecraft, now known as the Java Edition, was first developed in May 2009. Persson released a test video on YouTube of an early version of Minecraft.[99][104] The base program of Minecraft was completed by Persson over a weekend in that month and a private testing was released on TigIRC on 16 May 2009.[105] The game was first released to the public on 17 May 2009 as a developmental release on TIGSource forums.[106] Persson updated the game based on feedback from the forums.[97][107] This version later became known as the Classic version.[108] Further developmental phases dubbed as Survival Test, Indev, and Infdev were released in 2009 and 2010.[100]
+
+The first major update, dubbed Alpha, was released on 30 June 2010.[109][110] Although Persson maintained a day job with Jalbum.net at first, he later quit in order to work on Minecraft full-time as sales of the alpha version of the game expanded.[111] Persson continued to update the game with releases distributed to users automatically. These updates included new items, new blocks, new mobs, survival mode, and changes to the game's behavior (e.g. how water flows).[111] To back the development of Minecraft, Persson set up a video game company, Mojang, with the money earned from the game.[112][113][114] Mojang co-founders included Jakob Porser, one of Persson's coworkers from King, and Carl Manneh, jAlbum's CEO.[97]
+
+On 11 December 2010, Persson announced that Minecraft was entering its beta testing phase on 20 December 2010.[115] He further stated that bug fixes and all updates leading up to and including the release would still be free.[116] Over the course of the development, Mojang hired several new employees to work on the project.[117]
+
+Mojang moved the game out of beta and released the full version on 18 November 2011.[15] On 1 December 2011, Jens "Jeb" Bergensten took full creative control over Minecraft, replacing Persson as lead designer.[118] On 28 February 2012, Mojang announced that they had hired the developers of the popular "Bukkit" developer API for Minecraft,[65] to improve Minecraft's support of server modifications.[119] This acquisition also included Mojang apparently taking full ownership of the CraftBukkit server mod which enables the use of Bukkit,[120] although the validity of this claim was questioned due to its status as an open-source project with many contributors, licensed under the GNU General Public License and Lesser General Public License.[121]
+
+On 15 September 2014, Microsoft announced a $2.5 billion deal to buy Mojang, along with the ownership of the Minecraft intellectual property.[122][123][124] The deal was suggested by Persson when he posted a tweet asking a corporation to buy his share of the game after receiving criticism for enforcing terms in the game's end-user license agreement (EULA), which had been present in the EULA in the prior three years.[125][126][127] According to Persson, Mojang CEO Carl Manneh received a call from a Microsoft executive shortly after the tweet, asking if Persson was serious about a deal. Mojang was also approached by other companies including Activision Blizzard and Electronic Arts.[127] The deal with Microsoft was arbitrated on 6 November 2014 and led to Persson becoming one of Forbes' "World's Billionaires".[128][129][130][127]
+
+Since the first full release of Minecraft, dubbed the "Adventure Update", the game has been continuously updated with many major updates, available for free to users who have already purchased the game.[131] Early updates frequently introduced gameplay-altering mechanics while more recent updates tend to enhance the game through additional content or tweaks to existing features.[132][better source needed] The most recent major update to the game was "Trails & Tales", which released in June 2023 and added new creatures, biomes, and items.[133]
+
+The original version of the game was renamed to Minecraft: Java Edition on 18 September 2017 to separate it from Bedrock Edition, which was renamed to just Minecraft by the Better Together Update.[134]
+
+The Bedrock Edition has also been regularly updated, with these updates now matching the themes of Java Edition updates. Other versions of the game such as the various console editions and Pocket Edition were either merged into Bedrock or discontinued and as such have not received further updates.[134]
+
+On 16 April 2020, a beta version of Minecraft implementing physically based rendering, ray tracing, and DLSS was released by Nvidia on RTX-enabled GPUs.[135] The final version was released on 8 December 2020.[136]
+
+
+Minecraft: Pocket Edition
+In August 2011, Minecraft: Pocket Edition was released for the Xperia Play on the Android Market as an early alpha version. It was then released for several other compatible devices on 8 October 2011.[137][138] An iOS version of Minecraft was released on 17 November 2011.[139] A port was made available for Windows Phones shortly after Microsoft acquired Mojang.[140] The port concentrates on the creative building and the primitive survival aspect of the game and did not contain all the features of the PC release.[citation needed] On his Twitter account, Jens Bergensten said that the Pocket Edition of Minecraft is written in C++ and not Java, due to iOS not being able to support Java.[141] However, there now exists a way to play Java Edition on both Android and iOS devices.[142][143]
+
+On 10 December 2014, a port of Pocket Edition was released for Windows Phone 8.1.[144] In January 2017, Microsoft announced that it would no longer maintain the Windows Phone versions of Pocket Edition.[145] On 19 December 2016, the full version of Minecraft: Pocket Edition was released on iOS, Android, and Windows Phone.
+
+Pocket Edition was replaced by Minecraft: Bedrock Edition in 2017, enabling cross-platform play with the Xbox One and Nintendo Switch Editions.[146]
+
+
+Legacy Console Editions
+An Xbox 360 version of the game, developed by 4J Studios, was released on 9 May 2012.[147][148] On 22 March 2012, it was announced that Minecraft would be the flagship game in a new Xbox Live promotion called Arcade NEXT.[148] The game differs from the home computer versions in a number of ways, including a newly designed crafting system, the control interface, in-game tutorials, split-screen multiplayer, and the ability to play with friends via Xbox Live.[149][150] The worlds in the Xbox 360 version are also not "infinite", and are essentially barricaded by invisible walls.[150] The Xbox 360 version was originally similar in content to older PC versions, but was gradually updated to bring it closer to the current PC version prior to its discontinuation.[147][151][152] An Xbox One version featuring larger worlds among other enhancements[153] was released on 5 September 2014.[153]
+
+Versions of the game for the PlayStation 3 and PlayStation 4 were released on 17 December 2013 and 4 September 2014 respectively.[6] The PlayStation 4 version was announced as a launch title, though it was eventually delayed.[154][155] A version for PlayStation Vita was also released in October 2014.[156] Like the Xbox versions, the PlayStation versions were developed by 4J Studios.[157]
+
+On 17 December 2015, Minecraft: Wii U Edition was released. The Wii U version received a physical release on 17 June 2016 in North America,[158] in Japan on 23 June 2016,[159] and in Europe on 30 June 2016.[160] A Nintendo Switch version of the game was released on the Nintendo eShop on 11 May 2017, along with a physical retail version set for a later date.[161] During a Nintendo Direct presentation on 13 September 2017, Nintendo announced that Minecraft: New Nintendo 3DS Edition would be available for download immediately after the livestream, and a physical copy available on a later date. The game is only compatible with the New 3DS and New 3DS XL or New 2DS XL systems and does not work with the original 3DS and 3DS XL or 2DS systems.[13]
+
+On 20 September 2017, the Better Together Update was released on the Xbox One, Windows 10, VR, and mobile versions of the game, which used the Pocket Edition engine to enable cross-platform play between each of these versions. This version of the game eventually became known as the Bedrock Edition.[162] Shortly after, the Bedrock Edition was also ported to the Nintendo Switch.
+
+On 18 December 2018, the PlayStation 3, PlayStation Vita, Xbox 360, and Wii U versions of Minecraft received their final update and would later become known as Legacy Console Editions.[163]
+
+On 15 January 2019, the New Nintendo 3DS version of Minecraft received its final update, effectively becoming discontinued as well.[164]
+
+The PlayStation 4 version of Minecraft was updated in December 2019 and became part of the Bedrock Edition, which enabled cross-platform play for users with a free Xbox Live account.[165]
+
+
+Minecraft Education
+Minecraft Education (known as Minecraft: Education Edition until December 2022)[166] is an educational version of the game, designed specifically for use in educational establishments such as schools, and built off of the Bedrock Edition codebase. It is available on Windows 10, MacOS, iPadOS, and ChromeOS.[167][168] It includes a Chemistry Resource Pack,[169] free lesson plans available online, and two free companion applications: Code Connection and Classroom Mode.[170]
+
+An initial beta test was carried out between 9 June and 1 November 2016.[171] The full game was then released on Windows 10 and MacOS on 1 November 2016.[172] On 20 August 2018, Mojang announced that it would bring Education Edition to iPadOS in Autumn 2018. It was released to the App Store on 6 September 2018.[173] On 27 March 2019, it was announced that it would be operated by JD.com in China.[174] On 26 June 2020, a public beta for the Education Edition was made available to Google Play Store compatible Chromebooks. The full game was released to the Google Play Store for Chromebooks on 7 August 2020.[168]
+
+
+Minecraft China
+On 20 May 2016, Minecraft China was announced as a localized edition for China, where it was released under a licensing agreement between NetEase and Mojang.[175] The PC edition was released for public testing on 8 August 2017. The iOS version was released on 15 September 2017, and the Android version was released on 12 October 2017.[176][177][178] The PC edition is based on the original Java Edition, while the iOS and Android mobile version is based on the Bedrock Edition. The edition is free-to-play and had over 300 million players by November 2019.[179]
+
+
+Other PC versions
+Apart from Minecraft: Java Edition, there are other versions of Minecraft for PC, including Minecraft for Windows, Minecraft Classic, Minecraft 4K, and a version for the Raspberry Pi.
+
+Minecraft for Windows
+Minecraft for Windows is exclusive to Microsoft's Windows 10 and Windows 11 operating systems. The beta release for Windows 10 launched on the Windows Store on July 29, 2015.[180]
+
+After nearly one and a half years in beta, Microsoft fully released Minecraft for Windows on December 19, 2016. Called the "Ender Update", this release implemented new features to this version of Minecraft like world templates and add-on packs.[181] This version has the ability to play with Xbox Live friends, and to play local multiplayer with owners of Minecraft on other Bedrock platforms. Other features include the ability to use multiple control schemes such as a gamepad, keyboard, or touchscreen (for Microsoft Surface and other touchscreen-enabled devices). Virtual reality support has been implemented, as well as the ability to record and take screenshots in-game via the Windows built-in GameDVR.[182]
+
+As of 7 June 2022, the Java and Bedrock Editions of Minecraft for Windows were merged into a single title for purchase; those who owned one version would automatically gain access to the other version. Both game versions would otherwise remain separate.[183]
+
+Minecraft 4K
+Minecraft 4K is a simplified version of Minecraft similar to the Classic version that was developed for the Java 4K Game Programming Contest "in way less than 4 kilobytes".[184] The map itself is finite—composed of 64×64×64 blocks—and the same world is generated every time. Players are restricted to placing or destroying blocks, which consist of grass, dirt, stone, wood, leaves, and brick.[185]
+
+Raspberry Pi
+A version of Minecraft for the Raspberry Pi was officially revealed at Minecon 2012. The Pi Edition is based on an alpha version of Pocket Edition with the added ability of using text commands to edit the game world. Players can open the game code and use the Python programming language to manipulate things in the game world.[186] It also includes a scripting API to modify the game, and server software for multiplayer. The game was leaked on 20 December 2012, but was quickly pulled off.[187] It was officially released on 11 February 2013.[188] Mojang stopped providing updates to Minecraft: Raspberry Pi Edition in 2016. It is preinstalled on Raspberry Pi OS and can be downloaded for free from the official Minecraft website.[189]
+
+Music
+Main article: Music of Minecraft
+Minecraft's music and sound effects were produced by German musician Daniel Rosenfeld, better known as C418.[190] The background music in Minecraft is instrumental ambient music.[191] On 4 March 2011, Rosenfeld released a soundtrack titled Minecraft – Volume Alpha; it includes most of the tracks featured in Minecraft, as well as other music not featured in the game.[192] Kirk Hamilton of Kotaku chose the music in Minecraft as one of the best video game soundtracks of 2011.[193] On 9 November 2013, Rosenfeld released the second official soundtrack, titled Minecraft – Volume Beta, which includes the music that was added in later versions of the game.[194][195] A physical release of Volume Alpha, consisting of CDs, black vinyl, and limited-edition transparent green vinyl LPs, was issued by indie electronic label Ghostly International on 21 August 2015.[196][197]
+
+Rosenfeld's music remained the only music in the game until in 2020, "The Nether Update" invited a new composer, Lena Raine. since then, Minecraft has invited more composers with Raine remaining as the new primary composer, such as in 1.18 "Caves & Cliffs" soundtrack, along with Kumi Tanioka, 1.19 "The Wild Update" soundtrack with Samuel Åberg, and 1.20 "Trails and Tales" Soundtrack, with the addition of Aaron Cherof's music. Gareth Coker also composed some of the music for the game's mini games from the Legacy Console editions.[198][199][200][201]
+
+Variants
+Main article: Minecraft (franchise)
+For the tenth anniversary of the game's release, Mojang remade a version of Minecraft Classic in JavaScript and made it available to play online.[202][203] It functions much the same as creative mode, allowing players to build and destroy any and all parts of the world either alone or in a multiplayer server. Environmental hazards such as lava do not damage players, and some blocks function differently since their behavior was later changed during development.[204][205][206]
+
+Around 2011, prior to Minecraft's full release, there had been collaboration between Mojang and The Lego Group to make a Lego brick-based Minecraft game to be called Brickcraft. This would have modified the base Minecraft game to use Lego bricks, which meant adapting the basic 1×1 block to account for larger pieces typically used in Lego sets. Persson had worked on the preliminary version of this game, which he had named "Project Rex Kwon Do" based on the joke from Napoleon Dynamite. Lego had greenlit the project to go forward, and while Mojang had put two developers on the game for six months, they later opted to cancel the project, as Mojang felt that the Lego Group were too demanding on what they could do, according to Mojang's Daniel Kaplan. The Lego Group had considered buying out Mojang to complete the game, but at this point Microsoft made its offer to buy the company for over $2 billion. According to the Lego Group's Ronny Scherer, the company was not yet sure of the potential success of Minecraft at this point and backed off from acquisition after Microsoft brought this offer to Mojang.[207]
+
+Virtual reality
+Early on, Persson planned to support the Oculus Rift with a port of Minecraft. However, after Facebook acquired Oculus in 2013, he abruptly canceled plans noting "Facebook creeps me out."[208] A community-made modification known as Minecraft VR was developed in 2016 to provide virtual reality support to Minecraft: Java Edition oriented towards Oculus Rift hardware. A fork of the Minecraft VR modification known as Vivecraft ported the mod to OpenVR, and is oriented towards supporting HTC Vive hardware.[209] On 15 August 2016, Microsoft launched official Oculus Rift support for Minecraft on Windows 10.[209] Upon its release, the Minecraft VR mod was discontinued by its developer due to trademark complaints issued by Microsoft, and Vivecraft was endorsed by the community makers of the Minecraft VR modification due to its Rift support and being superior to the original Minecraft VR mod.[209] Also available is a Gear VR version, titled Minecraft: Gear VR Edition.[210] Windows Mixed Reality support was added in 2017. On 7 September 2020, Mojang Studios announced that the PlayStation 4 version of the game would be getting PlayStation VR support in the same month.[211] The only officially supported VR versions of Minecraft are the PlayStation 4 version, Minecraft: Gear VR Edition and Minecraft for Windows 10 for Oculus Rift and Windows Mixed Reality headsets.[212][211]
+
+Reception
+Reception
+Aggregate score
+Aggregator	Score
+Metacritic	(PC) 93/100[213]
+(PS4) 89/100[214]
+(XONE) 88/100[215]
+(PS3) 86/100[216]
+(NS) 86/100[217]
+(VITA) 84/100[218]
+(X360) 82/100[219]
+(WIIU) 77/100[220]
+(3DS) 62/100[221]
+(iOS) 53/100[222]
+Review scores
+Publication	Score
+1Up.com	(PC) A+[223]
+Edge	(PC) 9/10[224]
+Eurogamer	(PC) 10/10[33]
+(X360) 9/10[225]
+Game Informer	(PC) 9.25/10[226]
+(X360) 8.75/10[227]
+GameSpot	(PC) 8.5/10[228]
+(X360) 7.0/10[150]
+GameSpy	(PC) [229]
+IGN	(PC) 9.0/10[230]
+(iOS) 7.5/10[231]
+(X360) 8.5/10[87]
+(PS3) 9.5/10[232]
+(PS4) 9.7/10[233]
+(XONE) 9.7/10[233]
+(VITA) 9.5/10[232]
+(NS) 9.5/10[234]
+Nintendo Life	(WII U) 7.5/10[238]
+(3DS) 6.6/10[239]
+(NS) 8.2/10[240]
+PC Gamer (US)	(PC) 96/100[235]
+TouchArcade	(iOS) [236]
+(Version 0.12) [237]
+Critics
+Early versions of Minecraft received critical acclaim, praising the creative freedom it grants players in-game, as well as the ease of enabling emergent gameplay.[241][242][243] Critics have praised Minecraft's complex crafting system, commenting that it is an important aspect of the game's open-ended gameplay.[228] Most publications were impressed by the game's "blocky" graphics, with IGN describing them as "instantly memorable".[17] Reviewers also liked the game's adventure elements, noting that the game creates a good balance between exploring and building.[228] The game's multiplayer feature has been generally received favorably, with IGN commenting that "adventuring is always better with friends".[17] Jaz McDougall of PC Gamer said Minecraft is "intuitively interesting and contagiously fun, with an unparalleled scope for creativity and memorable experiences".[235] It has been regarded as having introduced millions of children to the digital world, insofar as its basic game mechanics are logically analogous to computer commands.[244]
+
+IGN was disappointed about the troublesome steps needed to set up multiplayer servers, calling it a "hassle".[17] Critics also said that visual glitches occur periodically.[228] Despite its release out of beta in 2011, GameSpot said the game had an "unfinished feel", adding that some game elements seem "incomplete or thrown together in haste".[228]
+
+A review of the alpha version, by Scott Munro of the Daily Record, called it "already something special" and urged readers to buy it.[245] Jim Rossignol of Rock Paper Shotgun also recommended the alpha of the game, calling it "a kind of generative 8-bit Lego Stalker".[246] On 17 September 2010, gaming webcomic Penny Arcade began a series of comics and news posts about the addictiveness of the game.[247] The Xbox 360 version was generally received positively by critics, but did not receive as much praise as the PC version. Although reviewers were disappointed by the lack of features such as mod support and content from the PC version, they acclaimed the port's addition of a tutorial and in-game tips and crafting recipes, saying that they make the game more user-friendly.[87] The Xbox One Edition was one of the best received ports, being praised for its relatively large worlds.[248]
+
+The PlayStation 3 Edition also received generally favorable reviews, being compared to the Xbox 360 Edition and praised for its well-adapted controls.[249] The PlayStation 4 edition was the best received port to date, being praised for having 36 times larger worlds than the PlayStation 3 edition and described as nearly identical to the Xbox One edition.[250][248][214] The PlayStation Vita Edition received generally positive reviews from critics but was noted for its technical limitations.[251]
+
+The Wii U version received generally positive reviews from critics but was noted for a lack of GamePad integration.[252] The 3DS version received mixed reviews, being criticized for its high price, technical issues, and lack of cross-platform play.[253] The Nintendo Switch Edition received fairly positive reviews from critics, being praised, like other modern ports, for its relatively larger worlds.[254]
+
+Minecraft: Pocket Edition initially received mixed reviews from critics. Although reviewers appreciated the game's intuitive controls, they were disappointed by the lack of content. The inability to collect resources and craft items, as well as the limited types of blocks and lack of hostile mobs, were especially criticized.[231][255][256] After updates added more content, Pocket Edition started receiving more positive reviews. Reviewers complimented the controls and the graphics, but still noted a lack of content.[231]
+
+Sales
+Minecraft surpassed over a million purchases less than a month after entering its beta phase in early 2011.[257][258] At the same time, the game had no publisher backing and has never been commercially advertised except through word of mouth,[259] and various unpaid references in popular media such as the Penny Arcade webcomic.[260] By April 2011, Persson estimated that Minecraft had made €23 million (US$33 million) in revenue, with 800,000 sales of the alpha version of the game, and over 1 million sales of the beta version.[261] In November 2011, prior to the game's full release, Minecraft beta surpassed 16 million registered users and 4 million purchases.[262] By March 2012, Minecraft had become the 6th best-selling PC game of all time.[263] As of 10 October 2014, the game had sold 17 million copies on PC, becoming the best-selling PC game of all time.[264] On 25 February 2014, the game reached 100 million registered users.[265] By May 2019, 180 million copies had been sold across all platforms, making it the single best-selling video game of all time. The free-to-play Minecraft China version had over 300 million players by November 2019.[266] By April 2021, Minecraft sold more than 238 million copies worldwide.[267]
+
+The Xbox 360 version of Minecraft became profitable within the first day of the game's release in 2012, when the game broke the Xbox Live sales records with 400,000 players online.[268] Within a week of being on the Xbox Live Marketplace, Minecraft sold upwards of a million copies.[269] GameSpot announced in December 2012 that Minecraft sold over 4.48 million copies since the game debuted on Xbox Live Arcade in May 2012.[270] In 2012, Minecraft was the most purchased title on Xbox Live Arcade; it was also the fourth most played title on Xbox Live based on average unique users per day.[271] As of 4 April 2014, the Xbox 360 version has sold 12 million copies.[272] In addition, Minecraft: Pocket Edition has reached a figure of 21 million in sales.[273] The PlayStation 3 Edition sold one million copies in five weeks.[274] The release of the game's PlayStation Vita version boosted Minecraft sales by 79%, outselling both PS3 and PS4 debut releases and becoming the largest Minecraft launch on a PlayStation console.[275] The PS Vita version sold 100,000 digital copies in Japan within the first two months of release, according to an announcement by SCE Japan Asia.[276] By January 2015, 500,000 digital copies of Minecraft were sold in Japan across all PlayStation platforms, with a surge in primary school children purchasing the PS Vita version.[277] As of 2022, the Vita version has sold over 1.65 million physical copies in Japan, making it the best-selling Vita game in the country.[278] Minecraft helped improve Microsoft's total first-party revenue by $63 million for the 2015 second quarter.[279]
+
+The game, including all of its versions, had over 112 million monthly active players by September 2019.[280] On its 11th anniversary in May 2020, the company announced that Minecraft had reached over 200 million copies sold across platforms with over 126 million monthly active players.[281] By April 2021, the number of active monthly users had climbed to 140 million.[282][267][283]
+
+Awards
+In July 2010, PC Gamer listed Minecraft as the fourth-best game to play at work.[284] In December of that year, Good Game selected Minecraft as their choice for Best Downloadable Game of 2010,[285] Gamasutra named it the eighth best game of the year as well as the eighth best indie game of the year,[286][287] and Rock, Paper, Shotgun named it the "game of the year".[288] Indie DB awarded the game the 2010 Indie of the Year award as chosen by voters, in addition to two out of five Editor's Choice awards for Most Innovative and Best Singleplayer Indie.[289] It was also awarded Game of the Year by PC Gamer UK.[290] The game was nominated for the Seumas McNally Grand Prize, Technical Excellence, and Excellence in Design awards at the March 2011 Independent Games Festival and won the Grand Prize and the community-voted Audience Award.[291][292] At Game Developers Choice Awards 2011, Minecraft won awards in the categories for Best Debut Game, Best Downloadable Game and Innovation Award, winning every award for which it was nominated.[293][294] It also won GameCity's video game arts award.[295] On 5 May 2011, Minecraft was selected as one of the 80 games that would be displayed at the Smithsonian American Art Museum as part of The Art of Video Games exhibit that opened on 16 March 2012.[296][297] At the 2011 Spike Video Game Awards, Minecraft won the award for Best Independent Game and was nominated in the Best PC Game category.[298][299] In 2012, at the British Academy Video Games Awards, Minecraft was nominated in the GAME Award of 2011 category and Persson received The Special Award.[300] In 2012, Minecraft XBLA was awarded a Golden Joystick Award in the Best Downloadable Game category,[301] and a TIGA Games Industry Award in the Best Arcade Game category.[302] In 2013, it was nominated as the family game of the year at the British Academy Video Games Awards.[303] Minecraft Console Edition won the award for TIGA Game Of The Year in 2014.[304] In 2015, the game placed 6th on USgamer's The 15 Best Games Since 2000 list.[305] In 2016, Minecraft placed 6th on Time's The 50 Best Video Games of All Time list.[306]
+
+Minecraft was nominated for the 2013 Kids' Choice Awards for Favorite App, but lost to Temple Run.[307] It was nominated for the 2014 Kids' Choice Awards for Favorite Video Game, but lost to Just Dance 2014.[308] The game later won the award for the Most Addicting Game at the 2015 Kids' Choice Awards.[309] In addition, the Java Edition was nominated for "Favorite Video Game" at the 2018 Kids' Choice Awards,[310] while the game itself won the "Still Playing" award at the 2019 Golden Joystick Awards,[311] as well as the "Favorite Video Game" award at the 2020 Kids' Choice Awards.[312] Minecraft also won "Stream Game of the Year" at inaugural Streamer Awards in 2022.[313] The game later garnered a Nickelodeon Kids' Choice Award nomination for Favorite Video Game in 2021,[314] and won the same category in 2022 and 2023.[315][316]
+
+Controversies
+2014 EULA changes
+Microsoft and Mojang announced in 2014 that it would be changing the Minecraft end-user license agreement (EULA) to prohibit servers from accepting donations or payments in exchange for the donating or paying players receiving in-game advantages on such server, essentially banning servers from enacting "pay-to-win" (PTW) servers. Mojang spokesperson Owen Hill provided examples of what it would and would not allow, saying company would allow for pay-to-play servers in which a player is required to pay a fee to access the server, or for cosmetic enhancements (such as in-game costumes or pets), but that Mojang would be cracking down on paying to obtain powerful swords or potions. The new crackdowns were supported by Persson, citing him receiving multiple emails from parents of children who had spent hundreds of dollars on servers. The Minecraft community and server owners, however, heavily despised the new change in enforcement and protested en masse, which included comparing Mojang to monolithic video game publishers like Electronic Arts and Activision, gaming companies often criticized online for their highly restrictive digital rights management and user license agreements. Many argued that the crackdown would force smaller servers to close their doors, and some blamed the crackdown on Mojang attempting to suppress competition for its own Minecraft Realms subscription service.[317]
+
+Account migration
+In 2020, Mojang Studios revealed that it would begin the process of requiring that Microsoft accounts be used in order to log into the Java Edition of the game, and that older Mojang Studios accounts would be sunsetted. The move to Microsoft accounts also required Java Edition players to create Xbox network Gamertags. Mojang Studios defended the move to Microsoft accounts by saying that improved security could be offered, which included Java accounts being able to use two factor authentication, players could block cyberbullies in chat, and improve parental controls. The community responded with intense backlash against this announcement, particularly taking issue to the various technical difficulties encountered in the process and how account migration would be mandatory, even for those who do not play on servers. As of March 10, 2022, Microsoft requires all players to migrate in order to access the Java Edition of Minecraft, with a deadline of September 19, 2023.[318][319]
+
+
+Java Edition chat reporting
+In June 2022, Microsoft and Mojang Studios announced it would be releasing a player reporting feature in all future builds of Java Edition. In earlier development builds, players could report other players on multiplayer servers for sending messages that are prohibited by the Xbox Live Code of Conduct; report categories included profane language, substance abuse, hate speech, threats of violence, and nudity, though Microsoft in later builds has since excluded the profane language category from the player reporting feature. If a player was found to be in violation of Xbox Community Standards, the player would be banned from all servers for a specific period of time or permanently. The update containing the report feature (1.19.1) was released on 27 July 2022.[320]
+
+Microsoft and Mojang Studios received substantial backlash and protest from community members, one of the most common complaints being that banned players would be forbidden from joining any server, even private ones. Others took issue to what they saw as Microsoft increasing control over its player base and exercising censorship,[321][322][323] sparking some to dub the version "1.19.84", in reference to the novel Nineteen Eighty-Four.[324][325]
+
+
+Cultural impact
+
+Cosplay of Minecraft's Steve
+In September 2019, The Guardian classified Minecraft as the best video game of (the first two decades of) the 21st century,[326] and in November 2019 Polygon called the game the "most important game of the decade" in its 2010s "decade in review".[327] In December 2019, Forbes gave Minecraft a special mention in a list of the best video games of the 2010s, stating that the game is "without a doubt one of the most important games of the last ten years."[328] In June 2020, Minecraft was inducted into the World Video Game Hall of Fame.[329]
+
+Minecraft is recognized as one of the first successful games to use an early access model to draw in sales prior to its full release version to help fund development.[330] As Minecraft helped to bolster indie game development in the early 2010s, it also helped to popularize the use of the early access model in indie game development.[331]
+
+
+Jordan Maron (known professionally as "CaptainSparklez") is known for his musical Minecraft parodies of hit songs.
+Social media sites such as YouTube, Facebook, and Reddit played a significant role in popularizing Minecraft.[332] Research conducted by the University of Pennsylvania's Annenberg School of Communication showed that one-third of Minecraft players learned about the game via Internet videos.[333] In 2010, Minecraft-related videos began to gain influence on YouTube, often made by commentators. The videos usually contain screen-capture footage of the game and voice-overs.[334] Common coverage in the videos includes creations made by players, walkthroughs of various tasks, and parodies of works in popular culture. By May 2012, over four million Minecraft-related YouTube videos had been uploaded.[335] The game would go on to be a prominent fixture within YouTube's gaming scene during the entire 2010s; in 2014, it was the second-most searched term on the entire platform.[336] By 2018, it was still YouTube's biggest game globally.[337]
+
+Some popular commentators have received employment at Machinima, a gaming video company that owns a highly watched entertainment channel on YouTube.[334] The Yogscast is a British company that regularly produces Minecraft videos; their YouTube channel has attained billions of views, and their panel at Minecon 2011 had the highest attendance.[334][338] Other well-known YouTube personalities include Jordan Maron, who has created many Minecraft parodies, including "Minecraft Style", a parody of the internationally successful single "Gangnam Style" by South Korean rapper Psy.[339] Minecraft's popularity on YouTube was described by Polygon as quietly dominant, although in 2019, thanks in part to PewDiePie's playthroughs of the game, Minecraft experienced a visible uptick in popularity on the platform.[336][340] YouTube later announced that on 14 December 2021 that the total amount of Minecraft-related views exceeded one trillion since the game's inception in 2009.[341]
+
+Minecraft has been referenced by other video games, such as Torchlight II, Team Fortress 2,[342][343] Borderlands 2, Choplifter HD, Super Meat Boy, The Elder Scrolls V: Skyrim, The Binding of Isaac, The Stanley Parable, FTL: Faster Than Light,[344][345] and Super Smash Bros. Ultimate, the lattermost of which features a downloadable character and stage based on Minecraft.[346] It was also referenced by electronic music artist deadmau5 in his performances.[347] The game is also referenced heavily in "Informative Murder Porn", the second episode of the seventeenth season of the animated television series South Park.[348]
+
+Applications
+The possible applications of Minecraft have been discussed extensively, especially in the fields of computer-aided design (CAD) and education. In a panel at Minecon 2011, a Swedish developer discussed the possibility of using the game to redesign public buildings and parks, stating that rendering using Minecraft was much more user-friendly for the community, making it easier to envision the functionality of new buildings and parks.[334] In 2012, a member of the Human Dynamics group at the MIT Media Lab, Cody Sumter, said: "Notch hasn't just built a game. He's tricked 40 million people into learning to use a CAD program." Various software has been developed to allow virtual designs to be printed using professional 3D printers or personal printers such as MakerBot and RepRap.[349]
+
+In September 2012, Mojang began the Block by Block project in cooperation with UN Habitat to create real-world environments in Minecraft.[350][351] The project allows young people who live in those environments to participate in designing the changes they would like to see. Using Minecraft, the community has helped reconstruct the areas of concern, and citizens are invited to enter the Minecraft servers and modify their own neighborhood. Carl Manneh, Mojang's managing director, called the game "the perfect tool to facilitate this process", adding "The three-year partnership will support UN-Habitat's Sustainable Urban Development Network to upgrade 300 public spaces by 2016." Mojang signed Minecraft building community, FyreUK, to help render the environments into Minecraft. The first pilot project began in Kibera, one of Nairobi's informal settlements and is in the planning phase. The Block by Block project is based on an earlier initiative started in October 2011, Mina Kvarter (My Block), which gave young people in Swedish communities a tool to visualize how they wanted to change their part of town. According to Manneh, the project was a helpful way to visualize urban planning ideas without necessarily having a training in architecture. The ideas presented by the citizens were a template for political decisions.[352][353]
+
+
+A yarn Minecraft sheep
+In April 2014, the Danish Geodata Agency generated all of Denmark in fullscale in Minecraft based on their own geodata.[354] This is possible because Denmark is one of the flattest countries with the highest point at 171 metres (561 ft) (ranking as the country with the 30th smallest elevation span), where the limit in default Minecraft is around 192 metres (630 ft) above in-game sea level.[355][356]
+
+Taking advantage of the game's accessibility where other websites are censored, the non-governmental organization Reporters Without Borders has used an open Minecraft server to create the Uncensored Library, a repository within the game of journalism by authors from countries (including Egypt, Mexico, Russia, Saudi Arabia and Vietnam) who have been censored and arrested, such as Jamal Khashoggi.[357] The neoclassical virtual building was created over about 250 hours by an international team of 24 people.[358]
+
+Despite its unpredictable nature, Minecraft has become a popular game for speedrunning, where players time themselves from being dropped into a new world to reaching The End and defeating the Ender Dragon boss. Some speedrunners use a combination of mods, external programs, and debug menus, while other runners play the game in a more vanilla or more consistency-oriented way.[359][360]
+
+Education
+
+Minecraft being played in an educational setting
+Minecraft has also been used in educational settings.[361] In 2011, an educational organization named MinecraftEdu was formed with the goal of introducing Minecraft into schools. The group works with Mojang to make the game affordable and accessible to schools. The version of Minecraft through MinecraftEdu includes unique features to allow teachers to monitor the students' progress within the virtual world, such as receiving screenshots from students to show completion of a lesson.[362] In September 2012, MinecraftEdu said that approximately 250,000 students around the world have access to Minecraft through the company.[363] A wide variety of educational activities involving the game have been developed to teach students various subjects, including history, language arts and science. For an example, one teacher built a world consisting of various historical landmarks for students to learn and explore.[363] Another teacher created a large-scale representation of an animal cell within Minecraft that student could explore and learn how cell functions work.[362] Great Ormond Street Hospital has been recreated in Minecraft, and it proposed that patients can use it to virtually explore the hospital before they visit it in real life.[364] Minecraft may also prove as an innovation in computer-aided design.[365] Minecraft offers an outlet of collaboration in design and could have an impact on the industry.[366]
+
+With the introduction of redstone blocks to represent electrical circuits, users have been able to build functional virtual computers within Minecraft.[367] Such virtual creations include a working hard drive,[368] an 8-bit virtual computer,[369] and even a smaller-scale version of Minecraft that is playable and able to be built completely in survival mode with no external modifications.[370] In at least one instance, a mod has been created to use this feature to teach younger players how to program within a language set by a virtual computer within a Minecraft world.[371]
+
+Another computational mechanic in Minecraft is the command block, a block that is only accessible in creative mode and can alter game logic. It has been used to create emulators for the Atari 2600 (including one by YouTube personality SethBling)[372][373] and the Game Boy Advance.[374]
+
+In September 2014, the British Museum in London announced plans to recreate its building along with all exhibits in Minecraft in conjunction with members of the public.[375] Microsoft and the non-profit organisation Code.org had teamed up to offer Minecraft-based games, puzzles, and tutorials aimed to help teach children how to program; by March 2018, Microsoft and Code.org reported that more than 85 million children have used their tutorials.[376]
+
+Clones
+After the release of Minecraft, other video games were released with various similarities to Minecraft, and some were described as being "clones". Examples include Ace of Spades, CastleMiner, CraftWorld, FortressCraft, Terraria, BlockWorld 3D, Total Miner,[377] and Minetest.[378] David Frampton, designer of The Blockheads, reported that one failure of his 2D game was the "low resolution pixel art" that too closely resembled the art in Minecraft, which resulted in "some resistance" from fans.[379] A homebrew adaptation of the alpha version of Minecraft for the Nintendo DS, titled DScraft, has been released; it has been noted for its similarity to the original game considering the technical limitations of the system.[380] In response to Microsoft's acquisition of Mojang and their Minecraft IP, various developers announced further clone titles developed specifically for Nintendo's consoles, as they were the only major platforms to not officially receive Minecraft at the time.[381] These clone titles include UCraft (Nexis Games),[382] Cube Life: Island Survival (Cypronia),[383] Discovery (Noowanda),[384] Battleminer (Wobbly Tooth Games),[385] Cube Creator 3D (Big John Games),[386] and Stone Shire (Finger Gun Games).[387] Despite this, the fears of fans were unfounded, with official Minecraft releases on Nintendo consoles eventually resuming.[388][389][11]
+
+Markus Persson made another similar game, Minicraft, for a Ludum Dare competition in 2011.[390]
+
+Minecon
+Main article: Minecon
+Minecon is the annual official fan convention dedicated to Minecraft. The first Minecon was held in November 2011 at the Mandalay Bay Hotel and Casino in Las Vegas.[391] The event included the official launch of Minecraft; keynote speeches, including one by Persson; building and costume contests; Minecraft-themed breakout classes; exhibits by leading gaming and Minecraft-related companies; commemorative merchandise; and autograph and picture times with Mojang employees and well-known contributors from the Minecraft community.[392] In 2016, Minecon was held in-person for the last time, with the following years featuring annual livestreams instead.
+
+Notes
+ Minecraft was first publicly available on 17 May 2009,[14] and was fully released on 18 November 2011.[15]
+ Ports to consoles developed by 4J Studios;[16] New Nintendo 3DS port developed by Other Ocean Interactive.
+ PC/Java, Android, iOS, Wii U, Nintendo 3DS, Nintendo Switch
+ Xbox 360, Xbox One, Windows Phone, Windows 10 Edition
+ PlayStation 3, PlayStation 4, PlayStation Vita
+ 2009–2011
+ 2011–present
+ Additional music has been written by Samuel Åberg and Gareth Coker for various later updates.
+ In a blog post,[24] Persson explains:
+"... let me clarify some things about the "infinite" maps: They're not infinite, but there's no hard limit either. It'll just get buggier and buggier the further out you are. Terrain is generated, saved and loaded, and (kind of) rendered in chunks of 16*16*128 blocks. These chunks have an offset value that is a 32 bit integer roughly in the range negative two billion to positive two billion. If you go outside that range (about 25% of the distance from where you are now to the sun), loading and saving chunks will start overwriting old chunks. At a 16/th of that distance, things that use integers for block positions, such as using items and pathfinding, will start overflowing and acting weird.
+Those are the two "hard" limits."
+References
+ "Minecraft–Pocket Edition–Android". IGN. Archived from the original on 16 November 2012. Retrieved 21 October 2012.
+ "Minecraft: Pocket Edition". GameSpot. CBS Interactive. Archived from the original on 23 October 2012. Retrieved 21 October 2012.
+ Brown, Mark (22 March 2012). "Minecraft for Xbox 360 release date announced, amongst others". Wired UK. Archived from the original on 18 December 2012. Retrieved 22 October 2012.
+ "Minecraft Raspberry Pi". Mojang. Archived from the original on 27 March 2013. Retrieved 27 March 2013.
+ "Amazon's first Fire TV games include in-house titles and Minecraft (update: video)". Engadget. Retrieved 25 September 2018.
+ Pitcher, Jenna (3 September 2014). "Minecraft PS4 Edition Release Date Confirmed". IGN. IGN Entertainment, Inc. Archived from the original on 1 October 2014. Retrieved 3 October 2014.
+ "Minecraft for Xbox One to launch on Friday". CNET. Archived from the original on 7 October 2014. Retrieved 13 October 2014.
+ "Minecraft: PS Vita Edition Release Date Revealed for North America". IGN. 10 October 2014. Archived from the original on 12 October 2014. Retrieved 13 October 2014.
+ "Minecraft Comes to Windows Phones". Mojang. 17 July 2019. Archived from the original on 30 December 2014.
+ "Announcing Minecraft Windows 10 Edition Beta". Archived from the original on 9 July 2015.
+ Makuch, Eddie (7 December 2015). "Minecraft Wii U Confirmed, Coming Very Soon". GameSpot. CBS Interactive. Archived from the original on 7 December 2015. Retrieved 8 December 2015.
+ Jones, Owen (19 December 2016). "minecraft.net – Apple TV Edition released!". Archived from the original on 27 December 2016. Retrieved 30 December 2016.
+ Pereira, Chris (13 September 2017). "New 3DS Version Of Minecraft Announced, Release Date Set For Today". GameSpot. Retrieved 13 September 2017.
+ Persson, Markus (17 May 2009). "Minecraft 0.0.11a for public consumption". The Word of Notch. Archived from the original on 16 July 2015. Retrieved 1 April 2018 – via Tumblr.
+ Fernandez, Carlo (17 November 2012). "Minecraft Full Version Available; MineCon Live Streaming". International Business Times. Archived from the original on 19 November 2011. Retrieved 17 October 2012.
+ Harper, Gavin (23 December 2021). "Minecraft: Gaming 'phenomenon' developed in Dundee passes 1 trillion YouTube views". The Courier. Dundee, Scotland, UK. Retrieved 29 August 2022.
+ Gallegos, Anthony (23 November 2011). "Minecraft Review — PC Review at IGN". IGN. Archived from the original on 6 November 2015. Retrieved 18 December 2011.
+ Meer, Alec (30 March 2011). "Minecraft:Wolves, Achievements, Mods, Merch". Rock Paper Shotgun. Archived from the original on 2 April 2015. Retrieved 26 March 2015.
+ "Advancements in Minecraft". www.digminecraft.com. Retrieved 11 August 2020.
+ Purchese, Robert (23 November 2011). "Minecraft 1.0 launch patch notes". Eurogamer. Eurogamer Network. Archived from the original on 3 February 2013. Retrieved 2 January 2013.
+ Ashdown, Jeremy (11 November 2010). "This is Minecraft". IGN. Archived from the original on 27 January 2013. Retrieved 2 January 2013.
+ Walton, Mark (25 November 2012). "Minecraft In Education: How Video Games Are Teaching Kids". GameSpot. CBS Interactive. Archived from the original on 10 October 2013. Retrieved 15 December 2012.
+ Tito, Greg (4 October 2010). "Player Creates Working Computer in Minecraft". The Escapist. Alloy Digital. Archived from the original on 8 October 2010. Retrieved 4 January 2011.
+ Persson, Markus (10 March 2011). "Terrain generation, Part 1". Mojang. Archived from the original on 12 March 2011. Retrieved 24 October 2010.
+ Bergensten, Jens (23 February 2011). "A Short Demystification of the 'Map Seed'". Mojang. Archived from the original on 7 October 2012. Retrieved 6 October 2012.
+ Miller-Watt, Josh. "Minecraft beginner's guide". GamesRadar. Future plc. Archived from the original on 11 July 2012. Retrieved 24 October 2012.
+ Meer, Alec (27 October 2010). "BiomeShock: The New Minecraft Worlds". Rock Paper Shotgun. Archived from the original on 12 November 2012. Retrieved 2 January 2013.
+ Phillips, Tom (20 January 2012). "Minecraft jungle biome, creatures coming soon". Eurogamer. Eurogamer Network. Archived from the original on 3 February 2013. Retrieved 2 January 2013.
+ Boots-Faubert, Chris. "Controls and Settings – Minecraft". Super Cheats. Videogamer Network. Archived from the original on 11 May 2013. Retrieved 3 January 2013.
+ Webster, Andrew (27 April 2015). "You can finally choose to play as a girl in Minecraft". The Verge.
+ Quach, Michael (7 October 2010). "How to edit your skin in Minecraft". PC Gamer. Retrieved 19 March 2020.
+ Senior, Tom (24 May 2012). "Minecraft update snapshot includes trading, currency, new item and sandstone stairs". PC Gamer. Future plc. Archived from the original on 3 February 2013. Retrieved 2 January 2013.
+ Meer, Alec (18 November 2011). "Minecraft Review • Reviews •". Eurogamer. Eurogamer Network. Archived from the original on 18 December 2011. Retrieved 18 December 2011.
+ Milton, Stephanie; Davies, Marsh (17 December 2018). Minecraft: Guide to Exploration. Random House Publishing Group. ISBN 9780399182013.
+ Francis, Tom (10 October 2010). "A clearer look at Minecraft's new hell dimension". PC Gamer. Future plc. Archived from the original on 1 November 2012. Retrieved 30 October 2012.
+ Roberts, Zachary (30 May 2022). "How to get water in the Nether in Minecraft". www.sportskeeda.com. Retrieved 13 September 2022.
+ Geere, Duncan (11 October 2019). "Visit the Nether!". The Minecraft Official Site. Deep Dives. Microsoft. Retrieved 12 October 2022.
+ Staff, Mojang AB (Firm); Milton, Stephanie (1 September 2017). Minecraft Guide to the Nether and the End. Egmont UK Limited. pp. 32–33. ISBN 9781405285995. Retrieved 29 December 2017 – via Google Books.
+ Liebl, Matt (5 May 2012). "Minecraft: The End, Ender Dragons, and Goop Portal All Explained". GameZone. GameZone Online. Archived from the original on 15 June 2013. Retrieved 31 October 2012.
+ Parker, James (22 May 2014). "Minecraft: The Most Creative Game Ever Made". The Atlantic. Retrieved 1 May 2023.
+ Litchfield, Ted (12 December 2022). "The writer of Minecraft's ending poem wants to 'liberate it from the corporate economy'". PC Gamer. Retrieved 2 May 2023.
+ Moloney, Eoghan (8 December 2022). "Irishman who wrote Minecraft's revered 'End Poem' gives words away for free after declining to sign over rights to Microsoft". Irish Independent. Retrieved 1 May 2023.
+ Anthony, Jason (2015). "Current Key Perspectives in Video Gaming and Religion" (PDF). Gamevironments. University of Bremen (3): 7–15. Retrieved 1 May 2023.
+ Plafke, James (26 December 2012). "How to find the Ender Portal in Minecraft". Geek.com. Archived from the original on 18 November 2018. Retrieved 21 September 2017.
+ "Health, Food, and Experience in Minecraft". www.digminecraft.com. Retrieved 26 July 2021.
+ Lee, Julia (20 August 2020). "How to regain health in Minecraft". Polygon. Retrieved 26 July 2021.
+ "Difficulty Modes in Minecraft". www.digminecraft.com. Retrieved 26 July 2021.
+ Kabra, Akshat (16 May 2022). "What is peaceful mode in Minecraft?". www.sportskeeda.com. Retrieved 4 May 2023.
+ Geere, Duncan (15 September 2017). "Block of the Week: Furnace". Minecraft.net. Retrieved 21 September 2017.
+ Brown, Mark (6 July 2012). "Gaming Minecraft update combines single and multiplayer, adds trading and tripwires". Wired UK. Archived from the original on 23 January 2013. Retrieved 21 November 2012.
+ "Using the Minecraft Inventory and Crafting Grid". dummies. Retrieved 11 August 2020.
+ Walker, John (18 February 2011). "Minecraft Is Getting Ready For Bed". Rock Paper Shotgun. Archived from the original on 9 November 2012. Retrieved 2 January 2013.
+ James, Ford (30 June 2020). "Minecraft Respawn Anchor: How to get one and set your spawn point in the Nether". gamesradar. Retrieved 10 August 2020.
+ Steinlage, Tate (26 September 2012). "Creative Mode coming to Minecraft: Xbox 360 Edition". GameZone. GameZone Online. Archived from the original on 19 May 2013. Retrieved 1 December 2012.
+ Haley, Sebastian (5 September 2012). "Creative Mode 'weeks away' for Minecraft: Xbox 360 Edition". VentureBeat. Archived from the original on 18 November 2012. Retrieved 1 December 2012.
+ Evans-Thirlwell, Edwin (5 September 2012). "Minecraft Xbox 360 update: Creative Mode still "weeks away", 4J dresses Cliffy B up as Creeper". Official Xbox Magazine. Future plc. Archived from the original on 30 April 2014. Retrieved 1 December 2012.
+ Ackroyd, Luke (2 June 2021). "Minecraft: Everything You Need To Know About Hardcore Mode". TheGamer. Retrieved 15 May 2023.
+ Stay, Jesse; Stay, Thomas; Corderio, Thomas (29 December 2014). Minecraft For Dummies. John Wiley & Sons. p. 288. ISBN 9781118537169.
+ Senior, Tom (23 September 2011). "Minecraft hardcore mode teased. When you die, the world dies with you". PC Gamer. Archived from the original on 4 October 2012. Retrieved 25 September 2012.
+ Walker, John (1 August 2012). "Minecraft Updates To 1.3 With Adventure Mode, Trading". Rock Paper Shotgun. Archived from the original on 17 November 2012. Retrieved 4 January 2013.
+ Hutchinson, Lee (10 September 2012). "Blocks with friends: How to run your own Minecraft server". Ars Technica. pp. 1–4. Archived from the original on 15 November 2012. Retrieved 24 November 2012.
+ Meer, Alec (18 June 2012). "Modern! Minecraft Adds 'Local Area Network' Support". Rock Paper Shotgun. Archived from the original on 18 September 2012. Retrieved 25 September 2012.
+ Fogel, Stefanie (13 December 2018). "Creators of Popular 'Minecraft' Server Announce New Game 'Hytale'". Variety. Retrieved 15 December 2018.
+ Jarvey, Natalie (13 December 2018). "Riot Games Leads Investment in Hypixel Game Studio". Tech. The Hollywood Reporter. Retrieved 14 December 2018.
+ Davies, Marsh (24 November 2012). "The Future of Minecraft: what lies ahead for the all-conquering sandbox game?". PC Gamer. Future plc. Archived from the original on 24 November 2012. Retrieved 24 November 2012.
+ Crecente, Brian (18 March 2013). "Minecraft Realms hopes to make an increasingly complex game more family-friendly". Polygon. Archived from the original on 21 March 2013. Retrieved 26 March 2013.
+ Peel, Jeremy (14 March 2013). "Minecraft Realms is a subscription service for families that will "bring in more money than the game itself"". PCGamesN. Retrieved 2 December 2019.
+ "Minecraft Realms". Minecraft.net. 31 July 2017. Retrieved 8 March 2018.
+ Owen (24 October 2014). "Realms is packed with awesome maps". mojang.com. Archived from the original on 10 July 2019. Retrieved 18 September 2017.
+ Frank, Allegra (13 June 2016). "Minecraft gets cross-platform play later this year". Polygon. Archived from the original on 16 June 2016. Retrieved 13 June 2016.
+ Carter, Chris (11 June 2017). "Minecraft is unifying nearly all of its versions across all platforms, except Sony". Destructoid. Archived from the original on 17 June 2017. Retrieved 11 June 2017.
+ Davies, Marsh (31 July 2017). "Beta Test Better Together!". Minecraft.net. Retrieved 1 August 2017.
+ "Minecraft's Aquatic Update Phase Two Gets Wet And Wild Today On Switch". Nintendo Life. 10 July 2018.
+ Peckham, Matt (8 May 2012). "The 10 Best Minecraft Mods". Time. Archived from the original on 30 October 2012. Retrieved 28 October 2012.
+ Senior, Tom (29 February 2012). "Minecraft mod API to be developed by new team at Mojang". PC Gamer. Future plc. Archived from the original on 3 February 2013. Retrieved 28 October 2012.
+ "Xaeros Minimap Mod from CurseForge".
+ "Durability Counter v1.1.1 for Minecraft BE 1.16/1.17.2". For-Minecraft.com.
+ Dyer, Mitch (4 July 2013). "Minecraft 1.6 'Horse Update' Launching in July". IGN. Archived from the original on 8 July 2013.
+ Savage, Phil. "The 25 best Minecraft custom maps". PC Gamer. Future plc. Archived from the original on 23 October 2012. Retrieved 28 October 2012.
+ Grayson, Nathan (6 July 2012). "Minecraft 1.3 Adding LAN, Adventure Mode In August". Rock Paper Shotgun. Archived from the original on 12 November 2012. Retrieved 4 January 2013.
+ Gallegos, Anthony (27 July 2012). "Minecraft Adding New Block". IGN. Archived from the original on 16 December 2012. Retrieved 28 October 2012.
+ Adams, Nathan (25 October 2017). "Minecraft Snapshot 17w43b". Minecraft.net. Retrieved 19 July 2020.
+ Östergård, Adrian (8 July 2020). "Minecraft Snapshot 20w28a". Minecraft.net. Retrieved 19 July 2020.
+ Watts, Steve (3 July 2012). "Minecraft XBLA adding DLC costumes". Shacknews. GameFly. Archived from the original on 4 December 2012. Retrieved 4 November 2012.
+ Borthwick, Ben (24 August 2013). "Minecraft Xbox 360 Title Update 12 out now". OXM UK. Archived from the original on 24 August 2013. Retrieved 8 September 2013.
+ Conditt, Jessica (2 September 2013). "Mass Effect texture pack lands on Minecraft Xbox 360". Joystiq. Archived from the original on 6 September 2013. Retrieved 8 September 2013.
+ Gallegos, Anthony. "Minecraft (Xbox 360 Edition)". IGN. Archived from the original on 11 May 2012. Retrieved 18 December 2011.
+ Webster, Andrew (9 May 2016). "Super Mario is coming to Minecraft". The Verge. Archived from the original on 9 May 2016. Retrieved 9 May 2016.
+ Davies, Marsh (15 December 2016). "Fallout Mash-up Pack Incoming!". Minecraft. Archived from the original on 17 December 2016. Retrieved 15 December 2016.
+ Lilly, Paul (18 April 2018). "Beware of malicious Minecraft skins that attempt to erase your hard drive". PC Gamer. Future Publishing. Archived from the original on 3 April 2021.
+ Fogel, Stefanie (18 April 2018). "Nearly 50,000 'Minecraft' Accounts Infected With Malware Thanks to Modified 'Skins'". Variety. Variety Media. Archived from the original on 10 December 2020. Retrieved 3 April 2021.
+ Fogel, Stefanie (19 April 2018). "'Minecraft' Developer Issues Fix for Skins Virus". Variety. Variety Media. Archived from the original on 7 September 2018. Retrieved 3 April 2021.
+ Lazarides, Tasos (June 2017). "'Minecraft PE' 1.1 Discovery Update Is Out, Adds Minecraft Marketplace, Skyrim Pack, Woodland Mansions, and More". TouchArcade. Archived from the original on 20 June 2022. Retrieved 16 July 2017.
+ Campbell, Colin (10 April 2017). "Minecraft Marketplace offers a new place to buy maps and more". Polygon. Archived from the original on 6 July 2022. Retrieved 17 September 2017.
+ "It's time to discover... Marketplace!". Minecraft.net. 10 April 2017. Archived from the original on 7 July 2022. Retrieved 17 September 2017.
+ "Minecraft: New marketplace for community creators". newsbeat. BBC. 10 April 2017. Archived from the original on 12 November 2020.
+ Cheshire, Tom (15 September 2014). "Changing the game: how Notch made Minecraft a cult hit". Wired. Retrieved 7 May 2020.
+ Cox, Alex (13 June 2018). "The history of Minecraft". TechRadar. Archived from the original on 9 August 2018. Retrieved 17 January 2019.
+ Persson, Markus (30 October 2009). "The origins of Minecraft". Tumblr. Archived from the original on 12 December 2018. Retrieved 7 May 2020.
+ Handy, Alex (23 March 2010). "Interview: Markus 'Notch' Persson Talks Making Minecraft". Gamasutra. Archived from the original on 9 May 2010. Retrieved 26 June 2010.
+ 2 Player Productions (8 November 2013). "Minecraft: The Story of Mojang". YouTube. Archived from the original on 3 May 2014. Retrieved 2 May 2014.
+ Clark, Kristoff (5 March 2012). "Minecraft Mastermind Markus Persson to Receive Bafta Special Award". Gamasutra. Archived from the original on 27 November 2019. Retrieved 15 July 2020.
+ Davies, Marsh (10 November 2012). "Blockbuster – The Making of Minecraft". PC Gamer. Future plc. Archived from the original on 15 December 2012. Retrieved 20 December 2012.
+ Persson, Markus (13 May 2009). "Cave game tech demo". Tumblr. Archived from the original on 11 November 2020. Retrieved 10 November 2020.
+ Persson, Markus (16 May 2009). "Early private singleplayer alpha coming very soon". Tumblr. Archived from the original on 17 November 2020. Retrieved 10 November 2020.
+ "Minecraft (alpha)". forums.tigsource.com. Retrieved 9 August 2020.
+ Smith, Graham (6 February 2012). "The First Moments of Minecraft". PC Gamer. Future plc. Archived from the original on 27 December 2012. Retrieved 1 January 2013.
+ Persson, Markus (28 June 2010). "The server is back up!". Tumblr. Archived from the original on 20 June 2021. Retrieved 10 November 2020.
+ Persson, Markus (30 June 2020). "I fixed a few bugs in /game/, and the game is now playable offline". Tumblr. Archived from the original on 11 November 2020. Retrieved 10 November 2020.
+ Persson, Markus (2 July 2010). "Seecret Friday update the third! OooooOOOoo!". Tumblr. Archived from the original on 13 November 2020. Retrieved 10 November 2020.
+ McDougal, Jaz (29 July 2010). "Community heroes: Notch, for Minecraft". PC Gamer. Future plc. Archived from the original on 12 October 2014. Retrieved 3 August 2010.
+ Cheshire, Tom (6 June 2012). "Changing the game: how Notch made Minecraft a cult hit". Wired UK. Archived from the original on 24 November 2012. Retrieved 18 October 2012.
+ Persson, Markus (28 September 2010). "I'm sorry about the lack of updates". Mojang. Archived from the original on 4 October 2010. Retrieved 18 October 2010.
+ Persson, Markus (6 September 2010). "Hiring some people, getting an office, and all that!". Mojang. Archived from the original on 8 September 2010. Retrieved 6 September 2010.
+ "Minecraft Beta: December 20, 2010". The Word of Notch. Archived from the original on 6 February 2019. Retrieved 9 August 2020.
+ Persson, Markus (11 December 2010). "Minecraft Beta: December 20, 2010". Mojang. Archived from the original on 14 December 2010. Retrieved 21 December 2010.
+ Persson, Markus (3 January 2011). "2011, here we go!". Mojang. Archived from the original on 6 January 2011. Retrieved 3 January 2011.
+ Persson, Markus (2 December 2011). "Och med dom orden så passar jag micken". The Word of Notch (in Swedish). Mojang. Archived from the original on 27 December 2011. Retrieved 2 December 2011.
+ Bergensten, Jens (28 February 2012). "Minecraft Team Strengthened!". Mojang. Archived from the original on 27 September 2013. Retrieved 22 September 2013.
+ Chalk, Andy (21 August 2014). "Minecraft Bukkit team lead tries to end development, but Mojang steps in". PC Gamer. Archived from the original on 24 August 2014. Retrieved 18 March 2020.
+ Walker, Alex (5 September 2014). "Minecraft's CraftBukkit mod taken down by DMCA claim". games.on.net. Archived from the original on 23 November 2015. Retrieved 29 May 2017.
+ Stuart, Keith; Hern, Alex (15 September 2014). "Minecraft sold: Microsoft buys Mojang for $2.5bn". The Guardian. ISSN 0261-3077. Retrieved 9 August 2020.
+ "Minecraft to join Microsoft". The Official Microsoft Blog. 15 September 2014. Retrieved 9 August 2020.
+ "Mojang". www.mojang.com. Retrieved 9 August 2020.
+ Stuart, Keith (24 June 2014). "Minecraft: how a change to the rules is tearing the community apart". The Guardian. ISSN 0261-3077. Retrieved 1 January 2021.
+ Bogart, Nicole (15 September 2014). "Updated: September 15, 2014 8:35 pm Microsoft acquires 'Minecraft' maker for $2.5 billion". Shaw Media. Global News. Archived from the original on 18 May 2015. Retrieved 2 May 2015.
+ Mac, Ryan (3 March 2015). "Inside The Post-Minecraft Life Of Billionaire Gamer God Markus Persson". Forbes. Archived from the original on 20 March 2015. Retrieved 25 March 2015.
+ Peckham, Matt (15 September 2014). "Minecraft Is Now Part of Microsoft, and It Only Cost $2.5 Billion". Time. Archived from the original on 15 September 2014. Retrieved 15 September 2014.
+ Bass, Dina (15 September 2014). "Microsoft to Buy Minecraft Maker Mojang for $2.5 Billion". Bloomberg Business. Archived from the original on 16 September 2014. Retrieved 16 September 2014.
+ Sarkar, Samit (6 November 2014). "Microsoft officially owns Minecraft and developer Mojang now". Polygon. Vox Media. Archived from the original on 30 November 2014.
+ Persson, Markus (18 January 2011). "The web server is struggling, we're migrating". Mojang. Archived from the original on 21 January 2011. Retrieved 26 January 2011.
+ Pentleton, Matthew (15 October 2021). "Every Major Minecraft Update, Ranked". The Gamer. Retrieved 18 June 2022.
+ Dankis, Sofia; Austin, Sophie (26 May 2023). "The Trails & Tales Update Is Coming". Minecraft.net. Retrieved 9 June 2023.
+ Corden, Jez (2 August 2017). "Minecraft "Better Together" FAQ: Xbox and Windows questions answered". Windows Central. Archived from the original on 1 September 2022. Retrieved 5 November 2019.
+ "Minecraft ray tracing is now live on PC—and it's a must-play, if you can". Ars Technica. 19 April 2020. Retrieved 19 April 2020. 'Currently, that limits interested players to Nvidia's "RTX" line of GPUs, since AMD has not yet released its own compatible line. Strangely, a Mojang representative told Ars last week that this week's beta would function on non-RTX graphics cards, albeit at an abysmal frame rate.'
+ Lilly, Paul (8 December 2020). "Minecraft with RTX launches out of beta with a built-in benchmark scene". PC Gamer. Retrieved 8 December 2020.
+ Rose, Mike (21 February 2011). "Official Minecraft iOS, Android Release Coming Later This Year". Gamasutra. Archived from the original on 23 February 2011. Retrieved 22 February 2011.
+ Crecente, Brian (21 February 2011). "Official Minecraft Coming to iPhone, iPad, Android". Kotaku. Gawker Media. Archived from the original on 6 November 2010. Retrieved 22 February 2011.
+ Brown, Mark (16 November 2011). "Minecraft: Pocket Edition arrives on iPhone and iPad". Wired UK. Archived from the original on 18 November 2011. Retrieved 18 November 2011.
+ Makuch, Eddie (10 December 2014). "Minecraft Now Available for Windows Phones, See First Images Here". GameSpot. Archived from the original on 28 February 2015. Retrieved 27 April 2015.
+ "jeb_: PE is in C++". Twitter. 8 October 2011. Archived from the original on 24 October 2013. Retrieved 25 September 2012.
+ "PojavLauncher | PojavLauncher". pojavlauncherteam.github.io. Retrieved 21 June 2022.
+ "How to play Minecraft Java Edition on Android & iOS with Pojav Launcher". XDA. 27 December 2021. Retrieved 21 June 2022.
+ Seppala, Timothy J. (11 December 2014). "Finally, you can now play 'Minecraft' on Windows Phone too". Engadget. AOL. Archived from the original on 11 December 2014. Retrieved 11 December 2014.
+ Bright, Peter (18 January 2017). "Microsoft-owned Minecraft no longer supported on Microsoft-owned Windows Phone/Mobile". Ars Technica. Archived from the original on 18 January 2017. Retrieved 19 January 2017.
+ Thielenhaus, Kevin (13 June 2017). "The Better Together Update Is Coming To Minecraft – Here's Everything It Does". Escapist Magazine. Archived from the original on 18 June 2017. Retrieved 8 March 2018.
+ "Minecraft will feature cross-functionality between the PC and Xbox 360 versions". Microsoft New Center. Microsoft. 6 June 2011. Archived from the original on 13 November 2014. Retrieved 13 November 2014.
+ Hryb, Larry (22 March 2012). "Xbox Live's Major Nelson". majornelson.com. Archived from the original on 19 January 2013. Retrieved 11 January 2013.
+ Rosenberg, Adam (7 May 2012). "Minecraft Xbox 360 Edition review at Digital Trends". Digital Trends. Archived from the original on 10 May 2012.
+ Meunier, Nathan (10 May 2009). "Minecraft: Xbox 360 Edition". GameSpot. CBS Interactive. Archived from the original on 15 December 2013. Retrieved 18 December 2011.
+ Evans-Thirlwell, Edwin (16 October 2012). "Minecraft Xbox 360 update 1.8.2 out today, 10am GMT". Official Xbox Magazine. Future plc. Archived from the original on 30 April 2014. Retrieved 28 October 2012.
+ Evans-Thirlwell, Edwin (2 October 2012). "Minecraft Xbox 360 update 1.8.2 – 4J releases enormous final contents list". Official Xbox Magazine. Future plc. Archived from the original on 30 April 2014. Retrieved 27 October 2012.
+ "Minecraft: Xbox One Edition Announce Trailer". Microsoft. 10 June 2013. Archived from the original on 17 June 2013. Retrieved 11 June 2013.
+ "Gamescom: Minecraft Coming to PS4, PS3, Vita – IGN". Uk.ign.com. 20 August 2013. Archived from the original on 21 November 2014. Retrieved 9 December 2013.
+ Makuch, Eddie (12 November 2013). "Minecraft not launching with PS4". GameSpot. Archived from the original on 14 November 2013. Retrieved 12 November 2013.
+ Campbell, Evan (10 October 2014). "Minecraft: PS Vita Edition Release Date Revealed for North America". IGN. Archived from the original on 6 November 2015. Retrieved 15 February 2015.
+ "Minecraft Wiki: PlayStation 3 Edition". 16 January 2014. Archived from the original on 26 January 2014. Retrieved 16 January 2014.
+ Jenni (9 May 2016). "Super Mario Is Coming To The Minecraft: Wii U Edition This Month". Siliconera. Archived from the original on 14 May 2016. Retrieved 13 May 2016.
+ Agent, Lite (25 May 2016). "Minecraft Wii U Edition Also Coming Out At Retail Next Month in Japan". Perfectly Nintendo. Archived from the original on 25 May 2016. Retrieved 25 May 2016.
+ Whitehead, Thomas (June 2016). "Minecraft: Wii U Edition Gets Its European Retail Release On 30th June". Nintendo Life. Archived from the original on 2 June 2016. Retrieved 2 June 2016.
+ Goldfarb, Andrew (12 April 2017). "Minecraft: Nintendo Switch Version Release Date Announced". IGN. Archived from the original on 13 April 2017. Retrieved 13 April 2017.
+ "The Better Together Update is Here". Minecraft.net. 20 September 2017.
+ Santana, Steven (20 December 2018). "Minecraft No Longer Receiving Updates on Legacy Hardware". DualShockers. Archived from the original on 16 May 2020. Retrieved 19 March 2020.
+ Franzese, Tomas (15 January 2019). "Minecraft: New Nintendo 3DS Edition Receives its Final Update Only Two Years After Launch". DualShockers. Retrieved 12 March 2023.
+ Phillips, Tom (9 December 2019). "Finally, PlayStation gets cross-platform Minecraft tomorrow". Eurogamer. Retrieved 9 December 2019.
+ "Minecraft Education: Product Name change". M365 Admin. 16 December 2022. Retrieved 25 January 2023.
+ "Minecraft: Education Edition officially launches". TechCrunch. 1 November 2016. Archived from the original on 22 November 2016. Retrieved 8 March 2018.
+ "Minecraft: Education Edition Is Now Available On Chromebooks". GameSpot. Retrieved 21 August 2020.
+ "Minecraft Chemistry Update Goes Live". The Journal. 21 February 2018. Archived from the original on 26 February 2018. Retrieved 8 March 2018.
+ "Minecraft: Education Edition: Five Fast Facts You Need to Know". 2 May 2017. Archived from the original on 2 May 2017. Retrieved 8 March 2018.
+ "Beta Version of Minecraft: Education Edition Available for Download for Schools and Educators! Education World". www.educationworld.com. Retrieved 21 August 2020.
+ September 2016, Darren Allan 22 (22 September 2016). "Minecraft: Education Edition starts schooling students on November 1". TechRadar. Retrieved 21 August 2020.
+ "'Minecraft: Education Edition' arrives on iPad in September". Engadget. Retrieved 21 August 2020.
+ "JD.com purchases rights to Minecraft: Education Edition in China". GamesIndustry.biz. Retrieved 21 August 2020.
+ Wilhelm, Parker (20 May 2016). "Minecraft is finally coming to China, but it's not the version you know". TechRadar. Retrieved 21 March 2019.
+ 欢迎回家！《我的世界》中国版PC Java版今日开测. mc.163.com (in Chinese). Retrieved 21 March 2019.
+ 《我的世界》手游今日App Store独家首发. mc.163.com (in Chinese). Retrieved 21 March 2019.
+ 《我的世界》中国版全平台公测今日开启. mc.163.com (in Chinese). Retrieved 12 October 2017.
+ Bailey, Dustin. "Minecraft player count reaches 480 million". PCGamesN. Archived from the original on 19 November 2019. Retrieved 19 November 2019.
+ Good, Owen S. (4 July 2015). "Minecraft: Windows 10 Edition announced; beta begins July 29". Polygon. Vox Media. Archived from the original on 8 July 2015. Retrieved 10 July 2015.
+ McDonald, Kit (20 December 2016). "Minecraft 1.0 release for Windows 10 and Pocket Editions brings Add-On Packages and World Templates". OnMSFT.com. Archived from the original on 20 April 2021. Retrieved 25 December 2021.
+ "Announcing Minecraft Windows 10 edition beta". mojang.com. 4 July 2015. Archived from the original on 1 August 2015. Retrieved 30 July 2015.
+ Capel, Chris (5 June 2022). "Minecraft Java and Bedrock editions are no more… separately". PCGamesN. Retrieved 5 June 2022.
+ "Notch: Minecraft in less than 4k". Twitter. 29 June 2011. Archived from the original on 7 November 2013. Retrieved 25 September 2012.
+ Donlan, Chris (25 November 2011). "The Friday Game: Minecraft 4k". Edge. Future plc. Archived from the original on 4 April 2013. Retrieved 2 October 2012.
+ Protalinski, Emil (24 November 2012). "Minecraft ported to the Raspberry Pi, to be officially released as Minecraft: Pi Edition". The Next Web. Archived from the original on 28 November 2012. Retrieved 28 November 2012.
+ Owen (20 December 2012). "Download Pi Edition now!". Mojang. Archived from the original on 15 February 2013. Retrieved 11 February 2013.
+ Owen (11 February 2013). "Minecraft: Pi Edition is available for download!". Mojang.com. Mojang. Archived from the original on 14 February 2013. Retrieved 18 March 2020.
+ "How To Play Minecraft On Raspberry Pi?". iotTrends.tech. 19 April 2021. Archived from the original on 19 January 2022. Retrieved 13 March 2022.
+ "Minecraft.net Credits". Mojang. Archived from the original on 26 December 2012. Retrieved 1 January 2013.
+ "Minecraft's Composer Explains Why the Music Is 'So Weird'". www.vice.com. 29 June 2015. Retrieved 9 August 2020.
+ "Minecraft Volume Alpha on Bandcamp". 4 March 2011. Archived from the original on 19 September 2012. Retrieved 25 September 2012.
+ Hamilton, Kirk. "All of the Best Video Game Music of 2011". Kotaku. Gawker Media. Archived from the original on 20 November 2012. Retrieved 14 November 2012.
+ "Minecraft Volume Beta on Bandcamp". 9 November 2013. Archived from the original on 9 November 2013. Retrieved 9 November 2013.
+ Stuart, Keith (7 November 2014). "How Daniel Rosenfeld wrote Minecraft's music". The Guardian. Archived from the original on 6 January 2017.
+ "Minecraft soundtrack to receive vinyl release this summer". FACT Magazine: Music News, New Music. 23 June 2015. Archived from the original on 2 July 2015.
+ "C418 presents Minecraft Volume Alpha". Ghostly International. Archived from the original on 29 June 2015. Retrieved 30 November 2015.
+ Wiborgh, Thomas (9 April 2020). "The Sound of Scary". Minecraft.net. Retrieved 1 June 2020.
+ Wakeling, Richard (8 April 2020). "Minecraft's Nether Update Will Have Music From Celeste Composer". GameSpot. Retrieved 8 April 2020.
+ Landin, Per (17 June 2020). "The Nether Update has a date!". Minecraft.net. Retrieved 17 June 2020.
+ Leston, Ryan (20 October 2021). "'Minecraft' just added some new music". NME. Retrieved 28 March 2022.
+ "Minecraft Classic". classic.minecraft.net.
+ Abent, Eric (9 May 2019). "Minecraft Classic can now be played in your web browser". slashgear.com. Retrieved 1 March 2022.
+ Persson, Markus (28 June 2010). "The server is back up!". The Word of Notch. Archived from the original on 20 June 2021. Retrieved 17 September 2017.
+ "Minecraft". Minecraft. 2 July 2010. Archived from the original on 2 July 2010. Retrieved 6 October 2017.
+ "Play Minecraft Classic". Minecraft. 10 September 2015. Archived from the original on 10 September 2015.
+ Stanton, Rich (9 December 2020). "A Lego Minecraft game called 'Brickcraft' was prototyped and greenlit – here's why it never happened". PC Gamer. Retrieved 9 December 2020.
+ Webster, Andrew (25 March 2014). "'Minecraft' creator cancels Oculus Rift version following Facebook acquisition". The Verge. Retrieved 14 September 2017.
+ Orland, Kyle (15 August 2016). "Minecraft VR mod shuts down as Microsoft adds official Rift support". Ars Technica. Archived from the original on 16 August 2016. Retrieved 16 August 2016.
+ "'Minecraft' arrives on Samsung's Gear VR headset". Engadget.
+ "Minecraft adds PS VR support this month". PlayStation. 7 September 2020. Retrieved 8 September 2020.
+ "Virtual Reality". Mojang. 9 June 2021.
+ "Minecraft". Metacritic. Fandom, Inc. Archived from the original on 19 April 2012. Retrieved 15 February 2021.
+ "Minecraft: Playstation 4 Edition". Metacritic. Fandom, Inc. Archived from the original on 21 March 2015. Retrieved 15 February 2021.
+ "Minecraft: Xbox One Edition". Metacritic. Fandom, Inc. Archived from the original on 4 May 2015. Retrieved 14 February 2021.
+ "Minecraft: PlayStation 3 Edition". Metacritic. Fandom, Inc. Archived from the original on 31 January 2014. Retrieved 15 February 2021.
+ "Minecraft (Switch)". Metacritic. Fandom, Inc. Retrieved 15 February 2021.
+ "Minecraft: PlayStation Vita Edition". Metacritic. Fandom, Inc. Archived from the original on 8 May 2015. Retrieved 15 February 2021.
+ "Minecraft: Xbox 360 Edition". Metacritic. Fandom, Inc. Archived from the original on 29 April 2012. Retrieved 15 February 2021.
+ "Minecraft: Wii U Edition". Metacritic. Fandom, Inc. Archived from the original on 9 July 2016. Retrieved 15 February 2021.
+ "Minecraft: New Nintendo 3DS Edition". Metacritic. Fandom, Inc. Retrieved 15 February 2021.
+ "Minecraft: Pocket Edition". Metacritic. Fandom, Inc. Archived from the original on 12 June 2013. Retrieved 15 February 2021.
+ "Minecraft PC Reviews". 1UP.com. Archived from the original on 18 January 2013. Retrieved 18 December 2011.
+ "Minecraft review". Edge. Future plc. 28 November 2011. Archived from the original on 4 April 2013. Retrieved 7 June 2012.
+ Meer, Alec (18 November 2011). "Minecraft: Xbox 360 Edition Review". Eurogamer. Eurogamer Network. Archived from the original on 12 May 2012. Retrieved 18 December 2011.
+ Biessener, Adam (22 November 2011). "More Toy Than Game, But That's Okay − Minecraft − PC". Game Informer. GameStop. Archived from the original on 7 August 2012. Retrieved 25 September 2012.
+ Cork, Jeff (9 May 2012). "Minecraft Xbox 360 Edition". Game Informer. GameStop. Archived from the original on 11 January 2013. Retrieved 2 January 2013.
+ Meunier, Nathan (10 May 2009). "Minecraft Review". GameSpot. CBS Interactive. Archived from the original on 15 October 2013. Retrieved 18 December 2011.
+ "GameSpy: Minecraft Review — Page 1". GameSpy. Glu Mobile. Archived from the original on 1 June 2012. Retrieved 18 December 2011.
+ "Minecraft Review". IGN. 24 November 2011. Retrieved 1 June 2020.
+ Albert, Brian (13 February 2014). "Minecraft: Pocket Edition Review". IGN. IGN Entertainment. Archived from the original on 1 March 2014. Retrieved 28 February 2014.
+ Albert, Brian (24 January 2014). "Minecraft PlayStation 3 Review – IGN". IGN. Archived from the original on 30 January 2014. Retrieved 30 January 2014.
+ Albert, Brian (5 September 2014). "Minecraft PS4 And Xbox One Review – IGN". IGN. Archived from the original on 22 September 2014. Retrieved 22 September 2014.
+ "Minecraft Switch Edition Review". IGN. 7 June 2017. Retrieved 1 June 2020.
+ McDougall, Jaz (24 December 2011). "Minecraft review". PC Gamer. Future US. Archived from the original on 24 April 2015. Retrieved 19 May 2015.
+ Khaw, Cassandra (18 November 2011). "'Minecraft – Pocket Edition' Review – Bigger May Be Better". TouchArcade. Retrieved 20 September 2018.
+ Musgrave, Shaun (1 October 2015). "'Minecraft – Pocket Edition Version 0.12' Review – You've Come A Long Way, Stevie". TouchArcade. Retrieved 20 September 2018.
+ "Minecraft: Wii U Edition". Nintendo Life. 5 February 2016. Retrieved 1 June 2020.
+ "Minecraft: New Nintendo 3DS Edition". Nintendo Life. 30 August 2018. Retrieved 1 June 2020.
+ "Minecraft (Switch)". Nintendo Life. Retrieved 1 June 2020.
+ Rossignol, Jim. "Building-block World". PC Gamer UK. No. 204.
+ Hindes, Daniel. "Trouble Down Mine". PC PowerPlay (169).
+ Reinhart, Brandon (28 July 2010). "Is that an Equalizer in your pocket?". Valve. Archived from the original on 5 July 2011. Retrieved 28 July 2010.
+ Thompson, Clive (14 April 2016). "The Minecraft Generation How a clunky Swedish computer game is teaching millions of children to master the digital world". The New York Times. Archived from the original on 22 April 2016. Retrieved 14 April 2016.
+ Munro, Scott (27 July 2010). "Minecraft (Alpha Review)". Daily Record. Trinity Mirror. Archived from the original on 6 December 2010. Retrieved 3 August 2010.
+ Rossignol, Jim (10 August 2010). "Chockablock: Minecraft Revisited". Rock Paper Shotgun. Archived from the original on 14 September 2010. Retrieved 3 September 2010.
+ Holkins, Jerry (17 September 2010). "Mine All Mine, Part One". Penny Arcade. Archived from the original on 18 September 2010. Retrieved 17 September 2010.
+ Albert, Brian (6 September 2014). "Minecraft PS4 and Xbox One Review". Imagine Games Network. Retrieved 18 June 2022.
+ Woolsey, Cameron. "Minecraft: PlayStation 3 Edition Review". Game Spot. Retrieved 18 June 2022.
+ Nunes, Timothy (16 September 2014). "Minecraft PS4 Review: A creator's and Creeper's playground". Play Station Universe. Retrieved 18 June 2022.
+ Barker, Sammy (24 October 2014). "Minecraft: PS Vita Edition Review". Push Square. Retrieved 18 June 2022.
+ Minuz, Allesandra (24 December 2015). "Minecraft – Review". Imagine Games Network Italy. Retrieved 18 June 2022.
+ Sean, Anthony (21 September 2017). "Minecraft on the go, again!, Minecraft: New Nintendo 3DS Edition Review". Gaming Trend. Retrieved 18 June 2022.
+ Brandt, Oliver (30 May 2017). "Minecraft: Nintendo Switch Edition (eShop) Review". Vooks. Retrieved 18 June 2022.
+ Geere, Duncan (23 November 2011). "Minecraft: Pocket Edition review". Wired UK. Archived from the original on 23 January 2013. Retrieved 2 January 2013.
+ Purewal, Sarah (25 April 2012). "Minecraft Pocket Edition Review: Build Blocky Masterpieces on the Go". PC World. IDG. Archived from the original on 17 November 2015. Retrieved 2 January 2013.
+ Persson, Markus. "Minecraft – Statistics". Mojang. Archived from the original on 14 January 2011. Retrieved 13 January 2011.
+ Reilly, Jim (12 January 2011). "Minecraft Sales Pass One Million". IGN. Archived from the original on 18 June 2013. Retrieved 26 November 2012.
+ Plunkett, Luke (4 January 2011). "Why Minecraft Is So Damn Popular". Kotaku. Gawker Media. Archived from the original on 9 January 2011. Retrieved 12 January 2011.
+ "Mine All Mine, Part One". 17 September 2010. Archived from the original on 23 July 2012. Retrieved 25 September 2012.
+ Orland, Kyle (6 April 2011). "Minecraft Draws Over $33 Million In Revenue From 1.8M Paying Customers". Gamasutra. Archived from the original on 8 April 2011. Retrieved 6 April 2011.
+ "Minecraft beta cracks 4 million". GameSpot. CBS Interactive. 7 November 2011. Archived from the original on 1 March 2014. Retrieved 9 November 2011.
+ Shields, Duncan (22 March 2012). "Top 15 best selling PC games of all time". SK Gaming. Archived from the original on 12 March 2013. Retrieved 16 January 2013.
+ "Built to last: the Minecraft model". The Independent. 10 October 2014. Archived from the original on 23 November 2014. Retrieved 13 November 2014.
+ Reilly, Luke (25 February 2014). "Original Minecraft Reaches 100 Million Registered Users". IGN. Ziff Davis. Archived from the original on 27 February 2014. Retrieved 26 February 2014.
+ Bailey, Dustin. "Minecraft player count reaches 480 million". PCGamesN. Archived from the original on 19 November 2019. Retrieved 19 November 2019.
+ "Minecraft Franchise Fact Sheet" (PDF). news.xbox.com. April 2021. Retrieved 27 October 2021.
+ Reilly, Jim (10 May 2012). "Minecraft Breaks Xbox Live Sales Records". Game Informer. GameStop. Archived from the original on 12 May 2012. Retrieved 11 May 2012.
+ Klepek, Patrick (14 May 2012). "Minecraft for Xbox Live Arcade Sells 1 Million Copies". Giant Bomb. CBS Interactive. Archived from the original on 16 May 2012. Retrieved 18 May 2012.
+ Makuch, Eddie (13 December 2012). "Minecraft franchise sales hit 17.5 million". GameSpot. CBS Interactive. Archived from the original on 17 December 2012. Retrieved 14 December 2012.
+ Nichols, Scott (23 January 2013). "'Black Ops 2', 'Minecraft' top 2012 Xbox Live activity charts". Digital Spy. Archived from the original on 23 January 2013. Retrieved 26 January 2013.
+ Phillips, Tom (4 April 2014). "Minecraft: Xbox 360 Edition sales hit 12m". Eurogamer. Gamer Network. Archived from the original on 6 April 2014. Retrieved 4 April 2014.
+ Hill, Owen (14 April 2014). "Watch our Pocket Edition stream. Now with footage!". Mojang. Archived from the original on 25 July 2014. Retrieved 31 July 2014.
+ Wawro, Alex (24 January 2014). "Minecraft on PS3 breaks 1 million sales in five weeks". Gamasutra. Think Services. Archived from the original on 29 January 2014. Retrieved 25 January 2014.
+ Wesley Yin-Poole (17 November 2014). "Assassin's Creed: Unity launch beats Black Flag's in UK chart". Eurogamer. Archived from the original on 18 November 2014. Retrieved 7 November 2014.
+ 2014-12-17, Minecraft On Vita Sells 100,000 Via Downloads In Japan Archived 24 February 2015 at the Wayback Machine, Siliconera
+ 国内PS版の『マインクラフト』が50万DLを突破、PS Vita版が牽引し小学生のあいだでブームの兆し [Domestic PlayStation version of Minecraft tops 500,000 downloads, signs of the PS Vita version booming amongst elementary school students]. Famitsu (in Japanese). 25 February 2015. Archived from the original on 25 February 2015. Retrieved 25 February 2015.
+ 2022ゲーム産業白書 (2022 Game Industry White Paper). Media Create. 2022. ISBN 978-4909977199.
+ Makuch, Eddie (21 July 2015). "Xbox Sales Rising, as Minecraft Continues to Perform Well for Microsoft". GameSpot. CBS Interactive. Archived from the original on 22 July 2015. Retrieved 22 July 2015.
+ Fingas, Jon. "'Minecraft' now has 112 million monthly players". Engadget. Retrieved 16 September 2019.
+ Warren, Tom (18 May 2020). "Minecraft still incredibly popular as sales top 200 million and 126 million play monthly". The Verge. Retrieved 18 May 2020.
+ "Minecraft Reached 140 Million Monthly Users And Generated Over $350 Million To Date". GameSpot. Retrieved 9 September 2021.
+ "Minecraft now has nearly 140 million monthly active users and over 1 billion mod and add-on downloads". Windows Central. 27 April 2021. Retrieved 9 September 2021.
+ Rossignol, Jim (5 July 2010). "50 Games to Play at Work". PC Gamer. Future plc. Archived from the original on 9 July 2010.
+ Bendixsen, Stephanie; O'Donnell, Steven (6 December 2010). "GG Awards 2010: Best Downloadable Game". Good Game. Season 5. Episode 43. Archived from the original on 11 December 2010.
+ "Gamasutra's Best Of 2010: The Top 10 Games of the Year". Gamasutra. 23 December 2010. Archived from the original on 25 December 2010. Retrieved 23 December 2010.
+ "Gamasutra's Best of 2010: Top 10 Indie Games". Gamasutra. 17 December 2010. Archived from the original on 20 December 2010. Retrieved 23 December 2010.
+ "The Games Of Christmas '10: Day 24". Rock Paper Shotgun. 25 December 2010. Archived from the original on 26 December 2010. Retrieved 24 December 2010.
+ "Winners – 2010 Indie of the Year Awards – Indie DB". Indie DB. 24 December 2010. Archived from the original on 30 October 2010. Retrieved 27 December 2010.
+ "Minecraft – PC Gamer UK's Game of the Year". PC Gamer. Future plc. 31 December 2010. Archived from the original on 3 January 2011. Retrieved 31 December 2010.
+ Carless, Simon (3 January 2011). "2011 Independent Games Festival Reveals Main Competition Finalists". IndieGames. Archived from the original on 6 January 2011. Retrieved 3 January 2011.
+ "Minecraft, Amnesia Top Winners At 13th Annual IGF Awards". IndieGames. 1 March 2011. Archived from the original on 6 March 2011. Retrieved 3 March 2011.
+ "Game Developers' Choice Online Awards Honor Rift, Minecraft, and Everquest". Kotaku. Gawker Media. 12 October 2011. Archived from the original on 20 March 2012. Retrieved 23 April 2012.
+ "Game Developers Choice Awards". Gamechoiceawards.com. Archived from the original on 27 January 2013. Retrieved 23 April 2012.
+ Kelion, Leo (29 October 2011). "Minecraft awarded GameCity videogame arts prize". BBC News. Archived from the original on 14 December 2012. Retrieved 25 September 2012.
+ "The Smithsonian Has Picked the Games of Its Art of Video Games Exhibit". Kotaku. Gawker Media. 5 May 2011. Archived from the original on 6 November 2010.
+ "The Art of Video Games". Smithsonian American Art Museum. Archived from the original on 10 January 2011. Retrieved 23 November 2013.
+ "Spike Announces VGA Nominees & Honors "Legend Of Zelda" With First Ever Video Game Hall Of Fame Award" (Press release). Spike TV. 16 November 2011. Archived from the original on 21 September 2013. Retrieved 2 August 2013.
+ "SPIKE TV ANNOUNCES 2011 "VIDEO GAME AWARDS" WINNERS" (Press release). Spike TV. 10 December 2011. Archived from the original on 27 September 2013. Retrieved 2 August 2013.
+ "Video Games Awards Winners & Nominees in 2012". British Academy of Film and Television Arts. 12 February 2012. Archived from the original on 7 March 2012. Retrieved 30 December 2012.
+ Robinson, Andy (26 October 2012). "GJA: Minecraft XBLA awarded Best Downloadable Game". Computer and Video Games. Future plc. Archived from the original on 31 October 2012. Retrieved 5 November 2012.
+ Martin, Liam (2 November 2012). "TIGA Games Industry Awards 2012 winners revealed, Dear Esther wins big". Digital Spy. Archived from the original on 9 May 2013. Retrieved 5 November 2012.
+ Stuart, Keith (12 February 2013). "Bafta Video Game Awards 2013 – nominees announced". The Guardian. Archived from the original on 26 October 2014. Retrieved 1 February 2015.
+ Hillier, Brenna (7 November 2014). "Minecraft console takes out TIGA game of the year award". VG247. Archived from the original on 26 February 2015. Retrieved 14 February 2015.
+ Williams, Mike (3 August 2015). "The 15 Best Games Since 2000, Number 6: Minecraft". USgamer. Gamer Network. Archived from the original on 4 August 2015. Retrieved 4 August 2015.
+ "The 50 Best Video Games of All Time". Time. 23 August 2016. Archived from the original on 26 August 2016. Retrieved 19 September 2016.
+ Bell, Amy (24 March 2013). "Nickelodeon Kids' Choice Awards 2013: Winners in full". Digital Spy. Archived from the original on 17 August 2020. Retrieved 14 March 2023.
+ Couch, Aaron; Washington, Arlene (29 March 2014). "Nickelodeon's Kids' Choice Awards: The Winners". The Hollywood Reporter. Archived from the original on 1 April 2022. Retrieved 14 March 2023.
+ "Full List: Winners, 2015 Nickelodeon Kids' Choice Awards". Rappler. 29 March 2015. Archived from the original on 10 May 2022. Retrieved 14 March 2023.
+ "Kids' Choice Awards: Complete List of Winners". The Hollywood Reporter. 24 March 2018. Archived from the original on 13 May 2018. Retrieved 14 March 2023.
+ GamesRadar staff (15 November 2019). "Here's every winner from this year's Golden Joystick Awards, including the Ultimate Game of the Year". GamesRadar+. Retrieved 16 November 2019.
+ Gennis, Sadie (3 May 2020). "Kids Choice Awards 2020: Full Winners List". TV Guide. Archived from the original on 21 February 2021. Retrieved 14 March 2023.
+ "The Streamer Awards Full Winners List". GameRant. 13 March 2022. Retrieved 21 March 2022.
+ Calvario, Liz (13 March 2021). "2021 Kids' Choice Awards: The Complete Winners List". Entertainment Tonight. Archived from the original on 14 March 2021. Retrieved 14 March 2023.
+ Gajewski, Ryan (9 April 2022). "Kids' Choice Awards: Spider-Man: No Way Home Wins Big; Dr. Jill Biden Speaks". The Hollywood Reporter. Archived from the original on 27 April 2022. Retrieved 14 March 2023.
+ Nordyke, Kimberly (4 March 2023). "Wednesday, Sonic the Hedgehog 2, Taylor Swift, Harry Styles Among Winners at 2023 Kids' Choice Awards". The Hollywood Reporter. Archived from the original on 5 March 2023. Retrieved 14 March 2023.
+ "Minecraft: how a change to the rules is tearing the community apart". The Guardian. 24 June 2014. Archived from the original on 15 July 2022. Retrieved 15 July 2022.
+ Coles, Jason (14 March 2022). "Microsoft's Minecraft migration meets a mixed response". PCGamesN. Archived from the original on 15 July 2022. Retrieved 15 July 2022.
+ Rich, Rob (10 February 2022). "Microsoft Gives Minecraft: Java Edition Players A Deadline To Migrate Accounts". SlashGear.com. Archived from the original on 15 July 2022. Retrieved 15 July 2022.
+ Hedberg, Mikael (27 July 2022). "Minecraft Java Edition 1.19.1". Minecraft. Mojang Studios. Archived from the original on 1 September 2022.
+ Orland, Kyle (24 June 2022). "Microsoft will start banning players from all private Minecraft servers". Ars Technica. Archived from the original on 8 August 2022. Retrieved 15 July 2022.
+ Bellingham, Hope (23 June 2022). "The new Minecraft update can totally ban you from all online play". GamesRadar+. Archived from the original on 17 September 2022. Retrieved 15 July 2022.
+ Quick, Will (22 June 2022). "Online Minecraft Bans Will Be Able To Block You From Private Servers". TechRaptor. Archived from the original on 31 July 2022. Retrieved 15 July 2022.
+ Gronich, Sara (August 2022). "'Minecraft' Players Say '1984' Patch Turns Game Into Totalitarian Dystopia". Vice. Archived from the original on 13 August 2022. Retrieved 5 August 2022.
+ ""Save Minecraft" Trends on Twitter as Fans Protest Controversial Update". GAMING. Archived from the original on 20 September 2022. Retrieved 30 August 2022.
+ Stuart, Keith; MacDonald, Keza (19 September 2019). "The 50 best video games of the 21st century". The Guardian. Retrieved 20 September 2019.
+ Hall, Charlie (7 November 2019). "Why Minecraft is the most important game of the decade". Polygon. Retrieved 9 November 2019.
+ Kain, Erikmine (31 December 2019). "The Best — And Most Important — Video Games Of The Decade". Forbes. Archived from the original on 1 January 2020. Retrieved 2 January 2019.
+ Hetfeld, Malindy (19 June 2020). "Minecraft inducted into the World Video Game Hall of Fame". PC Gamer. Retrieved 20 June 2020.
+ Orland, Kyle (6 April 2011). "Minecraft Draws Over $33 Million In Revenue From 1.8M Paying Customers". Gamasutra. Retrieved 16 October 2013.
+ Johnson, Soren (6 February 2012). "Design success means knowing what to do with feedback". Gamasutra. Retrieved 16 October 2013.
+ Silverman, Matt (1 October 2010). "Minecraft: How Social Media Spawned a Gaming Sensation". Mashable. Mashable Inc. Archived from the original on 30 December 2012. Retrieved 28 December 2012.
+ Tong, Sophia (28 August 2011). "Mining data from Minecraft". GameSpot. CBS Interactive. Archived from the original on 4 December 2013. Retrieved 28 December 2012.
+ Spillman, Rob (6 December 2011). "Inside the geeky, revolutionary world of "Minecraft"". Salon. Salon Media Group. Archived from the original on 17 January 2013. Retrieved 23 November 2013.
+ Nunneley, Stephany (24 March 2012). "Minecraft hits $80M in sales with over 5M paid downloads". VG247. Archived from the original on 26 March 2012. Retrieved 11 November 2012.
+ Alexander, Julia (7 August 2019). "Minecraft's recent surge on YouTube proves that the 'PewDiePie Effect' is still real". The Verge. Retrieved 5 October 2022.
+ Hernandez, Patricia (18 September 2018). "Fortnite is not the biggest game on YouTube this year". The Verge. Retrieved 5 October 2022.
+ Cellan-Jones, Rory (10 July 2012). "The TV tycoons you may have missed". BBC News. Archived from the original on 5 August 2012. Retrieved 10 July 2012.
+ Benedetti, Winda (23 October 2012). "Dig this 'Minecraft'-style 'Gangnam Style' parody". NBC News. NBCUniversal. Archived from the original on 10 June 2014. Retrieved 9 December 2012.
+ Hernandez, Patricia (1 August 2019). "Minecraft is having a big comeback in 2019". Polygon. Retrieved 5 October 2022.
+ Sherr, Ian (14 December 2021). "Minecraft crosses 1 trillion views on YouTube, most popular game ever on platform". CNet. Retrieved 14 December 2021.
+ "Team Fortress 2". www.teamfortress.com. Retrieved 23 October 2022.
+ "Only One Man In The World Owns TF2's "Top Notch" Hat". Kotaku Australia. 27 November 2011. Retrieved 23 October 2022.
+ Dean, Paul (24 September 2012). "Creeping up on you: The best Minecraft references in video games". PCGamesN. Network N. Archived from the original on 1 November 2012. Retrieved 4 November 2012.
+ "How The Stanley Parable goes down the rabbit hole of other games". Shacknews. 23 October 2013. Retrieved 21 September 2017.
+ Skrebels, Joe (1 October 2020). "Super Smash Bros. Ultimate's Next DLC Fighters Are Minecraft Characters". Retrieved 1 October 2020.
+ Kennedy, Sam (11 August 2011). "Deadmau5 References Minecraft in New Show". IGN. Archived from the original on 10 November 2012. Retrieved 4 November 2012.
+ Schreier, Jason (30 September 2013). "This Week's South Park Is All About Minecraft". Kotaku. Archived from the original on 30 September 2013. Retrieved 1 October 2013.
+ Cheshire, Tom (22 November 2012). "Want to learn computer-aided design (CAD)? Play Minecraft". Wired UK. Archived from the original on 27 November 2012. Retrieved 23 November 2012.
+ Eördögh, Fruzsina (6 September 2012). "Minecraft Partners With United Nations For Urban Planning". ReadWrite. SAY Media. Archived from the original on 24 November 2012. Retrieved 21 November 2012.
+ "About Block By Block". Block by Block. Archived from the original on 15 September 2022. Retrieved 9 September 2022.
+ "The Block by Block Playbook: Using Minecraft as a participatory design tool in urban design and governance | UN-Habitat". unhabitat.org. Archived from the original on 15 September 2022. Retrieved 14 September 2022.
+ Senior, Tom (5 September 2012). "Minecraft UN Block By Block project to help young people redesign their neighbourhoods". PC Gamer. Future plc. Archived from the original on 7 September 2012. Retrieved 5 September 2012.
+ "Geodatastyrelsen giver de unge hele Danmark i 3D" [The Geodata Agency gives the youth whole Denmark in 3D] (Press release) (in Danish). The Danish Geodata Agency. 24 April 2014. Archived from the original on 26 April 2014. Retrieved 25 April 2014.
+ Boddy, Zachary (4 January 2020). "Minecraft for beginners: How to find diamond, gold, and other rare ores in". Windows Central. Retrieved 14 April 2020.
+ Wilson, Iain (23 March 2020). "Minecraft commands and cheats: all the console commands you need for crafty success". GamesRadar. Retrieved 14 April 2020.
+ Batchelor, James (13 March 2020). "Reporters Without Borders builds censorship-free zone in Minecraft". GamesIndustry.biz. Retrieved 14 March 2020.
+ Gerken, Tom (13 March 2020). "Minecraft 'loophole' library of banned journalism". BBC News. Retrieved 14 March 2020.
+ Maillot, Anastasia (27 March 2021). "Minecraft: How To See The Debug Screen (And What It's Useful For)". The Gamer. Archived from the original on 15 June 2022. Retrieved 15 June 2022.
+ Yarwood, Jack (12 September 2020). "A glimpse into the unpredictable world of Minecraft speedrunning". PCGamesN. Retrieved 5 March 2021.
+ Walton, Mark (25 November 2012). "Minecraft In Education: How Video Games Are Teaching Kids". GameSpot. CBS Interactive. Archived from the original on 10 October 2013. Retrieved 9 December 2012.
+ MacGregor, Jody (22 August 2019). "How teachers are using Minecraft in the classroom". PC Gamer. Archived from the original on 6 July 2022. Retrieved 22 August 2014.
+ Waxman, Olivia (21 September 2012). "MinecraftEdu Teaches Students Through Virtual World-Building". Time. Archived from the original on 23 October 2012. Retrieved 9 December 2012.
+ "GOSH looks to DRIVE healthcare technology forward". Digital Health. 11 October 2018. Retrieved 11 October 2018.
+ O'Connell, Kim (2 February 2016). "Minecraft Architecture: What Architects Can Learn From a Video Game". RedShift. Retrieved 24 February 2019.
+ French, David; Stone, Brett; Nysetvold, Thomas; Hepworth, Ammon; Red, Edward (13 January 2015). "Collaborative Design Principles From Minecraft With Applications to Multi-User CAD." Volume 1A: Codes and Standards". asmedigitalcollection. American Society of Mechanical Engineers. doi:10.1115/DETC2014-35279. Retrieved 3 March 2019.
+ Fahey, Mike (28 September 2016). "Man Builds Computer Inside Computer Game". Kotaku. Archived from the original on 20 December 2016. Retrieved 6 December 2016.
+ Finley, Klint (21 August 2014). "Man Builds Working Hard Drive Inside Minecraft". Wired. Archived from the original on 20 December 2016. Retrieved 6 December 2016.
+ Doctorow, Cory (12 November 2010). "Working 8-bit CPU in Minecraft". Boing Boing. Archived from the original on 20 December 2016. Retrieved 6 December 2016.
+ I made Minecraft in Minecraft with redstone!, retrieved 12 October 2022
+ Finley, Klint (18 August 2014). "New Minecraft Mod Teaches You Code as You Play". Wired. Archived from the original on 5 October 2016. Retrieved 3 October 2016.
+ Atari 2600 Emulator in Minecraft, retrieved 12 October 2022
+ 1fps Atari 2600 Emulator in Vanilla Minecraft 1.13, retrieved 12 October 2022
+ Pokémon Red INSIDE Minecraft — An Interview with the Creator, "Mr. Squishy'", retrieved 12 October 2022
+ Miller, Joe (22 September 2014). "British Museum to be digitally recreated in Minecraft". BBC. Archived from the original on 21 September 2014. Retrieved 22 September 2014.
+ Hood, Vic (5 March 2018). "Minecraft has taught 85 million young people to code". PCGamesN. Retrieved 5 March 2018.
+ Webster, Andrew (27 July 2011). "Living under a blocky shadow: the world of Minecraft clones". Ars Technica. Archived from the original on 3 December 2012. Retrieved 17 October 2012.
+ Saunders, Mike (November 2017). "Minetest". Linux Magazine (204/2017). Archived from the original on 3 February 2021. Retrieved 30 July 2020.
+ Frampton, David (12 October 2013). "Postmortem: The Blockheads". Gamasutra. Archived from the original on 2 April 2015.
+ Brown, Mark (24 August 2011). "Hands-on with Minecraft for DS, with homebrew version DScraft". Pocket Gamer. Archived from the original on 21 March 2017. Retrieved 20 March 2017.
+ McFerran, Damien (24 December 2013). "Rumour: Minecraft Is Already In Development For Wii U, GamePad Said To Be The Focus". Nintendo Life. Archived from the original on 29 November 2014. Retrieved 14 November 2014.
+ Whitehead, Thomas (30 September 2014). "Nexis Games is Developing U Craft, a Minecraft Clone, for the eShop". Nintendo Life. Archived from the original on 10 November 2014. Retrieved 14 November 2014.
+ Calvert, Darren (19 January 2015). "Cube Life: Island Survival is Another Minecraft-Inspired Title Heading to the Wii U eShop". Nintendo Life. Archived from the original on 19 January 2015. Retrieved 19 January 2015.
+ Calvert, Darren (17 December 2015). "Prepare to Get Creative With Minecraft-Inspired Game Discovery Coming to Wii U eShop Soon". Nintendo Life. Archived from the original on 10 April 2016. Retrieved 9 April 2016.
+ Whitehead, Thomas (1 October 2014). "Battleminer Screens Show Some Familiar Block Building On the Way to 3DS". Nintendo Life. Archived from the original on 2 November 2014. Retrieved 14 November 2014.
+ Calvert, Darren (31 October 2014). "Another Minecraft Clone, Cube Creator 3D Coming To 3DS eShop". Nintendo Life. Archived from the original on 2 November 2014. Retrieved 14 November 2014.
+ Whitehead, Thomas (1 October 2014). "More Minecraft Mania Looks Set for Wii U With Stone Shire". Nintendo Life. Archived from the original on 6 November 2014. Retrieved 14 November 2014.
+ Calvin, Alex (9 July 2015). "Mojang's block party – what is next for Minecraft?". MCV UK. Archived from the original on 12 July 2015. Retrieved 11 July 2015.
+ Webster, Andrew (26 August 2015). "Giving Minecraft a story". The Verge. Archived from the original on 27 August 2015. Retrieved 27 August 2015.
+ Senior, Tom (19 December 2011). "Notch makes Minicraft in 48 hours for Ludum Dare". PC Gamer. Retrieved 11 August 2020.
+ Good, Owen (31 October 2012). "Well Whaddaya Know: MineCon Is Sold Out". Kotaku. Gawker Media. Archived from the original on 3 February 2013. Retrieved 11 January 2013.
+ "GameSpy: Tickets for Minecraft Convention, MineCon, Now On Sale — Page 1". GameSpy. Glu Mobile. 11 August 2011. Archived from the original on 3 February 2013. Retrieved 18 December 2011.
+Further reading
+Gallagher, Colin (2014). Minecraft in the Classroom: Ideas, Inspiration, and Student Projects for Teachers. Berkeley, CA: Peachpit Press. ISBN 978-0-13-385801-3.
+Garrelts, Nate (2014). Understanding Minecraft: Essays on Play, Community and Possibilities. Jefferson, NC: McFarland & Company. ISBN 978-0-7864-7974-0.
+Goldberg, Daniel (2013). Minecraft: The Unlikely Tale of Markus "Notch" Persson and the Game That Changed Everything. New York: Seven Stories Press. ISBN 978-1-60980-537-1.
+External links
+Official website Edit this at Wikidata
+Minecraft Classic
+vte
+Minecraft
+vte
+Mojang Studios
+vte
+Markus Persson
+vte
+Xbox Game Studios
+vte
+Seumas McNally Grand Prize
+Portals:
+icon Fantasy
+flag Sweden
+ Video games
+Minecraft at Wikipedia's sister projects:
+
+Media from Commons
+
+Textbooks from Wikibooks
+
+Resources from Wikiversity
+Authority control Edit this at Wikidata
+Categories: Minecraft2011 video gamesAndroid (operating system) gamesBAFTA winners (video games)Construction and management simulation gamesEarly access video gamesGolden Joystick Award winnersIndependent Games Festival winnersIndie gamesIOS gamesJava platform gamesLinux gamesMacOS gamesMicrosoft gamesMultiplayer and single-player video gamesNew Nintendo 3DS gamesNintendo 3DS eShop gamesNintendo Network gamesNintendo Switch gamesOpen-world video gamesPlayStation 3 gamesPlayStation 4 gamesPlayStation Network gamesPlayStation Vita gamesSeumas McNally Grand Prize winnersStreamer Award winnersSurvival video gamesVideo games adapted into comicsVideo games designed by Markus PerssonVideo games developed in SwedenVideo games scored by Gareth CokerVideo games scored by Kumi TaniokaVideo games scored by Lena RaineVideo games using procedural generationVideo games with cross-platform playVideo games with user-generated gameplay contentVideo games with voxel graphicsVirtual reality gamesVirtual world communities2000s fads and trends2010s fads and trends2020s fads and trendsWii U eShop gamesWii U gamesWindows gamesWindows Phone gamesWorld Video Game Hall of FameXbox 360 gamesXbox 360 Live Arcade gamesXbox One gamesOther Ocean Interactive gamesSpike Video Game Award winners4J Studios gamesCamels in artSandbox games
+This page was last edited on 27 August 2023, at 11:11 (UTC).
+Text is available under the Creative Commons Attribution-ShareAlike License 4.0; additional terms may apply. By using this site, you agree to the Terms of Use and Privacy Policy. Wikipedia® is a registered trademark of the Wikimedia Foundation, Inc., a non-profit organization.
+Privacy policyAbout WikipediaDisclaimersContact WikipediaCode of ConductMobile viewDevelopersStatisticsCookie statementWikimedia FoundationPowered by MediaWiki
+Toggle limited content width
+Strategy guides are instruction books that contain hints or complete solutions to specific video games. The line between strategy guides and walkthroughs is somewhat blurred, with the former often containing or being written around the latter. Strategy guides are often published in print, both in book form and also as articles within video game magazines. In cases of exceptionally popular game titles, guides may be sold through more mainstream publication channels, such as bookstores or even newsstands. Some publishers also sell E-Book versions on their websites.
+
+Change page preview settings
