@@ -10,7 +10,10 @@ import "../app/globals.css";
 
 function MyApp({ Component, pageProps }: AppProps) {
   useEffect(() => {
-    document.body.style.backgroundImage = "url('/background.png')";
+    const bgUrl = process.env.NODE_ENV === 'production'
+      ? 'public/background.png'
+      : '/background.png';
+    document.body.style.backgroundImage = `url('${bgUrl}')`;
     document.body.style.backgroundPosition = "center";
     document.body.style.backgroundSize = "cover";
     document.body.style.backgroundRepeat = "no-repeat";
