@@ -2,7 +2,14 @@ import { useState, useEffect, useRef } from "react";
 import { ChatComponent, Message } from "../components/ChatComponent";
 import { DocumentComponent } from "../components/DocumentComponent";
 
-export const apiHost = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:8000';
+export const getApiHost = () => {
+  if (process.env.NODE_ENV === 'development') {
+    return 'http://localhost:8000';
+  }
+  return "";
+};
+
+export const apiHost = getApiHost();
 
 type DocumentChunk = {
   text: string;

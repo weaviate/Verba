@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { DocumentComponent } from "../components/DocumentComponent";
 import { FixedSizeList as List } from "react-window";
-import { DocType, DOC_TYPE_COLORS, DOC_TYPE_COLOR_HOVER, apiHost } from "@/pages";
+import { DocType, DOC_TYPE_COLORS, DOC_TYPE_COLOR_HOVER, getApiHost } from "@/pages";
 
 type Document = {
     doc_name: string;
@@ -9,6 +9,8 @@ type Document = {
     doc_link: string;
     _additional: { id: string };
 };
+
+const apiHost = getApiHost()
 
 export default function DocumentOnly() {
     const [documentTitle, setDocumentTitle] = useState("");
