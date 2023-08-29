@@ -3,7 +3,9 @@
 
 Welcome to Verba The Golden RAGtriever, an open-source project aimed at providing an easy usable retrieval augmented generation (RAG) app. Use it to interact with your data in just a handful of steps!
 
-[![Weaviate](https://img.shields.io/static/v1?label=powered%20by&message=Weaviate%20%E2%9D%A4&color=green&style=flat-square)](https://weaviate.io/) 
+[![Weaviate](https://img.shields.io/static/v1?label=powered%20by&message=Weaviate%20%E2%9D%A4&color=green&style=flat-square)](https://weaviate.io/) [![Demo](https://img.shields.io/badge/Check%20out%20the%20demo!-yellow?&style=flat-square&logo=react&logoColor=white)](https://verba-golden-ragtriever.onrender.com/)
+
+![Demo of Verba](https://github.com/weaviate/Verba/blob/main/img/verba.gif)
 
 > Verba is a WIP project and many exciting features and updates are on their way!
 
@@ -83,7 +85,7 @@ Please note, that importing data will generate cost for your specified OpenAI ac
 
 ## 💰 Large Language Model (LLM) Costs
 
-Verba currently only supports OpenAI models. By default, any costs associated with using this service will be billed to the access key that you provide. Processes that will generate cost are the data embedding and answer generation part.
+Verba currently only supports OpenAI models. By default, any costs associated with using this service will be billed to the access key that you provide. Processes that will generate cost are the data embedding and answer generation part. The default vectorizer for this project is `Ada v2`
 
 ## 🛠️ Project Structure
 
