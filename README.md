@@ -14,7 +14,7 @@ It leverages Weaviate together with Generative Search to retrieve relevant docum
 
 ### 💡 Import your data to Weaviate
 
-Verba supports importing different data types (.txt, .md, .pdf, etc.) into Weaviate, chunking and vectorizing them beforehand.
+Verba supports importing different data types (.txt, .md, etc.) into Weaviate, chunking and vectorizing them beforehand.
 
 > Currently, there is no data cleaning pipeline for custom data (WIP). Make sure that your data is in a good state before feeding them into Weaviate
 
@@ -51,7 +51,7 @@ This method is advantageous as it enables Verba to return results from queries t
 - Install Verba with the following command:
 - ```pip install -e .```
 
-5. **Start the Verba:**
+5. **Start Verba with:**
 - ```verba start```
 
 
@@ -73,12 +73,12 @@ Please note, that importing data will generate cost for your specified OpenAI ac
 > Enhanced CRUD operations are WIP
 
 **02 Run verba**
-- Insert your data into the `verba start` and go to `localhost:8000`.
+- Run verba with `verba start` and go to `localhost:8000`.
 
 
 **(OPTIONAL) Importing Weaviate:**
 - You can also import all documentation, blog posts, video transcripts, etc from Weaviate. You need to specify your `GITHUB_TOKEN` environment variable to the `.env` file
-- Use `verba weaviate` script to download, process, and import Weaviate data to your cluster.)
+- Use `verba weaviate` script to download, process, and import Weaviate data to your cluster.
 - `verba weaviate --model gpt-4`
 
 ## 💰 Large Language Model (LLM) Costs
@@ -92,8 +92,6 @@ Verba is structured in three main components:
 1. A Weaviate database (either cluster hosted on WCS or local).
 2. A FastAPI endpoint facilitating communication between the LLM provider and database.
 3. An interactive React frontend for displaying the information.
-
-Make sure you have Python (`>=3.8.0`).
 
 > If you want to edit the frontend itself, make sure you have Node (`>=18.16.0`) installed.
 
