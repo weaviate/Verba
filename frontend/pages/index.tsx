@@ -303,7 +303,7 @@ export default function Home() {
             <div className="absolute mt-2 p-2 z-10 w-1/2 left-5 text-center justify-center">
               {suggestions.map((suggestion, index) => (
                 <div
-                  key={index}
+                  key={index + suggestion}
                   className="p-2 hover:bg-green-200 bg-gray-200 cursor-pointer shadow-md rounded-md text-xs animate-press-in mt-2 hover-container"
                   onClick={() => handleSuggestionClick(suggestion)}
                 >

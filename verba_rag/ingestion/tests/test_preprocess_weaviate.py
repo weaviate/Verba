@@ -1,7 +1,7 @@
 import pytest
 from wasabi import msg
 
-from verba.ingestion import preprocess_weaviate
+from verba_rag.ingestion import preprocess_weaviate
 
 
 @pytest.fixture(autouse=True)

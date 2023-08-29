@@ -24,7 +24,7 @@ class SimpleVerbaQueryEngine(VerbaQueryEngine):
             )
             .with_hybrid(query=query_string)
             .with_generate(
-                grouped_task=f"You are a chatbot for Weaviate, a vector database, answer the query {query_string} with the given snippets of documentation in 2-3 sentences and if needed give code examples at the end of the answer encapsulated with ```programming-language ```"
+                grouped_task=f"You are a chatbot for RAG, answer the query {query_string} based on the given context. Only use information provided in the context. Only if asked or required provide code examples based on the topic at the end of your answer encapsulated with ```programming-language ```"
             )
             .with_additional(properties=["score"])
             .with_limit(8)

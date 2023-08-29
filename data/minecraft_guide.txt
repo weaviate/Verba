@@ -1,0 +1,3574 @@
+
+800 East 96th Street,
+Indianapolis, Indiana 46240 USA
+MINECRAFT
+Stephen O’Brien
+The Ultimate Player’s Guide to
+ii The Ultimate Player’s Guide to Minecraft
+The Ultimate Player’s Guide to Minecraft
+Copyright © 2014 by Que Publishing
+All rights reserved. No part of this book shall be reproduced, stored in
+a retrieval system, or transmitted by any means, electronic, mechanical,
+photocopying, recording, or otherwise, without written permission from
+the publisher. No patent liability is assumed with respect to the use of
+the information contained herein. Although every precaution has been
+taken in the preparation of this book, the publisher and author assume
+no responsibility for errors or omissions. Nor is any liability assumed for
+damages resulting from the use of the information contained herein.
+ISBN-13: 978-0-7897-5223-9
+ISBN-10: 0-7897-5223-9
+Library of Congress Control Number: 2013946682
+Printed in the United States of America
+Sixth Printing February 2014
+Trademarks
+All terms mentioned in this book that are known to be trademarks or
+service marks have been appropriately capitalized. Que Publishing cannot
+attest to the accuracy of this information. Use of a term in this book should
+not be regarded as affecting the validity of any trademark or service mark.
+Minecraft is a trademark of Notch Development AB.
+Warning and Disclaimer
+Every effort has been made to make this book as complete and as accurate
+as possible, but no warranty or fi tness is implied. The information provided
+is on an “as is” basis. The author and the publisher shall have neither
+liability nor responsibility to any person or entity with respect to any loss or
+damages arising from the information contained in this book.
+Bulk Sales
+Que Publishing offers excellent discounts on this book when ordered in
+quantity for bulk purchases or special sales. For more information, please
+contact
+U.S. Corporate and Government Sales
+1-800-382-3419
+corpsales@pearsontechgroup.com
+For sales outside of the U.S., please contact
+International Sales
+international@pearsoned.com
+Editor-in-Chief
+Greg Wiegand
+Executive Editor
+Rick Kughen
+Development Editor
+Rick Kughen
+Managing Editor
+Sandra Schroeder
+Project Editor
+Seth Kerney
+Copy Editor
+Gill Editorial Services
+Indexer
+Ken Johnson
+Proofreader
+Jess DeGabriele
+Technical Editor
+Timothy L. Warner
+Publishing
+Coordinator
+Kristen Watterson
+Book Designer
+Mark Shirar
+Compositor
+Bronkella Publishing
+
+iii
+Contents at a Glance
+ Introduction 1
+CHAPTER 1 Getting Started 7
+CHAPTER 2 First-Night Survival 23
+CHAPTER 3 Gathering Resources 47
+CHAPTER 4 Mining 69
+CHAPTER 5 Combat School 83
+CHAPTER 6 Crop Farming 103
+CHAPTER 7 Taming Mobs 125
+CHAPTER 8 Creative Construction 137
+CHAPTER 9 Redstone, Rails, and More 159
+CHAPTER 10 Enchanting, Anvils, and Brewing 195
+CHAPTER 11 Villages and Other Structures 217
+CHAPTER 12 Playing Through: The Nether and The End 231
+CHAPTER 13 Mods and Multiplayer 251
+APPENDIX A Crafting Recipes (Online)
+ Index 273
+iv The Ultimate Player’s Guide to Minecraft
+Table of Contents
+ Introduction 1
+What’s in This Book 2
+How to Use This Book 4
+Crafting Recipes 4
+There’s More Online… 5
+Chapter 1 Getting Started 7
+Registering and Downloading 7
+Registering a Mojang Account 8
+Purchasing Minecraft 10
+Launching Minecraft 12
+Starting a New Game 14
+Choosing a World Generation Style 16
+Singleplayer Game Modes 16
+Seeding Your World 18
+Controls 19
+The Bottom Line 20
+Chapter 2 First-Night Survival 23
+Survive and Thrive 23
+Head for the Trees 25
+Using Your Inventory 27
+Build a Crafting Table 29
+Let’s Build Some Tools 30
+Creating a Shelter 33
+The Furnace Is Your Friend 38
+Let There Be Light 39
+Slumber with Lumber 41
+The Bottom Line 44
+Chapter 3 Gathering Resources 47
+Introducing the HUD 47
+Improving Your Tools 51
+Chests: Safely Stash Your Stuff 54
+Table of Contents v
+Avoiding Monsters 55
+Hunger Management 58
+Your Mission: Food, Resources, and Reconnaissance 59
+Food on the Run 61
+Finding a Building Site 63
+A Resourceful Guide to the Creative Mode Inventory 66
+The Bottom Line 68
+Chapter 4 Mining 69
+Dig Deep, My Friend 69
+The Mining Layer Cake Guide 71
+Lava Lakes and Other Pitfalls 73
+Descending to Layer 11 74
+The 2x1 Ladder Descent 74
+The Straight Staircase 76
+The Spiral Staircase 77
+Layouts for Fast, Efficient Mining 78
+Staying Safe While You Mine 81
+The Bottom Line 82
+Chapter 5 Combat School 83
+Introducing the Menagerie 83
+Zombies 84
+Spiders 86
+Skeletons 87
+Cave Spiders 88
+Spider Jockeys 89
+Creepers 89
+Slimes 90
+Endermen 91
+Zombie Pigmen 91
+Defensive Mobs 92
+Snow Golems 92
+Iron Golems 93
+vi The Ultimate Player’s Guide to Minecraft
+Weapons and Armor 94
+Swordcraft 95
+Bows and Arrows 95
+Armor-All 98
+Color Coordinate Your Leather 100
+The Bottom Line 101
+Chapter 6 Crop Farming 103
+Choosing a Crop 103
+Establishing a Farm 106
+Automated Farms 113
+Creating a Piston Harvester 117
+Sticky Piston Harvesting 119
+Creating a Water Harvester 119
+Harvesting Other Crops 122
+The Bottom Line 123
+Chapter 7 Taming Mobs 125
+Farming and Working with Friendly Mobs 125
+Using Leads 128
+Breeding Animals 129
+Taming and Riding Horses, Donkeys, and More 130
+Armoring Your Horse 132
+Loading Up the Pack 133
+Riding Pigs 134
+Fishing 134
+The Bottom Line 135
+Chapter 8 Creative Construction 137
+Leaving the Cave 137
+Unleashing Your Interior Decorator 140
+Building Underwater 147
+Protecting Your Perimeter 153
+Become a Ditch Witch 153
+Mob Pitfalls 155
+Thick as a Brick 157
+The Bottom Line 157
+Table of Contents vii
+Chapter 9 Redstone, Rails, and More 159
+Seeing Red: A Beginner’s Guide 160
+Power Sources 160
+Redstone Wiring 164
+Powered Blocks 166
+Modifiers 167
+Repeaters 168
+Comparators 170
+Output Devices 171
+Automatic Doors 173
+Vertical Currents 178
+Advanced Circuits 180
+NOT Gates, aka Inverters 180
+OR Gates, or Any Input Will Do 181
+AND Gates, Two True 182
+Repeater Loops 184
+Rail Transport 185
+Have Minecart, Will Travel 186
+Rolling on Rails 188
+Making Tracks and Stations 190
+T-Junctions 191
+Halfway Stations 192
+A Word About Hoppers 193
+The Bottom Line 194
+Chapter 10 Enchanting, Anvils, and Brewing 195
+Enchanting Wiles 195
+Creating and Mining Obsidian 197
+Crafting Books 200
+Casting Enchantments 200
+Improving Enchantment Chances with Bookshelves 202
+Earning and Managing Experience 203
+Spruce Up Your Weapons 204
+Enhance Your Armor 205
+Improve Your Tools 206
+viii The Ultimate Player’s Guide to Minecraft
+Hammer It Out with the Anvil 207
+Brewing Potions 209
+Brewing Up a Storm 211
+Enhancing Potions 214
+The Bottom Line 215
+Chapter 11 Villages and Other Structures 217
+Village Life 217
+Emerald City: Your Ticket to Trade 220
+Hidden Temples and Other Structures 222
+Desert Temples 223
+Jungle Temples 224
+Witch Huts 224
+Dungeons 225
+Abandoned Mineshafts 226
+Strongholds 226
+Nether Fortresses 227
+Mapping, or There and Back Again 227
+Crafting a Clock 229
+The Bottom Line 230
+Chapter 12 Playing Through: The Nether and The End 231
+Alternate Dimensions 231
+Getting to The Nether 234
+Portal Magic 236
+Surviving the Nether Fortress 239
+Nether Mobs 240
+The End Game 242
+Finding a Stronghold 244
+Defeating the Ender Dragon 246
+The Bottom Line 250
+Table of Contents ix
+Chapter 13 Mods and Multiplayer 251
+Customizing Your Experience 251
+Changing the Skin You’re In 252
+Minecraft Skin Editors 253
+Skincraft 253
+Minecraftskins 253
+Novaskin 254
+Resource Packs: Change Your World 255
+Mind My Mods 258
+Installing Forge Mods 259
+Too Many Items 261
+More Explosives 262
+Super Heroes 262
+REI’s MiniMap 263
+Legendary Beasts 263
+More Mobs 264
+Multiplayer Madness 265
+Sharing and Joining on LAN 266
+Joining a Multiplayer Server 267
+Hosting a Multiplayer Server 269
+The Bottom Line 272
+Appendix A Crafting Recipes (Online)
+ Index 273
+x The Ultimate Player’s Guide to Minecraft
+About the Author
+Stephen O’Brien is an Australian-born writer and entrepreneur currently residing in Sydney
+after too many years in Silicon Valley. He has previously written 27 books across multiple
+editions with publishers such as Prentice-Hall and Que, including several best-selling titles.
+He also founded Typefi, the world’s leading automated publishing system, and in his
+spare time he invented a new type of espresso machine called mypressi. He has been playing Minecraft since its earliest days and remains astounded at the unparalleled creativity it
+engenders.
+Acknowledgments xi
+Dedication
+To Mika, who at age nine taught his dad to laugh hysterically at the sight of a pig riding up a mountain in a
+minecart. Laughs and love always, dear boy.
+Acknowledgments
+It’s an author’s dream to work with a talented team, and I feel like I’m having a better
+dream than most. After 12 years away from Que working on entrepreneurial projects, I was
+incredibly fortunate to step straight back into the fold of a fantastic group. I’d like to thank
+Rick Kughen for his outstanding project direction, polished editorial efforts, and always
+gentle prompting even as I started to run behind schedule. Rick, it’s such a true pleasure to
+work with you again. Seth Kerney, thank you for so smoothly shepherding this book through
+the numerous stages of the publishing process. Karen Gill, I appreciate your thorough, precise copyediting and constantly joyful feedback. Mark Shirar, you created a fantastic cover
+and page design. And Tim Warner, thanks for a technical edit that truly left no block uncovered, no cobblestone unturned.
+Writing a book always feels a long leap into the dark, with the only light often being close
+family and friends. I thank you all, in particular my dad, Tony; my siblings, Justin, Adele,
+and Siobhan; my dear friend Laura; and everyone else who gave me no end of encouragement, best wishes, and a chorus of variations on the very Australian “goodonya.”
+Last, but by no means least, thank you, Amy, for your constant love, support, and encouragement.
+xii The Ultimate Player’s Guide to Minecraft
+We Want to Hear from You!
+As the reader of this book, you are our most important critic and commentator. We value
+your opinion and want to know what we’re doing right, what we could do better, what
+areas you’d like to see us publish in, and any other words of wisdom you’re willing to pass
+our way.
+We welcome your comments. You can email or write to let us know what you did or didn’t
+like about this book—as well as what we can do to make our books better.
+Please note that we cannot help you with technical problems related to the topic of this book.
+When you write, please be sure to include this book’s title and author as well as your name
+and email address. We will carefully review your comments and share them with the author
+and editors who worked on the book.
+Email: feedback@quepublishing.com
+Mail: Que Publishing
+ATTN: Reader Feedback
+800 East 96th Street
+Indianapolis, IN 46240 USA
+Reader Services
+Visit our website and register this book at quepublishing.com/register for convenient access
+to any updates, downloads, or errata that might be available for this book.
+Introduction
+Imagine waking one morning thrust from your soft, cozy bed into a strange new world. A square sun
+crosses the sky. You have no tools or weapons—nothing but your bare, knobby hands. You briefly
+survey the landscape. Hills and forests surround you. A cow lows in the distance.
+On a hunch you look for a Horn of Plenty—anything that may deliver something useful. Every other
+RPG you’ve played has plenty of stuff lying around. But it’s a fruitless search with no cache in sight.
+Curiously, though, one of your random clicks does dig a hole in the ground. Interesting. But how
+does it help? You try again. Another hole. Hmmm.
+You continue your reconnaissance, admiring the varied terrain, soaring cliffs, verdant forests, and
+clear blue lakes. It certainly is pleasing to the eye, but this universe seems to work by unfamiliar
+rules. The sun is moving far too briskly across the sky, and nightfall now looks like it’s mere minutes
+away.
+That can’t be good.
+You start a kind of random flail, clicking everything in sight. The trunk of a tree looks promising.
+Aha! A block of wood falls to the ground. But what to do with it? You have to figure that out later.
+Darkness descends, and with it comes an unearthly groan. Strange figures appear in the distant
+gloom, lurching toward you. A slithering slurp shrieks into your senses from behind. A cold finger of
+fear trips down your spine.
+You run for the base of the nearest cliff. If your back’s against the wall, it might as well be a sturdy
+one. Wait a moment. Is that the mouth of a cave? Perfect! A final quick dash sees you safely inside.
+The darkness turns to an inky black. You stumble down a ledge putting more distance between you
+and the horrifying creatures outside. Stop, breathe, look around.
+You hear the briefest hiss, like a burning fuse. Frantically spinning to find the source, you catch a
+glimpse of a ghastly green face. It’s the last you’ll see before a gigantic explosion claims your life.
+Welcome to Minecraft and a typical experience for the millions of players who buy this game in everincreasing numbers on every major platform. Minecraft is, without doubt, one of the most interesting open-ended games ever produced. It’s also one of the most vexatious.
+From the first moment I started playing this game, back in the beta, to today’s extraordinary experience, Minecraft has developed into a tour de force of absolutely splendid gameplay, but one that is
+not easily accessible.
+2 Introduction
+Before I even thought about writing this book I found it popping up more and more frequently in random conversations among all age levels—everyone from my nine-year old’s
+best friends going on up…way up. Minecraft’s unique open-endedness offers an equally
+open-ended fascination to people of all ages. Fifty million of them, and counting.
+Clearly, Minecraft was enjoying unparalleled success for an independent production, but
+there was something strange going on. The game still lacked an in-depth tutorial or documentation of any sort. And while there is no paucity of online resources, how do you
+explain a game where every block bends to your will; where the terrain can dance to your
+tune; where an electrical system can do a crazy range of things including simulating its own
+computer; and where other elements such as casting enchantments, brewing potions, and
+finding a way to get to and defeat the final boss require some curiously specific, obtuse
+steps and strategies?
+The online community has stepped into that breach admirably, going to the point of
+decompiling the code to understand and document specific game mechanics, but the essentials are often buried among hundreds of thousands of random Minecraft videos or tucked
+in with other encyclopedically detailed documentation. And, among all that, there are literally thousands of junk sites trying to trick you into clicking on ads or installing malware.
+This book fills the gap, bringing together all the key information you need in a single place.
+Written from the player’s perspective, it takes you through the essentials and then far
+beyond with all the background information, crafting recipes, strategies, and ideas you need
+to make your Minecraft world truly your own. It covers everything from first-night survival
+to hosting your own Multiplayer server.
+If you are a parent wondering if Minecraft is suitable for your own kids, consider it to be as
+far from a consumption-only experience as old-school rote learning is from an active education filled with exploration and discovery. Minecraft will inspire great feats of imagination
+and a thirst for understanding how its many facets enmesh and evolve. Best of all, it’s like
+one of those great movies or books that are marketed toward kids but entertain adults on a
+whole other level. Play it together—even turn off the monsters through its creative or peaceful modes—and enjoy your time playing together with kids as young as four or five. But I
+warn you, it’s addictive. Please remember to give them a go now and then.
+No matter who you are or how you play, you’ll find Minecraft to be an endlessly fascinating, wonderful, enjoyable world. It’s going to be quite the journey!
+What’s in This Book
+Survive and thrive in Minecraft with 13 chapters of detailed step-by-step guides, tips, tricks,
+and strategies. Each chapter in this book focuses on a key aspect of the game, from initial
+survival to building an empire. Make the most of your Minecraft world today:
+Q Chapter 1, “Getting Started,” will walk you through the steps needed to download and
+install Minecraft, and start a new game, optionally using seeds to control the world generation.
+What’s in This Book 3
+Q Chapter 2, “First-Night Survival,” is an essential strategy guide to one of the most challenging times in Minecraft. You’ll learn to craft essential tools and build your first mobproof shelter, all in less than 10 minutes of gameplay.
+Q Chapter 3, “Gathering Resources,” will fill out the skills you need to build a permanent
+base of operations, create better tools, store resources, and find food to stave off hunger. I also show you how to use the built-in GPS so you can always find your way home,
+even after extended forays into the wilds.
+Q Chapter 4, “Mining,” unlocks some of Minecraft’s deepest secrets. I’ll show you the best
+tunneling plan to uncover the most resources in the shortest possible time, the essential
+tools required, and the layers you should dig to uncover everything from basic iron ore
+to diamonds.
+Q Chapter 5, “Combat School,” will get you ready to tackle any mob, including the
+creeper. From sword-fighting techniques to armor, this chapter has you covered. You’ll
+also learn the essential perimeter protection techniques for your home.
+Q Chapter 6, “Crop Farming,” will help you become completely self-sufficient, ensuring
+the hunger bar stays full, constantly boosting your health. Learn to hydrate 80 blocks of
+farm land with a single water block, and automate your harvests at the touch of a
+button.
+Q Chapter 7, “Taming Mobs,” is all about Minecraft’s passive animals, the chickens,
+pigs, cows, horses, and more that populate its world and provide you with valuable
+resources. Learn to breed animals, tame Ocelots to scare off creepers, and gallop across
+the world on horseback.
+Q Chapter 8, “Creative Construction,” will help you unleash your inner architect. From
+grand constructions to inventive interiors, learn about the decorative ways you can use
+Minecraft’s blocks and items to build the perfect abode.
+Q Chapter 9, “Redstone, Rails, and More,” empowers your world with a host of automated devices. Control redstone power, automated doors, send minecarts on missions,
+and build stations, stopovers and more.
+Q Chapter 10, “Enchanting, Anvils, and Brewing,” will have you brewing up a storm. Cast
+spells, improve your weapons and armor, and fall from great heights with grace.
+Q Chapter 11, “Villages and Other Structures,” is your key to interacting with the other
+non-playing characters. Trade your way to better goods, and learn the secrets of the
+game’s temples.
+Q Chapter 12, “Playing Through: The Nether and The End,” is the strategy guide you’ll
+need to get through these tricky sections of the game. Find a fortress fast, get what you
+need, and then prepare for the Ender Dragon. It’s easy when you know how.
+4 Introduction
+Q Chapter 13, “Mods and Multiplayer,” will show you how to customize the game, from
+new character skins to mods that add a host of functionality. And along the way you’ll
+also learn how to access multiplayer games and set up a permanent world on your own
+server for family and friends.
+How to Use This Book
+Throughout this book, you’ll see that I have called out some items as Notes, Tips, and
+Cautions—all of which are explained here.
+NOTE
+Notes point out ancillary bits of information that are helpful but not crucial. They often
+make for an interesting meander.
+TIP
+Tips point out a useful bit of information to help you solve a problem. They’re useful in
+a tight spot.
+CAUTION
+Cautions alert you to potential disasters and pitfalls. Don’t ignore these!
+Crafting Recipes
+You’ll also see that I’ve included crafting recipes throughout this book. I’ve included the
+actual ingredients in the text, so just match the pattern you see to create the item, as shown
+here for a wooden pickaxe. It’s easy, and you’ll be surprised how quickly you can whip them
+up after just a few uses.
+There’s More Online… 5
+There’s More Online…
+In addition to the information packed between the covers of this book, I’ve put together a
+complete guide to all the crafting recipes online. Feel free to download! Visit http://www.
+quepublishing.com/register to register your book and download your free PDF copy.
+This page intentionally left blank 
+This page intentionally left blank 
+3
+Gathering Resources
+In This Chapter
+Q Never get lost. Learn the secrets of the HUD and its hidden GPS.
+Q Improve your tools with more durable materials.
+Q Safely store your hard-earned resources.
+Q Learn the easy way to manage hunger.
+Q Build your first outdoor shelter and enjoy the view.
+Q Access the full Creative mode inventory.
+Minecraft is filled to the brim with all manner of resources, and gathering them is the first step
+toward getting the most out of the game. In Chapter 2, “First-Night Survival,” you put together a
+pack of essentials sufficient to last the first night, but this is really just the smallest prequel to the
+real game, and describing how to find, create, and use other types of resources forms much of this
+book. This chapter is about building the foundation you can use to launch into the rest of the game.
+Your focus is on a few key points: build an outdoor shelter, find food to stave off hunger, improve
+your collection of tools, and build a chest to safely store items. This solidifies your position, making
+your base more impervious to attack, allows you to do all sorts of Minecrafty things more efficiently,
+and sets yourself up for longer excursions both above and below ground.
+The good news is that you already have a base, so you can explore during the day, try not to lose
+your way, and head back at night. However, you still need to avoid at least some of the hostile mobs
+that persist during the day.
+Introducing the HUD
+Before we start, let’s take a look at the Heads-Up Display (HUD)—that collection of icons and status
+bars at the bottom of the screen. Figure 3.1 shows the HUD as it appears in Survival mode with all
+possible indicators displayed. (The Creative mode HUD only shows the Inventory bar.)
+48 CHAPTER 3: Gathering Resources
+FIGURE 3.1 The HUD provides key status indications. Health is all important,
+but low hunger also leads to low health, so keep a close eye on both.
+1
+2 3 5
+4
+6
+1. Armor bar
+2. Health bar
+3. Experience bar
+4. Oxygen bar
+5. Hunger bar
+6. Inventory quick access
+Each section of the HUD provides a key nugget of information about the health or status of
+your avatar:
+Q Armor bar—The armor bar appears when you’ve equipped your avatar with any type of
+armor and shows the current damage absorption level. Each armor icon represents an
+8% reduction in the damage you’ll take, so a 10/10 suit of armor reduces the damage
+you take by 80%, whereas a 1/10 suit absorbs only 8%. Armor becomes less effective the
+more damage it absorbs, although the rate at which it deteriorates also depends on its
+material—leather being the weakest and diamond the strongest.
+Q Health bar—You have up to 20 points of health available, represented by the 10 hearts
+shown. Each heart disappears in two ticks. Health and hunger have a complicated relationship. You can read more below starting at “Hunger Management.”
+Q Experience bar—The experience bar increases the more you mine, smelt, cook, kill, and
+fish. Your current level is shown in the middle of the bar. When it’s full, you move to
+the next experience level. Experience isn’t generally important until you start enchanting
+and giving additional powers to items such as swords (see Chapter 10, “Enchantments,
+Anvils, and Brewing”). Unlike other role-playing games, experience in Minecraft is more
+like a currency that you spend on enchantments, so it waxes and wanes. But all experience gained counts toward the final score shown on the screen when you die. Killing
+a mob drops experience orbs that either fly directly toward you or float to the ground
+waiting for you to collect them, and you can also gain experience by smelting certain
+items in the furnace and carrying out other activities such as finding rare ores. Dying
+causes a substantial drop in your current experience level.
+Q Oxygen bar—The oxygen bar appears whenever you go underwater and it quickly starts
+to drop. You can probably hold your own breath for longer! As soon as your oxygen
+level hits zero, your health starts taking a two-point hit every second, but it resurfaces
+for just an instant if you hold down the jump key until you’ve reached air once more.
+Diving isn’t that big of a deal in Minecraft, at least not for completing the core game, 
+Introducing the HUD 49
+but you can use the ability to do interesting things like building an underwater base. An
+example is shown in Figure 3.2, and I’ll show you how to build your own in Chapter 8,
+“Creative Construction,” as well as sharing with you some other underwater breathing
+techniques.
+FIGURE 3.2 Underwater basesare impervious to mob attacks, even when built
+from glass, but you’ll need to watch your oxygen bar carefully to ensure you
+don’t run out of air while building this type of structure. By the way, the only
+mob that spawns underwater is the friendly, curious squid. Can you make out
+the one shown here? He’s now part of Elysia’s first private aquarium. Say hello
+to “Ceph.”
+ Hunger bar—You also have 20 points of hunger available, as well as a hidden value
+called Saturation. Like health, each hunger bar icon holds two points and can reduce by
+half an icon (that icon is, incidentally, a “shank,” or the lower part of a leg of meat) at
+a time.
+ Inventory quick access—These nine slots, also known as the Hotbar, represent items
+you can select with the mouse scroll wheel or by pressing the 1–9 keys. Press E to access
+your full inventory and to change the items in these slots. The white number next to
+some shows that slot’s count of stacked identical items. A durability bar also appears
+under each tool’s icon in green, gradually reducing as you use them until the tool
+actually breaks and disappears from your inventory. You’ll have some warning of this
+because the bar turns red when it’s close to zero. See “Improving Your Tools” later in the
+chapter to learn more about the durability of different materials.
+04
+50 CHAPTER 3: Gathering Resources
+TIP
+Showing Durability Stats in the HUD
+Press F3+H (or fn+F3+H on OS X) todisplay the current and maximum durability value
+of all the tools in your inventory. The value appears in a tool tip when you hover your
+mouse over that item.
+NOTE
+HUD Changes When Mounted
+The HUD changeswhen you ride a horse, showing the horse’s health in place of your
+own. The experience bar also changes to the jump bar. You can learn more about
+horses and other mountable mobs in Chapter 7, “Taming Mobs,” on page 125.
+In multiplayer, your HUD also displays a chat window in the bottom-left corner. Press T to
+expand the chat window.
+Toggle the entire HUD display off and on by pressing F1. Press F3 with the HUD turned on
+to view a much more detailed HUD debug screen (see Figure 3.3.)
+NOTE
+Hiding the HUD in the Xbox Editions
+You cannot hide the HUDin Minecraft Pocket Edition but there is an option for doing
+so on the Xbox edition. Press the Start key and open the Help & Options menu.
+Scroll down to SettingsUser Interface and deselect Display HUD. Unfortunately
+there isn’t a quicker way to do this at present.
+The coordinates shown in the debug screen are based on the world’s origin where x=0 and
+z=0. (y shows your current level above bedrock.) Take a note of the current values. If you
+become lost before you have had the chance to build a bed and reset your spawn point, you
+can always find your way back to your original spawn and, presumably, your first shelter, by
+facing in a direction that will bring both x and z back to those noted values. If you do sleep
+in a bed and reset your spawn, turn on the debug screen and write down the coordinates
+shown before you head out.
+0
+Improving Your Tools 51
+FIGURE 3.3 The Debug HUD provides a lot of cryptic information but can also
+help you navigate home.
+1. Your location in blocks east of your original spawn point. Blocks west are shown as a negative.
+2. Your current vertical height in layers above bedrock.
+3. Your location in blocks south of your original spawn point. Blocks north are shown as a negative.
+4. The current biome type.
+When you need to return, and I should warn you that this can take some experimentation
+and a little practice, turn and take a few steps while noting the change in values of your
+current coordinates. Shift those x and z values back toward the coordinates you originally
+recorded. You’ll probably wander around a bit, but eventually you’ll get there.
+Improving Your Tools
+Wooden tools wear out fast, so it’s best to upgrade your kit as quickly as possible.
+Each type of material has a different level of durability. Think of durability as the number of
+useful actions the tool can perform before wearing out completely and disappearing from
+the inventory. I’ve included the durability in parentheses after each material’s description:
+ Gold (33)—Although this is the least durable material, a gold pickaxe can break blocks
+out of most softer materials in the blink of an eye, and it happens to be the most
+enchantable material, so you can imbue it with superpowers (see Chapter 10). But given
+that gold is about 5 times as rare as iron and can be used to craft many other useful
+items, I wouldn’t recommend using it for tools.
+4
+2
+1
+3
+0
+52 CHAPTER 3: Gathering Resources
+ Wood (60)—It’s easy to obtain, especially in an emergency aboveground, but think of
+wood as just a means of getting to cobblestone because, unlike the latter, wooden tools
+can’t mine the more valuable ores such as iron, gold, diamond, and redstone. You will
+at least need a wooden pickaxe to mine stone because doing so with your bare hands
+will just break the stone down into unusable dust, but after that, switch to stone.
+ Stone (132)—With just a touch over twice the longevity of wood, stone makes a great
+starting point for more serious mining and other activities. Stone tools are built from
+cobblestone blocks, which in turn come from stone. That may seem a little confusing,
+but it will seem natural enough after a while.
+ Iron (251)—Iron will become your go-to material. It is found most commonly all the
+way from bedrock, the lowest layer of the Minecraft world, up to about 20 levels below
+sea level. Iron is used for building all kinds of tools, implements, and devices including
+armor, buckets (for carrying water, lava, and milk), compasses, minecarts, and minecart
+tracks. All these require at least iron ingots obtained by smelting the ore in a furnace,
+with each block of ore producing one ingot. Ingots and many other items are found
+scattered throughout the world in village chests, mine shafts, dungeons, and strongholds. You might also find them as drops from killed zombies and iron golems (if you
+dare tackle them!).
+ Diamond (1562)—It’s the strongest material of all, but also the most expensive given
+that diamonds are relatively rare. (You will enjoy the moment you do find your first
+diamond, but it’s found only in the first 16 layers above bedrock, the lowest layer in
+the Minecraft world, and even then it’s about 25 times as scarce as iron.) A diamond
+pickaxe is the only material that can successfully mine obsidian, a material required for
+creating the portal to reach The Nether region. Given diamond ore is much scarcer than
+iron but only 6 times as durable, you should use iron pickaxes as much as possible and
+only switch to diamond when you need to mine obsidian to reach The Nether. You’re
+better off saving any diamonds you find for weapons (a diamond sword does more
+damage, and that combined with its increased durability will ensure it lasts much longer
+than any other material), armor, and enchantment tables.
+NOTE
+Different Materials for Different Items
+Durability applies to all tools, weapons, and armor, although there are differences
+in the materials that can be used in each case. For example, you can craft leather
+armor and make stone tools, but not vice versa.
+04_9
+Improving Your Tools 53
+CAUTION
+Don’t Let Tools Wear Down to Nothing!
+Try not to let a tool becomeso worn it actually breaks down completely and disappears. Instead, place two of the same type of worn tools in the crafting grid to combine their remaining strength into another and give it a second shot at life, or busting
+blocks.
+The recipes for crafting tools from all materials are identical, save for the replacement of the
+head of the implement with the material of choice.
+Q To make a stone pick, you need two wooden sticks for the handle and three cobblestone blocks.
+Q Replace in the same way for the axe and the sword.
+Q You might also want to add a shovel to your collection, because it’s about four times
+faster than using hands to harvest softer materials such as dirt, gravel, sand, clay, and
+snow, and helps some of those blocks deliver resources rather than just breaking down.
+As you craft more items, you need to find somewhere to store those you don’t need to use
+right away. You should also store other resources and food you come across on your travels.
+That comes next.
+54 CHAPTER 3: Gathering Resources
+Chests: Safely Stash Your Stuff
+Whenever you head away from your secure shelter, there is always a reasonably high risk of
+death. Creepers, lava pits, long falls—they can all do you in. Respawning is only a moment
+away, but the real danger here is that any items you’ve collected and carry in your character’s inventory drop at the location of your untimely death and may prove impossible to
+retrieve in the 5 minutes you have to get back to them before they disappear forever.
+Chests act as an insurance policy. Put everything you don’t need in a chest before you
+embark on a mission, and those things will be there when you get back or after you
+respawn.
+The natural place to leave chests is in your shelter, but you can also leave them elsewhere,
+perhaps as a staging point as you work away in a mine, or even outside. Mobs will leave
+them alone, and the only real risk you face is leaving them out in the open on a multiplayer
+server or getting blown up from behind by a creeper in singleplayer mode while you’re rummaging around inside.
+Chests come in two sizes: single and double. A single chest can store 27 stacks of items.
+Create a double chest by placing two single chests side by side. The double chest stores up
+to 54 stacks of items. Given that a stack can be up to 64 items high, that’s an astonishing
+potential total of 3,510 blocks in a crate that takes just 2×1 blocks of floor space. If you’ve
+ever followed the Doctor Who TV series, consider chests the Tardis of storage!
+Create a chest at your crafting table with eight blocks of wooden planks arranged around
+the outside, leaving a space in the middle.
+Place and then right-click the chest to open . You can then move items back and forth
+between your inventory and the chest. In Figure 3.4, I’ve transferred all the items I don’t
+need for the next expedition.
+Before you head out, there are two other things you should know: how to avoid monsters
+and how to deal with hunger. Read on.
+Avoiding Monsters 55
+FIGURE 3.4 Chests act as an insurance policy for your items so they aren’t lost
+if you die. Use the inventory shortcuts you learned earlier to quickly move items
+between your active inventory and the chest’s storage slots.
+THE CONNECTED CHEST
+Chests are undoubtedly useful; it’s difficult to survive without them. But you can’t
+transport a chest’s contents with you. Need to shift your stash of diamonds? That
+can make for a fairly fraught journey.
+Enter the Ender chest, whichis like storage in the cloud. An Ender chest isn’t cheap
+to make. You’ll need eight Obsidian blocks obtained by combining lava with water, or
+through regular mining and caving, and one Eye of Ender, collected from a downed
+endermen. So what’s so good about Ender chests? All of them access the same virtual chest, sharing all contents between them. So let’s say you’ve built multiple dwellings across your vast world, and you have some items—a few favorites—that you’d
+like to be able to access anywhere you go. Place an Ender chest in each of your dwellings; any items that you place in any of the chests become available in all others. It’s
+like quantum travel without all that entanglement business.
+Avoiding Monsters
+There’s a key difference between the Minecraft world on the first and second days. In a
+word, mobs: hostile ones to be specific. Mobs only spawn in dark areas, and some only
+during the night, so if you are outside during your first day and stay in well-lit areas, you’ll
+be reasonably safe. By the second day, however, mobs have had a chance to build their
+numbers and wander about. It’s not that likely you’ll encounter them on day 2, but it’s best
+to be prepared.
+56 CHAPTER 3: Gathering Resources
+There are 14 types of hostile mobs in the Overworld. These are the ones you might meet on
+your second day outside:
+ Zombies—Zombies burn up in sunlight but can still survive in shadows or rain, or when
+wearing a helmet, and, of course, in dark caves all hours of the day or night. They are
+relatively easy to defeat, and if any come after you, just head to a well-lit area and keep
+your distance while they burn up in the sun.
+ Skeletons—Skeletons also burn up in sunlight unless they are wearing a helmet, and they
+can survive at any time in lower light conditions. They’re quite deadly with a bow and
+arrow and best avoided until you have an iron sword and sufficient cover to avoid their
+line of fire.
+ Spiders—Spiders come in two variants: large or blue. You’ll probably only see the larger
+spiders at this stage. They are passive during the day but become hostile in shadow and
+can attack at any time if provoked. They’ll climb, they’ll jump, and they are pretty darn
+fast. Fortunately, they’re also easy to kill with some swift sword attacks. The blue spiders are a smaller, poisonous variant called cave spiders. They live only in abandoned
+mine shafts underground, but in substantial numbers. If you suffer from arachnophobia, I don’t have much good news for you, except that with a little time you’ll get used
+to them and they won’t seem quite so nasty.
+ Creepers—Creepers have a well-earned reputation as the Minecraft bad guys. They are
+packed to their green gills with gunpowder, and they’ll start their very short 1.5-second
+fuse as soon as they are within three blocks of you. Their explosion can cause a lot of
+real damage to you, nearby structures, and the environment in general. If you hear a
+creeper’s fuse—a soft hissing noise—but can’t see it, run like heck in the direction you’re
+facing. Remember to sprint by double-tapping and holding your W key . With a little
+luck, you’ll get three blocks away and the creeper’s fuse will reset. Creepers are usually
+best dealt with using a ranged attack from a bow and arrow, but if you sprint at them
+with an iron or diamond sword and take a swipe at just the right moment, you can send
+them flying back out of their suicidal detonation range, causing the fuse to reset. Most
+creepers despawn around noon, leaving the afternoon generally free of their particular
+brand of terror.
+ Slimes—Slimes appear in the swamp biome and in some places underground. They initially spawn as quite large Jello-like green blocks and are more than capable of causing
+damage. Attacking eventually breaks them up into 2–4 new medium-sized slimes. These
+can still attack but are relatively easily killed, only to spawn a further 2–4 tiny slimes
+each! These last don’t cause any attack damage, but may still push you into peril if
+you’re unlucky.
+If you come across a lone spider, a zombie, or even a slime, now is as good a time as any to
+get in some sword practice. Just point your crosshairs at thecreature and strike with the left
+04_97
+Avoiding Monsters 57
+mouse button. Keep clicking as fast as you can, and you’ve got a very good chance of killing
+the mob and picking up any items it drops before it lands too many blows. Try to avoid the
+other mobs for now.
+TIP
+Switch to Peaceful Mode to Get a Break
+Getting mobbed by mobs? Click Esc to open the Options window and changeyour
+difficulty level to Peaceful. This despawns all hostile mobs and allows your health to
+regenerate. But do try to switch the level back to Normal as soon as you can.
+So how do you avoid mobs? Use these tips to survive:
+Q Stay in the open as much as you can, avoiding heavily wooded areas if possible.
+Q Most mobs have a 16-block detection radar. If they can also draw a line of sight to
+your position, they will enter pursuit mode . (Spiders can always detect you, even through
+other blocks.) At that point they’ll relentlessly plot and follow a path to your position,
+tracking you through other blocks without requiring a line of sight. Pursuit mode stays
+engaged much farther than 16 blocks.
+Q Keep your sound turned up because you’ll also hear mobs within 16 blocks, although
+creepers, befitting their name, are creepily quiet.
+Q Avoid skirting along the edges of hilly terrain. Creepers can drop on you from above
+with their fuse already ticking. Try to head directly up and down hills so you have a
+good view of the terrain ahead.
+Q Mobs are quite slow, so you can easily put some distance between them and yourself by
+keeping up a steady pace and circling around to get back to your shelter. Sprint mode
+will leave them far behind.
+CAUTION
+Sprinting Makes You Hungry
+Sprint modeburns up hunger points, so try to use it only in emergencies.
+58 CHAPTER 3: Gathering Resources
+Hunger Management
+Hunger plays a permanent role in Minecraft, much as in real life. While it’s only possible
+to starve to death on Hard difficulty, hunger does affect your character in other ways, so
+it’s always important to ensure you have the equivalent of a couple of sandwiches packed
+before heading deep into a mine or on a long trek.
+Hunger is a combination of two values: the one shown in the HUD’s hunger bar, as well
+as a hidden value called saturation. The latter provides a buffer to the hunger bar, decreasing first. In fact, your hunger bar doesn’t decrease at all until saturation reaches 0. At that
+point, you see the hunger bar start to jitter, and after a short while it takes its first hit.
+Saturation cannot exceed the value of the hunger bar, so with a full hunger bar of 20 points,
+it’s possible to have up to 20 points of saturation. However, a hunger level of 6 points also
+only provides a maximum of 6 points of saturation, and that makes you vulnerable.
+You’ll find some key information about the hunger system here:
+ On Easy and Normal Survival modes, there is no need to worry too much about hunger
+because your character won’t drop dead from it. If you’re close to home and pottering
+around in your farm or constructing some building extensions, you’re fairly safe, but
+your health starts to drop. Eat something as soon as you can to fill your hunger bar,
+and rebuild your health.
+ Sprinting isn’t possible when the hunger bar drops below 6 hunger points, or 3 shanks,
+as shown in the HUD.
+ Keeping a relatively full stomach at 18 hunger points (9 shanks in the HUD) allows
+health to regenerate at 1 point (half a heart) every 4 seconds.
+ Health depletes if the hunger bar drops to 0, increasing the risk of dying from one of the
+many imaginative ways Minecraft has on offer (see Figure 3.5).
+ There are some limits to the amount health can drop according to the difficulty level.
+On Easy, health cannot deplete from hunger further than 10 points, or half the full
+quotient. On Normal, it drops to 1 point, which is an extreme level of vulnerability. On
+Hard difficulty, there are no limits; don’t ignore the hunger bar, or death from starvation could be just moments away. See “Food on the Run” later in this chapter to help
+avoid this.
+04_97
+Your Mission: Food, Resources, and Reconnaissance 59
+FIGURE 3.5 The effects of extreme hunger on Normal difficulty: health depletes
+to just one point, or half a heart.
+Your Mission: Food, Resources, and
+Reconnaissance
+Your second day is the perfect opportunity to gather food and other resources and to take a
+quick survey of the landscape surrounding your first shelter, in particular to find somewhere
+suitable for your first outdoor abode. Keep an eye out for any of the following:
+ Passive mobs—Chickens, pigs , and cows all provide a ready source of food, or at least
+raw protein that can be cooked on the furnace and made more nutritious. Cows also
+drop leather that you can use for your first armor, and when you have an iron bucket,
+cows can be milked, giving you an instant cure for food poisoning. Chickens also lay
+eggs, so gather any that you find.
+ Natural harvest—The harvest includes cocoa pods, apples, cactus, sugar cane, carrots
+and potatoes (found in villages), and seeds. Knock down tall grass to find seeds. When
+you plant the seeds, they mature into wheat within 5–8 day/night cycles. From wheat,
+it’s easy to bake bread, one of the simplest but most effective sources of food, especially
+if there are no passive mobs nearby. See Chapter 6, “Crop Farming,” for more on agricultural techniques.
+04
+60 CHAPTER 3: Gathering Resources
+Q Construction resources—You can mine plenty of cobblestone quite safely by expanding
+your original shelter, digging into the terrain. But some other resources will definitely
+come in handy. Wood is always useful. If you see any sand, mine it so you can smelt
+it into glass blocks to let light into your shelter, and provide a view. (There’s no point
+moving from your first cave into the outdoor equivalent of another!) Also keep an eye
+out for coal. You can often see it in veins on the surface of the walls of small caves or
+on the sides of cliffs. If you can safely get to it, make like a miner and dig it out. Use the
+coal to make torches and to smelt other ores.
+FIGURE 3.6 Knock down grass to gather seeds to plant wheat, an easy crop to
+farm and turn into bread—a handy food if you’re stuck with no other edible options.
+TIP
+Making Use of Bones
+The morning sunburns up skeletons, leaving behind bones that you can craft into
+bone meal. Bone meal acts as a fertilizer, helping your crops grow faster. You can also
+use bone to tame wolves, providing you with an extra level of protection. Chapter 7,
+“Taming Mobs,” has a lot more information on breeding and taming Minecraft’s many
+friendly creatures.
+Start early, heading out with a stone sword at the ready, just in case. If you are low on wood,
+swing an axe at a few nearby trees.
+Your Mission: Food, Resources, and Reconnaissance 61
+Move carefully so you don’t lose your bearings. The sun rises in the east and sets in the
+west, and the clouds always travel from east to west, so you can always at least get your
+bearings. Following a compass cardinal point (north, south, east, or west) using the sun
+and clouds as a reference can lead you away and reasonably accurately back home again.
+TIP
+Finding Your Way
+It’s easy to become lost in Minecraft. Run helter-skelter from your base, chase a herd
+of livestock, discover a natural cave system, or take a shot across the sea like that
+famed Norseman, Leif Eriksson. It’s all part of the Minecraft charm. But don’t become
+Columbus in the process.
+A few quick tips:
+Q When you are able, craft a compass. Ittakes some redstone and iron, and both
+are relatively easy to obtain with some assiduous mining. The only problem with a
+compass is that it always points to your original world spawn point. Think of that
+point as the magnetic north pole—it’s not a GPS. Sleeping in a bed resets your
+spawn point but not your compass, so this method falls out of date as soon as
+you move to new dwellings and update your spawn point.
+Q A compass is actually more useful when crafted into a map, see Chapter 10,
+“Enchanting, Anvils, and Brewing” page 195.
+Q Don’t forget that you can always use the built-in GPS available through the debug
+screen (mentioned under the “Introducing theHUD” section earlier in this chapter).
+Food on the Run
+If you are getting dangerously hungry, head to the nearest equivalent of a fast food outlet—
+a passive mob—sword at the ready. Your best bet is to look for cows and pigs because they
+each can drop up to three pieces of raw meat, with each piece restoring 3 hunger units and
+1.8 in saturation. They’re an excellent target of opportunity. You can also eat raw chicken,
+although with a 30% chance of developing food poisoning, or you can try rotten meat harvested from zombies, which is guaranteed to give you a taste of the stomach aches. But you
+can also cure any type of food poisoning by drinking milk obtained with a bucket clicked on
+a cow, and you can eat any amount of poisoned meat, gaining the restorative benefits, and
+curing the whole lot with one serving of milk. So keep that rotten flesh the zombies drop
+around! And the bucket o’ milk.
+62 CHAPTER 3: Gathering Resources
+That said, unless you are desperate, it is actually much better to take the time to cook all
+your meat first. In fact, the secondary processing of foods makes them all healthier, restoring more hunger and saturation points. It’s therefore quite handy to always carry a furnace
+in your inventory, along with fuel. When you’ve finished cooking, break the furnace down
+with a pickaxe, and it floats back into your inventory. If you don’t mind seeming like a
+crazed pyromaniac, you can also both kill and cook pigs, chickens, and cows in one blazing
+swoop by setting the ground beneath them on fire with a flint and steel (right-click on the
+ground, not the animal), or a little more chaotically by pouring lava from a bucket. Just take
+caution that you don’t do this anywhere it could pose a risk, such as near that fantastic
+wood cabin you just spent the last three weeks building; there’s no Undo key in Minecraft.
+NOTE
+Fishing in the Sea of Plenty
+Mobs such as chicken, cows, and pigs spawn quite rarely compared tohostile mobs,
+so consider them a nonrenewable resource if you kill them in the wild. You’re better
+off breeding them in a farm so they can’t wander off and can be readily replaced.
+Fish, on the other hand, are unlimited in quantity and very plentiful. You can even fish
+in waterfalls! By the way, yourhunger bar never decreases when travelling by boat,
+making it the perfect opportunity to get in a spot of fishing. And you can never get
+food poisoning from raw fish. Sushi anyone? See Chapter 7 for more information.
+TIP
+Let Them Eat Cake
+What’s the quickest way to fill your hunger bar? Eat cake. Unlike another well-known
+game, Minecraft’s cake isnot a lie. Cake has a quite a complicated recipe, but each
+full cake provides up to 6 slices, each worth 1.5 hunger points, or 9 in total, and it’s
+less resource intensive than creating golden apples. Minecraft rewards calories, so
+eat as much as you like without penalty, quickly building back your full hunger bar but,
+as in the real world, the nutrients are lacking, so cake doesn’t provide any saturation
+benefit. Make sure you eat some more nutritional foods such as protein as your hunger bar starts to top out to ensure you also get that extra boost. If only they added
+pizza!
+Finally, if you simply cannot find mobs, your hunger bar has dropped to 0, and your health
+has plummeted to half a point, consider at least planting a wheat field and waiting it out in
+your shelter for three blocks of wheat to grow so you can harvest them and bake bread.
+
+Your Mission: Food, Resources, and Reconnaissance 63
+There’s one final alternative, and this is a pretty neat trick. Assuming you have reset your
+spawn point to a bed or are still near origin, head to your shelter, place everything you carry
+in a chest, and then head outside and either jump off a cliff, drown in a lake, or wait for
+a mob to kill you. You respawn back in your shelter with full health, a full hunger bar, and
+all your possessions waiting for you. Get dressed, fully equipped, and head out there to try
+again.
+Finding a Building Site
+As you scout around, keep in mind that you are also looking for a new building site. This
+doesn’t have to be fancy or even particularly large. A 6×5 space manages just fine, and even
+6×4 can squeeze in the basics. You can also level ground and break down a few trees to
+clear space. I did this in Figure 3.7. The site is located just up the hill from the first dugout,
+overlooking the same lake and river system.
+FIGURE 3.7 A nice, flat, elevated building site after clearing some trees and filling some holes in the ground with dirt.
+I usually prefer space that’s a little elevated because it provides a better view of the surroundings, but it’s perfectly possible to create a protected space just about anywhere. You
+may even decide to go a little hybrid, building a house that’s both tunneled into a hill and
+extending outside.
+64 CHAPTER 3: Gathering Resources
+TIP
+Light Those Caves
+Check for any cavesor tunnels close to your site’s location. If they aren’t too big, light
+them up with torches to prevent mobs spawning inside and wandering out during the
+day, or just block their entrance for now.
+So what can we build on this site? Let me show you a basic structure. It takes 34 cobblestone blocks dug out of the first shelter and 12 wood blocks for the roof obtained by cutting down the 3 trees that were occupying the site .
+FIGURE 3.8 The layout for a small cobblestone cabin using a total of 46 blocks,
+roof not shown. The sharp-eyed will notice it can be reduced in width one space
+further, but for the sake of four blocks, that would feel a little claustrophobic.
+You can build the roof from almost any handy material, including dirt, cobblestone, and
+wood. Avoid blocks that fall down, such as gravel and sand. A two-block high wall keeps
+out all mobs except for spiders, because they can climb walls. An overhang on the wall
+keeps spiders out because they can’t climb upside-down, but it’s easier to just add a roof,
+especially if there are trees nearby the spiders can climb up and use as an arachnid’s springboard to jump straight into your dwelling. (Yes, it’s happened to me. Sent shivers up my
+spine.) Figure 3.9 shows the finished hut with a few torches on the outside to keep things
+well lit.
+
+Your Mission: Food, Resources, and Reconnaissance 65
+FIGURE 3.9 The finished hut—basic but serviceable. And it’s spider proof.
+Although there is a large gap above the door, in Minecraft’s geometry the door
+fills theentire space. Spiders are also two blocks wide, so they can’t fit through
+a one-block-wide gap. You could actually leave the door wide open, and spiders
+will just gather outside and make horrible noises, but don’t do that because it’s
+an invitation for other mobs to enter.
+TIP
+No Housing Codes in Minecraft
+The roof in Figure 3.9 rests right on the lip of the inner wall. You can’tdirectly build a
+roof like this from scratch. First place a block on top of the wall, and then attach the
+inner block for the roof. Remove the first block, and the inner block floats. Attach new
+blocks to that to build out the roof structure. It won’t pass a building inspection, but it
+certainly works in Minecraft.
+Building a wall even two blocks high can take a little bit of fancy footwork. Some basic
+techniques help:
+ Place your walls one layer at time. Put down the first layer, and then jump on top to
+place the second.
+ If you fall off, place a temporary block on the inside of your structure against the wall,
+and use this to climb back up. You can remove it when you’re finished.
+ Use pillar jumping if you need to go higher. While looking directly down, press the
+04_
+66 CHAPTER 3: Gathering Resources
+spacebar to jump and then right-click to place a block underneath you. You land on
+that block instead of the one below. Repeat as often as necessary. Dig the blocks out
+from directly underneath you to go back down.
+Q Hold down the Shift key as you work around the top of tall walls so you don’t fall off.
+You can even use this technique to place blocks on the side of your current layer that are
+normally beyond sight.
+See Chapter 8 for more building techniques and ideas.
+A Resourceful Guide to the Creative Mode
+Inventory
+Minecraft’s resources fall into several primary categories. Some of them are a natural early
+focus as you improve your position from those gathered for first-night survival; others
+become more important as you get further through the game, gear up for your exploration
+of The Nether and The End regions, and become more creative with all that Minecraft has
+to offer. Here’s a quick summary of the different categories. You can view all possible tools
+and resources by opening your inventory in Creative mode, as shown in Figure 3.10. The
+categories that follow correspond to the tabs running across the upper and lower sections
+of the Creative mode inventory .
+FIGURE 3.10 Creative mode inventory provides access to the full set of
+resources and tools.
+A Resourceful Guide to the Creative Mode Inventory 67
+TIP
+Turn On Cheats
+Turn on Cheatswhen you start a new world to quickly jump between different
+gameplay modes. Type /gamemmode creative and /gamemode survival to move
+between the main types.
+ Building Blocks—Building blocks are used, as you might expect, for construction, including housing and almost anything else. Build a bridge for your redstone rail. Construct a
+dam. Elevate a farm above a level that won’t get trampled by mobs, or put up a fence.
+Build a skyscraper or reconstruct a monument. Minecraft provides a large number of primary blocks—such as cobblestone, gravel, wood, and dirt—that can be harvested directly,
+but things definitely become more interesting once you start creating secondary types of
+blocks from primary materials. You can store many items more efficiently (for example, by
+converting nine gold ingots into a single gold block), and climb more efficiently by crafting stairs instead of jumping up and down blocks on well-travelled routes. Building blocks
+are, without being too punny, the building blocks of creativity.
+ Decoration Blocks—Decoration blocks are something of a catchall category. Generally,
+they are things you can use to make your constructions more interesting. Some of those
+are just visual, such as carpet, whereas others such as crafting tables, chests, and the
+bed that keeps you safe at night provide vital functions.
+ Redstone—Redstone is an almost magical resource. You can use it to build powered
+circuits, quite complex ones, and then activate pistons to automatically harvest a farm
+plot, set up traps, open and close doors, and a huge amount more. The limits are set
+only by your imagination. Redstone is also used to craft powered rail tracks and a range
+of other useful items such as a compass and clock. See Chapter 9, “Redstone, Rails,
+and More,” for more information.
+ Transportation—Transportation is a small category, but one that’s a lot of fun and very
+useful. It includes powered and unpowered rails, minecarts, a saddle, a boat, and anything else related to moving yourself and other items around. There are enough options
+there to enable you to build everything from massive transportation systems to incredible
+roller coasters.
+ Miscellaneous—Miscellaneous contains a range of useful and obscure items. You’ll find
+the buckets quite handy for setting up new water and lava sources, and you can use the
+eggs to spawn most of the mobs , populating a farm and more.
+ Foodstuffs—Foodstuffs contains the full range of edibles, including the enchanted form
+of the golden apple, the rarest edible in the game. Take a few of these with you the next
+04_978
+68 CHAPTER 3: Gathering Resources
+time you think you’ll be in a tight spot, and you may just be able to make it through that
+moaning zombie horde.
+ Tools—Tools can be wielded as weapons, but not very effectively. They are, however,
+great at digging, chopping, hoeing, and setting Nether Portals on fire with the flint and
+steel. You’ll also find shears for stripping the wool from sheep, a fishing rod, and a few
+enchanted books that can add special powers to your tools.
+ Combat—Combat provides your weapons and armor, as well as the remaining enchanted
+books that relate to combat items.
+ Brewing—The Brewing tab contains all possible potions and a number of the rarer ingredients required that don’t fit into other categories. Potions are incredibly handy. Caught outside at night? The Potion of Night Vision triples the brightness to almost daylight conditions.
+You can learn more about brewing in Chapter 10.
+ Materials—Materials is the final catchall category, along with the miscellaneous and decoration blocks. It differs because it is composed of secondary items that are derived from
+another action. For example, killing a chicken can drop feathers, and you’ll need those for
+the fletching on arrows unless you gather them from skeletons. Grow wheat to get bushels
+that can be used to tame horses, donkeys, and mules.
+There are two other tabs on the Creative inventory. In the upper-right corner is a compass
+icon. This is the search bar. Just click on it and type in the item’s name.
+In the lower-right corner is a chest. This is your Survival mode inventory containing any items
+you were carrying when you switched to Creative mode. (This is empty if you started your world
+in Creative mode.) You can shift items between the Creative mode inventory and your Survival
+inventory . Any items you drag down to the quick access bar are common across both inventories. Re -move items from your Survival inventory by dragging them down to the square filled
+with an X.
+The Bottom Line
+Congratulations! You’ve now learned everything you need to know to understand how your
+character is doing, improve your tools for better longevity, hopefully not get lost on your travels, and create your first mob-proof outdoor shelter.
+These are the keys to Minecraft. Just remember to head back to your chest often to store the
+valuables you’ve gathered, or build other chests further afield.
+You might also want to consider building a pillar and platform on top of your new shelter.
+It can help you survey your terrain and acts as an easy-to-see landmark when you’re out and
+about. Put some torches on top because mobs can spawn on any platform, no matter how
+small, and you don’t want to poke your head up through the platform only to discover a
+creeper on a short fuse.
+The next chapter is all downhill—deep into your first mine.
+04_9
+INDEX
+NUMBERS
+2x1 ladder descent, mining and, 74
+A
+A key, 25
+activator rails, 189
+ads (pop-up), downloading resource packs, 258
+Adventure mode, 17
+airlocks, building, 36
+Allow Cheats setting (Create New World
+screen), 14
+anchor blocks, 166
+AND gates, 182-183
+animals, 125
+breeding, 126-130
+cats, 127
+chickens, 127
+crafting arrows, 97
+fences, 126
+cooking, 61
+cows, 127
+donkeys, 127, 130-133
+farms, 125-128
+fences, 126
+fi sh, 62
+fi shing, 134
+food poisoning, 61
+herding, 128
+horses, 127
+armor and, 132
+jumping with, 132
+leading, 129
+riding, 130-132
+taming, 130-132
+hostile mobs and safety, 128
+jumping with, 132
+leading, 127-129
+leather, obtaining, 99
+mooshrooms, 127
+mules, 127, 130-133
+ocelots, 127
+pack animals, 133
+pigs, 127, 134
+raw, eating, 61
+resources, animals as, 59, 62
+riding, 130-134
+sheep and wool, 42-43, 127, 130
+squid, 135
+taming, 127, 130-132
+wolves, 127
+anvils
+combining two items with, 209
+crafting, 207
+enchantments, 209
+placement of, 208
+renaming items, 209
+repairing items, 209
+274 Aqua Affinity enchantment
+Aqua Affi nity enchantment, 206
+architectural plans, fi nding, 140
+armor, 94
+armor bar (HUD), 48
+Armor slots (inventory), 27
+crafting
+color, 100
+leather, 99
+recipes, 99-100
+requirements, 98-99
+critical hits, 94
+damage absorption, 99
+enchantments, 205-206
+End survival checklist, The, 243
+horses and, 132
+Nether survival checklist, The, 234
+arrows and bows
+arrow slits, building, 157
+crafting, 96
+End survival checklist, The, 243
+fi ghting, 98
+Nether survival checklist, The, 235
+skeletons, 88, 96
+target practice, 98
+attacking. See combat
+automated farms, 113
+crop selection, 116
+harvesting, 115
+piston harvesters, 117-118
+sticky piston harvesters, 119
+sugar cane, 122
+water harvesters, 119-122
+automatic doors, building, 173-176
+awkward potion, 212-213
+axes, crafting, 32
+B
+Bane of Arthropods enchantment, 204
+barbeques, building, 146
+barricades, building in The Nether, 239
+bases
+mining bases, setting up, 81
+underwater bases, mob attacks, 49
+basins, 222
+BeastsMC multiplayer server, 269
+beds
+building, 41-43, 142
+End, The, 242-243
+Nether, The, 242
+spider string, 42
+taking with you, 44
+villages and, 219
+wool, 42-43
+bedside tables, building, 142
+biomes
+changing, 26
+choosing, 16
+Far Lands or Bust, 16
+islands, fi rst-night survival, 26
+Large Biomes option, 217
+oceans, fi rst-night survival, 26
+pocket edition, 16
+resetting, 26
+trees
+fi rst-night survival, 25
+lumberjacking, 26
+Xbox 360 Edition, 16
+blacksmiths, 220
+Blast Protection enchantment, 206
+bowls, crafting 275
+blaze rods
+fi nding, 234
+Nether, The, 234, 239
+potions, brewing, 210
+blazes in The Nether, 241
+blaze spawners, 239
+blocking
+areas off (mining), 73
+attacks, 95
+blocks
+anchor blocks, 166
+building blocks, 67
+cobblestone, 60
+furnace, crafting, 38-39
+huts, building, 64
+Nether survival checklist, The, 234
+powered blocks, 166
+Command Block, 267
+decoration blocks, 67
+diamonds, 52
+fl oating blocks, 140
+glowstones
+glowstone dust potion, 214
+Nether, The, 238
+underwater, building, 148-150
+gold (material type), 51
+gravel
+arrows, crafting, 97
+mining, 97
+Nether survival checklist, The, 234
+Nether, The
+barricades, building, 239
+Netherbrick, 238-239
+Nether quartz, 238
+Netherrack, 146, 237
+survival checklist, 234
+note blocks, 173
+obsidian
+enchantment tables, 197-199
+End survival checklist, The, 243
+mining, 70, 197-199
+Nether Portals, building, 236
+Nether survival checklist, The, 235
+powered blocks, 166-167
+redstone blocks, 67, 162
+scale of, 138
+signs, placement of, 141
+snow blocks, The Nether survival checklist,
+235
+soft blocks, building underwater, 148,
+152
+wood blocks, 52
+gathering, fi rst-night survival, 25-26
+mining and, 70
+Nether survival checklist, The, 235
+planks, crafting, 29
+wood buttons, 162, 166, 173
+boats, building, 134
+bobbers (fi shing), 134
+bones
+as resources, 60
+farming, 110
+Bonus Chest setting (Create New World
+screen), 15
+books
+crafting, 200
+enchantment tables, 200
+storing enchantments, 202
+bookshelves
+building, 145
+casting enchantments, 202
+bottles, crafting, 212
+bowls, crafting, 124
+276 bows and arrows
+bows and arrows
+arrow slits, building, 157
+crafting, 96
+End survival checklist, The, 243
+fi ghting, 98
+Nether survival checklist, The, 235
+skeletons, 88, 96
+target practice, 98
+branch mines, 79-80
+bread, 62
+breaking your fall, 75-76
+breeding animals, 126-130
+brewing. See also building; crafting;
+growing
+bottles, crafting, 212
+brewing stands, building, 212
+Creative mode inventory, 68
+potions
+blaze rods, 210
+Nether wart, 209-212
+soul sand, 209-211
+testing potions, 210
+buckets and mining, 70
+building, 137-138. See also brewing;
+crafting; growing
+airlocks, 36
+arrow slits, 157
+automatic doors, 173-176
+barbeques, building, 146
+barricades, building in The Nether, 239
+beds, 41-43, 142
+bedside tables, 142
+boats, 134
+bookshelves, 145
+brewing stands, 212
+building blocks, 67
+chairs, 141
+clocks (wall), 144
+crafting tables, 29-30, 35
+decoration blocks, 67
+dining tables, 142
+enchantment tables, 197-201
+fi replaces, 146
+fl oors (raised/lowered), 145
+fountains, 144
+frames (item), 144
+griefi ng, 140
+huts, 64-65
+item frames, 144
+lighting, 64
+location, determining, 139, 149
+maps (wall), 144
+multiplayer rules, 140
+Nether Portals, 236
+netting, 145
+overhangs and spiders, 64
+paintings, 144
+perimeters
+arrow slits, 157
+ditches, 153-154
+lighting, 155
+mobs, 155-157
+towers, 155
+walls, 157
+pits, 155-157
+plans, fi nding, 140
+planter boxes, 143
+ponds, 144
+pools, 144
+pressure plates, 156
+redstone, 67, 162
+resource packs, 138
+scale of, 138
+security
+arrow slits, 157
+ditches, 153-154
+carts (mine) 277
+lighting, 155
+mobs, 155-157
+perimeters, 153-157
+pits, 155-157
+pressure plates, 156
+towers, 155
+walls, 157
+shelter, 33-34
+doors, 36-37
+emergency shelters, 38
+heat sources, 37-38
+light sources, 37-41
+signs, placement of, 141
+sites
+fi nding, 63
+housing codes, 65
+walls, 65
+sliding doors, 177-179
+tables
+bedside tables, 142
+crafting tables, 29-30, 35
+enchantment tables, 197-201
+dining tables, 142
+tennis courts, 145
+tool enchantments, 206-207
+tracks
+halfway stations, 192
+mobs, protecting tracks from, 192
+powered rails, 190
+T-junctions, 191
+zig zags, 190
+trees (fantasy), growing, 144
+underwater, 139, 147, 151
+Creative mode, 147
+doors, 150
+enchantments, 153
+fl oating blocks, 140
+fl ooding, 152
+island spawn points, 149
+ladders, 150
+lighting, 148-150
+location, 149
+oxygen, 150
+required equipment, 148-149
+security, 153
+signs, 150
+soft blocks, 148, 152
+Survival mode, 148
+vandalism, 140
+villages, building next to, 139
+wall clocks, 144
+wall maps, 144
+walls, 86, 157
+water, building on, 139
+butchers, 220
+buttons, 162. See also pressure plates
+automatic doors, 173
+powered blocks, 166
+buying Minecraft, 10-11
+C
+cake, 62
+carrots, 105
+carts (mine), 185-186
+destroying and reusing, 188
+hopper minecarts, 187
+powered minecarts, 187-188
+rails, building, 159
+activated rails, 189
+detector rails, 164, 189
+halfway stations, 192
+mobs, protecting tracks from, 192
+normal rails, 188
+powered rails, 189-190
+T-junctions, 191
+zig zags, 190
+storage minecarts, 187
+278 carts (mine)
+TNT minecarts, 187-189
+trains, minecarts as, 188
+underground rails, 188
+cats, 127
+caves, 222
+cave spiders, 88-89
+doors, importance of, 85
+lighting, 64
+mining
+creating caves, 69
+existing caves, 69
+shelter, building, 34
+chairs, building, 141
+character skins, 251
+changing, 252, 255
+skin editor websites
+Minecraftskins, 253
+Novaskin, 254
+Skincraft, 253
+superhero skins, 262
+Steve, 252
+charcoal
+crafting, 37
+furnaces, fueling, 40
+chat window (HUD), 50
+cheats, 15
+Allow Cheats setting (Create New World
+screen), 14
+seeding, 19
+spawning, 42
+turning on, 67
+chests
+Bonus Chests setting (Create New World
+screen), 15
+Chest icon (Creative mode inventory), 68
+crafting, 54-55
+Ender chests, 55, 232, 235
+minecarts with chests (storage minecarts),
+187
+mining and, 81
+Nether survival checklist, The, 235
+opening, 54
+sizes of, 54
+trapped chests, 163
+chickens, 127
+arrows, crafting, 97
+fences, 126
+children in villages, 218, 221
+chopping down trees, 26
+circuits
+AND gates, 182-183
+NOR gates, 182
+NOT gates (inverters), 180
+OR gates, 181
+repeater loops, 184
+cliffs
+Nether, The, 238
+shelter, building, 34
+clocks, crafting, 144, 229
+closing doors, 36
+clothing, dyeing wool, 130
+coal
+charcoal, crafting, 37
+furnaces, fueling, 40
+cobblestone, 60
+furnace, crafting, 38-39
+huts, building, 64
+Nether survival checklist, The, 234
+powered blocks, 166
+cobwebs as netting, 145
+cocoa beans, 104-105
+color
+armor, crafting, 100
+dyeing and, 130
+crafting 279
+combat. See also defenses
+armor
+crafting, 98-100
+critical hits, 94
+damage absorption, 99
+arrows and bows
+arrow slits, 157
+crafting, 96
+End survival checklist, The, 243
+fi ghting, 98
+Nether survival checklist, The, 235
+skeletons, 88, 96
+target practice, 98
+combat category (Creative mode
+inventory), 68
+critical hits, 94
+creepers, 89-90, 102
+critical hits, 94
+enchantments, 204-205
+Ender Dragon, 246-249
+Endermen, 91
+hostile mobs, 84
+iron golems, 93-94
+Peaceful mode, resting via, 57
+skeletons, 87-89
+slimes, 90-91
+snow golems, 92-93
+spiders, 86-87
+cave spiders, 88-89
+spider jockeys, 89
+sprinting and, 95
+swords
+blocking attacks, 95
+crafting, 32, 95
+damage, dealing, 95
+End survival checklist, The, 243
+fi ghting with, 56
+Nether survival checklist, The, 234
+zombies, 84-85
+zombie pigmen, 91-92
+combining items and enchantments with an
+anvil, 209
+Command Block, 267
+compare mode (comparators), 170
+compasses
+Compass icon (Creative mode inventory),
+68
+crafting, 61, 227
+construction. See building
+controls
+A key, 25
+directional keys, 25
+D key, 25
+E key, 27
+Esc key, 25
+FN key (Mac OSX), 20
+left-handed options, 21
+list of controls, 19-20
+Q key, 29
+Shift key
+pausing on ladders, 74
+sneaking around hazards, 81
+S key, 25
+W key, 25, 56
+cooking, 61
+cows, 127
+crafting. See also brewing; building;
+growing
+anvils, 207
+armor
+color, 100
+leather, 99
+recipes, 99-100
+requirements, 98-99
+arrows and bows, 96
+axes, 32
+280 crafting
+books, 200
+bottles, 212
+bowls, 124
+bows and arrows, 96
+chests, 54-55
+clocks, 229
+compasses, 61, 227
+Crafting grid (inventory), 27
+crafting tables, 29-30, 35
+furnaces, 38-39
+heat sources, 37-38
+light sources, 37-41
+Minecraft: Xbox 360 edition, 31
+multicrafting, 36
+pickaxes, 32
+planks, 29
+shortcuts, 35
+shovels, 33
+swords, 32, 95
+tools
+durability, 53
+handles, 30-31
+torches, 39-41
+wool, 42, 43
+Create New World screen
+Allow Cheats setting, 14
+Bonus Chest setting, 15
+Generate Structures setting, 14
+World Type setting, 14
+Creative mode, 17
+compass icon, 68
+inventory, 66
+brewing, 68
+building blocks, 67
+Chest icon, 68
+combat, 68
+decoration blocks, 67
+foodstuffs, 67
+materials, 68
+miscellaneous, 67
+moving items to Survival mode inventory, 68
+redstone, 67
+tools, 68
+transportation, 67
+search bar, 68
+underwater, building, 147
+creepers, 56
+defending against, 102
+fi ghting, 89-90
+gunpowder and, 90
+swimming and, 90
+critical hits (combat), 94
+crop farming, 103
+automated farms, 113
+crop selection, 116
+harvesting, 115
+piston harvesters, 117-118
+sticky piston harvesters, 119
+sugar cane, 122
+water harvesters, 119-122
+bones and, 110
+carrots, 105
+choosing crops, 103-106
+cocoa beans, 104-105
+establishing farms
+block to crop ratios, 107
+bone meal, 110
+diffi cult terrain, 106
+fences, 109, 112
+growth cycles, 110
+harvesting, 112
+lighting, 110
+location, 106-107
+planting, 108
+raised beds, 111-112
+debug screen (HUD) 281
+saving crops, 111
+water, 107-108, 112
+fences, 104, 109, 112
+growth cycles, 110
+harvesting, 110-112, 115
+lighting and, 104, 110
+melons, 105
+Minecraft updates and, 107
+piston farms, 113
+crop selection, 116
+harvesting, 115
+piston harvesters, 117-118
+sticky piston harvesters, 119
+sugar cane, 122
+water harvesters, 119-122
+potatos, 105
+pumpkins, 105
+raised beds, 104, 111-112
+saving crops, 111
+seeds, 103, 108
+self-sufi ciency, 104
+sneaking and, 111
+soil, 104
+sugar cane, 104-106
+automated farms, 122
+piston farms, 122
+tending farms, 104
+underground farms, 104, 123
+wheat, 103, 106, 110-112
+crosshairs (bows and arrows), targeting
+with, 98
+current (vertical), 178-180
+customizing Minecraft
+Minecraft launchers, 11
+mods, 251
+defi ning, 258
+fi nding, 265
+Forge mods, 259-260
+installing, 259-260
+jar fi les, 261
+Legendary Beasts website, 263
+More Explosives website, 262
+More Mobs website, 264
+multiple mods, using, 258
+permanent effects of, 259
+REI’s MiniMap website, 263
+removing, 260
+restoring games, 259
+superheroes website, 262
+Too Many Items website, 261
+zip fi les, 261
+resource packs, 251, 255
+Dokucraft, 256-257
+downloading and pop-ups, 258
+Faithful 32, 257
+functionality, 256
+installing, 256-257
+Ovo2s Rustif, 257
+pixels per texture, 257
+skins, 251
+changing, 255
+Minecraftskins website, 253
+Novaskin website, 254
+Skincraft website, 253
+Steve, 252
+superheroes, 262
+D
+D key, 25
+damage
+absorbing, 99
+dealing, swords, 95
+dandelions, dyeing with, 130
+Dante’s infl uence on Minecraft, 242
+debug screen (HUD), 50-51
+282 decoration blocks
+decoration blocks, 67
+defenses. See also combat
+arrow slits, 157
+barricades, 239
+caves, 85
+creeper attacks, 102
+detection systems
+detector rails, 163-164, 189
+pressure plates, 156
+tripwires, 163
+ditches, 153-154
+doors, importance of, 85
+emergency shelters, 38
+enchantments, 205-206
+Ender Dragon, defeating, 246-249
+perimeters, 153-157
+pits, 155-157
+pressure plates, 156
+spiders, 86
+towers, 155
+trapdoors, 172
+tunnels, 85
+walls, 86, 157
+defensive mobs
+iron golems, 93-94
+snow golems, 92-93
+demo version
+time span, 7
+troubleshooting, 8
+desert temples, 223-224
+destroying and reusing carts, 188
+detection systems
+detector rails, 163-164, 189
+pressure plates, 156
+tripwires, 163
+diamonds, 52
+diffi culty levels, 57
+dining tables, building, 142
+directional keys, 25
+discarding inventory items, 29
+ditches, building, 153-155
+Dokucraft resource pack, 256-257
+donkeys, 127
+HUD changes while riding, 50
+jumping with, 132
+packing, 133
+riding, 130-132
+taming, 130-132
+doors
+airlocks, building, 36
+as output devices, 172
+automatic doors, building, 173-176
+caves, 85
+installing, 37
+iron doors, 36, 235
+opening/closing, 36
+sliding doors, building, 177-179
+trapdoors, 172
+tunnels, 85
+underwater, building, 150
+down, digging straight down, 73
+downloading
+Minecraft, 10-11
+resource packs and pop-ups, 258
+dungeons, 225-226
+durability
+diamond, 52
+gold, 51
+HUD, viewing stats in, 50
+iron, 52
+stone, 52
+End, The 283
+tools
+crafting, 53
+improving, 51-52
+wearing down, 53
+wood, 52
+dyeing
+color, choosing, 130
+dandelions and, 130
+Lapis Lazuli ore and, 130
+squid ink and, 135
+wool, 130
+E
+E key, 27
+earning XP, 203-204
+Easy mode and hunger, 58
+Easy option (Survival mode), 18
+Effi ciency enchantment, 207
+emeralds, farming, 222
+emergency shelters, 38
+enchantments, 195
+anvils, crafting enchantments and,
+207-209
+Aqua Affi nity enchantment, 206
+armor, 205-206
+Bane of Arthropods enchantment, 204
+benefi ts of, 195
+Blast Protection enchantment, 206
+books, 200-202
+bookshelves, 202
+casting, 200-202
+combining, 209
+Effi ciency enchantment, 207
+enchantment tables
+books, 200
+casting enchantments, 200-201
+obsidian, 197-199
+Feather Falling enchantment, 206
+Fire Aspect enchantment, 205
+Fire Protection enchantment, 206
+Flame enchantment, 205
+Fortune enchantment, 207
+Infi nity enchantment, 205
+Knockback enchantment, 204
+Looting enchantment, 205
+methods of gaining, 196
+Power enchantment, 205
+Projectile Protection enchantment, 206
+Protection enchantments, 205-206
+Punch enchantment, 205
+repairing enchanted items, 201
+Respiration enchantment, 153, 206
+Sharpness enchantment, 204
+Silk Touch enchantment, 207
+Smite enchantment, 204
+storing, 202
+Thorns enchantment, 206
+tools, 206-207
+Unbreaking enchantment, 207
+water affi nity, building underwater, 153
+weapons, 204-205
+End, The, 24, 231
+Dante’s infl uence on, 242
+Ender chests, 55, 232, 235
+Ender Dragon, 233, 245
+defeating, 246- 249
+egg, collecting, 250
+Endermen, 91, 246, 249
+Ender pearls, 91, 234
+End Poem, 250
+End Portals, 245
+Eyes of Ender, 233-234, 243-245
+navigating, 233
+silverfi sh spawners, 245
+284 End, The
+sleeping in, 242-243
+strongholds, fi nding, 244-245
+survival checklist, 243
+trading versus fi ghting, 234
+enemies
+avoiding, 57
+creepers, 56
+defending against, 102
+fi ghting, 89-90
+gunpowder and, 90
+swimming and, 90
+Endermen, 91, 246, 249
+iron golems, 93-94
+Legendary Beasts mod website, 263
+More Mobs mod website, 264
+Peaceful mode, 57
+pursuit mode, 57
+skeletons, 56
+arrows and, 88, 96
+as resources, 60
+bones, farming benefi ts, 110
+fi ghting, 87-88
+potions, 215
+spider jockeys, 89
+wither skeletons, 241
+slimes, 56, 90-91
+snow golems, 92-93
+spawners
+blaze spawners, 239
+disabling, 223
+silverfi sh spawners, 245
+spiders, 56
+cave spiders, 88-89
+defending against, 86
+ditches, crossing, 153
+eyes as food, 86
+fermented spider eye potions, 214
+fi ghting, 86-87
+overhangs and, 64
+spider jockeys, 89
+string, 42, 86
+uses for, 86
+walls as defense, 86
+zombies, 56
+crafting arrows, 97
+fi ghting, 84-85
+reinforcements, 85
+rotten meat, 85
+zombie pigmen, 91-92
+equipment
+End survival checklist, The, 243
+Nether survival checklist, The, 234-235
+Esc key, 25
+experience bar (HUD), 48
+experience points (XP)
+earning, 203-204
+enchantments, 195, 200
+managing, 203-204
+exploding minecarts, 187-189
+explosives
+exploding minecarts, 187-189
+More Explosives mod website, 262
+Eyes of Ender, 91, 233-234, 243-245
+F
+Faithful 32 resource pack, 257
+falling while mining, 73, 75-76
+fantasy trees, growing, 144
+Far Lands or Bust, 16
+farmers, 220
+farming, 103
+animals
+breeding, 126-130
+cats, 127
+fences 285
+chickens, 126-127
+cows, 127
+donkeys, 127, 130-133
+fences, 126
+fi sh, 62
+herding, 128
+horses, 127-132
+jumping with, 132
+leading, 127-129
+mobs and safety, 128
+mooshrooms, 127
+mules, 127, 130-133
+ocelots, 127
+pack animals, 133
+pigs, 127, 134
+riding, 130-134
+sheep and wool, 42-43, 127, 130
+taming, 127, 130-132
+wolves, 127
+automated farms, 113
+crop selection, 116
+harvesting, 115
+piston harvesters, 117-118
+sticky piston harvesters, 119
+sugar cane, 122
+water harvesters, 119-122
+bones and, 110
+carrots, 105
+choosing crops, 103-106
+cocoa beans, 104-105
+cooking, 61
+establishing farms
+animals, 125-128
+block to crop ratios, 107
+bone meal, 110
+diffi cult terrain, 106
+fences, 109, 112
+growth cycles, 110
+harvesting, 112
+lighting, 110
+location, 106-107
+planting, 108
+raised beds, 111-112
+saving crops, 111
+water, 107-108, 112
+fences, 104, 109, 112, 126
+growth cycles, 110
+harvesting, 110-112, 115
+leather, obtaining, 99
+lighting and, 104, 110
+melons, 105
+Minecraft updates and, 107
+piston farms, 113
+crop selection, 116
+harvesting, 115
+piston harvesters, 117-118
+sticky piston harvesters, 119
+sugar cane, 122
+water harvesters, 119-122
+potatos, 105
+pumpkins, 105
+raised beds, 104, 111-112
+saving crops, 111
+seeds, 103, 108
+self-suffi ciency, 104
+sneaking and, 111
+soil, 104
+sugar cane, 104-106, 122
+tending farms, 104
+underground farms, 104, 123
+wheat, 103, 106, 110-112
+Feather Falling enchantment, 206
+fences
+animals, 126
+farming, 104, 109, 112
+gates, 172
+286 fermented spider eye potion
+fermented spider eye potion, 214
+fi ghting
+armor
+crafting, 98-100
+critical hits, 94
+damage absorption, 99
+arrows and bows
+arrow slits, 157
+crafting, 96
+End survival checklist, The, 243
+fi ghting, 98
+Nether survival checklist, The, 235
+skeletons, 88, 96
+target practice, 98
+combat category (Creative mode
+inventory), 68
+critical hits, 94
+creepers, 89-90, 102
+critical hits, 94
+enchantments, 204-205
+Ender Dragon, 246-249
+Endermen, 91
+hostile mobs, 84
+iron golems, 93-94
+Peaceful mode, resting via, 57
+skeletons, 87-89
+slimes, 90-91
+snow golems, 92-93
+spiders, 86-87
+cave spiders, 88-89
+spider jockeys, 89
+sprinting and, 95
+swords
+blocking attacks, 95
+crafting, 32, 95
+damage, dealing, 95
+End survival checklist, The, 243
+fi ghting with, 56
+Nether survival checklist, The, 234
+zombies, 84-85
+zombie pigmen, 91-92
+fi nding
+blaze rods, 234
+building sites, 63
+End strongholds, The, 244-245
+mods, 265
+Nether fortresses, 238
+villages, 219
+Fire Aspect enchantment, 205
+fi replaces, building, 146
+Fire Protection enchantment, 206
+Fire Resistance potion, 213
+fi rst night, surviving
+building
+beds, 41-43
+crafting tables, 29-30, 35
+furnaces, 38-39
+shelter, 33-38
+crafting
+axes, 32
+crafting table, 29-30, 35
+heat sources, 37-38
+light sources, 37-41
+pickaxes, 32
+shovels, 33
+swords, 32
+tool handles, 30-31
+torches, 39-41
+fi rst-day tasks, 23-24
+inventory, checking, 27-29
+island biomes, 26
+ocean biomes, 26
+perimeter structures as protection, 36
+trees, 25-26
+wood, gathering, 25-26
+gates 287
+fi shing, 62, 134
+Flame enchantment, 205
+fl int and steel
+mining fl int, quick mining tips, 97
+Nether Portals, 236
+Nether survival checklist, The, 235
+fl oating blocks, 140
+fl ooding, building underwater, 152
+fl oors (raised/lowered), building, 145
+fl ying while leading animals, 129
+FN key, 20
+food
+animals, 59, 62
+bowls, crafting, 124
+bread, 62
+brewing, 68
+cake, 62
+cooking, 61
+End survival checklist, The, 243
+fi shing, 62, 134
+foodstuffs category (Creative mode
+inventory), 67
+harvesting, 59, 62
+health and, 58
+hunger, 49, 58
+meat (rotten) and zombies, 85
+mining and, 70
+mushroom stew, creating, 124
+Nether survival checklist, The, 235
+poisoning, 61
+raw, eating, 61
+spider eyes as food, 86
+vegetables, 59
+Forge mods, 259-260
+fortresses (Nether), 227
+fi nding, 238
+survival tips, 239-240
+Fortune enchantment, 207
+fountains, building, 144
+frames (item), building, 144
+free Minecraft demo version
+time span, 7
+troubleshooting, 8
+furnaces
+crafting, 38-39
+fueling, 40
+minecarts with furnaces (powered
+minecarts), 187-188
+G
+games (new)
+biomes
+choosing, 16
+Far Lands or Bust, 16
+game modes
+Adventure mode, 17
+Creative mode, 17
+Hardcore mode, 17
+selecting, 14
+Survival mode, 16-18
+Nether options, confi guring, The, 238
+pausing, 25
+setup, confi guring, 14-15
+worlds
+choosing world generation style, 16
+creating, 14-15
+naming, 14
+gates
+AND gates, 182-183
+as output devices, 172
+NOR gates, 182
+NOT gates (inverters), 180
+OR gates, 181
+288 Generate Structures setting
+Generate Structures setting
+Create New World screen, 14
+More World Options, 217
+ghasts, 237-240
+gifting Minecraft, 11
+glowstones
+glowstone dust potion, 214
+Nether, The, 238
+underwater, building, 148-150
+gold (material type), 51
+golems
+iron golems, 93-94
+snow golems, 92-93
+villages and, 219
+gravel
+arrows, crafting, 97
+mining, 97
+Nether survival checklist, The, 234
+griefi ng, 140
+growing plants. See also brewing; building;
+crafting
+establishing farms, 108
+fantasy trees, 144
+hedges, 143
+indoor plants, 142
+planter boxes, building, 143
+trees (fantasy), 144
+growth cycles (farming), 110
+gunpowder
+creepers and, 90
+potions, 214
+H
+halfway stations, 192
+handles (tool), crafting, 30-31
+Hardcore mode, 17
+Hard option (Survival mode), 18
+Harming potion, 215
+harvesting, 59, 110-112
+piston farms, 115
+wheat, 62
+Healing potion, 213
+health
+food and, 58
+health bar (HUD), 48
+hunger and, 58
+heat sources, crafting, 37-38
+hedges, growing, 143
+herding animals, 128
+Herobrine, 252
+hills, crafting shelter from, 34
+Hive multiplayer server, The, 268
+hoppers, 193-194
+as output devices, 173
+hopper minecarts, 187
+horses, 127
+armor and, 132
+Horse Update edition. See PC edition
+HUD changes while riding, 50
+jumping with, 132
+leading, 129
+leather, obtaining, 99
+riding, 130-132
+taming, 130-132
+hostile mobs. See mobs
+hosting
+LAN parties, 265-266
+multiplayer servers, 265, 269-271
+houses, building
+building blocks, 67
+decoration blocks, 67
+housing codes, 65
+inventory 289
+huts, 64-65
+overhangs and spiders, 64
+redstone, 67
+HUD (Heads Up Display), 47
+armor bar, 48
+chat window, 50
+debug screen, 50-51
+durability stats, viewing, 50
+experience bar, 48
+health bar, 48
+hiding, 50
+hunger bar, 49, 58
+inventory quick access, 49
+oxygen bar, 48
+riding animals, HUD changes while riding,
+50
+hunger
+dying from, 63
+Easy mode, 58
+food
+bread, 62
+cake, 62
+cooking, 61
+food poisoning, 61
+health and, 58
+hunger bar (HUD), 49, 58
+Normal diffi culty and, 58
+raw meat, eating, 61
+saturation, 58
+sprinting and, 57-58
+Survival mode, 58
+huts, 224
+building, 64-65
+overhangs and spiders, 64
+witch huts, 224
+hydration
+farming, 107-108, 112
+permanent watering holes, digging, 109
+water harvesters, 119-122
+I
+indoor plants, growing, 142
+Infi nity enchantment, 205
+ink (squid), 135
+installing
+doors, 37
+mods, 259-260
+resource packs, 256-257
+inventory
+Armor slots, 27
+Crafting grid, 27
+Creative mode, 66
+brewing, 68
+building blocks, 67
+Chest icon, 68
+combat, 68
+compass icon, 68
+decoration blocks, 67
+foodstuffs, 67
+materials, 68
+miscellaneous, 67
+moving items to Survival mode inventory, 68
+redstone, 67
+search bar, 68
+tools, 68
+transportation, 67
+discarding items from, 29
+evenly distributing items, 29
+fi rst-night survival, 27-29
+inventory quick access (HUD), 49
+Inventory slots, 28
+290 inventory
+main storage, moving quick access grid
+items to, 29
+opening, 27, 30
+picking up items, 29
+placing items in inventory, 29
+quick access grid (inventory), 28-29, 73,
+235
+removing items from, 29
+stacking items, 28
+storage area, 28
+Survival mode, moving items to Creative
+mode, 68
+inverters (NOT gates), 180
+Invisibility potion, 213-215
+iron, 52
+anvils, crafting, 207
+Nether survival checklist, The, 235
+iron doors, 36, 235
+iron golems
+fi ghting, 93-94
+villages and, 219
+islands
+fi rst-night survival, 26
+spawn points, building underwater, 149
+item frames, building, 144
+J - K
+jack-o’-lanterns, 235-237
+.jar fi les, modes as, 261
+joining
+LAN parties, 265-266
+Minecraft Realms, 268
+multiplayer servers, 265-268
+jumping, 132
+jungle temples, 224-225
+Knockback enchantments, 204
+L
+ladders
+2x1 ladder descent, mining and, 74
+End survival checklist, The, 243
+pausing on, 74
+underwater, building, 150
+lamps
+bedside tables and, 142
+redstone lamps, 171
+LAN parties (multiplayer games), 265-266
+lanterns
+Nether, The, 235-237
+perimeters, 155
+underwater, building, 150
+Lapis Lazuli and dyeing, 130
+Large Biomes option (structures), 217
+launching Minecraft
+custom launchers, 11
+logins, 13
+passwords, 12
+usernames, 12
+lava pools
+furnaces, fueling, 40
+mining and, 73, 79
+Nether, The, 238
+obsidian, mining, 197-199
+leading animals, 127-129
+leather, obtaining, 99
+left-handed control options, 21
+Legendary Beasts mod website, 263
+levers, 162, 166
+librarians, 220
+lighting
+bedside tables and, 142
+caves and tunnels, 64
+crafting, 39-41
+Minecraft 291
+farming and, 104, 110
+light sources, crafting, 37-41
+mining, 70, 73
+Nether, The, 235- 239
+perimeters, 155
+redstone torches, 161, 167, 178-180
+underwater, building, 148-150
+Linux, downloading Minecraft, 11
+logins, 13
+loops (repeater), 184
+Looting enchantment, 205
+lost, avoid getting
+compasses, crafting, 61, 227
+debug screen (HUD), 50
+maps
+numbering maps, 229
+REI’s MiniMap mod website, 263
+villages, 219
+wall maps, 144
+zooming in/out maps, 229
+lowered fl oors, building, 145
+lumberjacking, 26
+M
+Mac OSX
+downloading Minecraft, 11
+FN key, 20
+magma cubes, 241
+main storage (inventory), moving quick
+access grid Items to, 29
+maps
+compasses, crafting, 227
+numbering maps, 229
+REI’s MiniMap mod website, 263
+villages, 219
+wall maps, 144
+zooming in/out maps, 229
+materials category (Creative mode inventory), 68
+material strength. See durability
+meat (rotten) and zombies, 85
+melons, 105
+minecarts, 185-186
+destroying and reusing, 188
+hopper minecarts, 187
+powered minecarts, 187-188
+rails, building, 159
+activated rails, 189
+detector rails, 164, 189
+halfway stations, 192
+mobs, protecting tracks from, 192
+normal rails, 188
+powered rails, 189-190
+T-junctions, 191
+zig zags, 190
+storage minecarts, 187
+TNT minecarts, 187-189
+trains, minecarts as, 188
+underground rails, 188
+Minecraft
+cheats, 15
+controls
+A key, 25
+directional keys, 25
+D key, 25
+E key, 27
+Esc key, 25
+FN key (Mac OSX), 20
+left-handed options, 21
+list of controls, 19-20
+Q key, 29
+Shift key, 74, 81
+S key, 25
+W key, 25, 56
+292 Minecraft
+demo version
+time span, 7
+troubleshooting, 8
+downloading, 10-11
+game modes
+Adventure mode, 17
+Creative mode, 17
+Hardcore mode, 17
+selecting, 14
+Survival mode, 16-18
+gifting, 11
+launching
+custom launchers, 11
+logins, 13
+passwords, 12
+usernames, 12
+logins, 13
+Nether options, confi guring, The, 238
+new games
+choosing biomes, 16
+choosing world generation style, 16
+confi guring setup, 14-15
+creating worlds, 14-15
+naming worlds, 14
+selecting game mode, 14
+pausing, 25, 74
+PC edition, 8, 11
+Pocket edition, 8
+biomes, 16
+crafting in, 31
+hiding HUD, 50
+purchasing, 10-11
+Raspberry Pi edition, 8
+updates, 107
+Xbox 360 Edition, 8
+biomes, 16
+crafting in, 31
+hiding HUD, 50
+Xbox One Edition, 8
+Minecraft Realms, joining, 268
+mining
+2x1 ladder descent, 74
+abandoned mineshafts, 226-227
+bases, setting up, 81
+blocking off areas, 73
+branch mines, 79-80
+breaking your fall, 75-76
+buckets, 70
+caves
+cave spiders, 88-89
+creating caves, 69
+existing caves, 69
+chests, placing in mines, 81
+chunks, 82
+cobblestone, 60
+do’s and don’ts, 73-74
+down, digging straight down, 73
+falling and, 73-76
+farming underground, 104, 123
+fl int, quick mining tips, 97
+food, 70
+gravel, quick mining tips, 97
+ladders, 74
+lava pools, 73, 79
+lighting, 73
+mobs and, 81
+netherrack, 237
+obsidian, 70, 197-199
+ore layers, 71-72
+pickaxes, 70
+quick access bar, keeping blocks in, 73
+safety and, 81
+sleep, 81
+sneaking around hazards, 81
+staging points, 81
+mobs 293
+staircases
+spiral staircases, 77-78
+straight staircases, 76-77
+strategies for starting, 69
+tools, required equipment list, 70
+torches, 70, 73
+unlit areas, 73
+up, digging straight up, 73
+way out, knowing, 73
+wood blocks and, 70
+miscellaneous category (Creative mode
+inventory), 67
+mobs
+avoiding, 57
+character vulnerability and inventory
+checks, 30
+creepers, 56
+defending against, 102
+fi ghting, 89-90
+gunpowder and, 90
+swimming and, 90
+defi ning, 18
+ditches, crossing, 153-155
+employing, 155-157
+Endermen, 91, 246, 249
+farming and animals, 128
+inventory checks and character vulnerability, 30
+iron golems, 93-94
+Legendary Beasts mod website, 263
+mining, 81
+More Mobs mod website, 264
+Nether, The, 236-241
+passive mobs
+animals as, 59-62
+squid, 135
+Peaceful mode, 57
+pursuit mode, 57
+security
+ditches, 155
+pits, 155-157
+tunnels, 155
+water, 154
+skeletons, 56
+arrows and, 88, 96
+fi ghting, 87-88
+spider jockeys, 89
+sleep, 81
+slimes, 56, 90-91
+snow golems, 92-93
+spawners
+blaze spawners, 239
+disabling, 223
+silverfi sh spawners, 245
+spiders, 56
+cave spiders, 88-89
+crossing ditches, 153
+defending against, 86
+eyes as food, 86
+fermented spider eye potions, 214
+fi ghting, 86-87
+overhangs and, 64
+spider jockeys, 89
+string, 42, 86
+uses for, 86
+walls as defense, 86
+tracks, protecting from attack, 192
+tunnels, 155
+types of, 18
+underwater bases, 49
+water, 154
+zombies, 56
+arrows, crafting, 97
+fi ghting, 84-85
+reinforcements, 85
+rotten meat, 85
+zombie pigmen, 91-92
+294 mods
+mods, 251
+defi ning, 258
+fi nding, 265
+Forge mods, 259-260
+installing, 259-260
+.jar fi les, 261
+Legendary Beasts website, 263
+More Explosives website, 262
+More Mobs website, 264
+multiple mods, using, 258
+permanent effects of, 259
+REI’s MiniMap website, 263
+removing, 260
+restoring games, 259
+superheroes website, 262
+Too Many Items website, 261
+.zip fi les, 261
+Mojang accounts
+passwords, 10
+registering, 8-10
+security, 9
+monsters
+avoiding, 57
+blaze spawners, 239
+creepers, 56
+defending against, 102
+fi ghting, 89-90
+gunpowder and, 90
+swimming and, 90
+Endermen, 91, 246, 249
+iron golems, 93-94
+Legendary Beasts mod website, 263
+More Mobs mod website, 264
+Peaceful mode, 57
+pursuit mode, 57
+skeletons, 56
+arrows and, 88, 96
+as resources, 60
+bones, farming benefi ts, 110
+fi ghting, 87-88
+potions, 215
+spider jockeys, 89
+wither skeletons, 241
+slimes, 56, 90-91
+snow golems, 92-93
+spiders, 56
+cave spiders, 88-89
+defending against, 86
+eyes as food, 86
+fi ghting, 86-87
+overhangs and, 64
+spider jockeys, 89
+string, 86
+uses for, 86
+walls as defense, 86
+zombies, 56
+crafting arrows, 97
+fi ghting, 84-85
+reinforcements, 85
+rotten meat, 85
+zombie pigmen, 91-92
+mooshrooms, 127
+More Explosives mod website, 262
+More Mobs mod website, 264
+moving inventory items between main storage and quick access grid, 29
+mules, 127
+jumping with, 132
+packing, 133
+riding, 130-132
+taming, 130-132
+multicrafting, 36
+multiplayer games
+Command Block, 267
+LAN parties, 265-266
+netting 295
+Minecraft Realms, joining, 268
+multiplayer servers
+BeastsMC, 269
+Hive, The, 268
+hosting, 265, 269-271
+joining, 265-268
+Phanatic, 269
+Shotbow, 268
+Supercraft Brothers, 268
+superheroes mod website, 262
+singleplayer games versus, 13
+whitelisted (trusted) players, 140
+mushrooms
+mushroom stew, 124
+Nether, The, 238
+music, creating via note blocks, 173
+N
+navigating
+compasses, crafting, 61, 227
+debug screen (HUD), 50
+End, The, 233
+maps
+numbering maps, 229
+REI’s MiniMap mod website, 263
+villages, 219
+wall maps, 144
+zooming in/out maps, 229
+Minecraft controls
+FN key (Mac OSX), 20
+left-handed options, 21
+list of controls, 19-20
+Nether, The, 233
+negative effect potions, 214-215
+negative structures, 222
+Nether, The, 24, 231
+barricades, building, 239
+blaze rods, 234, 239
+blazes, 241
+blaze spawners, 239
+cliffs, 238
+Dante’s infl uence on, 242
+Ender chests, 232
+Ender pearls, 234
+fortresses
+fi nding, 238
+survival tips, 239-240
+game options, confi guring, 238
+ghasts, 237-240
+glowstone, 238
+jack-o’-lanterns, 237
+lanterns, 237
+lava pools, 238
+lighting, 237-239
+magma cubes, 241
+mobs, 236-241
+mushrooms, 238
+navigating, 233
+netherbrick, 238-239
+Nether Portal, 236-237
+Nether quartz, 238
+Nether wart, 209-212, 239
+Overworld size comparison to, 242
+sleeping in, 242
+Sneak key (Left Shift), 238
+soul sand, 238
+stairs, 237
+survival checklist, 234-235
+torches, 237-239
+tunnels, 237
+water, 235
+wither skeletons, 241
+netting, 145
+296 new games
+new games
+biomes
+choosing, 16
+Far Lands or Bust, 16
+game modes
+Adventure mode, 17
+Creative mode, 17
+Hardcore mode, 17
+selecting, 14
+Survival mode, 16-18
+Nether options, confi guring, The, 238
+pausing, 25
+setup, confi guring, 14-15
+worlds
+choosing world generation style, 16
+creating, 14-15
+naming, 14
+night (fi rst), surviving
+building
+beds, 41-43
+crafting table, 29-30, 35
+furnaces, 38-39
+shelter, 33-38
+crafting
+axes, 32
+crafting table, 29-30, 35
+heat sources, 37-38
+light sources, 37-41
+pickaxes, 32
+shovels, 33
+swords, 32
+tool handles, 30-31
+torches, 39-41
+fi rst-day tasks, 23-24
+inventory, checking, 27-29
+island biomes, 26
+ocean biomes, 26
+perimeter structures as protection, 36
+trees
+gathering wood, 25-26
+lumberjacking, 26
+Night Vision potion, 213
+NOR gates, 182
+Normal diffi culty and hunger, 58
+Normal option (Survival mode), 18
+note blocks, creating music, 173
+NOT gates (inverters), 180
+O
+obsidian
+enchantment tables, 197-199
+End survival checklist, The, 243
+mining, 70, 197-199
+Nether Portals, building, 236
+Nether survival checklist, The, 235
+oceans, fi rst-night survival, 26
+ocelots (cats), 127
+online resources, Far Lands or Bust, 16
+opening
+doors, 36
+inventory, 27, 30
+OR gates, 181
+OSX (Mac)
+FN key, 20
+Minecraft, downloading, 11
+overhangs and spiders, 64
+Overworld, 24, 242
+Ovo’s Rustic resource pack, 257
+oxygen bar (HUD), 48
+oxygen, building underwater, 150
+P
+pack animals, 133
+paintings, 144
+potions 297
+passive mobs
+animals as, 59-62
+squid, 135
+passwords, 12
+pausing games, 25, 74
+PC edition (Minecraft), 8, 11
+Peaceful mode, 57
+Peaceful option (Survival mode), 17
+pearls (Ender), 91, 234
+perimeters, building, 36
+arrow slits, 157
+ditches, 153-154
+fences, 104, 109, 112, 126
+lighting, 155
+mobs, 155-157
+towers, 155
+walls, 157
+Phanatic multiplayer server, 269
+pickaxes
+crafting, 32
+mining and, 70
+Nether survival checklist, The, 234
+picking-up items in inventory, 29
+pigmen (zombie), 91-92, 236-237, 240
+pigs, 127, 134
+pillar jumping, 38, 65
+piston farms, 113
+crop selection, 116
+harvesting, 115
+piston harvesters, 117-118
+sticky piston harvesters, 119
+sugar cane, 122
+water harvesters, 119-122
+pistons
+as output devices, 172
+sliding doors, 178
+pits, building, 155-157
+pixels per texture (resource packs), 257
+planks (wood), crafting, 29
+plants, growing
+establishing farms, 108
+fantasy trees, 144
+hedges, 143
+indoor plants, 142
+planter boxes, building, 143
+trees (fantasy), 144
+Pocket edition (Minecraft), 8
+biomes, 16
+crafting in, 31
+hiding HUD, 50
+poison
+food poisoning, 61
+Poison potion, 215
+rotting meat and zombies, 85
+spider eyes, 86
+ponds, 144
+pools, 144
+pop-ups, downloading resource packs, 258
+portals
+End Portals, 245
+Nether Portal, 236, 237
+positive effect potions, 213-215
+potatos, 105
+potions
+awkward potion, 212-213
+brewing, 209
+blaze rossa, 210
+building brewing stands, 212
+Nether wart, 209-212
+soul sand, 209-211
+testing potions, 210
+End survival checklist, The, 243
+enhancing, 214-215
+298 potions
+fermented spider eye potion, 214
+Fire Resistance potion, 21
+glowstone dust potion, 214
+gunpowder, 214
+Harming potion, 215
+Healing potion, 213
+Invisibility potion, 213-215
+negative effect potions, 214-215
+Night Vision potion, 213
+Poison potion, 215
+positive effect potions, 213-215
+redstone dust potion, 214
+Regeneration potion, 213
+skeletons, 215
+Slowness potion, 215
+Splash potion, 214
+Swiftness potion, 213
+testing, 210
+Weakness potion, 215
+zombies, 215
+powered blocks, 166-167
+powered minecarts, 187-188
+powered rails, 172, 189-190
+Power enchantment, 205
+power sources, 160, 170
+powered blocks, 166-167
+redstone, 162
+powered rails, 189-190
+redstone wire, properties of, 164
+repeaters, 168-169
+torches, 161, 167
+repeaters, 168-169
+pressure plates, 162. See also buttons
+automatic doors, 176
+detector rails, 189
+minecart rails, 163
+pits, 156
+priests, 220
+Projectile Protection enchantment, 206
+Protection enchantments, 205-206
+pumpkins, 105
+Punch enchantment, 205
+purchasing Minecraft, 10-11
+pursuit mode, mobs and, 57
+PvP (player versus player). See multiplayer
+games
+Q - R
+Q key, 29
+quick access grid (inventory), 28-29, 73,
+235
+rails, 159
+activated rails, 189
+detector rails, 163-164, 189
+halfway stations, 192
+minecarts, 185-186
+destroying and reusing, 188
+hopper minecarts, 187
+powered minecarts, 187-188
+storage minecarts, 187
+TNT minecarts, 187-189
+trains, 188
+mobs, protecting rails from, 192
+normal rails, 188
+powered rails, 172, 189-190
+pressure plates, 163
+T-junctions, 191
+trains, minecarts as, 188
+underground rails, 188
+zig zags, 190
+rain, fi shing in, 134
+raised beds (farming), 104, 111-112
+raised fl oors, building, 145
+security 299
+Raspberry Pi Edition (Minecraft), 8
+ravines, 222
+Realms (Minecraft), joining, 268
+redstone, 67, 159-160, 170
+automated farms, building, 116
+piston farms, creating, 116
+powered rails, 189-190
+redstone blocks, 162
+redstone dust potion, 214
+redstone lamps, 171
+redstone torches, 161, 167, 178-180
+redstone wire, 164
+repeaters, 168-169, 174
+sticky piston harvesters, building, 119
+Regeneration potion, 213
+registering Mojang accounts, 8
+passwords, 10
+security questions, 9
+REI’s MiniMap mod website, 263
+removing
+inventory items, 29
+mods, 260
+renaming items, anvils and, 209
+repairing
+anvils and, 209
+enchantment items, 201
+repeater loops, 184
+repeaters, 168-169, 174
+resetting biomes, 26
+resource packs, 138, 251, 255
+Dokucraft, 256-257
+downloading and pop-ups, 258
+Faithful 32, 257
+functionality, 256
+installing, 256-257
+Ovo2s Rustic, 257
+pixels per texture, 257
+respawning, 18, 63
+cheats, 42
+spawn points, building underwater, 149
+Respiration enchantment, 153, 206
+resting, Peaceful mode, 57
+restoring games, 259
+reusing destroyed minecarts, 188
+riding animals, 50, 130-132
+rotten meat and zombies, 85
+running, 56
+combat and, 95
+effects of, 57-58
+hunger and, 57-58
+S
+S key, 25
+safety, mining and, 81
+saturation, hunger and, 58
+saving crops, 111
+search bar (Creative mode inventory), 68
+security
+arrow slits, building, 157
+ditches, building, 153-154
+Minecraft passwords, 12
+mobs
+ditches, 155
+tunnels, 155
+water, 154
+Mojang accounts
+passwords, 10
+security questions, 9
+perimeters, building
+arrow slits, 157
+ditches, 153-154
+lighting, 155
+300 security
+mobs, 155-157
+towers, 155
+walls, 157
+pits, building, 155-157
+pressure plates, 156
+towers, building, 155
+underwater, building, 153
+walls, building, 157
+water, 154
+seeds
+farming, 103
+planting, 108
+servers (multiplayer)
+BeastsMC, 269
+Hive, The, 268
+hosting, 265, 269-271
+joining, 265-268
+Phanatic, 269
+Shotbow, 268
+Supercraft Brothers, 268
+whitelisted (trusted) players, 140
+setup
+Mojang accounts, 8-10
+new games, 14-15
+Sharpness enchantment, 204
+sheep and wool, 42-43, 127, 130
+shelter
+building, 33-34
+building blocks, 67
+caves, 34
+cliffs, 34
+decoration blocks, 67
+doors, 36-37
+emergency shelters, 38
+heat sources, crafting, 37-38
+hills, 34
+housing codes, 65
+huts, building, 64-65
+light sources, crafting, 37-41
+overhangs and spiders, 64
+pillar jumping, 38
+redstone, 67
+tunneling, 34
+Shift key
+ladders, pausing on, 74
+sneaking around hazards, 81
+Shotbow multiplayer server, 268
+shovels, 33, 234
+signals, 160
+buttons, 162
+automatic doors, 173
+powered blocks, 166
+detector rails, 164, 189
+levers, 162, 166
+pressure plates
+automatic doors, 176
+detector rails, 189
+minecart rails, 163
+weighted pressure plates, 162
+redstone torches, 161, 167
+tripwires, 163
+signs
+placement of, 141
+underwater, building, 150
+Silk Touch enchantment, 207
+silverfi sh spawners, 245
+singleplayer games
+Adventure mode, 17
+Creative mode, 17
+Hardcore mode, 17
+multiplayer games versus, 13
+sprinting 301
+Survival mode, 16
+Easy option, 18
+Hard option, 18
+Normal option, 18
+Peaceful option, 17
+skeletons, 56
+arrows and, 88, 96
+as resources, 60
+bones, farming benefi ts, 110 fi ghting, 87-88
+potions, 215
+spider jockeys, 89
+wither skeletons, 241
+skins, 251
+changing, 252-255
+skin editor websites
+Minecraftskins, 253
+Novaskin, 254
+Skincraft, 253
+superhero skins, 262
+Steve, 252
+sleep
+beds
+building, 41-43
+taking with you, 44
+End, The, 242-243
+mining and, 81
+mobs and, 81
+Nether, The, 242
+time and, 42
+villages and, 219
+sliding doors, building, 177-179
+slimes, 56, 90-91
+Slowness potion, 215
+Smite enchantment, 204
+sneaking
+around hazards, 81
+farming and, 111
+Sneak key (Left Shift), 238
+snow blocks, 235
+snow golems, 92-93
+soft blocks, building underwater, 148, 152
+soil, farming, 104
+soul sand
+brewing potions, 209-211
+Nether, The, 238
+spawners
+blaze spawners, 239
+disabling, 223
+silverfi sh spawners, 245
+spawning, 18, 63
+cheats, 42
+spawn points, building underwater, 149
+spiders, 56
+cave spiders, 88-89
+defending against, 86
+ditches, crossing, 153
+eyes
+as food, 86
+fermented spider eye potions, 214
+fi ghting, 86-87
+overhangs and, 64
+spider jockeys, 89
+string, 42, 86
+uses for, 86
+walls as defense, 86
+spiral staircases and mining, 77-78
+Splash potion, 214
+sprinting, 56
+combat and, 95
+effects of, 57-58
+hunger and, 57-58
+302 squid
+squid, 135
+stacking inventory items, 28
+staging points, mining and, 81
+staircases and mining
+Nether, The, 237
+spiral staircases, 77-78
+straight staircases, mining and, 76-77
+stations (halfway), 192
+steel and fl int
+Nether Portals, 236
+Nether survival checklist, The, 235
+Steve (character skin), 252
+stew, 124
+sticky piston harvesters, 119
+stone buttons, 162
+automatic doors, 173
+powered blocks, 166
+stone (material type), 52
+storage
+storage area (inventory), 28
+chests, 54-55
+enchantments, storing in books, 202
+storage minecarts, 187
+straight staircases and mining, 76-77
+Strength potion, 213
+string (spiders), 42, 86
+strongholds, 226, 244-245
+structures
+basins, 222
+caverns, 222
+desert temples, 223-224
+dungeons, 225-226
+End strongholds, The, 244-245
+Generate Structures setting
+Create New World screen, 14
+More World Options, 217
+jungle temples, 224-225
+Large Biomes option, 217
+mineshafts (abandoned), 226-227
+negative structures, 222
+Nether fortresses, 227
+fi nding, 238
+survival tips, 239-240
+ravines, 222
+spawners, disabling, 223
+strongholds, 226
+villages
+appearances of, 218
+beds, 219
+blacksmiths, 220
+butchers, 220
+children, 218, 221
+commonality of, 217
+farmers, 220
+fi nding, 219
+interacting with inhabitants, 218-221
+iron golems and, 219
+librarians, 220
+priests, 220
+sleeping in, 219
+trading with inhabitants, 219-221
+uses of, 218
+zombies and, 218-219, 222
+witch huts, 224
+subscription services, 268
+subtract mode (comparators), 170
+sugar cane, 106
+automated farms, 122
+growing, 104
+piston farms, 122
+Supercraft Brothers multiplayer server, 268
+superhero mods website, 262
+tools 303
+survival
+fi rst night survival
+axes, 32
+beds, 41-43
+crafting tables, 29-30, 35
+fi rst-day tasks, 23-24
+furnaces, 38-39
+heat sources, 37-38
+inventory, checking, 27-29
+island biomes, 26
+light sources, 37-41
+ocean biomes, 26
+perimeter structures as protection, 36
+pickaxes, 32
+shelter, 33-38
+shovels, 33
+swords, 32
+tool handles, 30-31
+torches, 39-41
+trees, 25-26
+wood, gathering, 25-26
+Survival mode, 16
+Easy option, 18
+Hard option, 18
+hunger, 58
+moving items to Creative mode inventory, 68
+Normal option, 18
+Peaceful option, 17
+underwater, building, 148
+Swiftness potion, 213
+swimming
+creepers and, 90
+swimming pools, 144
+switches, 114, 142, 161-162
+swords
+blocking attacks, 95
+crafting, 32, 95
+damage, dealing, 95
+End survival checklist, The, 243
+fi ghting with, 56
+Nether survival checklist, The, 234
+T
+tables
+bedside tables, 142
+crafting tables, 29-30, 35
+dining tables, 142
+enchantment tables, 197
+books, 200
+casting enchantments, 200-201
+obsidian, 197-199
+taming animals, 127, 130-132
+teleporting players into LAN parties, 266
+temples
+desert temples, 223-224
+jungle temples, 224-225
+tennis courts, building, 145
+testing potions, 210
+texture packs. See resource packs
+textures, pixels per (resource packs), 257
+Thorns enchantment, 206
+time, sleeping and, 42
+T-junctions, building tracks, 191
+TNT minecarts, 187, 189
+tools
+axes, 32
+durability, 53
+enchantments, 206-207
+End survival checklist, The, 243
+handles, 30-31
+improving, 51-52
+mining, required equipment list, 70
+Nether survival checklist, The, 234
+pickaxes, 32, 70
+shovels, 33
+304 tools
+tools category (Creative mode inventory),
+68
+wearing down, 53
+Too Many Items mod website, 261
+torches
+bedside tables and, 142
+crafting, 39-41
+farming and lighting, 104, 110
+mining, 70, 73
+Nether survival checklist, The, 235
+Nether, The, 237-239
+perimeters, 155
+redstone torches, 161
+powered blocks, 167
+vertical current, 178-180
+underwater, building, 148-150
+towers, building, 155
+tracks, 159
+activated rails, 189
+detector rails, 163-164, 189
+halfway stations, 192
+minecarts, 185-186
+destroying and reusing, 188
+hopper minecarts, 187
+powered minecarts, 187-188
+storage minecarts, 187
+TNT minecarts, 187-189
+trains, 188
+mobs, protecting rails from, 192
+normal rails, 188
+powered rails, 172, 189-190
+pressure plates, 163
+T-junctions, 191
+trains, minecarts as, 188
+underground rails, 188
+zig zags, 190
+trading
+End, The, trading versus fi ghting, 234
+with village inhabitants, 219-221
+trains, 159
+activated rails, 189
+detector rails, 163-164, 189
+halfway stations, 192
+minecarts, 185-189
+mobs, protecting rails from, 192
+normal rails, 188
+powered rails, 172, 189-190
+pressure plates, 163
+T-junctions, 191
+trains, minecarts as, 188
+underground rails, 188
+zig zags, 190
+trapdoors, 172
+trapped chests, 163
+treasure
+abandoned mineshafts, 226-227
+desert temples, 223-224
+dungeons, 225-226
+emeralds, farming, 222
+Ender pearls, 234
+jungle temples, 224-225
+Nether fortresses, 227
+spawners, disabling, 223
+strongholds, 226
+witch huts, 224
+trees
+biomes, 25
+fantasy trees, growing, 144
+fi rst-night survival, 25
+lumberjacking, 26
+tripwires, 163
+trusted (whitelisted) players, 140
+walls 305
+tunnels, 34
+abandoned mineshafts, 226-227
+ditches and, 155
+doors, 85
+lighting, 64
+Nether, The, 237
+underground rails, 188
+U
+Unbreaking enchantment, 207
+underground
+abandoned mineshafts, 226-227
+dungeons, 225-226
+rails, 188
+strongholds, 226
+underwater, building, 151
+Creative mode, 147
+doors, 150
+enchantments, 153
+fl ooding, 152
+island spawn points, 149
+ladders, 150
+lighting, 148-150
+location, 149
+mob attacks, 49
+oxygen, 150
+required equipment, 148-149
+security, 153
+signs, 150
+soft blocks, 148, 152
+Survival mode, 148
+up, digging straight down, 73
+usernames (Minecraft), 12
+V
+vandalism, 140
+vegetables, harvesting, 59
+vertical current, 178-180
+video cards (Minecraft PC edition), 8
+Video Settings menu (game options),
+confi guring The Nether options, 238
+villages
+appearances of, 218
+beds, 219
+blacksmiths, 220
+building next to, 139
+butchers, 220
+children, 218, 221
+commonality of, 217
+farmers, 220
+fi nding, 219
+interacting with inhabitants, 218-221
+iron golems and, 219
+librarians, 220
+priests, 220
+sleeping in, 219
+trading with inhabitants, 219-221
+uses of, 218
+wells, 222
+zombies and, 218-219, 222
+W
+W key, 25, 56
+walls
+building, 65, 157
+clocks, 144
+maps, 144
+spider-proof walls, 86
+306 water
+water
+Aqua Affi nity enchantment, 206
+boats, building, 134
+farming, 107-108, 112
+fi shing, 134
+fountains, 144
+Nether, The, 235
+obsidian, mining, 197-199
+permanent watering holes, digging, 109
+ponds, 144
+pools, 144
+security, 154
+underwater, building, 151
+Creative mode, 147
+doors, 150
+enchantments, 153
+fl oating blocks, 139-140
+fl ooding, 152
+island spawn points, 149
+ladders, 150
+lighting, 148-150
+location, 149
+oxygen, 150
+required equipment, 148-149
+security, 153
+signs, 150
+soft blocks, 148, 152
+Survival mode, 148
+water harvesters, 119-122
+wells, 222
+Weakness potion, 215
+weapons, 94
+arrows and bows
+arrow slits, 157
+crafting, 96
+End survival checklist, The, 243
+fi ghting, 98
+Nether survival checklist, The, 235
+skeletons, 88, 96
+target practice, 98
+critical hits, 94
+enchantments, 204-205
+Ender Dragon, defeating, 246-249
+End survival checklist, The, 243
+Nether survival checklist, The, 234-235
+Peaceful mode, resting via, 57
+swords
+blocking attacks, 95
+crafting, 32, 95
+damage, 95
+End survival checklist, The, 243
+fi ghting with, 56
+Nether survival checklist, The, 234
+web resources
+Far Lands or Bust, 16
+mods
+fi nding, 265
+Legendary Beasts website, 263
+More Explosives website, 262
+More Mobs website, 264
+REI’s MiniMap website, 263
+superheroes website, 262
+Too Many Items website, 261
+multiplayer server websites
+BeastsMC, 269
+Hive, The, 268
+Phanatic, 269
+Shotbow, 268
+Supercraft Brothers, 268
+skin editors
+Minecraftskins, 253
+Novaskin, 254
+Skincraft, 253
+superheroes, 262
+zooming in/out maps 307
+weighted pressure plates, 162
+wells, 222
+wheat, 106, 222
+farming, 103
+growth cycles, 110
+harvesting, 62, 110-112
+whitelisted (trusted) players, 140
+witch huts, 224
+wither skeletons, 241
+wolves, 127
+wood blocks, 52
+gathering, fi rst-night survival, 25-26
+mining and, 70
+Nether survival checklist, The, 235
+planks, crafting, 29
+wood buttons, 162
+automatic doors, 173
+powered blocks, 166
+wool
+crafting, 42-43
+dyeing, 130
+spider string instead of, 42
+worlds
+biomes
+choosing, 16
+Far Lands or Bust, 16
+pocket edition, 16
+Xbox 360 Edition, 16
+creating, 14-15
+naming, 14
+Overworld, 24
+world generation style, choosing, 16
+World Type setting (Create New World
+screen), 14
+X
+Xbox 360 Edition (Minecraft), 8
+biomes, 16
+crafting in, 31
+HUD, hiding, 50
+Xbox One Edition (Minecraft), 8
+XP (experience points)
+earning, 203-204
+enchantments, 195, 200
+managing, 203-204
+Y - Z
+YouTube, fi nding architectural plans, 140
+zig-zag tracks, building, 190
+.zip fi les, mods as, 261
+zombies, 56
+arrows, crafting, 97
+fi ghting, 84-85
+potions, 215
+reinforcements, 85
+rotten meat, 85
+villages and, 218-219, 222
+wells, 222
+zombie pigmen
+fi ghting, 91-92
+Nether, The, 236-237, 240
+zooming in/out maps, 229
