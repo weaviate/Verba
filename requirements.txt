@@ -8,3 +8,6 @@ nltk>=3.8.1
 fastapi>=0.102.0
 uvicorn[standard]
 click>= 8.1.7
+setuptools
+wheel
+twine
