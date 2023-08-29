@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import Typewriter from "typewriter-effect";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneLight } from "react-syntax-highlighter/dist/cjs/styles/prism";
+import PulseLoader from "react-spinners/PulseLoader";
 
 interface ChatComponentProps {
   onUserMessageSubmit: Message[];
@@ -59,7 +60,7 @@ export function ChatComponent({
       onUserMessageSubmit.length &&
       (messageHistory.length === 0 ||
         onUserMessageSubmit[onUserMessageSubmit.length - 1].content !==
-          messageHistory[messageHistory.length - 1].content)
+        messageHistory[messageHistory.length - 1].content)
     ) {
       const newMessage = onUserMessageSubmit[onUserMessageSubmit.length - 1];
       setMessageHistory((prev) => [...prev, newMessage]);
@@ -84,7 +85,7 @@ export function ChatComponent({
   }, [messageHistory]);
 
   return (
-    <div className="bg-gray-100 p-4 overflow-y-auto h-[400px]">
+    <div className="bg-gray-100 p-4 overflow-y-auto h-[350px]">
       {messageHistory.map((message, index) => (
         <div
           ref={index === messageHistory.length - 1 ? lastMessageRef : null}
@@ -92,47 +93,44 @@ export function ChatComponent({
           className={`mb-4 ${message.type === "user" ? "text-right" : ""}`}
         >
           <span
-            className={`inline-block p-3 rounded-xl animate-press-in shadow-md font-mono text-sm ${
-              message.type === "user" ? "bg-yellow-200" : "bg-white"
-            }`}
+            className={`inline-block p-3 rounded-xl animate-press-in shadow-md font-mono text-sm ${message.type === "user" ? "bg-yellow-200" : "bg-white"
+              }`}
           >
             {message.type === "system"
               ? parseMessage(message.content).map((segment, segIndex) => {
-                  if (segment.type === "text") {
-                    return (
-                      <Typewriter
-                        key={segIndex}
-                        onInit={(typewriter) => {
-                          typewriter
-                            .typeString(segment.content || "N/A")
-                            .start();
-                        }}
-                        options={{ delay: 15 }}
-                      />
-                    );
-                  } else if (segment.type === "code") {
-                    return (
-                      <SyntaxHighlighter
-                        key={segIndex}
-                        language={segment.language}
-                        style={oneLight}
-                        className="rounded p-2"
-                      >
-                        {segment.content}
-                      </SyntaxHighlighter>
-                    );
-                  }
-                  return null;
-                })
+                if (segment.type === "text") {
+                  return (
+                    <Typewriter
+                      key={segIndex}
+                      onInit={(typewriter) => {
+                        typewriter
+                          .typeString(segment.content || "N/A")
+                          .start();
+                      }}
+                      options={{ delay: 15 }}
+                    />
+                  );
+                } else if (segment.type === "code") {
+                  return (
+                    <SyntaxHighlighter
+                      key={segIndex}
+                      language={segment.language}
+                      style={oneLight}
+                      className="rounded p-2"
+                    >
+                      {segment.content}
+                    </SyntaxHighlighter>
+                  );
+                }
+                return null;
+              })
               : message.content}
           </span>
         </div>
       ))}
       {isFetching && (
         <div className="flex items-center pl-4 mb-4">
-          <span className="dot"></span>
-          <span className="dot"></span>
-          <span className="dot"></span>
+          <PulseLoader color={"#292929"} loading={true} size={10} speedMultiplier={0.75} />
         </div>
       )}
     </div>

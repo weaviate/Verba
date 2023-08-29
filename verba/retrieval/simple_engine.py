@@ -27,7 +27,7 @@ class SimpleVerbaQueryEngine(VerbaQueryEngine):
                 grouped_task=f"You are a chatbot for Weaviate, a vector database, answer the query {query_string} with the given snippets of documentation in 2-3 sentences and if needed give code examples at the end of the answer encapsulated with ```programming-language ```"
             )
             .with_additional(properties=["score"])
-            .with_limit(7)
+            .with_limit(8)
             .do()
         )
 
@@ -136,6 +136,7 @@ class SimpleVerbaQueryEngine(VerbaQueryEngine):
                 properties=["suggestion"],
             )
             .with_bm25(query=query)
+            .with_additional(properties=["score"])
             .with_limit(3)
             .do()
         )
@@ -145,6 +146,10 @@ class SimpleVerbaQueryEngine(VerbaQueryEngine):
         if not results:
             return []
 
-        suggestions = [result["suggestion"] for result in results]
+        suggestions = []
+
+        for result in results:
+            if float(result["_additional"]["score"]) > 0.5:
+                suggestions.append(result["suggestion"])
 
         return suggestions

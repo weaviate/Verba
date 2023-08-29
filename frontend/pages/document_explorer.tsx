@@ -66,7 +66,7 @@ export default function DocumentOnly() {
     }, [focusedDocument]);
 
     return (
-        <main className="flex min-h-screen flex-col items-center justify-between p-12 text-gray-900">
+        <main className="flex min-h-screen flex-col items-center justify-between p-10 text-gray-900">
             <div className="flex flex-col w-full items-start">
                 <div className="mb-4">
                     <div className="flex text-lg">
@@ -81,10 +81,12 @@ export default function DocumentOnly() {
                         </span>
                     </div>
 
-                    <h1 className="text-8xl font-bold mt-2">Verba</h1>
-                    <p className="text-sm mt-1 text-gray-400">
-                        Retrieval Augmented Generation system powered by Weaviate
-                    </p>
+                    <div className="flex items-center"> {/* <-- flexbox container */}
+                        <h1 className="text-8xl font-bold mt-2">Verba</h1>
+                        <p className="text-sm mt-16 text-gray-400 ml-4"> {/* <-- Added ml-4 for some spacing */}
+                            Retrieval Augmented Generation system powered by Weaviate ❤️
+                        </p>
+                    </div>
                 </div>
                 <div className="flex w-full space-x-4">
                     {documents.length > 0 && (

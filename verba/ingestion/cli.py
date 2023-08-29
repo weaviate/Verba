@@ -28,6 +28,11 @@ def init(model):
 
 
 @cli.command()
+def clear_cache_command():
+    init_cache()
+
+
+@cli.command()
 @click.option(
     "--path",
     default="./data",
