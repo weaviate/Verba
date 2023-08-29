@@ -65,7 +65,7 @@ export function DocumentComponent({
     const end = extract ? start + extract.length : -1;
 
     return (
-        <div className="border-2 border-gray-900 shadow-lg rounded-xl bg-gray-100 p-2 animate-pop-in overflow-y-auto max-h-[548px] document-container">
+        <div className="border-2 border-gray-900 shadow-lg rounded-xl bg-gray-100 p-2 animate-pop-in overflow-y-auto max-h-[498px] document-container">
             <div
                 className={`${DOC_TYPE_COLORS[type]} text-black p-4 rounded-t-xl w-full sticky top-0 z-10 shadow-md`}
             >
@@ -80,7 +80,7 @@ export function DocumentComponent({
                 {extract && (
                     <div
                         ref={extractRef}
-                        className={`${DOC_TYPE_COLORS[type]} rounded-lg p-3 shadow-lg text-sm`}
+                        className={`${DOC_TYPE_COLORS[type]} rounded-lg p-3 shadow-lg extract text-sm`}
                     >
                         <RenderMarkdown text={text.slice(start, end)} type={type} />
                     </div>

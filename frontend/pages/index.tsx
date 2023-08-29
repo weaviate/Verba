@@ -69,21 +69,21 @@ export default function Home() {
   const handleSendMessage = async (e?: React.FormEvent, message?: string) => {
     e?.preventDefault();
 
-    checkApiHealth()
-
     const sendInput = message || userInput;
 
     if (sendInput.trim()) {
       setMessages((prev) => [...prev, { type: "user", content: sendInput }]);
 
-      setUserInput("");
       // Clear the suggestions list
       setSuggestions([]);
+
+      setUserInput("");
 
       // Start the API call
       setIsFetching(true);
 
       try {
+        checkApiHealth()
         const response = await fetch(apiHost + "/api/query", {
           method: "POST",
           headers: {
@@ -93,9 +93,10 @@ export default function Home() {
         });
 
         const data = await response.json();
-
+        checkApiHealth()
         setDocumentChunks([]);
         setDocumentChunks(data.documents);
+        setSuggestions([]);
 
         if (data.system) {
           setMessages((prev) => [
@@ -104,6 +105,7 @@ export default function Home() {
           ]);
         }
       } catch (error) {
+        checkApiHealth()
         console.error("Failed to fetch from API:", error);
       } finally {
         setIsFetching(false);
@@ -120,7 +122,6 @@ export default function Home() {
 
   useEffect(() => {
     const fetchDocument = async () => {
-      checkApiHealth()
       if (focusedDocument && focusedDocument.doc_uuid) {
         try {
           const response = await fetch(apiHost + "/api/get_document", {
@@ -194,10 +195,28 @@ export default function Home() {
     handleSendMessage(undefined, suggestion);
   };
 
+  const escapeRegExp = (string: string) => {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+  };
+
+  const renderBoldedSuggestion = (suggestion: string, userInput: string) => {
+    const escapedUserInput = escapeRegExp(userInput);
+    const parts = suggestion.split(new RegExp(`(${escapedUserInput})`, 'gi'));
+    return (
+      <span>
+        {parts.map((part, i) => (
+          <span key={i} className={part.toLowerCase() === userInput.toLowerCase() ? 'font-bold text-sm' : ''}>
+            {part}
+          </span>
+        ))}
+      </span>
+    );
+  };
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-12 text-gray-900">
+    <main className="flex min-h-screen flex-col items-center justify-between p-10 text-gray-900">
       <div className="flex flex-col w-full items-start">
-        <div className="mb-4">
+        <div className="mb-2">
           <div className="flex text-lg">
             <span className="bg-opacity-0 rounded px-2 py-1 hover-container animate-pop-in">
               The
@@ -206,14 +225,16 @@ export default function Home() {
               Golden
             </span>
             <span className="bg-yellow-200 rounded px-2 py-1 hover-container animate-pop-more-late">
-              RAGtriever
+              RAGtriever 🐕
             </span>
           </div>
 
-          <h1 className="text-8xl font-bold mt-2">Verba</h1>
-          <p className="text-sm mt-1 text-gray-400">
-            Retrieval Augmented Generation system powered by Weaviate
-          </p>
+          <div className="flex items-center"> {/* <-- flexbox container */}
+            <h1 className="text-8xl font-bold mt-2">Verba</h1>
+            <p className="text-sm mt-16 text-gray-400 ml-4"> {/* <-- Added ml-4 for some spacing */}
+              Retrieval Augmented Generation system powered by Weaviate ❤️
+            </p>
+          </div>
         </div>
         <div className="p-1 flex overflow-x-auto justify-center w-full mb-2">
           {documentChunks.map((chunk, index) => (
@@ -223,7 +244,7 @@ export default function Home() {
             >
               <div
                 className={`${DOC_TYPE_COLORS[chunk.doc_type]
-                  } rounded-lg text-xs hover-container shadow-lg border-2 hover:border-white border-black mx-1 h-32 p-3 ${DOC_TYPE_COLOR_HOVER[chunk.doc_type]
+                  } rounded-lg text-xs hover-container shadow-lg border-2 hover:border-white border-black mx-1 h-32 w-48 p-3 ${DOC_TYPE_COLOR_HOVER[chunk.doc_type]
                   } animate-pop-in`}
               >
                 <div className="flex items-center">
@@ -268,7 +289,7 @@ export default function Home() {
 
             {/* Input area */}
             <form
-              className="rounded-b-xl bg-gray-800 p-4"
+              className="rounded-b-xl bg-gray-800 p-4 relative"
               onSubmit={handleSendMessage}
             >
               <input
@@ -279,14 +300,14 @@ export default function Home() {
                 className="w-full p-2 rounded-md bg-white text-gray-900 placeholder-gray-400"
               />
             </form>
-            <div className="mt-2 bg-gray-200 rounded-md relative">
+            <div className="absolute mt-2 p-2 z-10 w-1/2 left-5 text-center justify-center">
               {suggestions.map((suggestion, index) => (
                 <div
                   key={index}
-                  className="p-2 hover:bg-green-200 cursor-pointer text-sm animate-press-in mt-1 hover-container"
+                  className="p-2 hover:bg-green-200 bg-gray-200 cursor-pointer shadow-md rounded-md text-xs animate-press-in mt-2 hover-container"
                   onClick={() => handleSuggestionClick(suggestion)}
                 >
-                  {suggestion}
+                  {renderBoldedSuggestion(suggestion, userInput)}
                 </div>
               ))}
             </div>
