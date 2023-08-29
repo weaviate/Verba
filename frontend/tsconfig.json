@@ -34,7 +34,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "../verba/server/frontend//types/**/*.ts"
+    "../verba-rag/server/frontend/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"
