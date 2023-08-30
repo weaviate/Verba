@@ -1,6 +1,7 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { ChatComponent, Message } from "../components/ChatComponent";
 import { DocumentComponent } from "../components/DocumentComponent";
+import CountUp from 'react-countup';
 
 export const getApiHost = () => {
   if (process.env.NODE_ENV === 'development') {
@@ -10,6 +11,10 @@ export const getApiHost = () => {
 };
 
 export const apiHost = getApiHost();
+const bgUrl = process.env.NODE_ENV === 'production'
+  ? 'static/'
+  : '/';
+
 
 type DocumentChunk = {
   text: string;
@@ -46,7 +51,7 @@ export default function Home() {
   const [isFetching, setIsFetching] = useState(false);
 
   // Function for checking the health of the API
-  const checkApiHealth = async () => {
+  const checkApiHealth = useCallback(async () => {
     try {
       // Change ENDPOINT based on your setup (Default to localhost:8000)
       const response = await fetch(apiHost + '/api/health');
@@ -59,12 +64,12 @@ export default function Home() {
     } catch (error) {
       setApiStatus('Offline');
     }
-  };
+  }, []);
 
   // UseEffect hook to check the API health on initial load
   useEffect(() => {
     checkApiHealth();
-  }, []);
+  }, [checkApiHealth]);
 
   const handleSendMessage = async (e?: React.FormEvent, message?: string) => {
     e?.preventDefault();
@@ -182,7 +187,7 @@ export default function Home() {
   };
 
   // Debounce the fetchSuggestions function to prevent rapid requests
-  const debouncedFetchSuggestions = debounce(fetchSuggestions, 25);
+  const debouncedFetchSuggestions = debounce(fetchSuggestions, 200);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUserInput(e.target.value);
@@ -217,47 +222,50 @@ export default function Home() {
     <main className="flex min-h-screen flex-col items-center justify-between p-10 text-gray-900">
       <div className="flex flex-col w-full items-start">
         <div className="mb-2">
-          <div className="flex text-lg">
-            <span className="bg-opacity-0 rounded px-2 py-1 hover-container animate-pop-in">
-              The
-            </span>
-            <span className="bg-opacity-0 rounded font-bold px-2 py-1 hover-container animate-pop-in-late">
-              Golden
-            </span>
-            <span className="bg-yellow-200 rounded px-2 py-1 hover-container animate-pop-more-late">
-              RAGtriever 🐕
-            </span>
-          </div>
-
-          <div className="flex items-center"> {/* <-- flexbox container */}
-            <h1 className="text-8xl font-bold mt-2">Verba</h1>
-            <p className="text-sm mt-16 text-gray-400 ml-4"> {/* <-- Added ml-4 for some spacing */}
-              Retrieval Augmented Generation system powered by Weaviate ❤️
-            </p>
+          <div className="flex justify-between items-center w-full"> {/* <-- flexbox container */}
+            <div className="flex-none">
+              <div className="bg-yellow-200 border-2 border-gray-800 rounded-lg shadow-lg animate-pop-in hover-container mr-4 ">
+                <img src={`${bgUrl}verba.png`} alt="Verba Logo" className=" w-24 h-24 shadow-lg" />
+              </div>
+            </div>
+            <div className="flex-1">
+              <h1 className=" text-6xl font-bold">Verba</h1>
+              <div className="flex text-lg">
+                <span className="bg-opacity-0 rounded px-2 py-1 hover-container animate-pop-in">
+                  The
+                </span>
+                <span className="bg-opacity-0 rounded font-bold px-2 py-1 hover-container animate-pop-in-late">
+                  Golden
+                </span>
+                <span className="bg-yellow-200 rounded px-2 py-1 hover-container animate-pop-more-late">
+                  RAGtriever
+                </span>
+              </div>
+            </div>
           </div>
         </div>
-        <div className="p-1 flex overflow-x-auto justify-center w-full mb-2">
+        <div className="p-1 flex overflow-x-auto justify-center h-32 w-full mb-2">
           {documentChunks.map((chunk, index) => (
             <button
               key={chunk.doc_name + index}
               onClick={() => setFocusedDocument(chunk)}
             >
               <div
-                className={`${DOC_TYPE_COLORS[chunk.doc_type]
-                  } rounded-lg text-xs hover-container shadow-lg border-2 hover:border-white border-black mx-1 h-32 w-48 p-3 ${DOC_TYPE_COLOR_HOVER[chunk.doc_type]
-                  } animate-pop-in`}
+                className={`bg-none
+                  } rounded-lg text-xs hover-container mx-1 h-28 w-48 p-1 animate-pop-in`}
               >
-                <div className="flex items-center">
-                  <span className="font-bold">{chunk.doc_name}</span>
+                <div className={`text-xs mb-1 ${focusedDocument === chunk ? '' : 'fade-in-out'} ${DOC_TYPE_COLORS[chunk.doc_type]} p-2 rounded-lg w-full`}>
+                  {chunk.doc_type}
                 </div>
-                <div className="flex justify-between space-x-1 mt-3">
-                  <div className="text-xs bg-white bg-opacity-50 p-2 rounded-lg">
-                    {chunk.doc_type}
+                <div className="flex space-x-2 mt-1">
+                  <div className={`flex items-center rounded-md bg-gray-200 p-2 h-16 border-2 shadow-md hover:border-white border-black ${focusedDocument === chunk ? DOC_TYPE_COLORS[chunk.doc_type] : DOC_TYPE_COLOR_HOVER[chunk.doc_type]}`}>
+                    <div className={`text-sm font-bold ${DOC_TYPE_COLORS[chunk.doc_type]} p-2 rounded-lg`}>
+                      {" "}
+                      <CountUp end={Math.round(chunk._additional.score * 10000)} />
+                    </div>
+                    <span className="font-bold w-full ml-1">{chunk.doc_name}</span>
                   </div>
-                  <div className="text-xs bg-white bg-opacity-50 p-2 rounded-lg">
-                    {" "}
-                    Score {Math.round(chunk._additional.score * 10000)}
-                  </div>
+
                 </div>
               </div>
             </button>
@@ -271,12 +279,16 @@ export default function Home() {
               Verba Chat
               <div className="text-xs text-white font-mono flex justify-center">
                 <span
-                  className={`rounded-indicator text-white p-2 ${apiStatus === 'Online'
+                  className={`rounded-indicator hover-container text-white p-2 ${apiStatus === 'Online'
                     ? 'bg-green-500'
                     : 'bg-red-500'
                     }`}
                 >
                   Demo {apiStatus}
+                </span>
+                <span
+                  className="rounded-indicator text-white bg-green-500 ml-2 p-2 hover-container">
+                  Powered by Weaviate ❤️
                 </span>
               </div>
             </div>
@@ -304,7 +316,7 @@ export default function Home() {
               {suggestions.map((suggestion, index) => (
                 <div
                   key={index + suggestion}
-                  className="p-2 hover:bg-green-200 bg-gray-200 cursor-pointer shadow-md rounded-md text-xs animate-press-in mt-2 hover-container"
+                  className="p-2 hover:bg-green-300 bg-gray-200 cursor-pointer shadow-md rounded-md text-xs animate-press-in mt-2 hover-container"
                   onClick={() => handleSuggestionClick(suggestion)}
                 >
                   {renderBoldedSuggestion(suggestion, userInput)}

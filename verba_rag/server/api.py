@@ -161,13 +161,32 @@ async def get_document(payload: GetDocumentPayload):
 
 
 ## Retrieve all documents imported to Weaviate
-@app.get("/api/get_all_documents")
+@app.post("/api/get_all_documents")
 async def get_all_documents():
     msg.info(f"Get all documents request received")
 
     try:
         documents = verba_engine.retrieve_all_documents()
         msg.good(f"Succesfully retrieved document: {len(documents)} documents")
+        return JSONResponse(
+            content={
+                "documents": documents,
+            }
+        )
+    except Exception as e:
+        msg.fail(f"All Document retrieval failed: {str(e)}")
+        return JSONResponse(
+            content={
+                "documents": [],
+            }
+        )
+
+
+## Search for documentation
+@app.post("/api/search_documents")
+async def search_documents(payload: QueryPayload):
+    try:
+        documents = verba_engine.search_documents(payload.query)
         return JSONResponse(
             content={
                 "documents": documents,

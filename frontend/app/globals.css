@@ -26,7 +26,7 @@
   }
 
   80% {
-    transform: scale(1.05);
+    transform: scale(1.025);
   }
 
   100% {
@@ -44,7 +44,7 @@
   }
 
   75% {
-    transform: scale(1.05);
+    transform: scale(1.025);
   }
 
   100% {
@@ -59,7 +59,7 @@
   }
 
   50% {
-    transform: scale(1.05);
+    transform: scale(1.025);
   }
 
   100% {
@@ -85,7 +85,7 @@
 }
 
 .hover-container:hover {
-  transform: scale(1.05);
+  transform: scale(1.025);
 }
 
 .animate-press-in {
@@ -259,4 +259,17 @@
   100% {
     background-position: 25% 50%;
   }
+}
+
+.fade-in-out {
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+button:hover .fade-in-out {
+  opacity: 1;
+}
+
+.hide {
+  opacity: 0;
 }
