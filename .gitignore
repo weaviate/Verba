@@ -6,3 +6,6 @@ __pycache__
 venv
 dist
 build
+~
+.local
+.cache

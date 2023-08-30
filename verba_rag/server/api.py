@@ -17,13 +17,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-verba_engine = SimpleVerbaQueryEngine(
-    os.environ.get("WEAVIATE_URL", ""),
-    os.environ.get("WEAVIATE_API_KEY", ""),
-    os.environ.get("OPENAI_API_KEY", ""),
-)
-
-msg.good("Connected to Weaviate Client")
+verba_engine = SimpleVerbaQueryEngine()
 
 # FastAPI App
 app = FastAPI()

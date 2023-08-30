@@ -258,12 +258,12 @@ export default function Home() {
                   {chunk.doc_type}
                 </div>
                 <div className="flex space-x-2 mt-1">
-                  <div className={`flex items-center rounded-md bg-gray-200 p-2 h-16 border-2 shadow-md hover:border-white border-black ${focusedDocument === chunk ? DOC_TYPE_COLORS[chunk.doc_type] : DOC_TYPE_COLOR_HOVER[chunk.doc_type]}`}>
+                  <div className={`flex items-center rounded-md bg-gray-200 p-2 truncate h-16 border-2 shadow-md hover:border-white border-black ${focusedDocument === chunk ? DOC_TYPE_COLORS[chunk.doc_type] : DOC_TYPE_COLOR_HOVER[chunk.doc_type]}`}>
                     <div className={`text-sm font-bold ${DOC_TYPE_COLORS[chunk.doc_type]} p-2 rounded-lg`}>
                       {" "}
                       <CountUp end={Math.round(chunk._additional.score * 10000)} />
                     </div>
-                    <span className="font-bold w-full ml-1">{chunk.doc_name}</span>
+                    <p className="font-bold ml-1">{chunk.doc_name}</p>
                   </div>
 
                 </div>

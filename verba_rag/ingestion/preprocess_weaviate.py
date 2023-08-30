@@ -2,7 +2,9 @@ import os
 
 import re
 
-from haystack.schema import Document
+import spacy
+from spacy.tokens import Doc
+from spacy.language import Language
 
 from verba_rag.ingestion.fetch_github import (
     fetch_docs,
@@ -10,7 +12,7 @@ from verba_rag.ingestion.fetch_github import (
     is_link_working,
 )
 from verba_rag.ingestion.util import hash_string
-from verba_rag.ingestion.preprocess import chunking_data
+from verba_rag.ingestion.preprocess import chunk_docs
 
 from wasabi import msg  # type: ignore[import]
 from dotenv import load_dotenv
@@ -18,11 +20,14 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-def retrieve_documentation() -> tuple[list[Document], list[Document]]:
+def retrieve_documentation(nlp: Language) -> tuple[list[Doc], list[Doc]]:
     """Downloads the Weaviate documentation, preprocesses, and chunks it. Returns a list of full documents and a list of chunks
     @returns tuple[list[Document], list[Document]] - A tuple of list of documents and list of chunks
     """
+    nlp = spacy.blank("en")
+
     weaviate_documentation = download_from_github(
+        nlp,
         "weaviate",
         "weaviate-io",
         "developers/",
@@ -30,16 +35,17 @@ def retrieve_documentation() -> tuple[list[Document], list[Document]]:
         "Documentation",
     )
 
-    chunked_weaviate_documentation = chunking_data(weaviate_documentation)
+    chunked_weaviate_documentation = chunk_docs(weaviate_documentation, nlp)
 
     return weaviate_documentation, chunked_weaviate_documentation
 
 
-def retrieve_blogs() -> tuple[list[Document], list[Document]]:
+def retrieve_blogs(nlp: Language) -> tuple[list[Doc], list[Doc]]:
     """Downloads the Weaviate documentation, preprocesses, and chunks it. Returns a list of full documents and a list of chunks
     @returns tuple[list[Document], list[Document]] - A tuple of list of documents and list of chunks
     """
     weaviate_documentation = download_from_github(
+        nlp,
         "weaviate",
         "weaviate-io",
         "blog/",
@@ -47,25 +53,26 @@ def retrieve_blogs() -> tuple[list[Document], list[Document]]:
         "Blog",
     )
 
-    chunked_weaviate_documentation = chunking_data(weaviate_documentation)
+    chunked_weaviate_documentation = chunk_docs(weaviate_documentation, nlp)
 
     return weaviate_documentation, chunked_weaviate_documentation
 
 
 def download_from_github(
+    nlp: Language,
     owner: str,
     repo: str,
     folder_path: str,
     token: str = None,
     doc_type: str = "Documentation",
-) -> list[Document]:
+) -> list[Doc]:
     """Downloads .mdx/.md files from Github
     @parameter owner : str - Repo owner
     @parameter repo : str - Repo name
     @parameter folder_path : str - Directory in repo to fetch from
     @parameter token : str - Github token
     @parameter doc_type : str - Document type (code, blogpost, podcast)
-    @returns list[Document] - A list of haystack documents
+    @returns list[Doc] - A list of spaCy documents
     """
     msg.divider(f"Starting downloading {doc_type} from {owner}/{repo}/{folder_path}")
     document_names = fetch_docs(owner, repo, folder_path, token)
@@ -77,16 +84,14 @@ def download_from_github(
             msg.fail(str(e))
 
         if filtering(path, doc_type):
-            doc = Document(
-                content=cleaning(fetched_text, doc_type),
-                meta={
-                    "doc_name": process_filename(str(path), doc_type),
-                    "doc_hash": hash_string(str(path)),
-                    "doc_type": doc_type,
-                    "doc_link": process_url(str(path), doc_type, fetched_text),
-                },
-            )
-            msg.info(f"Loaded {doc.meta['doc_name']}")
+            doc = nlp(text=cleaning(fetched_text, doc_type))
+            doc.user_data = {
+                "doc_name": process_filename(str(path), doc_type),
+                "doc_hash": hash_string(str(path)),
+                "doc_type": doc_type,
+                "doc_link": process_url(str(path), doc_type, fetched_text),
+            }
+            msg.info(f"Loaded {doc.user_data['doc_name']}")
             raw_docs.append(doc)
 
     msg.good(f"All {len(raw_docs)} files successfully loaded")
