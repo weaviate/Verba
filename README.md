@@ -12,7 +12,7 @@ Welcome to Verba The Golden RAGtriever, an open-source project aimed at providin
 ## 🎯 Overview
 
 Verba provides an interface for importing and querying your data. You can ask questions about your documents and discuss different data points.
-It leverages Weaviate together with Generative Search to retrieve relevant document pieces and uses LLMs to power the answer to your query. Verba aims to support popular RAG solutions such as Llama Index, Langchain, Haystack, and more!
+It leverages Weaviate together with Generative Search to retrieve relevant document pieces and uses LLMs to power the answer to your query. Verba aims to support popular RAG solutions such as LlamaIndex, Langchain, Haystack, and more!
 
 ### 💡 Import your data to Weaviate
 

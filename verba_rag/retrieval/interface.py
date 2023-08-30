@@ -1,6 +1,8 @@
 import weaviate
 from weaviate import Client
 
+from verba_rag.ingestion.util import setup_client
+
 
 class VerbaQueryEngine:
     """
@@ -9,12 +11,8 @@ class VerbaQueryEngine:
 
     client: Client = None
 
-    def __init__(self, weaviate_url: str, weaviate_api_key: str, openai_key: str):
-        VerbaQueryEngine.client = weaviate.Client(
-            url=weaviate_url,
-            auth_client_secret=weaviate.AuthApiKey(api_key=weaviate_api_key),
-            additional_headers={"X-OpenAI-Api-Key": openai_key},
-        )
+    def __init__(self):
+        VerbaQueryEngine.client = setup_client()
 
     def query(self, query_string: str) -> tuple:
         """Execute a query to a receive specific chunks from Weaviate

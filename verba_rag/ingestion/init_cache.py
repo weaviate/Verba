@@ -11,11 +11,7 @@ load_dotenv()
 def init_cache():
     msg.divider("Creating Cache class")
 
-    client = setup_client(
-        openai_key=os.environ.get("OPENAI_API_KEY", ""),
-        weaviate_url=os.environ.get("WEAVIATE_URL", ""),
-        weaviate_key=os.environ.get("WEAVIATE_API_KEY", ""),
-    )
+    client = setup_client()
 
     cache_schema = {
         "classes": [
