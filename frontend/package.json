@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build && next export && cp -r out/* ../verba/server/frontend/out/ && rm -r out",
+    "build": "next build && next export && cp -r out/* ../verba_rag/server/frontend/out/ && rm -r out",
     "start": "next start -H 0.0.0.0 -p 8080",
     "lint": "next lint"
   },
@@ -20,6 +20,7 @@
     "next": "13.4.13",
     "postcss": "8.4.27",
     "react": "18.2.0",
+    "react-countup": "^6.4.2",
     "react-dom": "18.2.0",
     "react-markdown": "^8.0.7",
     "react-spinners": "^0.13.8",
@@ -31,6 +32,7 @@
   },
   "devDependencies": {
     "@types/react-syntax-highlighter": "^15.5.7",
-    "@types/react-window": "^1.8.5"
+    "@types/react-window": "^1.8.5",
+    "@welldone-software/why-did-you-render": "^7.0.1"
   }
 }

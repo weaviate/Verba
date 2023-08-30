@@ -13,6 +13,7 @@ type Document = {
 const apiHost = getApiHost()
 
 export default function DocumentOnly() {
+    const [searchQuery, setSearchQuery] = useState("");
     const [documentTitle, setDocumentTitle] = useState("");
     const [documentText, setDocumentText] = useState("");
     const [documentType, setDocumentType] = useState<DocType>("Documentation");
@@ -20,20 +21,33 @@ export default function DocumentOnly() {
     const [documents, setDocuments] = useState<Document[]>([]);
     const [focusedDocument, setFocusedDocument] = useState<Document | null>(null);
 
-    useEffect(() => {
-        const fetchAllDocuments = async () => {
-            try {
-                const response = await fetch(apiHost + "/api/get_all_documents");
-                const data = await response.json();
-                console.log(data);
-                // Assuming the data is an array of documents
-                setDocuments(data.documents);
-            } catch (error) {
-                console.error("Failed to fetch all documents:", error);
-            }
-        };
+    const fetchDocuments = async (query = "") => {
+        try {
+            const endpoint = query
+                ? `${apiHost}/api/search_documents`
+                : `${apiHost}/api/get_all_documents`;
 
-        fetchAllDocuments();
+            const body = query ? { "query": query } : {};
+
+            const response = await fetch(endpoint, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(body),
+            });
+
+            const data = await response.json();
+
+            // Assuming the data is an array of documents
+            setDocuments(data.documents);
+        } catch (error) {
+            console.error(`Failed to fetch documents: ${error}`);
+        }
+    };
+
+    useEffect(() => {
+        fetchDocuments();
     }, []);
 
     useEffect(() => {
@@ -65,6 +79,16 @@ export default function DocumentOnly() {
         fetchDocument();
     }, [focusedDocument]);
 
+    // Handle form submission
+    const handleSearch = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const form = e.currentTarget;
+        const formData = new FormData(form);
+        const query = formData.get("searchInput");  // 'searchInput' is the name attribute of input field
+
+        fetchDocuments(query as string);
+    };
+
     return (
         <main className="flex min-h-screen flex-col items-center justify-between p-10 text-gray-900">
             <div className="flex flex-col w-full items-start">
@@ -89,8 +113,22 @@ export default function DocumentOnly() {
                     </div>
                 </div>
                 <div className="flex w-full space-x-4">
-                    {documents.length > 0 && (
-                        <div className="w-1/2 p-2 border-2 shadow-lg h-2/3 border-gray-900 rounded-xl animate-pop-in">
+                    <div className="w-1/2 p-2 border-2 shadow-lg h-2/3 border-gray-900 rounded-xl animate-pop-in">
+                        <div className="rounded-t-xl bg-yellow-200 p-4 flex justify- between items-center">
+                            <form
+                                className="rounded-b-xl p-4 w-full"
+                                onSubmit={handleSearch}
+                            >
+                                <input
+                                    type="text"
+                                    name="searchInput"
+                                    placeholder="Search for documents"
+                                    className="w-full p-2 rounded-md bg-white text-gray-900 placeholder-gray-400"
+                                />
+                            </form>
+                        </div>
+                        {documents.length > 0 && (
+
                             <List
                                 height={528}
                                 itemCount={documents.length}
@@ -114,8 +152,8 @@ export default function DocumentOnly() {
                                     </button>
                                 )}
                             </List>
-                        </div>
-                    )}
+                        )}
+                    </div>
                     <div className="w-1/2 space-y-4">
                         <DocumentComponent
                             title={documentTitle}

@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import React from 'react';
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneLight } from "react-syntax-highlighter/dist/cjs/styles/prism";
@@ -12,33 +13,7 @@ interface DocumentComponentProps {
     docLink?: string;
 }
 
-const RenderMarkdown = ({ text, type }: { text: string; type: DocType }) => {
-    return (
-        <ReactMarkdown
-            components={{
-                code({ node, inline, className, children, ...props }) {
-                    const match = /language-(\w+)/.exec(className || "");
-                    return !inline && match ? (
-                        <SyntaxHighlighter
-                            {...props}
-                            style={oneLight}
-                            language={match[1]}
-                            PreTag="div"
-                        >
-                            {String(children).replace(/\n$/, "")}
-                        </SyntaxHighlighter>
-                    ) : (
-                        <code {...props} className={className}>
-                            {children}
-                        </code>
-                    );
-                },
-            }}
-        >
-            {text}
-        </ReactMarkdown>
-    );
-};
+const MemoizedSyntaxHighlighter = React.memo(SyntaxHighlighter);
 
 export function DocumentComponent({
     title,
@@ -59,6 +34,34 @@ export function DocumentComponent({
         }
     }, [text, extract]);
 
+    const RenderMarkdown = React.memo(function RenderMarkdown({ text }: { text: string; }) {
+        return (
+            <ReactMarkdown
+                components={{
+                    code({ node, inline, className, children, ...props }) {
+                        const match = /language-(\w+)/.exec(className || "");
+                        return !inline && match ? (
+                            <MemoizedSyntaxHighlighter
+                                {...props}
+                                style={oneLight}
+                                language={match[1]}
+                                PreTag="div"
+                            >
+                                {String(children).replace(/\n$/, "")}
+                            </MemoizedSyntaxHighlighter>
+                        ) : (
+                            <code {...props} className={className}>
+                                {children}
+                            </code>
+                        );
+                    },
+                }}
+            >
+                {text}
+            </ReactMarkdown>
+        );
+    });
+
     if (!title) return <div className=""></div>;
 
     const start = extract ? text.indexOf(extract) : -1;
@@ -75,22 +78,22 @@ export function DocumentComponent({
             </div>
             <div className="p-4 my-markdown-styles text-sm font-mono">
                 {start !== -1 && (
-                    <RenderMarkdown text={text.slice(0, start)} type={type} />
+                    <RenderMarkdown text={text.slice(0, start)} />
                 )}
                 {extract && (
                     <div
                         ref={extractRef}
                         className={`${DOC_TYPE_COLORS[type]} rounded-lg p-3 shadow-lg extract text-sm`}
                     >
-                        <RenderMarkdown text={text.slice(start, end)} type={type} />
+                        <RenderMarkdown text={text.slice(start, end)} />
                     </div>
                 )}
                 {start !== -1 ? (
                     <div className="pt-3">
-                        <RenderMarkdown text={text.slice(end)} type={type} />
+                        <RenderMarkdown text={text.slice(end)} />
                     </div>
                 ) : (
-                    <RenderMarkdown text={text} type={type} />
+                    <RenderMarkdown text={text} />
                 )}
             </div>
         </div>

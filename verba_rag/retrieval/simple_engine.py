@@ -70,6 +70,23 @@ class SimpleVerbaQueryEngine(VerbaQueryEngine):
         results = query_results["data"]["Get"]["Document"]
         return results
 
+    def search_documents(self, query: str) -> list:
+        """Search for documents from Weaviate
+        @parameter query_string : str - Search query
+        @returns list - Document list
+        """
+        query_results = (
+            VerbaQueryEngine.client.query.get(
+                class_name="Document", properties=["doc_name", "doc_type", "doc_link"]
+            )
+            .with_bm25(query, properties=["doc_name"])
+            .with_additional(properties=["id"])
+            .with_limit(20)
+            .do()
+        )
+        results = query_results["data"]["Get"]["Document"]
+        return results
+
     # Custom methods
 
     def retrieve_semantic_cache(
@@ -102,7 +119,7 @@ class SimpleVerbaQueryEngine(VerbaQueryEngine):
             msg.good(f"Retrieved from cache for query {query}")
             return (
                 json.loads(result["results"]),
-                f"Cached ({round(float(result['_additional']['distance']),2)}) "
+                f"Cached results ({round(float(result['_additional']['distance']),2)}): "
                 + result["system"],
             )
         else:

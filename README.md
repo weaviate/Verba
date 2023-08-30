@@ -7,7 +7,7 @@ Welcome to Verba The Golden RAGtriever, an open-source project aimed at providin
 
 ![Demo of Verba](https://github.com/weaviate/Verba/blob/main/img/verba.gif)
 
-> Verba is a WIP project and many exciting features and updates are on their way!
+> Verba is a WIP project and many important features and updates are on their way!
 
 ## 🎯 Overview
 
@@ -100,3 +100,14 @@ Verba is structured in three main components:
 ## 💖 Open Source Contribution
 
 Your contributions are always welcome! Feel free to contribute ideas, feedback, or create issues and bug reports if you find any! Please adhere to the code guidelines that include formatting, linting, and testing.
+
+## 🛣️ Roadmap
+
+- Add more robustness to the app
+    - Write a lot of tests
+- Improve data interaction with the app
+    - More CRUD operations, interact with the frontend to ingest data
+- Add more retrieval algorithms (e.g. LlamaIndex, LangChain, etc.)
+- Add more datatypes (.pdf, etc.)
+- Connect to datasources
+- Support fast changing data
