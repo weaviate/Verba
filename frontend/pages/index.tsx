@@ -180,7 +180,10 @@ export default function Home() {
       });
 
       const data = await response.json();
-      setSuggestions(data.suggestions); // Assuming the returned data structure contains a "suggestions" field
+
+      if (userInput != '') {
+        setSuggestions(data.suggestions);
+      }
     } catch (error) {
       console.error("Failed to fetch suggestions:", error);
     }
@@ -278,18 +281,22 @@ export default function Home() {
             <div className="rounded-t-xl bg-yellow-200 p-4 flex justify-between items-center">
               Verba Chat
               <div className="text-xs text-white font-mono flex justify-center">
-                <span
-                  className={`rounded-indicator hover-container text-white p-2 ${apiStatus === 'Online'
-                    ? 'bg-green-500'
-                    : 'bg-red-500'
-                    }`}
-                >
-                  Demo {apiStatus}
-                </span>
-                <span
-                  className="rounded-indicator text-white bg-green-500 ml-2 p-2 hover-container">
-                  Powered by Weaviate ❤️
-                </span>
+                <a href="https://github.com/weaviate/Verba" target="_blank" rel="noopener noreferrer">
+                  <span
+                    className={`rounded-indicator hover-container text-white p-2 ${apiStatus === 'Online'
+                      ? 'bg-green-500 hover:bg-green-400'
+                      : 'bg-red-500 hover:bg-red-400'
+                      }`}
+                  >
+                    Demo {apiStatus}
+                  </span>
+                </a>
+                <a href="https://www.weaviate.io" target="_blank" rel="noopener noreferrer">
+                  <span
+                    className="rounded-indicator text-white bg-green-500 hover:bg-green-400 ml-2 p-2 hover-container">
+                    Powered by Weaviate ❤️
+                  </span>
+                </a>
               </div>
             </div>
 
@@ -335,6 +342,6 @@ export default function Home() {
           </div>
         </div>
       </div>
-    </main>
+    </main >
   );
 }

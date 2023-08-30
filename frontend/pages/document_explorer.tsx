@@ -11,6 +11,10 @@ type Document = {
 };
 
 const apiHost = getApiHost()
+const bgUrl = process.env.NODE_ENV === 'production'
+    ? 'static/'
+    : '/';
+
 
 export default function DocumentOnly() {
     const [searchQuery, setSearchQuery] = useState("");
@@ -92,27 +96,30 @@ export default function DocumentOnly() {
     return (
         <main className="flex min-h-screen flex-col items-center justify-between p-10 text-gray-900">
             <div className="flex flex-col w-full items-start">
-                <div className="mb-4">
-                    <div className="flex text-lg">
-                        <span className="bg-opacity-0 rounded px-2 py-1 hover-container animate-pop-in">
-                            The
-                        </span>
-                        <span className="bg-opacity-0 rounded font-bold px-2 py-1 hover-container animate-pop-in-late">
-                            Golden
-                        </span>
-                        <span className="bg-yellow-200 rounded px-2 py-1 hover-container animate-pop-more-late">
-                            RAGtriever
-                        </span>
-                    </div>
-
-                    <div className="flex items-center"> {/* <-- flexbox container */}
-                        <h1 className="text-8xl font-bold mt-2">Verba</h1>
-                        <p className="text-sm mt-16 text-gray-400 ml-4"> {/* <-- Added ml-4 for some spacing */}
-                            Retrieval Augmented Generation system powered by Weaviate ❤️
-                        </p>
+                <div className="mb-2">
+                    <div className="flex justify-between items-center w-full"> {/* <-- flexbox container */}
+                        <div className="flex-none">
+                            <div className="bg-yellow-200 border-2 border-gray-800 rounded-lg shadow-lg animate-pop-in hover-container mr-4 ">
+                                <img src={`${bgUrl}verba.png`} alt="Verba Logo" className=" w-24 h-24 shadow-lg" />
+                            </div>
+                        </div>
+                        <div className="flex-1">
+                            <h1 className=" text-6xl font-bold">Verba</h1>
+                            <div className="flex text-lg">
+                                <span className="bg-opacity-0 rounded px-2 py-1 hover-container animate-pop-in">
+                                    The
+                                </span>
+                                <span className="bg-opacity-0 rounded font-bold px-2 py-1 hover-container animate-pop-in-late">
+                                    Golden
+                                </span>
+                                <span className="bg-yellow-200 rounded px-2 py-1 hover-container animate-pop-more-late">
+                                    RAGtriever
+                                </span>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div className="flex w-full space-x-4">
+                <div className="flex w-full space-x-4 mt-12">
                     <div className="w-1/2 p-2 border-2 shadow-lg h-2/3 border-gray-900 rounded-xl animate-pop-in">
                         <div className="rounded-t-xl bg-yellow-200 p-4 flex justify- between items-center">
                             <form

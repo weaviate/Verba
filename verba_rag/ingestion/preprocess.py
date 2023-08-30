@@ -16,8 +16,8 @@ from wasabi import msg  # type: ignore[import]
 def chunk_docs(
     raw_docs: list[Doc],
     nlp: Language,
-    split_length: int = 200,
-    split_overlap: int = 100,
+    split_length: int = 300,
+    split_overlap: int = 50,
 ) -> list[Doc]:
     """Splits a list of docs into smaller chunks
     @parameter raw_docs : list[Doc] - List of docs
