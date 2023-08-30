@@ -209,6 +209,15 @@ def import_weaviate_suggestions(client: Client) -> None:
         "What is Weaviate's consistency model in a distributed setup?",
         "With your aggregations I could not see how to do time buckets, is this possible?",
         "How can I run the latest master branch with Docker Compose?",
+        "Give me an code example of nearText",
+        "Give me an code example of nearVector",
+        "Give me an code example of using filters",
+        "Give me an code example of setting up the weaviate client",
+        "Give me an code example of adding objects to weaviate",
+        "Give me an code example of removing objects from weaviate",
+        "Give me an code example of updating objects in weaviate",
+        "Give me an code example of searching objects in weaviate",
+        "How to retrieve all objects from weaviate?",
     ]
 
     with client.batch as batch:

@@ -6,7 +6,7 @@ from wasabi import msg
 
 
 class SimpleVerbaQueryEngine(VerbaQueryEngine):
-    def query(self, query_string: str) -> tuple:
+    def query(self, query_string: str, model: str = None) -> tuple:
         """Execute a query to a receive specific chunks from Weaviate
         @parameter query_string : str - Search query
         @returns tuple - (system message, iterable list of results)

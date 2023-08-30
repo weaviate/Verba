@@ -12,12 +12,14 @@ from pathlib import Path
 from pydantic import BaseModel
 
 from verba_rag.retrieval.simple_engine import SimpleVerbaQueryEngine
+from verba_rag.retrieval.advanced_engine import AdvancedVerbaQueryEngine
 
 from dotenv import load_dotenv
 
 load_dotenv()
 
-verba_engine = SimpleVerbaQueryEngine()
+# verba_engine = SimpleVerbaQueryEngine()
+verba_engine = AdvancedVerbaQueryEngine()
 
 # FastAPI App
 app = FastAPI()
@@ -94,7 +96,9 @@ async def root():
 @app.post("/api/query")
 async def query(payload: QueryPayload):
     try:
-        system_msg, results = verba_engine.query(payload.query)
+        system_msg, results = verba_engine.query(
+            payload.query, os.environ["VERBA_MODEL"]
+        )
         msg.good(f"Succesfully processed query: {payload.query}")
 
         return JSONResponse(
@@ -104,7 +108,8 @@ async def query(payload: QueryPayload):
             }
         )
     except Exception as e:
-        msg.fail(f"Query failed: {str(e)}")
+        msg.fail(f"Query failed")
+        print(e)
         return JSONResponse(
             content={
                 "system": f"Something went wrong! {str(e)}",

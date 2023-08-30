@@ -1,5 +1,6 @@
 import click
 import uvicorn
+import os
 
 from verba_rag.ingestion.cli import init as init_ingest
 from verba_rag.ingestion.cli import clear_cache_command as clear_cache
@@ -14,10 +15,16 @@ def cli():
 
 
 @cli.command()
-def start():
+@click.option(
+    "--model",
+    default="gpt-3.5-turbo",
+    help="Generative OpenAI model",
+)
+def start(model):
     """
     Run the FastAPI application.
     """
+    os.environ["VERBA_MODEL"] = model
     uvicorn.run("verba_rag.server.api:app", host="0.0.0.0", port=8000, reload=True)
 
 
