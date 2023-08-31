@@ -141,6 +141,25 @@ def import_chunks(client: Client, chunks: list[Doc], doc_uuid_map: dict) -> None
     msg.good("Imported all chunks")
 
 
+def import_suggestions(client: Client, suggestions: list[str]) -> None:
+    """Imports a list of strings as suggestions to the Weaviate Client
+    @parameter client : Client - Weaviate Client
+    @parameter suggestions : list[str] - List of strings
+    @returns None
+    """
+    with client.batch as batch:
+        batch.batch_size = 100
+        for i, d in enumerate(suggestions):
+            msg.info(f"({i+1}/{len(suggestions)}) Importing suggestion")
+            properties = {
+                "suggestion": d,
+            }
+
+            client.batch.add_data_object(properties, "Suggestion")
+
+    msg.good("Imported all suggestions")
+
+
 def import_weaviate_suggestions(client: Client) -> None:
     suggestion_list = [
         "What is a vector database?",
@@ -219,15 +238,4 @@ def import_weaviate_suggestions(client: Client) -> None:
         "Give me an code example of searching objects in weaviate",
         "How to retrieve all objects from weaviate?",
     ]
-
-    with client.batch as batch:
-        batch.batch_size = 100
-        for i, d in enumerate(suggestion_list):
-            msg.info(f"({i+1}/{len(suggestion_list)}) Importing suggestion)")
-            properties = {
-                "suggestion": d,
-            }
-
-            client.batch.add_data_object(properties, "Suggestion")
-
-    msg.good("Imported all suggestions")
+    import_suggestions(suggestion_list)

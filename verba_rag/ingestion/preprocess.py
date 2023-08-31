@@ -1,10 +1,13 @@
 import glob
 import os
+import json
 
 from verba_rag.ingestion.util import hash_string
 
 from spacy.tokens import Doc
 from spacy.language import Language
+
+from weaviate import Client
 
 from pathlib import Path
 
@@ -16,7 +19,7 @@ from wasabi import msg  # type: ignore[import]
 def chunk_docs(
     raw_docs: list[Doc],
     nlp: Language,
-    split_length: int = 300,
+    split_length: int = 150,
     split_overlap: int = 50,
 ) -> list[Doc]:
     """Splits a list of docs into smaller chunks
@@ -77,30 +80,73 @@ def chunk_doc(
 # Loading Files from Directory
 
 
-def load_directory(dir_path: Path) -> dict:
-    """Loads text files from a directory
-    @parameter dir_path : Path - Path to directoy
+def load_suggestions(file_path: Path) -> dict:
+    """Loads json file with suggestions
+
+    @param dir_path : Path - Path to directory
     @returns dict - Dictionary of filename (key) and their content (value)
     """
-    # Initialize an empty list to store the file contents
+    with open(file_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    # Check if data is a list
+    if not isinstance(data, list):
+        msg.warn(f"{file_path} is not a list.")
+        return []
+
+    # Check if every item in the list is a string
+    if not all(isinstance(item, str) for item in data):
+        msg.warn(f"{file_path} is not a list of strings.")
+        return []
+
+    return data
+
+
+def load_file(file_path: Path) -> dict:
+    """Loads text file
+
+    @param dir_path : Path - Path to directory
+    @returns dict - Dictionary of filename (key) and their content (value)
+    """
+    file_contents = {}
+    file_types = ["txt", "md", "mdx"]
+
+    if file_path.suffix not in file_types:
+        msg.warn(f"{file_path.suffix} not supported")
+        return {}
+
+    with open(file_path, "r", encoding="utf-8") as f:
+        msg.info(f"Reading {str(file_path)}")
+        file_contents[str(file_path)] = f.read()
+    msg.good(f"Loaded {len(file_contents)} files")
+    return file_contents
+
+
+def load_directory(dir_path: Path) -> dict:
+    """Loads text files from a directory and its subdirectories.
+
+    @param dir_path : Path - Path to directory
+    @returns dict - Dictionary of filename (key) and their content (value)
+    """
+    # Initialize an empty dictionary to store the file contents
     file_contents = {}
 
     # Convert dir_path to string, in case it's a Path object
     dir_path_str = str(dir_path)
 
     # Create a list of file types you want to read
-    file_types = ["*.txt", "*.md", "*.mdx"]
+    file_types = ["txt", "md", "mdx"]
 
     # Loop through each file type
     for file_type in file_types:
-        # Use glob to find all the files in dir_path matching the current file_type
-        files = glob.glob(os.path.join(dir_path_str, file_type))
+        # Use glob to find all the files in dir_path and its subdirectories matching the current file_type
+        files = glob.glob(f"{dir_path_str}/**/*.{file_type}", recursive=True)
 
         # Loop through each file
         for file in files:
             msg.info(f"Reading {str(file)}")
             with open(file, "r", encoding="utf-8") as f:
-                # Read the file and add its content to the list
+                # Read the file and add its content to the dictionary
                 file_contents[str(file)] = f.read()
 
     msg.good(f"Loaded {len(file_contents)} files")
@@ -111,7 +157,7 @@ def load_directory(dir_path: Path) -> dict:
 
 
 def convert_files(
-    files: dict, nlp: Language, doc_type: str = "Documentation"
+    client: Client, files: dict, nlp: Language, doc_type: str = "Documentation"
 ) -> list[Doc]:
     """Converts list of strings to list of Documents
     @parameter files : dict - Dictionary with filenames and their content
@@ -129,8 +175,36 @@ def convert_files(
             "doc_link": "",
         }
         msg.info(f"Converted {doc.user_data['doc_name']}")
-        raw_docs.append(doc)
+        if not check_if_file_exits(client, file_name):
+            raw_docs.append(doc)
+        else:
+            msg.warn(f"{file_name} already exists in database")
 
     msg.good(f"All {len(raw_docs)} files successfully loaded")
 
     return raw_docs
+
+
+def check_if_file_exits(client: Client, doc_name: str) -> bool:
+    results = (
+        client.query.get(
+            class_name="Document",
+            properties=[
+                "doc_name",
+            ],
+        )
+        .with_where(
+            {
+                "path": ["doc_name"],
+                "operator": "Equal",
+                "valueText": doc_name,
+            }
+        )
+        .with_limit(1)
+        .do()
+    )
+
+    if results["data"]["Get"]["Document"]:
+        return True
+    else:
+        return False

@@ -247,7 +247,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-        <div className="p-1 flex overflow-x-auto justify-center h-32 w-full mb-2">
+        <div className="p-1 lg:flex overflow-x-auto justify-center h-32 w-full mb-2 hidden">
           {documentChunks.map((chunk, index) => (
             <button
               key={chunk.doc_name + index}
@@ -275,7 +275,7 @@ export default function Home() {
           ))}
         </div>
         <div className="flex w-full space-x-4">
-          <div className="w-1/2 p-2 border-2 shadow-lg h-2/3 border-gray-900 rounded-xl animate-pop-in">
+          <div className="lg:w-1/2 md:w-full sm:w-full p-2 border-2 shadow-lg lg:h-2/3 sm:h-full md:h-full border-gray-900 rounded-xl animate-pop-in">
 
             {/* Header */}
             <div className="rounded-t-xl bg-yellow-200 p-4 flex justify-between items-center">
@@ -331,7 +331,7 @@ export default function Home() {
               ))}
             </div>
           </div>
-          <div className="w-1/2 space-y-4">
+          <div className="w-1/2 space-y-4 hidden lg:block">
             <DocumentComponent
               title={documentTitle}
               text={documentText}
