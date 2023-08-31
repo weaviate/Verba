@@ -1,113 +1,129 @@
 # Verba 
 ## 🐕 The Golden RAGtriever
 
-Welcome to Verba The Golden RAGtriever, an open-source project aimed at providing an easy usable retrieval augmented generation (RAG) app. Use it to interact with your data in just a handful of steps!
+Welcome to Verba: The Golden RAGtriever, an open-source initiative designed to offer a streamlined, user-friendly interface for Retrieval-Augmented Generation (RAG) applications. In just a few easy steps, dive into your data and make meaningful interactions!
 
-[![Weaviate](https://img.shields.io/static/v1?label=powered%20by&message=Weaviate%20%E2%9D%A4&color=green&style=flat-square)](https://weaviate.io/) [![Demo](https://img.shields.io/badge/Check%20out%20the%20demo!-yellow?&style=flat-square&logo=react&logoColor=white)](https://verba-golden-ragtriever.onrender.com/)
+```pip install verba_rag```
+
+[![Weaviate](https://img.shields.io/static/v1?label=powered%20by&message=Weaviate%20%E2%9D%A4&color=green&style=flat-square)](https://weaviate.io/) 
+[![PyPi downloads](https://static.pepy.tech/personalized-badge/verba_rag?period=total&units=international_system&left_color=grey&right_color=orange&left_text=pip%20downloads)](https://pypi.org/project/verba_rag/) [![Docker support](https://img.shields.io/badge/Docker_support-%E2%9C%93-4c1?style=flat-square&logo=docker&logoColor=white)](https://docs.docker.com/get-started/) [![Demo](https://img.shields.io/badge/Check%20out%20the%20demo!-yellow?&style=flat-square&logo=react&logoColor=white)](https://verba.weaviate.io/)
 
 ![Demo of Verba](https://github.com/weaviate/Verba/blob/main/img/verba.gif)
 
-> Verba is a WIP project and many important features and updates are on their way!
+## 🎯 What Is Verba?
+Verba is more than just a tool—it's a personal assistant for querying and interacting with your data. Have questions about your documents? Need to cross-reference multiple data points? Want to gain insights from your existing knowledge base? Verba makes it all possible through the power of Weaviate and Large Language Models (LLMs).
 
-## 🎯 Overview
+## ⚙️ Under the Hood
+Built on top of Weaviate's state-of-the-art Generative Search technology, Verba fetches relevant portions of documents to answer your queries. It leverages the computational strength of LLMs to offer comprehensive, contextually relevant answers. All of this is conveniently accessible through Verba's intuitive user interface.
 
-Verba provides an interface for importing and querying your data. You can ask questions about your documents and discuss different data points.
-It leverages Weaviate together with Generative Search to retrieve relevant document pieces and uses LLMs to power the answer to your query. Verba aims to support popular RAG solutions such as LlamaIndex, Langchain, Haystack, and more!
+## 💡 Effortless Data Import with Weaviate
+Verba offers seamless data import functionality, supporting a diverse range of file types including .txt, .md, and more. Before feeding your data into Weaviate, our system handles chunking and vectorization to optimize it for search and retrieval.
 
-### 💡 Import your data to Weaviate
+> 🔧 Work in Progress: We are actively developing a data cleaning pipeline for custom datasets. Until then, please ensure your data is clean and well-structured before importing it into Weaviate.
 
-Verba supports importing different data types (.txt, .md, etc.) into Weaviate, chunking and vectorizing them beforehand.
+## 💥 Advanced Query Resolution with Hybrid and Generative Search
+Harness the power of Weaviate's generate module and hybrid search features when using Verba. These advanced search techniques sift through your documents to identify contextually relevant fragments, which are then used by Large Language Models to formulate comprehensive answers to your queries.
 
-> Currently, there is no data cleaning pipeline for custom data (WIP). Make sure that your data is in a good state before feeding them into Weaviate
+## 🔥 Accelerate Queries with Semantic Cache
+Verba utilizes Weaviate's Semantic Cache to embed both the generated results and queries, making future searches incredibly efficient. When you ask a question, Verba will first check the Semantic Cache to see if a semantically identical query has already been processed.
 
-### 💥 Hybrid- and Generative Search to answer your queries 
+# ✨ Getting Started with Verba
 
-Verba uses Weaviate's `generate` module and `hybrid search` to fetch relevant document pieces and generate an answer to your query based on their context. 
+This section outlines various methods to set up and deploy Verba, so you can choose the one that fits you best:
 
-### 🔥 Semantic Cache to speed up your process
+- Deploy with `pip`
+- Build from Source
+- Use Docker for Deployment
 
-We embed the generated results and queries to Weaviate, and use it as a `Semantic Cache`.
-This method is advantageous as it enables Verba to return results from queries that are semantically equal to the new query. This method allows us to gain much more from generated results than traditional string matching would permit. It's a simple yet potent solution that enhances the efficiency of the search process.
+**Prerequisites**: If you're not using Docker, ensure that you have Python >=3.9.0 installed on your system.
 
-## ✨ Quickstart
+**🔑 API Key Requirement**: Regardless of the deployment method, you'll need an OpenAI API key to enable data ingestion and querying features. You can specify this by either creating a .env file when cloning the project, or by storing the API key in your system environment variables.
 
-1. **Set up your Weaviate cluster:**
-- **OPTION 1** Create a cluster in WCS (for more details, refer to the [Weaviate Cluster Setup Guide](https://weaviate.io/developers/wcs/guides/create-instance))
-- **OPTION 2** Use Docker-Compose to setup a cluster locally [Weaviate Docker Guide](https://weaviate.io/developers/weaviate/installation/docker-compose)
+## 🚀 Quickstart: Deploy with pip
 
-2. **Set environment variables:**
-- Create a `.env` file to set the following variables
+1. **Initialize a new Python Environment**
+- ```python3 -m virutalenv venv```
 
-- ```WEAVIATE_URL=http://your-weaviate-server:8080```
-- ```WEAVIATE_API_KEY=your-weaviate-database-key```
-- ```OPENAI_API_KEY=your-openai-api-key```
-- (OPTIONAL) ```GITHUB_TOKEN=your-token``` (Only if you want to ingest Weaviate data)
-> You can use `.env` files (https://github.com/theskumar/python-dotenv) or set the variables to your system
+2. **Install Verba**
+- ```pip install verba_rag```
 
-3. **Create a new Python virtual environment:**
-- Make sure you have python `>=3.8.0` installed
-- ```python3 -m venv env```
-- ```source env/bin/activate```
-
-4. **Install dependencies:**
-- Install Verba with the following command:
-- ```pip install -e .```
-
-5. **Start Verba with:**
+3. **Launch Verba**
 - ```verba start```
 
+## 🛠️ Quickstart: Build from Source
 
-## 📦 Importing your data
+1. **Clone the Verba repos**
+- ```git clone https://github.com/weaviate/Verba.git```
 
-Please note, that importing data will generate cost for your specified OpenAI access key.
-> Currently, you can only import simple files such as (.txt, .md, .mdx). Other data types are WIP.
+2. **Initialize a new Python Environment**
+- ```python3 -m virutalenv venv```
 
-> Basic CRUD-Operations and interactions through the interface are WIP
+3. **Install Verba**
+- ```pip install -e .```
 
-**01 Import your data:**
-- Insert your data into the `./data` folder (currently only supporting .txt, .md, .mdx files). The folder contains example data about Minecraft.
-- Use `verba import` to import all data inside the folder
-- `verba import --model gpt-4` 
-> You can also specify the OpenAI model, default is set to gpt-3.5-turbo
+4. **Launch Verba**
+- ```verba start```
 
-> Using this command will remove all existing documents, chunks, and cache entries in your Weaviate cluster
+## 🐳 Quickstart: Deploy with Docker
+If you're unfamiliar with Docker, you can learn more about it [here](https://docker-curriculum.com/)
 
-> Enhanced CRUD operations are WIP
+0. **Clone the Verba repos**
+- ```git clone https://github.com/weaviate/Verba.git```
 
-**02 Run verba**
-- Run verba with `verba start` and go to `localhost:8000`.
+2. **Deploy using Docker**
+- ```docker-compose up```
 
+## 🌐 Selecting the Optimal Weaviate Deployment for Verba
 
-**(OPTIONAL) Importing Weaviate:**
-- You can also import all documentation, blog posts, video transcripts, etc from Weaviate. You need to specify your `GITHUB_TOKEN` environment variable to the `.env` file
-- Use `verba weaviate` script to download, process, and import Weaviate data to your cluster.
-- `verba weaviate --model gpt-4`
+Verba provides flexibility in connecting to Weaviate instances based on your needs. By default, Verba opts for [Weaviate Embedded](https://weaviate.io/developers/weaviate/installation/embedded) if it doesn't detect the `VERBA_URL` and `VERBA_API_KEY` environment variables. This local deployment is the most straightforward way to launch your Weaviate database for prototyping and testing.
+
+However, you have other compelling options to consider:
+
+**🌩️ Weaviate Cloud Service (WCS)**
+
+If you prefer a cloud-based solution, Weaviate Cloud Service (WCS) offers a scalable, managed environment. Learn how to set up a cloud cluster by following the [Weaviate Cluster Setup Guide](https://weaviate.io/developers/wcs/guides/create-instance).
+
+**🐳 Docker Deployment**
+Another robust local alternative is deploying Weaviate using Docker. For more details, consult the [Weaviate Docker Guide](https://weaviate.io/developers/weaviate/installation/docker-compose).
+
+**🌿 Environment Variable Configuration**
+Regardless of your chosen deployment method, you'll need to specify the following environment variables. These can either be added to a .env file in your project directory or set as global environment variables on your system:
+
+- ```VERBA_URL=http://your-weaviate-server:8080```
+- ```VERBA_API_KEY=your-weaviate-database-key```
+
+# 📦 Data Import Guide
+
+Verba offers straightforward commands to import your data for further interaction. Before you proceed, please be aware that importing data will incur costs based on your configured OpenAI access key.
+
+> **Important Notes:**
+> Supported file types are currently limited to .txt, .md, and .mdx. Additional formats are in development.
+> Basic CRUD operations and UI interactions are also in the pipeline.
+
+``` 
+verba start             # Initiates Verba application
+verba import --path "Path to your dir or file" --model "gpt-3.5-turbo" --clear True # Imports data into Verba
+verba clear             # Deletes all data within Verba
+verba clear_cache       # Removes cached data in Verba
+```
+
+If you've cloned the repository, you can get a quick start with sample datasets in the `./data` directory. Use `verba import --path ./data` to import these samples. You can also populate Verba with predefined suggestions using a JSON list via `verba import --path suggestions.json`. An example is provided in the `./data` directory.
 
 ## 💰 Large Language Model (LLM) Costs
 
-Verba currently only supports OpenAI models. By default, any costs associated with using this service will be billed to the access key that you provide. Processes that will generate cost are the data embedding and answer generation part. The default vectorizer for this project is `Ada v2`
+Verba exclusively utilizes OpenAI models. Be advised that the usage costs for these models will be billed to the API access key you provide. Primarily, costs are incurred during data embedding and answer generation processes. The default vectorization engine for this project is `Ada v2`.
 
-## 🛠️ Project Structure
+## 🛠️ Project Architecture
+Verba is built on three primary components:
 
-Verba is structured in three main components:
+- Weaviate Database: You have the option to host on Weaviate Cloud Service (WCS) or run it locally.
+- FastAPI Endpoint: Acts as the communication bridge between the Large Language Model provider and the Weaviate database.
+- React Frontend (Static served through FastAPI): Offers an interactive UI to display and interact with your data.
+Development 
 
-1. A Weaviate database (either cluster hosted on WCS or local).
-2. A FastAPI endpoint facilitating communication between the LLM provider and database.
-3. An interactive React frontend for displaying the information.
-
-> If you want to edit the frontend itself, make sure you have Node (`>=18.16.0`) installed.
+>Note: If you're planning to modify the frontend, ensure you have Node.js version >=18.16.0 installed. For more details on setting up the frontend, check out the Frontend README.
 
 ## 💖 Open Source Contribution
 
-Your contributions are always welcome! Feel free to contribute ideas, feedback, or create issues and bug reports if you find any! Please adhere to the code guidelines that include formatting, linting, and testing.
+Your contributions are always welcome! Feel free to contribute ideas, feedback, or create issues and bug reports if you find any! Visit our [Weaviate Community Forum](https://forum.weaviate.io/) if you need any help!
 
-## 🛣️ Roadmap
-
-- Add more robustness to the app
-    - Write a lot of tests
-- Improve data interaction with the app
-    - More CRUD operations, interact with the frontend to ingest data
-- Add more retrieval algorithms (e.g. LlamaIndex, LangChain, etc.)
-- Add more datatypes (.pdf, etc.)
-- Connect to datasources
-- Support fast changing data

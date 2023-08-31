@@ -1,0 +1,10 @@
+---
+version: '3.4'
+services:
+  verba:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - 8000:8000
+...

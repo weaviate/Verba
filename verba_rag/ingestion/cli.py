@@ -34,6 +34,18 @@ def clear_cache_command():
 
 @cli.command()
 @click.option(
+    "--model",
+    default="gpt-3.5-turbo",
+    help="OpenAI Model name to initialize. (default gpt-3.5-turbo)",
+)
+def clear_all_command(model):
+    init_schema(model=model)
+    init_cache()
+    init_suggestion()
+
+
+@cli.command()
+@click.option(
     "--path",
     default="./data",
     help="Path to data directory",
@@ -43,21 +55,22 @@ def clear_cache_command():
     default="gpt-3.5-turbo",
     help="OpenAI Model name to initialize. (default gpt-3.5-turbo)",
 )
-def import_data_command(path, model):
-    init_schema(model=model)
-    init_cache()
-    init_suggestion()
-    import_data(dir_path=path)
+@click.option(
+    "--clear",
+    default=False,
+    help="Remove all existing data before ingestion",
+)
+def import_data_command(path, model, clear):
+    if clear:
+        init_schema(model=model)
+        init_cache()
+        init_suggestion()
+    import_data(path)
 
 
 @cli.command()
-@click.option(
-    "--model",
-    default="gpt-3.5-turbo",
-    help="OpenAI Model name to initialize. (default gpt-3.5-turbo)",
-)
-def import_weaviate_command(model):
-    init_schema(model=model)
+def import_weaviate_command():
+    init_schema(model="gpt-4")
     init_cache()
     init_suggestion()
     import_weaviate()

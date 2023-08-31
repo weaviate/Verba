@@ -9,15 +9,23 @@ from verba_rag.ingestion.util import (
     setup_client,
     import_documents,
     import_chunks,
+    import_suggestions,
 )
-from verba_rag.ingestion.preprocess import load_directory, convert_files, chunk_docs
+from verba_rag.ingestion.preprocess import (
+    load_directory,
+    convert_files,
+    chunk_docs,
+    load_file,
+    load_suggestions,
+)
 
 from dotenv import load_dotenv
 
 load_dotenv()
 
 
-def import_data(dir_path: Path):
+def import_data(path_str: str):
+    data_path = Path(path_str)
     msg.divider("Starting data import")
 
     nlp = spacy.blank("en")
@@ -30,9 +38,21 @@ def import_data(dir_path: Path):
         msg.fail("Client setup failed")
         return
 
-    file_contents = load_directory(dir_path)
-    documents = convert_files(file_contents, nlp=nlp)
-    chunks = chunk_docs(documents, nlp)
+    file_contents = {}
+    suggestions = []
+    if data_path.is_file():
+        if data_path.suffix == ".json":
+            suggestions = load_suggestions(data_path)
+        else:
+            file_contents = load_file(data_path)
+    else:
+        file_contents = load_directory(data_path)
 
-    uuid_map = import_documents(client=client, documents=documents)
-    import_chunks(client=client, chunks=chunks, doc_uuid_map=uuid_map)
+    if file_contents:
+        documents = convert_files(client, file_contents, nlp=nlp)
+        chunks = chunk_docs(documents, nlp)
+        uuid_map = import_documents(client=client, documents=documents)
+        import_chunks(client=client, chunks=chunks, doc_uuid_map=uuid_map)
+
+    elif suggestions:
+        import_suggestions(client=client, suggestions=suggestions)

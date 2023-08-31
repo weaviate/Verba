@@ -29,7 +29,6 @@ setup(
         "openai>=0.27.9",
         "wasabi>=1.1.2",
         "spacy",
-        "nltk>=3.8.1",
         "fastapi>=0.102.0",
         "uvicorn[standard]",
         "click>= 8.1.7",

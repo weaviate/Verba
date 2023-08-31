@@ -27,7 +27,7 @@ class AdvancedVerbaQueryEngine(SimpleVerbaQueryEngine):
             )
             .with_hybrid(query=query_string)
             .with_additional(properties=["score"])
-            .with_limit(6)
+            .with_limit(8)
             .do()
         )
 
@@ -58,7 +58,7 @@ class AdvancedVerbaQueryEngine(SimpleVerbaQueryEngine):
             system_msg = str(completion["choices"][0]["message"]["content"])
             self.add_semantic_cache(query_string, results, system_msg)
         except Exception as e:
-            system_msg = f"Something went wrong! {str(e)} {str(completion)}"
+            system_msg = f"Something went wrong! {str(e)}"
             msg.fail(system_msg)
 
         return (system_msg, results)
@@ -76,7 +76,7 @@ class AdvancedVerbaQueryEngine(SimpleVerbaQueryEngine):
 
         for doc in doc_name_map:
             chunk_map = doc_name_map[doc]
-            window = len(chunk_map)
+            window = 1
             added_chunks = {}
             for chunk in chunk_map:
                 chunk_id = int(chunk)
@@ -134,6 +134,7 @@ class AdvancedVerbaQueryEngine(SimpleVerbaQueryEngine):
                 k: doc_name_map[doc][k]
                 for k in sorted(doc_name_map[doc], key=lambda x: int(x))
             }
+            msg.info(f"{doc}: {len(sorted_dict)} chunks")
             for chunk in sorted_dict:
                 context += sorted_dict[chunk]["text"]
 
