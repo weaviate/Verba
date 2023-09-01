@@ -43,4 +43,5 @@ def init_suggestion():
         client.schema.create(suggestion_schema)
         msg.good("'Suggestion' schema created")
 
+    client._connection.embedded_db.stop()
     msg.info("Done")
