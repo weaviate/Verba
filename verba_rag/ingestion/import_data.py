@@ -19,12 +19,16 @@ from verba_rag.ingestion.preprocess import (
     load_suggestions,
 )
 
+from verba_rag.ingestion.init_schema import init_schema
+from verba_rag.ingestion.init_cache import init_cache
+from verba_rag.ingestion.init_suggestion import init_suggestion
+
 from dotenv import load_dotenv
 
 load_dotenv()
 
 
-def import_data(path_str: str):
+def import_data(path_str: str, model: str):
     data_path = Path(path_str)
     msg.divider("Starting data import")
 
@@ -37,6 +41,15 @@ def import_data(path_str: str):
     if not client:
         msg.fail("Client setup failed")
         return
+
+    if not client.schema.exists("Document"):
+        init_schema(model)
+    if not client.schema.exists("Cache"):
+        init_cache()
+    if not client.schema.exists("Suggestion"):
+        init_suggestion()
+
+    msg.info("All schemas available")
 
     file_contents = {}
     suggestions = []

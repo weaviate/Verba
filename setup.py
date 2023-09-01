@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="verba_rag",
-    version="0.2",
+    version="0.2.1",
     packages=find_packages(),
     entry_points={
         "console_scripts": [
@@ -14,6 +14,7 @@ setup(
     author_email="edward@weaviate.io",
     description="Welcome to Verba: The Golden RAGtriever, an open-source initiative designed to offer a streamlined, user-friendly interface for Retrieval-Augmented Generation (RAG) applications. In just a few easy steps, dive into your data and make meaningful interactions!",
     long_description=open("README.md").read(),
+    long_description_content_type="text/markdown",
     url="https://github.com/weaviate/Verba",
     classifiers=[
         "License :: OSI Approved :: BSD License",
@@ -24,6 +25,7 @@ setup(
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
     ],
+    include_package_data=True,
     install_requires=[
         "weaviate-client>=3.23.1",
         "python-dotenv>=1.0.0",
