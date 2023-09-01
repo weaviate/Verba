@@ -65,7 +65,7 @@ def import_data_command(path, model, clear):
         init_schema(model=model)
         init_cache()
         init_suggestion()
-    import_data(path)
+    import_data(path, model)
 
 
 @cli.command()
