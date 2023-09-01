@@ -92,6 +92,21 @@ async def root():
         )
 
 
+# Define health check endpoint
+@app.get("/api/get_google_tag")
+async def get_google_tag():
+    tag = os.environ.get("VERBA_GOOGLE_TAG", "")
+
+    if tag:
+        msg.good("Google Tag available!")
+
+    return JSONResponse(
+        content={
+            "tag": tag,
+        }
+    )
+
+
 # Receive query and return chunks and query answer
 @app.post("/api/query")
 async def query(payload: QueryPayload):

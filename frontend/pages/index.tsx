@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { ChatComponent, Message } from "../components/ChatComponent";
 import { DocumentComponent } from "../components/DocumentComponent";
 import CountUp from 'react-countup';
