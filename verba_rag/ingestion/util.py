@@ -41,8 +41,8 @@ def setup_client() -> Optional[Client]:
         client = weaviate.Client(
             additional_headers={"X-OpenAI-Api-Key": openai.api_key},
             embedded_options=EmbeddedOptions(
-                persistence_data_path=".local/share/verba",
-                binary_path=".cache/verba/weaviate-embedded",
+                persistence_data_path="./.verba/local/share/",
+                binary_path="./.verba/cache/weaviate-embedded",
             ),
         )
         msg.good("Client connected to local Weaviate server")
@@ -238,4 +238,4 @@ def import_weaviate_suggestions(client: Client) -> None:
         "Give me an code example of searching objects in weaviate",
         "How to retrieve all objects from weaviate?",
     ]
-    import_suggestions(suggestion_list)
+    import_suggestions(client, suggestion_list)
