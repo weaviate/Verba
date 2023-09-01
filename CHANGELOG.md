@@ -7,6 +7,9 @@ All notable changes to this project will be documented in this file.
 ### Release!
 - First version of Verba released! (many to come :)
 
+### Added
+- Verba favicon
+
 ### Fixed
 - Add static files to package
 - Weaviate Embedded not shutting down
