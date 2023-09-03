@@ -11,13 +11,13 @@ Welcome to Verba: The Golden RAGtriever, an open-source initiative designed to o
 ![Demo of Verba](https://github.com/weaviate/Verba/blob/main/img/verba.gif)
 
 ## 🎯 What Is Verba?
-Verba is more than just a tool—it's a personal assistant for querying and interacting with your data. Have questions about your documents? Need to cross-reference multiple data points? Want to gain insights from your existing knowledge base? Verba makes it all possible through the power of Weaviate and Large Language Models (LLMs).
+Verba is more than just a tool—it's a personal assistant for querying and interacting with your data. Have questions about your documents? Need to cross-reference multiple data points? Want to gain insights from your existing knowledge base? Verba makes it all possible through the power of Weaviate and Large Language Models (LLMs)!
 
 ## ⚙️ Under the Hood
-Built on top of Weaviate's state-of-the-art Generative Search technology, Verba fetches relevant portions of documents to answer your queries. It leverages the computational strength of LLMs to offer comprehensive, contextually relevant answers. All of this is conveniently accessible through Verba's intuitive user interface.
+Built on top of Weaviate's state-of-the-art Generative Search technology, Verba fetches relevant context from your documents to answer queries. It leverages the computational strength of LLMs to offer comprehensive, contextually relevant answers. All of this is conveniently accessible through Verba's intuitive user interface.
 
 ## 💡 Effortless Data Import with Weaviate
-Verba offers seamless data import functionality, supporting a diverse range of file types including .txt, .md, and more. Before feeding your data into Weaviate, our system handles chunking and vectorization to optimize it for search and retrieval.
+Verba offers seamless data import functionality, supporting a diverse range of file types including `.txt`, `.md`, and more. Before feeding your data into Weaviate, our system handles chunking and vectorization to optimize it for search and retrieval.
 
 > 🔧 Work in Progress: We are actively developing a data cleaning pipeline for custom datasets. Until then, please ensure your data is clean and well-structured before importing it into Weaviate.
 
@@ -56,7 +56,7 @@ This section outlines various methods to set up and deploy Verba, so you can cho
 - ```git clone https://github.com/weaviate/Verba.git```
 
 2. **Initialize a new Python Environment**
-- ```python3 -m virutalenv venv```
+- ```python3 -m virtualenv venv```
 
 3. **Install Verba**
 - ```pip install -e .```
@@ -65,7 +65,7 @@ This section outlines various methods to set up and deploy Verba, so you can cho
 - ```verba start```
 
 ## 🐳 Quickstart: Deploy with Docker
-If you're unfamiliar with Docker, you can learn more about it [here](https://docker-curriculum.com/)
+If you're unfamiliar with Docker, you can learn more about it [here](https://docker-curriculum.com/).
 
 0. **Clone the Verba repos**
 - ```git clone https://github.com/weaviate/Verba.git```
@@ -94,7 +94,7 @@ Regardless of your chosen deployment method, you'll need to specify the followin
 
 # 📦 Data Import Guide
 
-Verba offers straightforward commands to import your data for further interaction. Before you proceed, please be aware that importing data will incur costs based on your configured OpenAI access key.
+Verba offers straightforward commands to import your data for further interaction. Before you proceed, please be aware that importing data will **incur costs** based on your configured OpenAI access key.
 
 > **Important Notes:**
 > Supported file types are currently limited to .txt, .md, and .mdx. Additional formats are in development.
