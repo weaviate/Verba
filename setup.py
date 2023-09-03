@@ -1,13 +1,12 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="verba_rag",
+    name="goldenverba",
     version="0.2.3",
     packages=find_packages(),
     entry_points={
         "console_scripts": [
-            "verba=verba_rag.server.cli:cli",
-            "verba-ingest=verba.ingestion.cli:cli",
+            "verba=goldenverba.server.cli:cli",
         ],
     },
     author="Weaviate",

@@ -2,11 +2,11 @@ import click
 import uvicorn
 import os
 
-from verba_rag.ingestion.cli import init as init_ingest
-from verba_rag.ingestion.cli import clear_cache_command as clear_cache
-from verba_rag.ingestion.cli import clear_all_command as clear_all
-from verba_rag.ingestion.cli import import_data_command as import_data
-from verba_rag.ingestion.cli import import_weaviate_command as import_weaviate
+from goldenverba.ingestion.cli import init as init_ingest
+from goldenverba.ingestion.cli import clear_cache_command as clear_cache
+from goldenverba.ingestion.cli import clear_all_command as clear_all
+from goldenverba.ingestion.cli import import_data_command as import_data
+from goldenverba.ingestion.cli import import_weaviate_command as import_weaviate
 
 
 @click.group()
@@ -26,7 +26,7 @@ def start(model):
     Run the FastAPI application.
     """
     os.environ["VERBA_MODEL"] = model
-    uvicorn.run("verba_rag.server.api:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("goldenverba.server.api:app", host="0.0.0.0", port=8000, reload=True)
 
 
 cli.add_command(init_ingest, name="init")
