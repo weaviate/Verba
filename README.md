@@ -3,10 +3,10 @@
 
 Welcome to Verba: The Golden RAGtriever, an open-source initiative designed to offer a streamlined, user-friendly interface for Retrieval-Augmented Generation (RAG) applications. In just a few easy steps, dive into your data and make meaningful interactions!
 
-```pip install verba_rag```
+```pip install goldenverba```
 
 [![Weaviate](https://img.shields.io/static/v1?label=powered%20by&message=Weaviate%20%E2%9D%A4&color=green&style=flat-square)](https://weaviate.io/) 
-[![PyPi downloads](https://static.pepy.tech/personalized-badge/verba_rag?period=total&units=international_system&left_color=grey&right_color=orange&left_text=pip%20downloads)](https://pypi.org/project/verba_rag/) [![Docker support](https://img.shields.io/badge/Docker_support-%E2%9C%93-4c1?style=flat-square&logo=docker&logoColor=white)](https://docs.docker.com/get-started/) [![Demo](https://img.shields.io/badge/Check%20out%20the%20demo!-yellow?&style=flat-square&logo=react&logoColor=white)](https://verba.weaviate.io/)
+[![PyPi downloads](https://static.pepy.tech/personalized-badge/goldenverba?period=total&units=international_system&left_color=grey&right_color=orange&left_text=pip%20downloads)](https://pypi.org/project/goldenverba/) [![Docker support](https://img.shields.io/badge/Docker_support-%E2%9C%93-4c1?style=flat-square&logo=docker&logoColor=white)](https://docs.docker.com/get-started/) [![Demo](https://img.shields.io/badge/Check%20out%20the%20demo!-yellow?&style=flat-square&logo=react&logoColor=white)](https://verba.weaviate.io/)
 
 ![Demo of Verba](https://github.com/weaviate/Verba/blob/main/img/verba.gif)
 
@@ -42,10 +42,10 @@ This section outlines various methods to set up and deploy Verba, so you can cho
 ## 🚀 Quickstart: Deploy with pip
 
 1. **Initialize a new Python Environment**
-- ```python3 -m virutalenv venv```
+- ```python3 -m virtualenv venv```
 
 2. **Install Verba**
-- ```pip install verba_rag```
+- ```pip install goldenverba```
 
 3. **Launch Verba**
 - ```verba start```

@@ -1,1 +1,1 @@
-recursive-include verba_rag/server/frontend/out *
+recursive-include goldenverba/server/frontend/out *
