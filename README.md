@@ -101,13 +101,14 @@ Verba offers straightforward commands to import your data for further interactio
 > Basic CRUD operations and UI interactions are also in the pipeline.
 
 ``` 
-verba start             # Initiates Verba application
+verba start --model "gpt-3.5-turbo"     # Initiates Verba application
 verba import --path "Path to your dir or file" --model "gpt-3.5-turbo" --clear True # Imports data into Verba
-verba clear             # Deletes all data within Verba
-verba clear_cache       # Removes cached data in Verba
+verba clear                             # Deletes all data within Verba
+verba clear_cache                       # Removes cached data in Verba
 ```
 
-If you've cloned the repository, you can get a quick start with sample datasets in the `./data` directory. Use `verba import --path ./data` to import these samples. You can also populate Verba with predefined suggestions using a JSON list via `verba import --path suggestions.json`. An example is provided in the `./data` directory.
+If you've cloned the repository, you can get a quick start with sample datasets in the `./data` directory. Use `verba import --path ./data` to import these samples. You can also populate Verba with predefined suggestions using a JSON list via `verba import --path suggestions.json`. An example is provided in the `./data/minecraft` directory.
+
 
 ## 💰 Large Language Model (LLM) Costs
 
