@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.3] - 05.09.2023
+
+### Added
+- OpenAI API documentation example dataset
+
 ## [0.2.2] - 31.08.2023
 
 ### Release!
