@@ -71,4 +71,6 @@ def import_data(path_str: str, model: str):
     elif suggestions:
         import_suggestions(client=client, suggestions=suggestions)
 
-    client._connection.embedded_db.stop()
+    if client._connection.embedded_db:
+        msg.info("Stopping Weaviate Embedded")
+        client._connection.embedded_db.stop()
