@@ -66,5 +66,7 @@ def init_cache():
         client.schema.create(cache_schema)
         msg.good("'Cache' schema created")
 
-    client._connection.embedded_db.stop()
+    if client._connection.embedded_db:
+        msg.info("Stopping Weaviate Embedded")
+        client._connection.embedded_db.stop()
     msg.info("Done")
