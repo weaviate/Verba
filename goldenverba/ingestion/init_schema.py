@@ -113,5 +113,7 @@ def init_schema(model: str = "gpt-3.5-turbo"):
         client.schema.create(chunk_schema)
         msg.good("'Document' and 'Chunk' schemas created")
 
-    client._connection.embedded_db.stop()
+    if client._connection.embedded_db:
+        msg.info("Stopping Weaviate Embedded")
+        client._connection.embedded_db.stop()
     msg.info("Done")
