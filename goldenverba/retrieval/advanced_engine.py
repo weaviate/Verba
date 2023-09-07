@@ -2,7 +2,7 @@ from goldenverba.retrieval.simple_engine import SimpleVerbaQueryEngine
 
 import os
 from wasabi import msg
-import openai
+import litellm
 
 
 class AdvancedVerbaQueryEngine(SimpleVerbaQueryEngine):
@@ -41,11 +41,9 @@ class AdvancedVerbaQueryEngine(SimpleVerbaQueryEngine):
         msg.info(
             f"Combined context of all chunks and their weighted windows ({len(context)} characters)"
         )
-
-        openai.api_key = os.environ.get("OPENAI_API_KEY", "")
         try:
             msg.info(f"Starting API call to answer {query_string}")
-            completion = openai.ChatCompletion.create(
+            completion = litellm.completion(
                 model=model,
                 messages=[
                     {
