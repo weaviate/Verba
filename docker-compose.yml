@@ -1,5 +1,6 @@
 ---
 version: '3.4'
+
 services:
   verba:
     build:
@@ -7,4 +8,61 @@ services:
       dockerfile: Dockerfile
     ports:
       - 8000:8000
+    environment:
+      - VERBA_URL=http://weaviate:8080
+      ## IF YOU WANT AUTHENTICATION, UNCOMENT BELLOW 
+      ## AND  AT WEAVIATE SERVICE
+      #- VERBA_API_KEY=adminkey
+      - OPENAI_API_KEY=$OPENAI_API_KEY
+    volumes:
+      - ./data:/data/
+    depends_on:
+      weaviate:
+        condition: service_healthy
+    healthcheck:
+      test: wget --no-verbose --tries=3 --spider http://localhost:8000 || exit 1
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_period: 10s    
+
+  weaviate:
+    command:
+    - --host
+    - 0.0.0.0
+    - --port
+    - '8080'
+    - --scheme
+    - http
+    image: semitechnologies/weaviate:1.21.2
+    ports:
+    - 8080:8080
+    - 3000:8080
+    volumes:
+    - weaviate_data:/var/lib/weaviate
+    restart: on-failure:0
+    healthcheck:
+      test: wget --no-verbose --tries=3 --spider http://localhost:8080/v1/.well-known/ready || exit 1
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_period: 10s 
+    environment:
+      OPENAI_APIKEY: $OPENAI_API_KEY
+      QUERY_DEFAULTS_LIMIT: 25
+      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: 'true'
+      PERSISTENCE_DATA_PATH: '/var/lib/weaviate'
+      DEFAULT_VECTORIZER_MODULE: 'text2vec-openai'
+      ENABLE_MODULES: 'text2vec-openai, generative-openai, qna-openai'
+      CLUSTER_HOSTNAME: 'node1'
+      #######IF YOU WANT AUTHENTICATION UNCOMMENT BELOW########
+      # AUTHENTICATION_APIKEY_ENABLED: 'true'
+      # AUTHENTICATION_APIKEY_ALLOWED_KEYS: 'readonlykey,adminkey'
+      # AUTHENTICATION_APIKEY_USERS: 'jane@doe.com,john@doe.com'
+      # AUTHORIZATION_ADMINLIST_ENABLED: 'true'
+      # AUTHORIZATION_ADMINLIST_USERS: 'john@doe.com'
+      # AUTHORIZATION_ADMINLIST_READONLY_USERS: 'jane@doe.com'
+
+volumes:
+  weaviate_data: {}
 ...
