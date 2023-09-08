@@ -1,4 +1,3 @@
-import os
 from wasabi import msg  # type: ignore[import]
 
 from goldenverba.ingestion.util import setup_client

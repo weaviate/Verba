@@ -1,4 +1,3 @@
-import weaviate
 from weaviate import Client
 
 from goldenverba.ingestion.util import setup_client

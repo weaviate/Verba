@@ -1,5 +1,3 @@
-import os
-
 from wasabi import msg  # type: ignore[import]
 import spacy
 

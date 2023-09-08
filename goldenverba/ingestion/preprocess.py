@@ -1,5 +1,4 @@
 import glob
-import os
 import json
 
 from goldenverba.ingestion.util import hash_string

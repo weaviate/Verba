@@ -11,7 +11,6 @@ from fastapi.responses import FileResponse
 from pathlib import Path
 from pydantic import BaseModel
 
-from goldenverba.retrieval.simple_engine import SimpleVerbaQueryEngine
 from goldenverba.retrieval.advanced_engine import AdvancedVerbaQueryEngine
 
 from dotenv import load_dotenv

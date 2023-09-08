@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 
 from wasabi import msg  # type: ignore[import]
