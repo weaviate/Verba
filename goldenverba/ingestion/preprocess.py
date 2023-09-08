@@ -109,8 +109,7 @@ def load_file(file_path: Path) -> dict:
     @returns dict - Dictionary of filename (key) and their content (value)
     """
     file_contents = {}
-    file_types = ["txt", "md", "mdx"]
-
+    file_types = [".txt", ".md", ".mdx", "txt", "md", "mdx"]
     if file_path.suffix not in file_types:
         msg.warn(f"{file_path.suffix} not supported")
         return {}
