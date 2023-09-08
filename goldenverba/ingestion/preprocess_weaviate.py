@@ -24,8 +24,6 @@ def retrieve_documentation(nlp: Language) -> tuple[list[Doc], list[Doc]]:
     """Downloads the Weaviate documentation, preprocesses, and chunks it. Returns a list of full documents and a list of chunks
     @returns tuple[list[Document], list[Document]] - A tuple of list of documents and list of chunks
     """
-    nlp = spacy.blank("en")
-
     weaviate_documentation = download_from_github(
         nlp,
         "weaviate",
