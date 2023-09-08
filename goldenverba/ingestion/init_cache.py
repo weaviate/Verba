@@ -12,6 +12,10 @@ def init_cache():
     msg.divider("Creating Cache class")
 
     client = setup_client()
+    
+    if not client:
+        msg.fail("Could not get client.")
+        return False
 
     cache_schema = {
         "classes": [

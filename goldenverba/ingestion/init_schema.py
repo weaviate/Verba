@@ -1,5 +1,5 @@
-import os
 from wasabi import msg  # type: ignore[import]
+import weaviate
 
 from goldenverba.ingestion.util import setup_client
 
@@ -12,6 +12,17 @@ def init_schema(model: str = "gpt-3.5-turbo"):
     msg.divider("Creating Document and Chunk class")
 
     client = setup_client()
+
+    if not client:
+        msg.fail("Could not get client.")
+        return False
+    
+    # check if we can get info from server (testing auth)
+    try:
+        client.cluster.get_nodes_status()
+    except weaviate.exceptions.UnexpectedStatusCodeException as e:
+        msg.fail("Error on init schema: {0}".format(e))
+        return False
 
     chunk_schema = {
         "classes": [
@@ -117,3 +128,4 @@ def init_schema(model: str = "gpt-3.5-turbo"):
         msg.info("Stopping Weaviate Embedded")
         client._connection.embedded_db.stop()
     msg.info("Done")
+    return True
