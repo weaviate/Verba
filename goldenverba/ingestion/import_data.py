@@ -19,9 +19,11 @@ from goldenverba.ingestion.preprocess import (
     load_suggestions,
 )
 
-from goldenverba.ingestion.init_schema import init_schema
-from goldenverba.ingestion.init_cache import init_cache
-from goldenverba.ingestion.init_suggestion import init_suggestion
+from goldenverba.ingestion.schema.schema_generation import (
+    init_cache,
+    init_documents,
+    init_suggestion,
+)
 
 from dotenv import load_dotenv
 
@@ -43,7 +45,7 @@ def import_data(path_str: str, model: str):
         return
 
     if not client.schema.exists("Document"):
-        init_schema(model)
+        init_documents()
     if not client.schema.exists("Cache"):
         init_cache()
     if not client.schema.exists("Suggestion"):
