@@ -61,6 +61,7 @@ class GetDocumentPayload(BaseModel):
 
 
 @app.get("/")
+@app.head("/")
 async def serve_frontend():
     return FileResponse(os.path.join(BASE_DIR, "frontend/out/index.html"))
 
