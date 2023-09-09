@@ -71,7 +71,15 @@ If you're unfamiliar with Docker, you can learn more about it [here](https://doc
 - ```git clone https://github.com/weaviate/Verba.git```
 
 2. **Deploy using Docker**
-- ```docker-compose up```
+- ``` docker compose up -d ```
+
+3. **Init and import default data**
+- ```docker compose run --rm verba verba init```
+- ```docker compose run --rm verba verba import```
+
+4. **Importing your own data**
+- ```cp /tmp/somefile.txt ./data```
+- ```docker compose run --rm verba verba import --path /data/somefile.txt```
 
 ## 🌐 Selecting the Optimal Weaviate Deployment for Verba
 
