@@ -13,6 +13,10 @@ def init_suggestion():
 
     client = setup_client()
 
+    if not client:
+        msg.fail("Could not get client.")
+        return False    
+
     suggestion_schema = {
         "classes": [
             {
