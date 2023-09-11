@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { ChatComponent, Message } from "../components/ChatComponent";
 import { DocumentComponent } from "../components/DocumentComponent";
+import ImportModalComponent from "../components/ImportModalComponent";
+import { FaPlus } from "react-icons/fa";
 import CountUp from 'react-countup';
 
 export const getApiHost = () => {
@@ -37,6 +39,7 @@ export const DOC_TYPE_COLOR_HOVER: Record<DocType, string> = {
 };
 
 export default function Home() {
+  const [showModal, setShowModal] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [userInput, setUserInput] = useState("");
   const [documentTitle, setDocumentTitle] = useState("");
@@ -223,6 +226,7 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-10 text-gray-900">
+      {showModal && <ImportModalComponent onClose={() => setShowModal(false)} apiHost={apiHost} />}
       <div className="flex flex-col w-full items-start">
         <div className="mb-2">
           <div className="flex justify-between items-center w-full"> {/* <-- flexbox container */}
@@ -244,6 +248,15 @@ export default function Home() {
                   RAGtriever
                 </span>
               </div>
+            </div>
+            <div className="ml-16 animate-pop-in">
+              <button
+                className="flex items-center space-x-2 bg-gray-200 text-black p-3  rounded-lg  hover:bg-green-400 border-2 border-black hover:border-white hover-container shadow-md"
+                onClick={() => setShowModal(true)}
+              >
+                <FaPlus />
+                <span>Add Documents</span>
+              </button>
             </div>
           </div>
         </div>

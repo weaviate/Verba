@@ -11,15 +11,18 @@ from fastapi.responses import FileResponse
 from pathlib import Path
 from pydantic import BaseModel
 
-from goldenverba.retrieval.simple_engine import SimpleVerbaQueryEngine
 from goldenverba.retrieval.advanced_engine import AdvancedVerbaQueryEngine
+from goldenverba import verba_manager
 
 from dotenv import load_dotenv
 
 load_dotenv()
 
-# verba_engine = SimpleVerbaQueryEngine()
-verba_engine = AdvancedVerbaQueryEngine()
+manager = verba_manager.VerbaManager()
+
+readers = manager.reader_get_readers()
+
+verba_engine = AdvancedVerbaQueryEngine(manager.client)
 
 # FastAPI App
 app = FastAPI()
@@ -58,6 +61,12 @@ class QueryPayload(BaseModel):
 
 class GetDocumentPayload(BaseModel):
     document_id: str
+
+
+class LoadPayload(BaseModel):
+    reader: str
+    contents: list[str]
+    document_type: str
 
 
 @app.get("/")
@@ -104,6 +113,57 @@ async def get_google_tag():
     return JSONResponse(
         content={
             "tag": tag,
+        }
+    )
+
+
+# Define health check endpoint
+@app.get("/api/get_readers")
+async def get_readers():
+    msg.info("Retrieving readers")
+
+    reader_data = {"readers": []}
+
+    for key in readers:
+        current_reader = readers[key]
+        current_reader_data = {
+            "name": key,
+            "description": current_reader.description,
+            "input_form": current_reader.input_form,
+        }
+        reader_data["readers"].append(current_reader_data)
+
+    return JSONResponse(content=reader_data)
+
+
+# Receive query and return chunks and query answer
+@app.post("/api/load_data")
+async def load_data(payload: LoadPayload):
+    manager.reader_set_reader(payload.reader)
+
+    if payload.contents:
+        try:
+            documents = manager.reader_load(payload.contents, payload.document_type)
+            return JSONResponse(
+                content={
+                    "status": 200,
+                    "status_msg": "Succesfully imported "
+                    + str(len(documents))
+                    + " documents",
+                }
+            )
+        except Exception as e:
+            msg.fail(f"Loading data failed {str(e)}")
+            return JSONResponse(
+                content={
+                    "status": "400",
+                    "status_msg": str(e),
+                }
+            )
+    return JSONResponse(
+        content={
+            "status": "200",
+            "status_msg": "No documents received",
         }
     )
 

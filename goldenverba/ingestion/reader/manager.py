@@ -1,4 +1,5 @@
 from goldenverba.ingestion.reader.textreader import TextReader
+from goldenverba.ingestion.reader.simplereader import SimpleReader
 from goldenverba.ingestion.reader.interface import Reader
 from goldenverba.ingestion.reader.document import Document
 
@@ -7,8 +8,11 @@ from wasabi import msg
 
 class ReaderManager:
     def __init__(self):
-        self.readers: dict[str, Reader] = {"TextReader": TextReader()}
-        self.selected_reader: Reader = self.readers["TextReader"]
+        self.readers: dict[str, Reader] = {
+            "SimpleReader": SimpleReader(),
+            "TextReader": TextReader(),
+        }
+        self.selected_reader: Reader = self.readers["SimpleReader"]
 
     def load(
         self,
