@@ -4,7 +4,7 @@ from datetime import datetime
 from pathlib import Path
 from wasabi import msg
 
-from goldenverba.ingestion.reader.interface import Reader
+from goldenverba.ingestion.reader.interface import Reader, InputForm
 from goldenverba.ingestion.reader.document import Document
 
 
@@ -16,29 +16,35 @@ class TextReader(Reader):
     def __init__(self):
         self.file_types = [".txt", ".md", ".mdx"]
         self.name = "TextReader"
+        self.requires_env = (
+            []
+        )  # The TextReader does not require any environment variables to work
+        self.description = "Imports text files from a path. Both individual files and directories work."
+        self.input_form = InputForm.INPUT.value
 
     def load(
         self,
-        paths: list[str] = [],
+        contents: list[str] = [],
         document_type: str = "Documentation",
     ) -> list[Document]:
         """Load data from text sources
-        @parameter: paths : list[str] - List of paths to resources
+        @parameter: contents : list[str] - List of absolute paths to a file or a directory
         @parameter: document_type : str - Document type
         @returns list[Document] - List of Documents
         """
 
         documents = []
 
-        for path_str in paths:
-            data_path = Path(path_str)
-            if data_path.exists():
-                if data_path.is_file():
-                    documents += self.load_file(data_path, document_type)
+        for path_str in contents:
+            if path_str != "":
+                data_path = Path(path_str)
+                if data_path.exists():
+                    if data_path.is_file():
+                        documents += self.load_file(data_path, document_type)
+                    else:
+                        documents += self.load_directory(data_path, document_type)
                 else:
-                    documents += self.load_directory(data_path, document_type)
-            else:
-                msg.warn(f"Path {data_path} does not exist")
+                    msg.warn(f"Path {data_path} does not exist")
 
         return documents
 

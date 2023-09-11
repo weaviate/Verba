@@ -130,7 +130,8 @@ SCHEMA_SUGGESTION = {
     ]
 }
 
-VECTORIZERS = ["text2vec-openai"]
+VECTORIZERS = ["text2vec-openai"]  # Needs to match with Weaviate modules
+EMBEDDINGS = ["SentenceTransformer"]  # Custom Vectors
 
 
 def strip_non_letters(s: str):
@@ -174,27 +175,29 @@ def add_suffix(schema: dict, vectorizer: str) -> tuple[dict, str]:
     """
     modified_schema = schema
     # Verify Vectorizer and add suffix
-    if vectorizer in VECTORIZERS:
-        modified_schema["classes"][0]["class"] = modified_schema["classes"][0][
-            "class"
-        ] + strip_non_letters(vectorizer)
-    elif vectorizer != None:
-        msg.warn(f"Could not find matching vectorizer: {vectorizer}")
-
+    modified_schema["classes"][0]["class"] = modified_schema["classes"][0][
+        "class"
+    ] + strip_non_letters(vectorizer)
     return modified_schema, modified_schema["classes"][0]["class"]
 
 
-def init_schemas(vectorizer: str = None, force: bool = False) -> bool:
+def init_schemas(
+    client: Client = None,
+    vectorizer: str = None,
+    force: bool = False,
+    check: bool = False,
+) -> bool:
     """Initializes a weaviate client and initializes all required schemas
+    @parameter client : Client - Weaviate Client
     @parameter vectorizer : str - Name of the vectorizer
     @parameter force : bool - Delete existing schema without user input
+    @parameter check : bool - Only create if not exist
     @returns tuple[dict, dict] - Tuple of modified schemas
     """
-    client = setup_client()
     try:
-        init_documents(client, vectorizer, force)
-        init_cache(client, vectorizer, force)
-        init_suggestion(client, vectorizer, force)
+        init_documents(client, vectorizer, force, check)
+        init_cache(client, vectorizer, force, check)
+        init_suggestion(client, vectorizer, force, check)
         return True
     except Exception as e:
         msg.fail(f"Schema initialization failed {str(e)}")
@@ -202,12 +205,13 @@ def init_schemas(vectorizer: str = None, force: bool = False) -> bool:
 
 
 def init_documents(
-    client: Client, vectorizer: str = None, force: bool = False
+    client: Client, vectorizer: str = None, force: bool = False, check: bool = False
 ) -> tuple[dict, dict]:
     """Initializes the Document and Chunk class
     @parameter client : Client - Weaviate client
     @parameter vectorizer : str - Name of the vectorizer
     @parameter force : bool - Delete existing schema without user input
+    @parameter check : bool - Only create if not exist
     @returns tuple[dict, dict] - Tuple of modified schemas
     """
 
@@ -223,6 +227,8 @@ def init_documents(
     chunk_schema, chunk_name = add_suffix(chunk_schema, vectorizer)
 
     if client.schema.exists(document_name):
+        if check:
+            return document_schema, chunk_schema
         if not force:
             user_input = input(
                 f"{document_name} class already exists, do you want to delete it? (y/n): "
@@ -252,11 +258,14 @@ def init_documents(
     return document_schema, chunk_schema
 
 
-def init_cache(client: Client, vectorizer: str = None, force: bool = False) -> dict:
+def init_cache(
+    client: Client, vectorizer: str = None, force: bool = False, check: bool = False
+) -> dict:
     """Initializes the Cache
     @parameter client : Client - Weaviate client
     @parameter vectorizer : str - Name of the vectorizer
     @parameter force : bool - Delete existing schema without user input
+    @parameter check : bool - Only create if not exist
     @returns dict - Modified schema
     """
 
@@ -271,6 +280,8 @@ def init_cache(client: Client, vectorizer: str = None, force: bool = False) -> d
     cache_schema, cache_name = add_suffix(cache_schema, vectorizer)
 
     if client.schema.exists(cache_name):
+        if check:
+            return cache_schema
         if not force:
             user_input = input(
                 f"{cache_name} class already exists, do you want to delete it? (y/n): "
@@ -296,12 +307,13 @@ def init_cache(client: Client, vectorizer: str = None, force: bool = False) -> d
 
 
 def init_suggestion(
-    client: Client, vectorizer: str = None, force: bool = False
+    client: Client, vectorizer: str = None, force: bool = False, check: bool = False
 ) -> dict:
     """Initializes the Suggestion schema
     @parameter client : Client - Weaviate client
     @parameter vectorizer : str - Name of the vectorizer
     @parameter force : bool - Delete existing schema without user input
+    @parameter check : bool - Only create if not exist
     @returns dict - Modified schema
     """
 
@@ -309,6 +321,8 @@ def init_suggestion(
     suggestion_schema, suggestion_name = add_suffix(SCHEMA_SUGGESTION, vectorizer)
 
     if client.schema.exists(suggestion_name):
+        if check:
+            return suggestion_schema
         if not force:
             user_input = input(
                 f"{suggestion_name} class already exists, do you want to delete it? (y/n): "

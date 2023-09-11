@@ -11,8 +11,8 @@ class VerbaQueryEngine:
 
     client: Client = None
 
-    def __init__(self):
-        VerbaQueryEngine.client = setup_client()
+    def __init__(self, client):
+        VerbaQueryEngine.client = client
 
     def query(self, query_string: str) -> tuple:
         """Execute a query to a receive specific chunks from Weaviate
