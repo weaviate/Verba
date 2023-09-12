@@ -6,6 +6,7 @@ from goldenverba.ingestion.reader.document import Document
 class InputForm(Enum):
     UPLOAD = "UPLOAD"  # Input Form to upload text files directly
     INPUT = "INPUT"  # Simple Text Input in Frontend
+    CHUNKER = "CHUNKER"  # Default Input for Chunkers
 
 
 class Reader:

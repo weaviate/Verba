@@ -8,17 +8,18 @@ from goldenverba.ingestion.reader.document import Document
 from goldenverba.ingestion.reader.interface import InputForm
 
 
-class WordChunker(Chunker):
+class SentenceChunker(Chunker):
     """
-    WordChunker for Verba built with spaCy
+    SentenceChunker for Verba built with spaCy
     """
 
     def __init__(self):
         self.name = "WordChunker"
         self.requires_env = []
         self.input_form = InputForm.CHUNKER.value
-        self.description = "Chunk documents by words. You can specify how many words should overlap between chunks to improve retrieval."
+        self.description = "Chunk documents by sentences. You can specify how many sentences should overlap between chunks to improve retrieval."
         self.nlp = spacy.blank("en")
+        self.nlp.add_pipe("sentencizer")
 
     def chunk(
         self, documents: list[Document], units: int, overlap: int
@@ -30,7 +31,7 @@ class WordChunker(Chunker):
         @returns list[str] - List of documents that contain the chunks
         """
         for document in documents:
-            doc = self.nlp(document.text)
+            doc = list(self.nlp(document.text).sents)
 
             if units > len(doc) or units < 1:
                 msg.warn(
@@ -53,8 +54,12 @@ class WordChunker(Chunker):
                 if end_i > len(doc):
                     end_i = len(doc)  # Adjust for the last chunk
 
+                text = ""
+                for sent in doc[start_i:end_i]:
+                    text += sent.text
+
                 doc_chunk = Chunk(
-                    text=doc[start_i:end_i].text,
+                    text=text,
                     doc_name=document.name,
                     doc_type=document.type,
                     chunk_id=split_id_counter,

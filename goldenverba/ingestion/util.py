@@ -239,3 +239,28 @@ def import_weaviate_suggestions(client: Client) -> None:
         "How to retrieve all objects from weaviate?",
     ]
     import_suggestions(client, suggestion_list)
+
+
+def check_if_file_exits(client: Client, doc_name: str) -> bool:
+    results = (
+        client.query.get(
+            class_name="Document",
+            properties=[
+                "doc_name",
+            ],
+        )
+        .with_where(
+            {
+                "path": ["doc_name"],
+                "operator": "Equal",
+                "valueText": doc_name,
+            }
+        )
+        .with_limit(1)
+        .do()
+    )
+
+    if results["data"]["Get"]["Document"]:
+        return True
+    else:
+        return False

@@ -17,7 +17,7 @@ class SimpleReader(Reader):
         self.requires_env = (
             []
         )  # The SimpleReader does not require any environment variables to work
-        self.description = "Reads text documents directly from the frontend."
+        self.description = "Reads text files directly from the frontend."
         self.input_form = InputForm.UPLOAD.value
 
     def load(
