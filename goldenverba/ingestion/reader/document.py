@@ -1,4 +1,5 @@
 import pickle
+from goldenverba.ingestion.chunking.chunk import Chunk
 
 
 class Document:
@@ -21,6 +22,7 @@ class Document:
         self._timestamp = timestamp
         self._reader = reader
         self._meta = meta
+        self.chunks: list[Chunk] = []
 
     @property
     def text(self):

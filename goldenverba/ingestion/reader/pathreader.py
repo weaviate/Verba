@@ -8,18 +8,18 @@ from goldenverba.ingestion.reader.interface import Reader, InputForm
 from goldenverba.ingestion.reader.document import Document
 
 
-class TextReader(Reader):
+class PathReader(Reader):
     """
-    TextReader for Verba
+    PathReader for Verba
     """
 
     def __init__(self):
         self.file_types = [".txt", ".md", ".mdx"]
-        self.name = "TextReader"
+        self.name = "PathReader"
         self.requires_env = (
             []
-        )  # The TextReader does not require any environment variables to work
-        self.description = "Imports text files from a path. Both individual files and directories work."
+        )  # The PathReader does not require any environment variables to work
+        self.description = "Imports text files and directories from a path."
         self.input_form = InputForm.INPUT.value
 
     def load(

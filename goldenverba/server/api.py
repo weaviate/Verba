@@ -21,6 +21,30 @@ load_dotenv()
 manager = verba_manager.VerbaManager()
 
 readers = manager.reader_get_readers()
+chunker = manager.chunker_get_chunker()
+
+last_reader = list(readers.keys())[0]
+last_document_type = "Documentation"
+last_chunker = list(chunker.keys())[0]
+last_unit = 100
+last_overlap = 50
+
+
+def create_reader_payload(key: str, reader) -> dict:
+    return {
+        "name": key,
+        "description": reader.description,
+        "input_form": reader.input_form,
+    }
+
+
+def create_chunker_payload(key: str, chunker) -> dict:
+    return {
+        "name": key,
+        "description": chunker.description,
+        "input_form": chunker.input_form,
+    }
+
 
 verba_engine = AdvancedVerbaQueryEngine(manager.client)
 
@@ -65,8 +89,11 @@ class GetDocumentPayload(BaseModel):
 
 class LoadPayload(BaseModel):
     reader: str
+    chunker: str
     contents: list[str]
     document_type: str
+    chunkUnits: int
+    chunkOverlap: int
 
 
 @app.get("/")
@@ -118,38 +145,70 @@ async def get_google_tag():
 
 
 # Define health check endpoint
-@app.get("/api/get_readers")
-async def get_readers():
-    msg.info("Retrieving readers")
+@app.get("/api/get_components")
+async def get_components():
+    msg.info("Retrieving components")
 
-    reader_data = {"readers": []}
+    data = {
+        "readers": [],
+        "chunker": [],
+    }
 
     for key in readers:
         current_reader = readers[key]
-        current_reader_data = {
-            "name": key,
-            "description": current_reader.description,
-            "input_form": current_reader.input_form,
-        }
-        reader_data["readers"].append(current_reader_data)
+        current_reader_data = create_reader_payload(key, current_reader)
+        data["readers"].append(current_reader_data)
 
-    return JSONResponse(content=reader_data)
+    for key in chunker:
+        current_chunker = chunker[key]
+        current_chunker_data = create_chunker_payload(key, current_chunker)
+        data["chunker"].append(current_chunker_data)
+
+    data["default_values"] = {
+        "last_reader": create_reader_payload(last_reader, readers[last_reader]),
+        "last_chunker": create_chunker_payload(last_chunker, chunker[last_chunker]),
+        "last_document_type": last_document_type,
+        "last_unit": last_unit,
+        "last_overlap": last_overlap,
+    }
+
+    return JSONResponse(content=data)
 
 
 # Receive query and return chunks and query answer
 @app.post("/api/load_data")
 async def load_data(payload: LoadPayload):
     manager.reader_set_reader(payload.reader)
+    manager.chunker_set_chunker(payload.chunker)
+
+    global last_reader, last_document_type, last_chunker, last_unit, last_overlap
+
+    last_reader = payload.reader
+    last_document_type = payload.document_type
+    last_chunker = payload.chunker
+    last_unit = payload.chunkUnits
+    last_overlap = payload.chunkOverlap
+
+    msg.info(
+        f"Received Data to Import: READER({payload.reader}, Documents {len(payload.contents)}, Type {payload.document_type}) CHUNKER ({payload.chunker}, UNITS {payload.chunkUnits}, OVERLAP {payload.chunkOverlap})"
+    )
 
     if payload.contents:
         try:
-            documents = manager.reader_load(payload.contents, payload.document_type)
+            documents = manager.import_data(
+                payload.contents,
+                payload.document_type,
+                payload.chunkUnits,
+                payload.chunkOverlap,
+            )
+
+            document_count = len(documents)
+            chunks_count = sum([len(document.chunks) for document in documents])
+
             return JSONResponse(
                 content={
                     "status": 200,
-                    "status_msg": "Succesfully imported "
-                    + str(len(documents))
-                    + " documents",
+                    "status_msg": f"Succesfully imported {document_count} documents and {chunks_count} chunks",
                 }
             )
         except Exception as e:

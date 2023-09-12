@@ -9,20 +9,38 @@ from weaviate.embedded import EmbeddedOptions
 from wasabi import msg
 
 from goldenverba.ingestion.reader.manager import ReaderManager
+from goldenverba.ingestion.chunking.manager import ChunkerManager
 from goldenverba.ingestion.reader.document import Document
 from goldenverba.ingestion.reader.interface import Reader
+from goldenverba.ingestion.chunking.interface import Chunker
 
 import goldenverba.ingestion.schema.schema_generation as schema
 
 
 class VerbaManager:
+    """Manages all Verba Components"""
+
     def __init__(self) -> None:
         self.reader_manager = ReaderManager()
+        self.chunker_manager = ChunkerManager()
         self.environment_variables = {}
+        self.current_embedding = ""
         self.client = self.setup_client()
         # Check if all schemas exist for all possible vectorizers
-        for vectorizer in schema.VECTORIZERS:
+        for vectorizer in schema.VECTORIZERS + schema.EMBEDDINGS:
             schema.init_schemas(self.client, vectorizer, False, True)
+
+    def import_data(
+        self,
+        contents: list[str] = [],
+        document_type: str = "Documentation",
+        units: int = 100,
+        overlap: int = 50,
+    ) -> list[Document]:
+        loaded_documents = self.reader_load(contents, document_type)
+        modified_documents = self.chunker_chunk(loaded_documents, units, overlap)
+
+        return modified_documents
 
     def reader_load(
         self,
@@ -31,11 +49,22 @@ class VerbaManager:
     ) -> list[Document]:
         return self.reader_manager.load(contents, document_type)
 
+    def chunker_chunk(
+        self, documents: list[Document], units: int, overlap: int
+    ) -> list[Document]:
+        return self.chunker_manager.chunk(documents, units, overlap)
+
     def reader_set_reader(self, reader: str) -> bool:
         return self.reader_manager.set_reader(reader)
 
     def reader_get_readers(self) -> dict[str, Reader]:
         return self.reader_manager.get_readers()
+
+    def chunker_set_chunker(self, chunker: str) -> bool:
+        return self.chunker_manager.set_chunker(chunker)
+
+    def chunker_get_chunker(self) -> dict[str, Chunker]:
+        return self.chunker_manager.get_chunkers()
 
     def setup_client(self) -> Optional[Client]:
         """

@@ -39,12 +39,6 @@ SCHEMA_CHUNK = {
                     "dataType": ["number"],
                     "description": "Document chunk from the whole document",
                 },
-                {
-                    # Skip
-                    "name": "text_no_overlap",
-                    "dataType": ["text"],
-                    "description": "Text of the chunk without overlapping texts from other chunks",
-                },
             ],
         }
     ]
@@ -147,7 +141,7 @@ def verify_vectorizer(
     @parameter skip_properties: list[str] - List of property names that should not get vectorized
     @returns dict - Modified schema if vectorizer is available
     """
-    modified_schema = schema
+    modified_schema = schema.copy()
     # Verify Vectorizer
     if vectorizer in VECTORIZERS:
         modified_schema["classes"][0]["vectorizer"] = vectorizer
@@ -161,6 +155,8 @@ def verify_vectorizer(
                     }
                 }
                 property["moduleConfig"] = moduleConfig
+    elif vectorizer in EMBEDDINGS:
+        msg.info(f"Not modifying schema for {vectorizer}")
     elif vectorizer != None:
         msg.warn(f"Could not find matching vectorizer: {vectorizer}")
 
@@ -173,7 +169,7 @@ def add_suffix(schema: dict, vectorizer: str) -> tuple[dict, str]:
     @parameter vectorizer : str - Name of the vectorizer
     @returns dict - Modified schema if vectorizer is available
     """
-    modified_schema = schema
+    modified_schema = schema.copy()
     # Verify Vectorizer and add suffix
     modified_schema["classes"][0]["class"] = modified_schema["classes"][0][
         "class"
@@ -219,7 +215,7 @@ def init_documents(
     chunk_schema = verify_vectorizer(
         SCHEMA_CHUNK,
         vectorizer,
-        ["doc_type", "doc_uuid", "chunk_id", "text_no_overlap"],
+        ["doc_type", "doc_uuid", "chunk_id"],
     )
 
     # Add Suffix
