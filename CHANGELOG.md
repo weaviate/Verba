@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.0] - 12.09.2023
+
+### Added
+- Refactor modular architecture
+- Add ability to import data through the frontend
+- Add Readers (SimpleReader, PathReader)
+- Add Chunkers (WordChunker, SentenceChunker)
+
 ## [0.2.3] - 05.09.2023
 
 ### Added
