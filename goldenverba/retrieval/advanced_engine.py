@@ -23,7 +23,8 @@ class AdvancedVerbaQueryEngine(SimpleVerbaQueryEngine):
         query_results = (
             SimpleVerbaQueryEngine.client.query.get(
                 class_name="Chunk",
-                properties=["text", "doc_name", "chunk_id", "doc_uuid", "doc_type"],
+                properties=["text", "doc_name",
+                            "chunk_id", "doc_uuid", "doc_type"],
             )
             .with_hybrid(query=query_string)
             .with_additional(properties=["score"])
@@ -42,7 +43,8 @@ class AdvancedVerbaQueryEngine(SimpleVerbaQueryEngine):
             f"Combined context of all chunks and their weighted windows ({len(context)} characters)"
         )
 
-        openai.api_key = os.environ.get("OPENAI_API_KEY", "")
+        openai.api_key = os.environ.get(
+            "OPENAI_API_KEY", "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")
         try:
             msg.info(f"Starting API call to answer {query_string}")
             completion = openai.ChatCompletion.create(
@@ -50,7 +52,7 @@ class AdvancedVerbaQueryEngine(SimpleVerbaQueryEngine):
                 messages=[
                     {
                         "role": "system",
-                        "content": f"You are a Retrieval Augmented Generation chatbot. Try to answer this user query {query_string} with only the provided context. If the provided documentation does not provide enough information, say so. If the answer requires code examples encapsulate them with ```programming-language-name ```. Don't do pseudo-code.",
+                        "content": f"Tu es un chatbot de génération augmentée par recherche. Essaye de répondre à cette demande de l'utilisateur {query_string} avec seulement le contexte fourni. Si la documentation fournie ne fournit pas suffisamment d'informations, dis-le. Si la réponse nécessite des exemples de code, encapsule-les avec nom-du-langage-de-programmation. Ne fais pas de pseudo-code.",
                     },
                     {"role": "user", "content": context},
                 ],
@@ -80,7 +82,8 @@ class AdvancedVerbaQueryEngine(SimpleVerbaQueryEngine):
             added_chunks = {}
             for chunk in chunk_map:
                 chunk_id = int(chunk)
-                all_chunk_range = list(range(chunk_id - window, chunk_id + window + 1))
+                all_chunk_range = list(
+                    range(chunk_id - window, chunk_id + window + 1))
                 for _range in all_chunk_range:
                     if (
                         _range >= 0
