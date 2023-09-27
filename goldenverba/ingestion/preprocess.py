@@ -115,9 +115,17 @@ def load_file(file_path: Path) -> dict:
         msg.warn(f"{file_path.suffix} not supported")
         return {}
 
-    with open(file_path, "r", encoding="utf-8") as f:
-        msg.info(f"Reading {str(file_path)}")
-        file_contents[str(file_path)] = f.read()
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            msg.info(f"Reading {str(file_path)}")
+            file_contents[str(file_path)] = f.read()
+    except UnicodeDecodeError:
+        try:
+            with open(file_path, "r", encoding="utf-16-le") as f:
+                file_contents[str(file_path)] = f.read()
+        except Exception as e:
+            msg.error(f"Could not read file {str(file_path)} due to {str(e)}")
+
     msg.good(f"Loaded {len(file_contents)} files")
     return file_contents
 
@@ -145,9 +153,16 @@ def load_directory(dir_path: Path) -> dict:
         # Loop through each file
         for file in files:
             msg.info(f"Reading {str(file)}")
-            with open(file, "r", encoding="utf-8") as f:
-                # Read the file and add its content to the dictionary
-                file_contents[str(file)] = f.read()
+            try:
+                with open(file, "r", encoding="utf-8") as f:
+                    # Read the file and add its content to the dictionary
+                    file_contents[str(file)] = f.read()
+            except UnicodeDecodeError:
+                try:
+                    with open(file, "r", encoding="utf-16-le") as f:
+                        file_contents[str(file)] = f.read()
+                except Exception as e:
+                    msg.error(f"Could not read file {str(file)} due to {str(e)}")
 
     msg.good(f"Loaded {len(file_contents)} files")
     return file_contents
