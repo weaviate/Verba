@@ -301,7 +301,7 @@ export default function Home() {
                       : 'bg-red-500 hover:bg-red-400'
                       }`}
                   >
-                    Demo {apiStatus}
+                    {apiStatus}
                   </span>
                 </a>
                 <a href="https://www.weaviate.io" target="_blank" rel="noopener noreferrer">

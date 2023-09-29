@@ -7,6 +7,7 @@ class InputForm(Enum):
     UPLOAD = "UPLOAD"  # Input Form to upload text files directly
     INPUT = "INPUT"  # Simple Text Input in Frontend
     CHUNKER = "CHUNKER"  # Default Input for Chunkers
+    TEXT = "TEXT"  # Default Input for Embedder
 
 
 class Reader:
@@ -18,12 +19,22 @@ class Reader:
         self.name = "Reader"
         self.file_types = []
         self.requires_env = []
+        self.requires_library = []
         self.description = ""
         self.input_form = InputForm.UPLOAD.value
 
-    def load(contents: list[str], document_type: str) -> list[Document]:
+    def load(
+        bytes: list[str],
+        contents: list[str],
+        paths: list[str],
+        fileNames: list[str],
+        document_type: str,
+    ) -> list[Document]:
         """Ingest data into Weaviate
-        @parameter: contents : list[str] - List of paths to resources
+        @parameter: bytes : list[str] - List of bytes
+        @parameter: contents : list[str] - List of string content
+        @parameter: paths : list[str] - List of paths to files
+        @parameter: fileNames : list[str] - List of file names
         @parameter: document_type : str - Document type
         @returns list[str] - List of strings
         """

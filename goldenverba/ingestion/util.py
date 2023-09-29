@@ -6,7 +6,6 @@ import openai
 import weaviate  # type: ignore[import]
 from weaviate import Client
 from typing import Optional
-from spacy.tokens import Doc
 
 from weaviate.embedded import EmbeddedOptions
 
@@ -81,7 +80,7 @@ def hash_string(text: str) -> str:
     return str(sha256.hexdigest())
 
 
-def import_documents(client: Client, documents: list[Doc]) -> dict:
+def import_documents(client: Client, documents) -> dict:
     """Imports a list of document to the Weaviate Client and returns a list of UUID for the chunks to match
     @parameter client : Client - Weaviate Client
     @parameter documents : list[Document] - List of whole documents
@@ -111,7 +110,7 @@ def import_documents(client: Client, documents: list[Doc]) -> dict:
     return doc_uuid_map
 
 
-def import_chunks(client: Client, chunks: list[Doc], doc_uuid_map: dict) -> None:
+def import_chunks(client: Client, chunks, doc_uuid_map: dict) -> None:
     """Imports a list of chunks to the Weaviate Client and uses a list of UUID for the chunks to match
     @parameter client : Client - Weaviate Client
     @parameter chunks : list[Document] - List of chunks of documents
