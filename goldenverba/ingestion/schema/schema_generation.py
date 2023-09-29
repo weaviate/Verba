@@ -5,131 +5,12 @@ from weaviate import Client
 
 from goldenverba.ingestion.util import setup_client
 
-SCHEMA_CHUNK = {
-    "classes": [
-        {
-            "class": "Chunk",
-            "description": "Chunks of Documentations",
-            "properties": [
-                {
-                    "name": "text",
-                    "dataType": ["text"],
-                    "description": "Content of the document",
-                },
-                {
-                    "name": "doc_name",
-                    "dataType": ["text"],
-                    "description": "Document name",
-                },
-                {
-                    # Skip
-                    "name": "doc_type",
-                    "dataType": ["text"],
-                    "description": "Document type",
-                },
-                {
-                    # Skip
-                    "name": "doc_uuid",
-                    "dataType": ["text"],
-                    "description": "Document UUID",
-                },
-                {
-                    # Skip
-                    "name": "chunk_id",
-                    "dataType": ["number"],
-                    "description": "Document chunk from the whole document",
-                },
-            ],
-        }
-    ]
-}
-
-SCHEMA_CACHE = {
-    "classes": [
-        {
-            "class": "Cache",
-            "description": "Cache of Documentations and their queries",
-            "properties": [
-                {
-                    "name": "query",
-                    "dataType": ["text"],
-                    "description": "Query",
-                },
-                {
-                    # Skip
-                    "name": "system",
-                    "dataType": ["text"],
-                    "description": "System message",
-                },
-                {
-                    # Skip
-                    "name": "results",
-                    "dataType": ["text"],
-                    "description": "List of results",
-                },
-            ],
-        }
-    ]
-}
-
-SCHEMA_DOCUMENT = {
-    "classes": [
-        {
-            "class": "Document",
-            "description": "Documentation",
-            "properties": [
-                {
-                    "name": "text",
-                    "dataType": ["text"],
-                    "description": "Content of the document",
-                },
-                {
-                    "name": "doc_name",
-                    "dataType": ["text"],
-                    "description": "Document name",
-                },
-                {
-                    "name": "doc_type",
-                    "dataType": ["text"],
-                    "description": "Document type",
-                },
-                {
-                    "name": "doc_link",
-                    "dataType": ["text"],
-                    "description": "Link to document",
-                },
-                {
-                    "name": "timestamp",
-                    "dataType": ["text"],
-                    "description": "Timestamp of document",
-                },
-            ],
-        }
-    ]
-}
-
-SCHEMA_SUGGESTION = {
-    "classes": [
-        {
-            "class": "Suggestion",
-            "description": "List of possible prompts",
-            "properties": [
-                {
-                    "name": "suggestion",
-                    "dataType": ["text"],
-                    "description": "Query",
-                },
-            ],
-        }
-    ]
-}
-
-VECTORIZERS = ["text2vec-openai"]  # Needs to match with Weaviate modules
-EMBEDDINGS = ["SentenceTransformer"]  # Custom Vectors
+VECTORIZERS = set(["text2vec-openai"])  # Needs to match with Weaviate modules
+EMBEDDINGS = set(["SentenceTransformer"])  # Custom Vectors
 
 
 def strip_non_letters(s: str):
-    return re.sub(r"[^a-zA-Z]", "", s)
+    return re.sub(r"[^a-zA-Z0-9]", "_", s)
 
 
 def verify_vectorizer(
@@ -156,7 +37,7 @@ def verify_vectorizer(
                 }
                 property["moduleConfig"] = moduleConfig
     elif vectorizer in EMBEDDINGS:
-        msg.info(f"Not modifying schema for {vectorizer}")
+        pass
     elif vectorizer != None:
         msg.warn(f"Could not find matching vectorizer: {vectorizer}")
 
@@ -171,9 +52,9 @@ def add_suffix(schema: dict, vectorizer: str) -> tuple[dict, str]:
     """
     modified_schema = schema.copy()
     # Verify Vectorizer and add suffix
-    modified_schema["classes"][0]["class"] = modified_schema["classes"][0][
-        "class"
-    ] + strip_non_letters(vectorizer)
+    modified_schema["classes"][0]["class"] = (
+        modified_schema["classes"][0]["class"] + "_" + strip_non_letters(vectorizer)
+    )
     return modified_schema, modified_schema["classes"][0]["class"]
 
 
@@ -190,6 +71,7 @@ def init_schemas(
     @parameter check : bool - Only create if not exist
     @returns tuple[dict, dict] - Tuple of modified schemas
     """
+
     try:
         init_documents(client, vectorizer, force, check)
         init_cache(client, vectorizer, force, check)
@@ -210,6 +92,81 @@ def init_documents(
     @parameter check : bool - Only create if not exist
     @returns tuple[dict, dict] - Tuple of modified schemas
     """
+
+    SCHEMA_CHUNK = {
+        "classes": [
+            {
+                "class": "Chunk",
+                "description": "Chunks of Documentations",
+                "properties": [
+                    {
+                        "name": "text",
+                        "dataType": ["text"],
+                        "description": "Content of the document",
+                    },
+                    {
+                        "name": "doc_name",
+                        "dataType": ["text"],
+                        "description": "Document name",
+                    },
+                    {
+                        # Skip
+                        "name": "doc_type",
+                        "dataType": ["text"],
+                        "description": "Document type",
+                    },
+                    {
+                        # Skip
+                        "name": "doc_uuid",
+                        "dataType": ["text"],
+                        "description": "Document UUID",
+                    },
+                    {
+                        # Skip
+                        "name": "chunk_id",
+                        "dataType": ["number"],
+                        "description": "Document chunk from the whole document",
+                    },
+                ],
+            }
+        ]
+    }
+
+    SCHEMA_DOCUMENT = {
+        "classes": [
+            {
+                "class": "Document",
+                "description": "Documentation",
+                "properties": [
+                    {
+                        "name": "text",
+                        "dataType": ["text"],
+                        "description": "Content of the document",
+                    },
+                    {
+                        "name": "doc_name",
+                        "dataType": ["text"],
+                        "description": "Document name",
+                    },
+                    {
+                        "name": "doc_type",
+                        "dataType": ["text"],
+                        "description": "Document type",
+                    },
+                    {
+                        "name": "doc_link",
+                        "dataType": ["text"],
+                        "description": "Link to document",
+                    },
+                    {
+                        "name": "timestamp",
+                        "dataType": ["text"],
+                        "description": "Timestamp of document",
+                    },
+                ],
+            }
+        ]
+    }
 
     # Verify Vectorizer
     chunk_schema = verify_vectorizer(
@@ -265,6 +222,34 @@ def init_cache(
     @returns dict - Modified schema
     """
 
+    SCHEMA_CACHE = {
+        "classes": [
+            {
+                "class": "Cache",
+                "description": "Cache of Documentations and their queries",
+                "properties": [
+                    {
+                        "name": "query",
+                        "dataType": ["text"],
+                        "description": "Query",
+                    },
+                    {
+                        # Skip
+                        "name": "system",
+                        "dataType": ["text"],
+                        "description": "System message",
+                    },
+                    {
+                        # Skip
+                        "name": "results",
+                        "dataType": ["text"],
+                        "description": "List of results",
+                    },
+                ],
+            }
+        ]
+    }
+
     # Verify Vectorizer
     cache_schema = verify_vectorizer(
         SCHEMA_CACHE,
@@ -312,6 +297,22 @@ def init_suggestion(
     @parameter check : bool - Only create if not exist
     @returns dict - Modified schema
     """
+
+    SCHEMA_SUGGESTION = {
+        "classes": [
+            {
+                "class": "Suggestion",
+                "description": "List of possible prompts",
+                "properties": [
+                    {
+                        "name": "suggestion",
+                        "dataType": ["text"],
+                        "description": "Query",
+                    },
+                ],
+            }
+        ]
+    }
 
     # Add Suffix
     suggestion_schema, suggestion_name = add_suffix(SCHEMA_SUGGESTION, vectorizer)

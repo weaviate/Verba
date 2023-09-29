@@ -1,6 +1,9 @@
 from wasabi import msg
 
-import spacy
+try:
+    import spacy
+except:
+    pass
 
 from goldenverba.ingestion.chunking.interface import Chunker
 from goldenverba.ingestion.chunking.chunk import Chunk
@@ -16,9 +19,13 @@ class WordChunker(Chunker):
     def __init__(self):
         self.name = "WordChunker"
         self.requires_env = []
+        self.requires_library = ["spacy"]
         self.input_form = InputForm.CHUNKER.value
         self.description = "Chunk documents by words. You can specify how many words should overlap between chunks to improve retrieval."
-        self.nlp = spacy.blank("en")
+        try:
+            self.nlp = spacy.blank("en")
+        except:
+            self.nlp = None
 
     def chunk(
         self, documents: list[Document], units: int, overlap: int
@@ -30,6 +37,10 @@ class WordChunker(Chunker):
         @returns list[str] - List of documents that contain the chunks
         """
         for document in documents:
+            # Skip if document already contains chunks
+            if len(document.chunks) > 0:
+                continue
+
             doc = self.nlp(document.text)
 
             if units > len(doc) or units < 1:

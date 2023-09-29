@@ -12,6 +12,7 @@ class Chunker:
     def __init__(self):
         self.name = ""
         self.requires_env = []
+        self.requires_library = []
         self.input_form = InputForm.CHUNKER.value  # Default for all Chunkers
         self.description = ""
 

@@ -9,6 +9,7 @@ const Navbar = () => {
   const links = [
     { name: "Search", path: "/" },
     { name: "Documents", path: "/document_explorer" },
+    { name: "Status", path: "/status" },
   ];
 
   return (

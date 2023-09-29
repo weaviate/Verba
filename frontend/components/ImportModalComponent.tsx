@@ -1,34 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import { FaPlus, FaTimes } from "react-icons/fa";
-import internal from 'stream';
+import { useDropzone } from 'react-dropzone';
+import HashLoader from "react-spinners/HashLoader";
 
 type ImportModalProps = {
     onClose: () => void;
     apiHost: string;
 }
 
-type Reader = {
+type Component = {
     name: string;
     description: string;
-    input_form: 'UPLOAD' | 'INPUT';
-};
-
-type Chunker = {
-    name: string;
-    description: string;
-    input_form: 'CHUNKER';
+    input_form: 'UPLOAD' | 'INPUT' | 'CHUNKER' | 'TEXT';
 };
 
 const ImportModal: React.FC<ImportModalProps> = ({ onClose, apiHost }) => {
-    const [readers, setReaders] = useState<Reader[]>([]);
-    const [chunker, setChunker] = useState<Chunker[]>([]);
+    const [readers, setReaders] = useState<Component[]>([]);
+    const [chunker, setChunker] = useState<Component[]>([]);
+    const [embedder, setEmbedder] = useState<Component[]>([]);
     const [selectedOption, setSelectedOption] = useState<string>("Reader");
-    const [selectedReader, setSelectedReader] = useState<Reader | null>(null);
-    const [selectedChunker, setSelectedChunker] = useState<Chunker | null>(null);
-    const [files, setFiles] = useState<string[]>([]);
-    const [docType, setDocType] = useState<string>("Documentation");
-    const [fileContents, setFileContents] = useState<string[]>([]);
+    const [selectedReader, setSelectedReader] = useState<Component | null>(null);
+    const [selectedChunker, setSelectedChunker] = useState<Component | null>(null);
+    const [selectedEmbedder, setSelectedEmbedder] = useState<Component | null>(null);
+
+    const [loadingState, setLoadingState] = useState<boolean>(false);
+
+    const [droppedFiles, setDroppedFiles] = useState<File[]>([]);
     const [filePath, setFilePath] = useState<string>("");
+
+    const [docType, setDocType] = useState<string>("Documentation");
     const [chunkUnits, setChunkUnits] = useState<number>(100);
     const [chunkOverlap, setChunkOverlap] = useState<number>(50);
     const [inputFileKey, setInputFileKey] = useState<number>(Date.now());  // Using the current timestamp as the initial key  
@@ -42,10 +42,12 @@ const ImportModal: React.FC<ImportModalProps> = ({ onClose, apiHost }) => {
                 const data = await response.json();
                 setReaders(data.readers);
                 setChunker(data.chunker);
+                setEmbedder(data.embedder);
 
                 if (data.readers && data.readers.length > 0) {
                     setSelectedReader(data.default_values.last_reader);
                     setSelectedChunker(data.default_values.last_chunker)
+                    setSelectedEmbedder(data.default_values.last_embedder)
                     setDocType(data.default_values.last_document_type)
                     setChunkUnits(data.default_values.last_unit)
                     setChunkOverlap(data.default_values.last_overlap)
@@ -57,20 +59,6 @@ const ImportModal: React.FC<ImportModalProps> = ({ onClose, apiHost }) => {
         fetchReaders();
     }, [apiHost]);
 
-    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (event.target.files) {
-            const filesArray = Array.from(event.target.files);
-            const contents: string[] = [];
-
-            for (const file of filesArray) {
-                const content = await file.text();
-                contents.push(file.name + "<VERBASPLIT>" + content);
-            }
-
-            setFileContents(contents);
-        }
-    };
-
     const handleFilePathInput = (event: React.ChangeEvent<HTMLInputElement>) => {
         setFilePath(event.target.value);
     };
@@ -81,28 +69,41 @@ const ImportModal: React.FC<ImportModalProps> = ({ onClose, apiHost }) => {
             return;
         }
 
-        let payload;
+        setLoadingState(true);
 
-        if (selectedReader.input_form === 'UPLOAD') {
-            payload = {
-                reader: selectedReader.name,
-                chunker: selectedChunker.name,
-                contents: fileContents,
-                document_type: docType,
-                chunkUnits: chunkUnits,
-                chunkOverlap: chunkOverlap,
+        const fileNames: string[] = droppedFiles.map(file => file.name);
 
-            };
-        } else {
-            payload = {
-                reader: selectedReader.name,
-                chunker: selectedChunker.name,
-                contents: [filePath],
-                document_type: docType,
-                chunkUnits: chunkUnits,
-                chunkOverlap: chunkOverlap,
-            };
-        }
+        // Read the File objects to get their bytes and convert them to base64 strings
+        const promises = droppedFiles.map(file => {
+            return new Promise<string>((resolve) => {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    // Convert ArrayBuffer to base64 string
+                    const base64String = btoa(
+                        Array.from(new Uint8Array(reader.result as ArrayBuffer)).map(
+                            (byte) => String.fromCharCode(byte)
+                        ).join('')
+                    );
+                    resolve(base64String);
+                };
+                reader.readAsArrayBuffer(file);
+            });
+        });
+
+        const fileBytesBase64 = await Promise.all(promises);
+
+        let payload = {
+            reader: selectedReader.name,
+            chunker: selectedChunker.name,
+            embedder: selectedEmbedder?.name,
+            fileBytes: fileBytesBase64,
+            fileNames: fileNames,
+            filePath: filePath,
+            document_type: docType,
+            chunkUnits: chunkUnits,
+            chunkOverlap: chunkOverlap,
+
+        };
 
         try {
             const response = await fetch(`${apiHost}/api/load_data`, {
@@ -115,10 +116,11 @@ const ImportModal: React.FC<ImportModalProps> = ({ onClose, apiHost }) => {
 
             const data = await response.json();
 
+            setLoadingState(false);
+
             if (response.ok) {
                 // Clear files and path after successful import
-                setFiles([]);
-                setFileContents([]);
+                setDroppedFiles([]);
                 setFilePath("");
 
                 // Reset the input file by changing its key
@@ -136,6 +138,22 @@ const ImportModal: React.FC<ImportModalProps> = ({ onClose, apiHost }) => {
         }
     };
 
+    const onDrop = async (acceptedFiles: File[]) => {
+        setDroppedFiles(prevFiles => [...prevFiles, ...acceptedFiles]);
+    };
+
+    const { getRootProps, getInputProps } = useDropzone({
+        onDrop,
+        accept: {
+            'text/txt': ['.txt', '.md', '.mdx'],
+            'text/verba': ['.verba']
+        }
+    });
+
+    const handleRemoveAllFiles = () => {
+        setDroppedFiles([]);
+    };
+
     return (
         <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center z-50">
             <div className="absolute w-full h-full bg-black opacity-50"></div>
@@ -144,21 +162,21 @@ const ImportModal: React.FC<ImportModalProps> = ({ onClose, apiHost }) => {
                     <button onClick={onClose} className="mr-3 bg-red-500 text-white hover:bg-red-600 shadow-md hover-container p-2 rounded-full flex items-center justify-center">
                         <FaTimes />
                     </button>
-                    <button onClick={() => setSelectedOption("Reader")} className={`${"Reader" === selectedOption ? 'bg-yellow-200' : 'bg-gray-200'} text-black text-lg rounded-lg font-bold border-2 border-black animate-pop-in-late p-4 w-full hover-container shadow-md mr-6 hover:bg-yellow-300 hover:border-white`}>Reader</button>
-                    <button onClick={() => setSelectedOption("Chunking")} className={`${"Chunking" === selectedOption ? 'bg-cyan-200' : 'bg-gray-200'} text-black text-lg rounded-lg font-bold border-2 border-black animate-pop-in-late p-4 w-full hover-container shadow-md mr-6 hover:bg-cyan-300 hover:border-white`}>Chunking</button>
-                    <button onClick={() => setSelectedOption("Embedding")} className={`${"Embedding" === selectedOption ? 'bg-fuchsia-200' : 'bg-gray-200'} bg-gray-200 text-black text-lg rounded-lg font-bold border-2 border-black animate-pop-in-late p-4 w-full hover-container shadow-md hover:bg-fuchsia-300 hover:border-white`}>Embedding</button>
+                    <button onClick={() => setSelectedOption("Reader")} className={`${"Reader" === selectedOption ? 'bg-yellow-200' : 'bg-gray-200'} text-black text-lg rounded-lg font-bold border-2 border-black animate-pop-in-late truncate p-4 w-full hover-container shadow-md mr-6 hover:bg-yellow-300 hover:border-white`}>{selectedReader?.name}</button>
+                    <button onClick={() => setSelectedOption("Chunking")} className={`${"Chunking" === selectedOption ? 'bg-cyan-200' : 'bg-gray-200'} text-black text-lg rounded-lg font-bold border-2 border-black animate-pop-in-late p-4 truncate w-full hover-container shadow-md mr-6 hover:bg-cyan-300 hover:border-white`}>{selectedChunker?.name}</button>
+                    <button onClick={() => setSelectedOption("Embedding")} className={`${"Embedding" === selectedOption ? 'bg-fuchsia-200' : 'bg-gray-200'} bg-gray-200 text-black text-lg rounded-lg font-bold border-2 border-black truncate animate-pop-in-late p-4 w-full hover-container shadow-md hover:bg-fuchsia-300 hover:border-white`}>{selectedEmbedder?.name}</button>
 
                 </div>
                 <div className="flex p-4">
                     {/* Left column for the list of readers */}
-                    <div className="w-2/5 pr-2 border-r border-gray-300 overflow-y-auto">
+                    <div className="w-2/5 pr-2 border-r border-gray-300 overflow-y-auto max-h-80">
                         <ul>
                             {selectedOption === "Reader" ? (
                                 readers.map((reader, index) => (
                                     <button
                                         onClick={() => setSelectedReader(reader)}
-                                        className={`${reader.name === selectedReader?.name ? 'bg-green-300' : 'bg-gray-200'} text-black text-lg truncate rounded-lg font-bold border-2 mb-3 border-black animate-pop-in-late p-4 w-full shadow-md hover:bg-green-400 hover:border-white`}
-                                        key={index}
+                                        className={`${reader.name === selectedReader?.name ? 'bg-yellow-300' : 'bg-gray-200'} text-black text-lg truncate rounded-lg font-bold border-2 mb-3 border-black animate-pop-in-late p-4 w-full shadow-md hover:bg-yellow-400 hover:border-white`}
+                                        key={index + reader.name}
                                         title={reader.name} // hover tooltip in case of truncation
                                     >
                                         {reader.name}
@@ -169,10 +187,21 @@ const ImportModal: React.FC<ImportModalProps> = ({ onClose, apiHost }) => {
                                     <button
                                         onClick={() => setSelectedChunker(chunk)}
                                         className={`${chunk.name === selectedChunker?.name ? 'bg-cyan-300' : 'bg-gray-200'} text-black text-lg truncate rounded-lg font-bold border-2 mb-3 border-black animate-pop-in-late p-4 w-full shadow-md hover:bg-cyan-400 hover:border-white`}
-                                        key={index}
+                                        key={index + chunk.name}
                                         title={chunk.name} // hover tooltip in case of truncation
                                     >
                                         {chunk.name}
+                                    </button>
+                                ))
+                            ) : selectedOption === "Embedding" ? (
+                                embedder.map((embedder, index) => (
+                                    <button
+                                        onClick={() => setSelectedEmbedder(embedder)}
+                                        className={`${embedder.name === selectedEmbedder?.name ? 'bg-fuchsia-300' : 'bg-gray-200'} text-black text-lg truncate rounded-lg font-bold border-2 mb-3 border-black animate-pop-in-late p-4 w-full shadow-md hover:bg-fuchsia-400 hover:border-white`}
+                                        key={index + embedder.name}
+                                        title={embedder.name} // hover tooltip in case of truncation
+                                    >
+                                        {embedder.name}
                                     </button>
                                 ))
                             ) : null}
@@ -183,14 +212,34 @@ const ImportModal: React.FC<ImportModalProps> = ({ onClose, apiHost }) => {
                         <div className='mb-6'>
                             {selectedOption === "Reader" && selectedReader && selectedReader.input_form === 'UPLOAD' ? (
                                 <div className=''>
-                                    <h3 className='mb-2'>Upload documents</h3>
-                                    <input
-                                        key={inputFileKey}
-                                        type="file"
-                                        multiple
-                                        accept=".txt,.md,.mdx"
-                                        onChange={handleFileChange}
-                                    />
+                                    <h3 className='mb-2'>📁 Upload documents</h3>
+                                    <div {...getRootProps()} className="border-dashed border-2 p-4 border-white rounded-lg">
+                                        <input {...getInputProps()} />
+                                        <p className='text-sm text-gray-500'>Drop your files here, or click to select files</p>
+                                    </div>
+                                    <div className='my-6'>
+                                        {droppedFiles.length > 0 && (
+                                            <div className="flex items-center space-x-2 mb-2">
+                                                <span className="truncate">{droppedFiles.length} files selected</span>
+                                                <button onClick={handleRemoveAllFiles} className="bg-red-500 p-1 rounded-full hover:bg-red-600">
+                                                    <FaTimes />
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="mb-2">
+                                        <label htmlFor="docType" className="block text-sm font-medium text-gray-700">Document Type</label>
+                                        <input
+                                            type="text"
+                                            id="docType"
+                                            name="docType"
+                                            value={docType}
+                                            onChange={(e) => setDocType(e.target.value)}
+                                            className="mt-1 focus:ring-yellow p-3
+                                            -500 focus:border-yellow-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                                            placeholder="Documentation"
+                                        />
+                                    </div>
                                 </div>
                             ) : selectedOption === "Reader" && selectedReader && selectedReader.input_form === 'INPUT' ? (
                                 <div className=''>
@@ -222,18 +271,34 @@ const ImportModal: React.FC<ImportModalProps> = ({ onClose, apiHost }) => {
                                         className='p-2 rounded-lg w-1/2'
                                     />
                                 </div>
+                            ) : selectedOption === "Embedding" && selectedEmbedder?.input_form === 'TEXT' ? (
+                                <div className='flex space-x-2'>
+
+                                </div>
                             ) : null}
                         </div>
                         <div className='text-center shadow-md rounded-lg p-4 hover-container overflow-y-auto mb-6'>
-                            <p>{selectedOption === "Reader" ? selectedReader?.description : selectedChunker?.description}</p>
+                            <p>{selectedOption === "Reader" ? selectedReader?.description : selectedOption === "Chunking" ? selectedChunker?.description : selectedEmbedder?.description}</p>
                         </div>
                         <div className="flex justify-end">
                             <button
-                                onClick={handleImport} className="flex items-center space-x-2 bg-gray-200 text-black p-3 rounded-lg hover:bg-green-400 border-2 border-black hover:border-white hover-container shadow-md"
+                                onClick={handleImport}
+                                disabled={loadingState} // Disable the button when loading
+                                className={`flex items-center space-x-2 bg-gray-200 text-black p-3 rounded-lg border-2 border-black hover-container shadow-md ${loadingState ? 'cursor-not-allowed hover:bg-gray-200' : 'hover:bg-green-400 hover:border-white'}`}
                             >
-
-                                <FaPlus />
-                                <span>Import</span>
+                                {loadingState ? (
+                                    // Display when loading
+                                    <>
+                                        <HashLoader color='#292929' loading={true} size={20} speedMultiplier={0.75} />
+                                        <span>Importing...</span>
+                                    </>
+                                ) : (
+                                    // Display when not loading
+                                    <>
+                                        <FaPlus />
+                                        <span>Import</span>
+                                    </>
+                                )}
                             </button>
                         </div>
                     </div >

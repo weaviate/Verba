@@ -1,4 +1,5 @@
 import os
+import base64
 
 from wasabi import msg  # type: ignore[import]
 
@@ -22,10 +23,12 @@ manager = verba_manager.VerbaManager()
 
 readers = manager.reader_get_readers()
 chunker = manager.chunker_get_chunker()
+embedders = manager.embedder_get_embedder()
 
 last_reader = list(readers.keys())[0]
 last_document_type = "Documentation"
 last_chunker = list(chunker.keys())[0]
+last_embedder = list(embedders.keys())[0]
 last_unit = 100
 last_overlap = 50
 
@@ -43,6 +46,14 @@ def create_chunker_payload(key: str, chunker) -> dict:
         "name": key,
         "description": chunker.description,
         "input_form": chunker.input_form,
+    }
+
+
+def create_embedder_payload(key: str, embedder) -> dict:
+    return {
+        "name": key,
+        "description": embedder.description,
+        "input_form": embedder.input_form,
     }
 
 
@@ -90,7 +101,10 @@ class GetDocumentPayload(BaseModel):
 class LoadPayload(BaseModel):
     reader: str
     chunker: str
-    contents: list[str]
+    embedder: str
+    fileBytes: list[str]
+    fileNames: list[str]
+    filePath: str
     document_type: str
     chunkUnits: int
     chunkOverlap: int
@@ -144,15 +158,12 @@ async def get_google_tag():
     )
 
 
-# Define health check endpoint
+# Get Readers, Chunkers, and Embedders
 @app.get("/api/get_components")
 async def get_components():
     msg.info("Retrieving components")
 
-    data = {
-        "readers": [],
-        "chunker": [],
-    }
+    data = {"readers": [], "chunker": [], "embedder": []}
 
     for key in readers:
         current_reader = readers[key]
@@ -164,12 +175,35 @@ async def get_components():
         current_chunker_data = create_chunker_payload(key, current_chunker)
         data["chunker"].append(current_chunker_data)
 
+    for key in embedders:
+        current_embedder = embedders[key]
+        current_embedder_data = create_chunker_payload(key, current_embedder)
+        data["embedder"].append(current_embedder_data)
+
     data["default_values"] = {
         "last_reader": create_reader_payload(last_reader, readers[last_reader]),
         "last_chunker": create_chunker_payload(last_chunker, chunker[last_chunker]),
+        "last_embedder": create_embedder_payload(
+            last_embedder, embedders[last_embedder]
+        ),
         "last_document_type": last_document_type,
         "last_unit": last_unit,
         "last_overlap": last_overlap,
+    }
+
+    return JSONResponse(content=data)
+
+
+# Get Status meta data
+@app.get("/api/get_status")
+async def get_status():
+    msg.info("Retrieving status")
+
+    data = {
+        "type": manager.weaviate_type,
+        "libraries": manager.installed_libraries,
+        "variables": manager.environment_variables,
+        "schemas": manager.get_schemas(),
     }
 
     return JSONResponse(content=data)
@@ -180,23 +214,28 @@ async def get_components():
 async def load_data(payload: LoadPayload):
     manager.reader_set_reader(payload.reader)
     manager.chunker_set_chunker(payload.chunker)
+    manager.embedder_set_embedder(payload.embedder)
 
-    global last_reader, last_document_type, last_chunker, last_unit, last_overlap
+    global last_reader, last_document_type, last_chunker, last_embedder, last_unit, last_overlap
 
     last_reader = payload.reader
     last_document_type = payload.document_type
     last_chunker = payload.chunker
+    last_embedder = payload.embedder
     last_unit = payload.chunkUnits
     last_overlap = payload.chunkOverlap
 
     msg.info(
-        f"Received Data to Import: READER({payload.reader}, Documents {len(payload.contents)}, Type {payload.document_type}) CHUNKER ({payload.chunker}, UNITS {payload.chunkUnits}, OVERLAP {payload.chunkOverlap})"
+        f"Received Data to Import: READER({payload.reader}, Documents {len(payload.fileBytes)}, Type {payload.document_type}) CHUNKER ({payload.chunker}, UNITS {payload.chunkUnits}, OVERLAP {payload.chunkOverlap}), EMBEDDER ({payload.embedder})"
     )
 
-    if payload.contents:
+    if payload.fileBytes or payload.filePath:
         try:
             documents = manager.import_data(
-                payload.contents,
+                payload.fileBytes,
+                [],
+                [payload.filePath],
+                payload.fileNames,
                 payload.document_type,
                 payload.chunkUnits,
                 payload.chunkOverlap,
@@ -278,7 +317,7 @@ async def get_document(payload: GetDocumentPayload):
     msg.info(f"Document ID received: {payload.document_id}")
 
     try:
-        document = verba_engine.retrieve_document(payload.document_id)
+        document = manager.retrieve_document(payload.document_id)
         msg.good(f"Succesfully retrieved document: {payload.document_id}")
         return JSONResponse(
             content={
@@ -300,7 +339,7 @@ async def get_all_documents():
     msg.info(f"Get all documents request received")
 
     try:
-        documents = verba_engine.retrieve_all_documents()
+        documents = manager.retrieve_all_documents()
         msg.good(f"Succesfully retrieved document: {len(documents)} documents")
         return JSONResponse(
             content={

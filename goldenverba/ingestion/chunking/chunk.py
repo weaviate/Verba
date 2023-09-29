@@ -36,3 +36,6 @@ class Chunk:
     @property
     def chunk_id(self):
         return self._chunk_id
+
+    def set_uuid(self, uuid):
+        self._doc_uuid = uuid
