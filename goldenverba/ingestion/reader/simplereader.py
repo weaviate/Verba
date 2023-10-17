@@ -15,12 +15,10 @@ class SimpleReader(Reader):
     """
 
     def __init__(self):
-        self.file_types = [".txt", ".md", ".mdx", ".verba"]
+        super().__init__()
+        self.file_types = [".txt", ".md", ".mdx"]
         self.name = "SimpleReader"
-        self.requires_env = (
-            []
-        )  # The SimpleReader does not require any environment variables to work
-        self.description = "Reads .txt, .md, and .verba files"
+        self.description = "Reads .txt and .md files"
         self.input_form = InputForm.UPLOAD.value
 
     def load(

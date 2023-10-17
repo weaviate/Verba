@@ -17,10 +17,11 @@ class WordChunker(Chunker):
     """
 
     def __init__(self):
+        super().__init__()
         self.name = "WordChunker"
-        self.requires_env = []
         self.requires_library = ["spacy"]
-        self.input_form = InputForm.CHUNKER.value
+        self.default_units = 100
+        self.default_overlap = 50
         self.description = "Chunk documents by words. You can specify how many words should overlap between chunks to improve retrieval."
         try:
             self.nlp = spacy.blank("en")

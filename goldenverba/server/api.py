@@ -15,6 +15,11 @@ from pydantic import BaseModel
 from goldenverba.retrieval.advanced_engine import AdvancedVerbaQueryEngine
 from goldenverba import verba_manager
 
+from goldenverba.ingestion.reader.interface import Reader
+from goldenverba.ingestion.chunking.interface import Chunker
+from goldenverba.ingestion.embedding.interface import Embedder
+
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -25,35 +30,49 @@ readers = manager.reader_get_readers()
 chunker = manager.chunker_get_chunker()
 embedders = manager.embedder_get_embedder()
 
-last_reader = list(readers.keys())[0]
-last_document_type = "Documentation"
-last_chunker = list(chunker.keys())[0]
-last_embedder = list(embedders.keys())[0]
-last_unit = 100
-last_overlap = 50
+option_cache = {
+    "last_reader": list(readers.keys())[0],
+    "last_document_type": "Documentation",
+    "last_chunker": list(chunker.keys())[0],
+    "last_embedder": list(embedders.keys())[0],
+}
 
 
-def create_reader_payload(key: str, reader) -> dict:
+def create_reader_payload(key: str, reader: Reader) -> dict:
+    available, message = manager.check_verba_component(reader)
+
     return {
         "name": key,
         "description": reader.description,
         "input_form": reader.input_form,
+        "available": available,
+        "message": message,
     }
 
 
-def create_chunker_payload(key: str, chunker) -> dict:
+def create_chunker_payload(key: str, chunker: Chunker) -> dict:
+    available, message = manager.check_verba_component(chunker)
+
     return {
         "name": key,
         "description": chunker.description,
         "input_form": chunker.input_form,
+        "units": chunker.default_units,
+        "overlap": chunker.default_overlap,
+        "available": available,
+        "message": message,
     }
 
 
-def create_embedder_payload(key: str, embedder) -> dict:
+def create_embedder_payload(key: str, embedder: Embedder) -> dict:
+    available, message = manager.check_verba_component(embedder)
+
     return {
         "name": key,
         "description": embedder.description,
         "input_form": embedder.input_form,
+        "available": available,
+        "message": message,
     }
 
 
@@ -177,18 +196,20 @@ async def get_components():
 
     for key in embedders:
         current_embedder = embedders[key]
-        current_embedder_data = create_chunker_payload(key, current_embedder)
+        current_embedder_data = create_embedder_payload(key, current_embedder)
         data["embedder"].append(current_embedder_data)
 
     data["default_values"] = {
-        "last_reader": create_reader_payload(last_reader, readers[last_reader]),
-        "last_chunker": create_chunker_payload(last_chunker, chunker[last_chunker]),
-        "last_embedder": create_embedder_payload(
-            last_embedder, embedders[last_embedder]
+        "last_reader": create_reader_payload(
+            option_cache["last_reader"], readers[option_cache["last_reader"]]
         ),
-        "last_document_type": last_document_type,
-        "last_unit": last_unit,
-        "last_overlap": last_overlap,
+        "last_chunker": create_chunker_payload(
+            option_cache["last_chunker"], chunker[option_cache["last_chunker"]]
+        ),
+        "last_embedder": create_embedder_payload(
+            option_cache["last_embedder"], embedders[option_cache["last_embedder"]]
+        ),
+        "last_document_type": option_cache["last_document_type"],
     }
 
     return JSONResponse(content=data)
@@ -209,6 +230,16 @@ async def get_status():
     return JSONResponse(content=data)
 
 
+# Reset Verba
+@app.get("/api/reset")
+async def reset_verba():
+    msg.info("Resetting verba")
+
+    manager.reset()
+
+    return JSONResponse(status_code=200, content={})
+
+
 # Receive query and return chunks and query answer
 @app.post("/api/load_data")
 async def load_data(payload: LoadPayload):
@@ -216,14 +247,17 @@ async def load_data(payload: LoadPayload):
     manager.chunker_set_chunker(payload.chunker)
     manager.embedder_set_embedder(payload.embedder)
 
-    global last_reader, last_document_type, last_chunker, last_embedder, last_unit, last_overlap
+    global option_cache
 
-    last_reader = payload.reader
-    last_document_type = payload.document_type
-    last_chunker = payload.chunker
-    last_embedder = payload.embedder
-    last_unit = payload.chunkUnits
-    last_overlap = payload.chunkOverlap
+    option_cache["last_reader"] = payload.reader
+    option_cache["last_document_type"] = payload.document_type
+    option_cache["last_chunker"] = payload.chunker
+    option_cache["last_embedder"] = payload.embedder
+
+    # Set new default values based on user input
+    current_chunker = manager.chunker_get_chunker()[payload.chunker]
+    current_chunker.default_units = payload.chunkUnits
+    current_chunker.default_overlap = payload.chunkOverlap
 
     msg.info(
         f"Received Data to Import: READER({payload.reader}, Documents {len(payload.fileBytes)}, Type {payload.document_type}) CHUNKER ({payload.chunker}, UNITS {payload.chunkUnits}, OVERLAP {payload.chunkOverlap}), EMBEDDER ({payload.embedder})"
@@ -240,6 +274,14 @@ async def load_data(payload: LoadPayload):
                 payload.chunkUnits,
                 payload.chunkOverlap,
             )
+
+            if documents == None:
+                return JSONResponse(
+                    content={
+                        "status": 200,
+                        "status_msg": f"Succesfully imported {document_count} documents and {chunks_count} chunks",
+                    }
+                )
 
             document_count = len(documents)
             chunks_count = sum([len(document.chunks) for document in documents])

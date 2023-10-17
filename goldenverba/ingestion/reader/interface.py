@@ -1,6 +1,7 @@
 from enum import Enum
 
 from goldenverba.ingestion.reader.document import Document
+from goldenverba.ingestion.component import VerbaComponent
 
 
 class InputForm(Enum):
@@ -10,12 +11,13 @@ class InputForm(Enum):
     TEXT = "TEXT"  # Default Input for Embedder
 
 
-class Reader:
+class Reader(VerbaComponent):
     """
     Interface for Verba Readers
     """
 
     def __init__(self):
+        super().__init__()
         self.name = "Reader"
         self.file_types = []
         self.requires_env = []

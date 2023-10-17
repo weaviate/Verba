@@ -163,6 +163,11 @@ def init_documents(
                         "dataType": ["text"],
                         "description": "Timestamp of document",
                     },
+                    {
+                        "name": "chunk_count",
+                        "dataType": ["number"],
+                        "description": "Number of chunks",
+                    },
                 ],
             }
         ]

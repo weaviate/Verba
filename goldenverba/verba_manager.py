@@ -16,6 +16,8 @@ from goldenverba.ingestion.reader.interface import Reader
 from goldenverba.ingestion.chunking.interface import Chunker
 from goldenverba.ingestion.embedding.interface import Embedder
 
+from goldenverba.ingestion.component import VerbaComponent
+
 import goldenverba.ingestion.schema.schema_generation as schema_manager
 
 
@@ -54,8 +56,16 @@ class VerbaManager:
         loaded_documents = self.reader_manager.load(
             bytes, contents, paths, fileNames, document_type
         )
+
+        filtered_documents = []
+
+        # Check if document names exist in DB
+        for document in loaded_documents:
+            if not self.check_if_document_exits(document):
+                filtered_documents.append(document)
+
         modified_documents = self.chunker_manager.chunk(
-            loaded_documents, units, overlap
+            filtered_documents, units, overlap
         )
 
         if self.embedder_manager.embed(modified_documents, client=self.client):
@@ -63,22 +73,47 @@ class VerbaManager:
             return modified_documents
         else:
             msg.fail("Embedding failed")
-            return None
+            return []
 
     def reader_set_reader(self, reader: str) -> bool:
-        return self.reader_manager.set_reader(reader)
+        available, message = self.check_verba_component(
+            self.reader_manager.readers[reader]
+        )
+
+        if available:
+            msg.good(f"Set Reader to {reader}")
+            return self.reader_manager.set_reader(reader)
+        else:
+            msg.warn(message)
+            return False
 
     def reader_get_readers(self) -> dict[str, Reader]:
         return self.reader_manager.get_readers()
 
     def chunker_set_chunker(self, chunker: str) -> bool:
-        return self.chunker_manager.set_chunker(chunker)
+        available, message = self.check_verba_component(
+            self.chunker_manager.chunker[chunker]
+        )
+        if available:
+            msg.good(f"Set Chunker to {chunker}")
+            return self.chunker_manager.set_chunker(chunker)
+        else:
+            msg.warn(message)
+            return False
 
     def chunker_get_chunker(self) -> dict[str, Chunker]:
         return self.chunker_manager.get_chunkers()
 
     def embedder_set_embedder(self, embedder: str) -> bool:
-        return self.embedder_manager.set_embedder(embedder)
+        available, message = self.check_verba_component(
+            self.embedder_manager.embedders[embedder]
+        )
+        if available:
+            msg.good(f"Set Embedder to {embedder}")
+            return self.embedder_manager.set_embedder(embedder)
+        else:
+            msg.warn(message)
+            return False
 
     def embedder_get_embedder(self) -> dict[str, Embedder]:
         return self.embedder_manager.get_embedders()
@@ -141,6 +176,17 @@ class VerbaManager:
 
         if client != None:
             msg.good("Connected to Weaviate")
+
+            # Batch Configuration
+            def batch_callback(logs: dict):
+                if logs is not None:
+                    for result in logs:
+                        if "result" in result and "errors" in result["result"]:
+                            if "error" in result["result"]["errors"]:
+                                msg.fail(result["result"])
+
+            client.batch.configure(callback=batch_callback)
+
         else:
             msg.fail("Connection to Weaviate failed")
 
@@ -158,6 +204,13 @@ class VerbaManager:
             self.installed_libraries["spacy"] = True
         except Exception as e:
             self.installed_libraries["spacy"] = False
+
+        try:
+            import openai
+
+            self.installed_libraries["openai"] = True
+        except Exception as e:
+            self.installed_libraries["openai"] = False
 
     def verify_variables(self) -> None:
         """
@@ -230,3 +283,60 @@ class VerbaManager:
 
     def reset(self):
         self.client.schema.delete_all()
+        # Check if all schemas exist for all possible vectorizers
+        for vectorizer in schema_manager.VECTORIZERS:
+            schema_manager.init_schemas(self.client, vectorizer, False, True)
+
+        for embedding in schema_manager.EMBEDDINGS:
+            schema_manager.init_schemas(self.client, embedding, False, True)
+
+    def check_if_document_exits(self, document: Document) -> bool:
+        """Return a document by it's ID (UUID format) from Weaviate
+        @parameter document : Document - Document object
+        @returns bool - Whether the doc name exist in the cluster
+        """
+
+        class_name = "Document_" + schema_manager.strip_non_letters(
+            self.embedder_manager.selected_embedder.vectorizer
+        )
+
+        results = (
+            self.client.query.get(
+                class_name=class_name,
+                properties=[
+                    "doc_name",
+                ],
+            )
+            .with_where(
+                {
+                    "path": ["doc_name"],
+                    "operator": "Equal",
+                    "valueText": document.name,
+                }
+            )
+            .with_limit(1)
+            .do()
+        )
+
+        if results["data"]["Get"][class_name]:
+            msg.warn(f"{document.name} already exists")
+            return True
+        else:
+            return False
+
+    def check_verba_component(self, component: VerbaComponent) -> tuple[bool, str]:
+        for library in component.requires_library:
+            if library in self.installed_libraries:
+                if not self.installed_libraries[library]:
+                    return (False, f"{library} not installed")
+            else:
+                return (False, f"{library} not installed")
+
+        for env in component.requires_env:
+            if env in self.environment_variables:
+                if not self.environment_variables[env]:
+                    return (False, f"{env} not set")
+            else:
+                return (False, f"{env} not set")
+
+        return (True, f"Available")
