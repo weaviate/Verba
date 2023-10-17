@@ -119,7 +119,7 @@ export default function StatusPage() {
                     <div className="flex-1 bg-white bg-opacity-20 rounded-lg shadow-md backdrop-filter max-h-[50vh] backdrop-blur-md p-4 w-full overflow-y-auto animate-pop-in">
                         <div className="flex justify-between items-center mb-4"> {/* Container for the title and button */}
                             <h2 className="text-lg font-bold">📝 Schemas & Objects</h2>
-                            <button onClick={() => setShowModal(true)} className="text-sm bg-gray-300 hover:bg-red-400 hover-container text-black px-3 py-1 rounded">
+                            <button onClick={() => setShowModal(true)} className="text-sm bg-gray-400 text-white hover:bg-red-400 hover-container text-black px-3 py-1 rounded">
                                 Reset Verba
                             </button>
                         </div>
