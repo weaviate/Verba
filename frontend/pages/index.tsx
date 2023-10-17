@@ -291,13 +291,12 @@ export default function Home() {
           <div className="lg:w-1/2 md:w-full sm:w-full p-2 border-2 shadow-lg lg:h-2/3 sm:h-full md:h-full border-gray-900 rounded-xl animate-pop-in">
 
             {/* Header */}
-            <div className="rounded-t-xl bg-yellow-200 p-4 flex justify-between items-center">
-              Verba Chat
+            <div className="rounded-t-xl bg-gray-200 p-4 flex justify-between items-center">
               <div className="text-xs text-white font-mono flex justify-center">
                 <a href="https://github.com/weaviate/Verba" target="_blank" rel="noopener noreferrer">
                   <span
                     className={`rounded-indicator hover-container text-white p-2 ${apiStatus === 'Online'
-                      ? 'bg-green-500 hover:bg-green-400'
+                      ? 'bg-gray-400 hover:bg-green-400'
                       : 'bg-red-500 hover:bg-red-400'
                       }`}
                   >
@@ -306,7 +305,7 @@ export default function Home() {
                 </a>
                 <a href="https://www.weaviate.io" target="_blank" rel="noopener noreferrer">
                   <span
-                    className="rounded-indicator text-white bg-green-500 hover:bg-green-400 ml-2 p-2 hover-container">
+                    className="rounded-indicator text-white bg-gray-400 hover:bg-green-400 ml-2 p-2 hover-container">
                     Powered by Weaviate ❤️
                   </span>
                 </a>
@@ -321,7 +320,7 @@ export default function Home() {
 
             {/* Input area */}
             <form
-              className="rounded-b-xl bg-gray-800 p-4 relative"
+              className="rounded-b-xl bg-gray-500 p-4 relative"
               onSubmit={handleSendMessage}
             >
               <input
