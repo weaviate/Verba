@@ -12,6 +12,7 @@ class Chunk:
         self._doc_type = doc_type
         self._doc_uuid = doc_uuid
         self._chunk_id = chunk_id
+        self._tokens = 0
 
     @property
     def text(self):
@@ -37,5 +38,12 @@ class Chunk:
     def chunk_id(self):
         return self._chunk_id
 
+    @property
+    def tokens(self):
+        return self._tokens
+
     def set_uuid(self, uuid):
         self._doc_uuid = uuid
+
+    def set_tokens(self, token):
+        self._tokens

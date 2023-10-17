@@ -17,10 +17,11 @@ class SentenceChunker(Chunker):
     """
 
     def __init__(self):
+        super().__init__()
         self.name = "WordChunker"
-        self.requires_env = []
         self.requires_library = ["spacy"]
-        self.input_form = InputForm.CHUNKER.value
+        self.default_units = 3
+        self.default_overlap = 2
         self.description = "Chunk documents by sentences. You can specify how many sentences should overlap between chunks to improve retrieval."
         try:
             self.nlp = spacy.blank("en")

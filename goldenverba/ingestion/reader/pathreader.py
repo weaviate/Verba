@@ -14,11 +14,10 @@ class PathReader(Reader):
     """
 
     def __init__(self):
+        super().__init__()
         self.file_types = [".txt", ".md", ".mdx"]
         self.name = "PathReader"
-        self.requires_env = (
-            []
-        )  # The PathReader does not require any environment variables to work
+        self.requires_library = ["unstructured"]
         self.description = "Imports text files and directories from a path."
         self.input_form = InputForm.INPUT.value
 

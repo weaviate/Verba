@@ -1,4 +1,5 @@
 from goldenverba.ingestion.reader.simplereader import SimpleReader
+from goldenverba.ingestion.reader.pathreader import PathReader
 from goldenverba.ingestion.reader.interface import Reader
 from goldenverba.ingestion.reader.document import Document
 
@@ -9,6 +10,7 @@ class ReaderManager:
     def __init__(self):
         self.readers: dict[str, Reader] = {
             "SimpleReader": SimpleReader(),
+            "PDFReader": PathReader(),
         }
         self.selected_reader: Reader = self.readers["SimpleReader"]
 

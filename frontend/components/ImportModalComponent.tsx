@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaPlus, FaTimes } from "react-icons/fa";
 import { useDropzone } from 'react-dropzone';
+import CoolButton from "../components/CoolButton";
 import HashLoader from "react-spinners/HashLoader";
 
 type ImportModalProps = {
@@ -12,6 +13,10 @@ type Component = {
     name: string;
     description: string;
     input_form: 'UPLOAD' | 'INPUT' | 'CHUNKER' | 'TEXT';
+    available: boolean;
+    message: string;
+    units?: number,
+    overlap?: number
 };
 
 const ImportModal: React.FC<ImportModalProps> = ({ onClose, apiHost }) => {
@@ -21,6 +26,8 @@ const ImportModal: React.FC<ImportModalProps> = ({ onClose, apiHost }) => {
     const [selectedOption, setSelectedOption] = useState<string>("Reader");
     const [selectedReader, setSelectedReader] = useState<Component | null>(null);
     const [selectedChunker, setSelectedChunker] = useState<Component | null>(null);
+    const [chunkUnits, setChunkUnits] = useState<number>(100);
+    const [chunkOverlap, setChunkOverlap] = useState<number>(50);
     const [selectedEmbedder, setSelectedEmbedder] = useState<Component | null>(null);
 
     const [loadingState, setLoadingState] = useState<boolean>(false);
@@ -29,8 +36,6 @@ const ImportModal: React.FC<ImportModalProps> = ({ onClose, apiHost }) => {
     const [filePath, setFilePath] = useState<string>("");
 
     const [docType, setDocType] = useState<string>("Documentation");
-    const [chunkUnits, setChunkUnits] = useState<number>(100);
-    const [chunkOverlap, setChunkOverlap] = useState<number>(50);
     const [inputFileKey, setInputFileKey] = useState<number>(Date.now());  // Using the current timestamp as the initial key  
     const [apiResponse, setApiResponse] = useState<{ status: number, status_msg: string } | null>(null);
 
@@ -46,11 +51,9 @@ const ImportModal: React.FC<ImportModalProps> = ({ onClose, apiHost }) => {
 
                 if (data.readers && data.readers.length > 0) {
                     setSelectedReader(data.default_values.last_reader);
-                    setSelectedChunker(data.default_values.last_chunker)
+                    handleChunkerSelection(data.default_values.last_chunker)
                     setSelectedEmbedder(data.default_values.last_embedder)
                     setDocType(data.default_values.last_document_type)
-                    setChunkUnits(data.default_values.last_unit)
-                    setChunkOverlap(data.default_values.last_overlap)
                 }
             } catch (error) {
                 console.error("Error fetching readers:", error);
@@ -64,8 +67,8 @@ const ImportModal: React.FC<ImportModalProps> = ({ onClose, apiHost }) => {
     };
 
     const handleImport = async () => {
-        if (!selectedReader || !selectedChunker) {
-            console.error("No reader selected!");
+        if (!selectedReader || !selectedChunker || !selectedEmbedder) {
+            console.error("Missing component");
             return;
         }
 
@@ -95,7 +98,7 @@ const ImportModal: React.FC<ImportModalProps> = ({ onClose, apiHost }) => {
         let payload = {
             reader: selectedReader.name,
             chunker: selectedChunker.name,
-            embedder: selectedEmbedder?.name,
+            embedder: selectedEmbedder.name,
             fileBytes: fileBytesBase64,
             fileNames: fileNames,
             filePath: filePath,
@@ -150,6 +153,33 @@ const ImportModal: React.FC<ImportModalProps> = ({ onClose, apiHost }) => {
         }
     });
 
+    const handleChunkerSelection = (chunk: Component) => {
+        setSelectedChunker(chunk);
+        if (chunk.units !== undefined) {
+            setChunkUnits(chunk.units);
+        }
+        if (chunk.overlap !== undefined) {
+            setChunkOverlap(chunk.overlap);
+        }
+    };
+
+
+    const handleChunkerUnitsSelection = (value: number) => {
+        setChunkUnits(value);
+        if (selectedChunker) {
+            selectedChunker.units = value;
+            setSelectedChunker({ ...selectedChunker });
+        }
+    };
+
+    const handleChunkerOverlapSelection = (value: number) => {
+        setChunkOverlap(value);
+        if (selectedChunker) {
+            selectedChunker.overlap = value;
+            setSelectedChunker({ ...selectedChunker });
+        }
+    };
+
     const handleRemoveAllFiles = () => {
         setDroppedFiles([]);
     };
@@ -173,36 +203,47 @@ const ImportModal: React.FC<ImportModalProps> = ({ onClose, apiHost }) => {
                         <ul>
                             {selectedOption === "Reader" ? (
                                 readers.map((reader, index) => (
-                                    <button
+                                    <CoolButton
+                                        key={reader.name + index}
+                                        main={reader.name}
+                                        clipboard={false}
+                                        sub={reader.available ? '' : reader.message} // You can add any subtitle here or leave it empty if not needed.
                                         onClick={() => setSelectedReader(reader)}
-                                        className={`${reader.name === selectedReader?.name ? 'bg-yellow-300' : 'bg-gray-200'} text-black text-lg truncate rounded-lg font-bold border-2 mb-3 border-black animate-pop-in-late p-4 w-full shadow-md hover:bg-yellow-400 hover:border-white`}
-                                        key={index + reader.name}
-                                        title={reader.name} // hover tooltip in case of truncation
-                                    >
-                                        {reader.name}
-                                    </button>
+                                        subBgColor={reader.available ? 'green' : 'red'}
+                                        isActive={reader.name === selectedReader?.name}
+                                        available={reader.available}
+                                        title={reader.name}
+                                    />
                                 ))
                             ) : selectedOption === "Chunking" ? (
                                 chunker.map((chunk, index) => (
-                                    <button
-                                        onClick={() => setSelectedChunker(chunk)}
-                                        className={`${chunk.name === selectedChunker?.name ? 'bg-cyan-300' : 'bg-gray-200'} text-black text-lg truncate rounded-lg font-bold border-2 mb-3 border-black animate-pop-in-late p-4 w-full shadow-md hover:bg-cyan-400 hover:border-white`}
-                                        key={index + chunk.name}
-                                        title={chunk.name} // hover tooltip in case of truncation
-                                    >
-                                        {chunk.name}
-                                    </button>
+                                    <CoolButton
+                                        key={chunk.name + index}
+                                        main={chunk.name}
+                                        clipboard={false}
+                                        sub={chunk.available ? '' : chunk.message} // You can add any subtitle here or leave it empty if not needed.
+                                        onClick={() => handleChunkerSelection(chunk)}
+                                        mainBgColor='cyan'
+                                        subBgColor={chunk.available ? 'green' : 'red'}
+                                        isActive={chunk.name === selectedChunker?.name}
+                                        available={chunk.available}
+                                        title={chunk.name}
+                                    />
                                 ))
                             ) : selectedOption === "Embedding" ? (
                                 embedder.map((embedder, index) => (
-                                    <button
+                                    <CoolButton
+                                        key={embedder.name + index}
+                                        main={embedder.name}
+                                        clipboard={false}
+                                        sub={embedder.available ? '' : embedder.message}
+                                        available={embedder.available} // You can add any subtitle here or leave it empty if not needed.
                                         onClick={() => setSelectedEmbedder(embedder)}
-                                        className={`${embedder.name === selectedEmbedder?.name ? 'bg-fuchsia-300' : 'bg-gray-200'} text-black text-lg truncate rounded-lg font-bold border-2 mb-3 border-black animate-pop-in-late p-4 w-full shadow-md hover:bg-fuchsia-400 hover:border-white`}
-                                        key={index + embedder.name}
-                                        title={embedder.name} // hover tooltip in case of truncation
-                                    >
-                                        {embedder.name}
-                                    </button>
+                                        mainBgColor='fuchsia'
+                                        subBgColor={embedder.available ? 'green' : 'red'}
+                                        isActive={embedder.name === selectedEmbedder?.name}
+                                        title={embedder.name}
+                                    />
                                 ))
                             ) : null}
                         </ul>

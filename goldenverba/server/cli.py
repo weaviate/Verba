@@ -18,16 +18,70 @@ def cli():
 
 @cli.command()
 @click.option(
-    "--model",
-    default="gpt-3.5-turbo",
-    help="Generative OpenAI model",
+    "--port",
+    default=8000,
+    help="FastAPI Port",
 )
-def start(model):
+def start(port):
     """
     Run the FastAPI application.
     """
-    os.environ["VERBA_MODEL"] = model
-    uvicorn.run("goldenverba.server.api:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("goldenverba.server.api:app", host="0.0.0.0", port=port, reload=True)
+
+
+@cli.command()
+@click.option(
+    "--reader",
+    default="SimpleReader",
+    help="Reader",
+)
+@click.option(
+    "--type",
+    default="Documentation",
+    help="Document Type",
+)
+@click.option(
+    "--chunker",
+    default="WordChunker",
+    help="Chunker",
+)
+@click.option(
+    "--units",
+    default=100,
+    help="Units per chunk",
+)
+@click.option(
+    "--overlap",
+    default=50,
+    help="Overlap of units per chunk",
+)
+@click.option(
+    "--embedder",
+    default="ADAEmbedder",
+    help="Embedder",
+)
+@click.option(
+    "--path",
+    help="Path to data",
+)
+def load(reader, type, chunker, units, overlap, embedder, path):
+    """
+    Run the FastAPI application.
+    """
+    manager = VerbaManager()
+    manager.reader_set_reader(reader)
+    manager.chunker_set_chunker(chunker)
+    manager.embedder_set_embedder(embedder)
+
+    manager.import_data(
+        bytes=[],
+        contents=[],
+        paths=[path],
+        fileNames=[path],
+        document_type=type,
+        units=units,
+        overlap=overlap,
+    )
 
 
 @cli.command()
