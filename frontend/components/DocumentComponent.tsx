@@ -68,10 +68,11 @@ export function DocumentComponent({
     const end = extract ? start + extract.length : -1;
 
     return (
-        <div className="border-2 border-gray-900 shadow-lg rounded-xl bg-gray-100 p-2 animate-pop-in overflow-y-auto max-h-[498px] document-container">
+        <div className="border-2 border-gray-900 shadow-lg rounded-xl bg-gray-100 p-2 animate-pop-in overflow-y-auto max-h-[50vh] document-container">
             <div
-                className={`${DOC_TYPE_COLORS[type]} text-black p-4 rounded-t-xl w-full sticky top-0 z-10 shadow-md`}
+                className={`bg-gray-300 text-black p-4 rounded-t-xl w-full sticky top-0 z-10 shadow-md`}
             >
+                <span className="mr-4 bg-yellow-300 p-2 rounded-lg shadow-md ">{type}</span>
                 <a href={docLink || "#"} target="_blank" rel="noopener noreferrer">
                     {title || "Placeholder Title"}
                 </a>

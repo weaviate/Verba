@@ -4,6 +4,12 @@ from goldenverba.ingestion.reader.document import Document
 from goldenverba.ingestion.reader.interface import InputForm
 from goldenverba.ingestion.component import VerbaComponent
 
+from goldenverba.ingestion.schema.schema_generation import (
+    VECTORIZERS,
+    EMBEDDINGS,
+    strip_non_letters,
+)
+
 from wasabi import msg
 
 
@@ -99,3 +105,56 @@ class Embedder(VerbaComponent):
         )
 
         msg.warn(f"Deleted document {doc_name} and its chunks")
+
+    def remove_document_by_id(self, client: Client, doc_id: str):
+        doc_class_name = "Document_" + strip_non_letters(self.vectorizer)
+        chunk_class_name = "Chunk_" + strip_non_letters(self.vectorizer)
+
+        client.data_object.delete(uuid=doc_id, class_name=doc_class_name)
+
+        client.batch.delete_objects(
+            class_name=chunk_class_name,
+            where={"path": ["doc_uuid"], "operator": "Equal", "valueText": doc_id},
+        )
+
+        msg.warn(f"Deleted document {doc_id} and its chunks")
+
+    def search_documents(self, client: Client, query: str, doc_type: str) -> list:
+        """Search for documents from Weaviate
+        @parameter query_string : str - Search query
+        @returns list - Document list
+        """
+        doc_class_name = "Document_" + strip_non_letters(self.vectorizer)
+
+        if doc_type == "":
+            query_results = (
+                client.query.get(
+                    class_name=doc_class_name,
+                    properties=["doc_name", "doc_type", "doc_link"],
+                )
+                .with_bm25(query, properties=["doc_name"])
+                .with_additional(properties=["id"])
+                .with_limit(20)
+                .do()
+            )
+        else:
+            query_results = (
+                client.query.get(
+                    class_name=doc_class_name,
+                    properties=["doc_name", "doc_type", "doc_link"],
+                )
+                .with_bm25(query, properties=["doc_name"])
+                .with_where(
+                    {
+                        "path": ["doc_type"],
+                        "operator": "Equal",
+                        "valueText": doc_type,
+                    }
+                )
+                .with_additional(properties=["id"])
+                .with_limit(20)
+                .do()
+            )
+
+        results = query_results["data"]["Get"][doc_class_name]
+        return results

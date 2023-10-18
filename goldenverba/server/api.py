@@ -76,6 +76,7 @@ def create_embedder_payload(key: str, embedder: Embedder) -> dict:
     }
 
 
+# Delete later
 verba_engine = AdvancedVerbaQueryEngine(manager.client)
 
 # FastAPI App
@@ -111,6 +112,11 @@ app.mount("/static", StaticFiles(directory=BASE_DIR / "frontend/out"), name="app
 
 class QueryPayload(BaseModel):
     query: str
+
+
+class SearchQueryPayload(BaseModel):
+    query: str
+    doc_type: str
 
 
 class GetDocumentPayload(BaseModel):
@@ -377,31 +383,28 @@ async def get_document(payload: GetDocumentPayload):
 
 ## Retrieve all documents imported to Weaviate
 @app.post("/api/get_all_documents")
-async def get_all_documents():
+async def get_all_documents(payload: SearchQueryPayload):
     msg.info(f"Get all documents request received")
 
     try:
-        documents = manager.retrieve_all_documents()
+        documents = manager.retrieve_all_documents(payload.doc_type)
         msg.good(f"Succesfully retrieved document: {len(documents)} documents")
+
+        doc_types = set([document["doc_type"] for document in documents])
+
         return JSONResponse(
-            content={
-                "documents": documents,
-            }
+            content={"documents": documents, "doc_types": list(doc_types)}
         )
     except Exception as e:
         msg.fail(f"All Document retrieval failed: {str(e)}")
-        return JSONResponse(
-            content={
-                "documents": [],
-            }
-        )
+        return JSONResponse(content={"documents": [], "doc_types": []})
 
 
 ## Search for documentation
 @app.post("/api/search_documents")
-async def search_documents(payload: QueryPayload):
+async def search_documents(payload: SearchQueryPayload):
     try:
-        documents = verba_engine.search_documents(payload.query)
+        documents = manager.search_documents(payload.query, payload.doc_type)
         return JSONResponse(
             content={
                 "documents": documents,
@@ -414,3 +417,12 @@ async def search_documents(payload: QueryPayload):
                 "documents": [],
             }
         )
+
+
+# Retrieve specific document based on UUID
+@app.post("/api/delete_document")
+async def delete_document(payload: GetDocumentPayload):
+    msg.info(f"Document ID received: {payload.document_id}")
+
+    manager.delete_document_by_id(payload.document_id)
+    return JSONResponse(content={})

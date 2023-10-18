@@ -78,7 +78,7 @@ export default function StatusPage() {
                 </div>
                 <div className="flex mt-16 space-x-4 w-full justify-center items-start"> {/* Adjusted container for the three sections */}
                     {/* First Section */}
-                    <div className="flex-1 bg-white bg-opacity-20 rounded-lg shadow-md backdrop-filter max-h-[50vh] backdrop-blur-md p-4 w-full animate-pop-in">
+                    <div className="flex-1 border-2 border-black bg-white bg-opacity-20 rounded-lg shadow-md backdrop-filter max-h-[50vh] backdrop-blur-md p-4 w-full overflow-y-auto animate-pop-in">
                         <h2 className="text-lg font-bold mb-4">🐕 Verba Status</h2>
                         <p className="text-xs font-bold mb-4 text-gray-600">This view shows whether your Verba Client is connected to the Backend and which Deployment of Weaviate you are using</p>
                         <hr></hr>
@@ -88,7 +88,7 @@ export default function StatusPage() {
                         </div>
                     </div>
                     {/* Second Section */}
-                    <div className="flex-1 bg-white bg-opacity-20 rounded-lg shadow-md backdrop-filter max-h-[50vh] backdrop-blur-md p-4 w-full animate-pop-in">
+                    <div className="flex-1 border-2 border-black bg-white bg-opacity-20 rounded-lg shadow-md backdrop-filter max-h-[50vh] backdrop-blur-md p-4 overflow-y-auto w-full animate-pop-in">
                         <h2 className="text-lg font-bold mb-4">📚 Libraries & Variables</h2>
                         <p className="text-xs font-bold mb-4 text-gray-600">This view shows the available libraries and set variables</p>
                         <hr />
@@ -116,11 +116,11 @@ export default function StatusPage() {
                         </div>
                     </div>
                     {/* Third Section */}
-                    <div className="flex-1 bg-white bg-opacity-20 rounded-lg shadow-md backdrop-filter max-h-[50vh] backdrop-blur-md p-4 w-full overflow-y-auto animate-pop-in">
+                    <div className="flex-1 bg-white border-2 border-black bg-opacity-20 rounded-lg shadow-md backdrop-filter max-h-[50vh] backdrop-blur-md p-4 w-full overflow-y-auto animate-pop-in">
                         <div className="flex justify-between items-center mb-4"> {/* Container for the title and button */}
                             <h2 className="text-lg font-bold">📝 Schemas & Objects</h2>
-                            <button onClick={() => setShowModal(true)} className="text-sm bg-gray-400 text-white hover:bg-red-400 hover-container text-black px-3 py-1 rounded">
-                                Reset Verba
+                            <button onClick={() => setShowModal(true)} className="text-xs bg-gray-400 text-white hover:bg-red-400 hover-container px-3 py-2 rounded-lg">
+                                ❌ Reset Verba
                             </button>
                         </div>
                         <p className="text-xs font-bold mb-4 text-gray-600">This view shows all schemas and their object count</p>
@@ -143,7 +143,7 @@ export default function StatusPage() {
             {showModal && (
                 <div className="fixed inset-0 flex items-center justify-center z-50">
                     <div className="bg-white p-6 rounded-lg shadow-lg border-2 border-black animate-pop-in">
-                        <h3 className="font-bold mb-4">Warning</h3>
+                        <h3 className="font-bold mb-4">⚠️ Warning</h3>
                         <p>Are you sure? This will remove all existing data.</p>
                         <div className="flex justify-end mt-4">
                             <button onClick={() => setShowModal(false)} className="mr-2 px-4 py-2 bg-gray-300 hover:bg-gray-200 rounded">
