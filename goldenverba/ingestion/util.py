@@ -1,6 +1,7 @@
 import hashlib
 import ssl
 import os
+import time
 
 import openai
 import weaviate  # type: ignore[import]
@@ -24,6 +25,11 @@ def setup_client() -> Optional[Client]:
     weaviate_url = os.environ.get("VERBA_URL", "")
     weaviate_key = os.environ.get("VERBA_API_KEY", "")
 
+    if os.getenv("OPENAI_API_TYPE") == "azure":
+        openai_header_key = "X-Azure-Api-Key"
+    else:
+        openai_header_key = "X-OpenAI-Api-Key"
+
     if openai_key == "":
         msg.fail("OPENAI_API_KEY environment variable not set")
         return None
@@ -38,8 +44,9 @@ def setup_client() -> Optional[Client]:
             ssl._create_default_https_context = _create_unverified_https_context
 
         msg.info("VERBA_URL environment variable not set. Using Weaviate Embedded")
+
         client = weaviate.Client(
-            additional_headers={"X-OpenAI-Api-Key": openai.api_key},
+            additional_headers={openai_header_key: openai.api_key},
             embedded_options=EmbeddedOptions(
                 persistence_data_path="./.verba/local/share/",
                 binary_path="./.verba/cache/weaviate-embedded",
@@ -52,12 +59,17 @@ def setup_client() -> Optional[Client]:
         msg.warn("VERBA_API_KEY environment variable not set")
 
     openai.api_key = openai_key
+    openai.api_type = os.getenv("OPENAI_API_TYPE")
+    openai.api_base = os.getenv("OPENAI_API_BASE")
+    openai.api_version = os.getenv("OPENAI_API_VERSION")
+    openai.api_key = os.getenv("OPENAI_API_KEY")    
+
     url = weaviate_url
     auth_config = weaviate.AuthApiKey(api_key=weaviate_key)
 
     client = weaviate.Client(
         url=url,
-        additional_headers={"X-OpenAI-Api-Key": openai.api_key},
+        additional_headers={openai_header_key: openai.api_key},
         auth_client_secret=auth_config,
     )
 
@@ -137,6 +149,8 @@ def import_chunks(client: Client, chunks: list[Doc], doc_uuid_map: dict) -> None
             }
 
             client.batch.add_data_object(properties, "Chunk")
+            wait_time = int(os.getenv("VERBA_WAIT_TIME_BETWEEN_INGESTION_QUERIES",0))
+            time.sleep(wait_time)
 
     msg.good("Imported all chunks")
 

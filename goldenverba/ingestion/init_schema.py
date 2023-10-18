@@ -1,5 +1,6 @@
 from wasabi import msg  # type: ignore[import]
 import weaviate
+import os
 
 from goldenverba.ingestion.util import setup_client
 
@@ -24,15 +25,32 @@ def init_schema(model: str = "gpt-3.5-turbo"):
         msg.fail("Error on init schema: {0}".format(e))
         return False
 
+
+    if os.getenv("OPENAI_API_TYPE") == "azure":
+        resourceName = os.getenv("AZURE_OPENAI_RESOURCE_NAME")
+        if resourceName is None:
+            raise Exception("AZURE_OPENAI_RESOURCE_NAME should be set when OPENAI_API_TYPE is azure. It is XXX in http://XXX.openai.azure.com")
+        moduleConfig = { 
+            "generative-openai": {
+                    "generative-openai": {"model": model}
+            },
+            "text2vec-openai": {
+                    "deploymentId": model,
+                    "resourceName": resourceName
+            }
+        }
+    else:
+        moduleConfig =  {
+                    "generative-openai": {"model": model}
+                },
+
     chunk_schema = {
         "classes": [
             {
                 "class": "Chunk",
                 "description": "Chunks of Documentations",
                 "vectorizer": "text2vec-openai",
-                "moduleConfig": {
-                    "generative-openai": {"model": model}
-                },  # gpt-4 / gpt-3.5-turbo
+                "moduleConfig": moduleConfig, 
                 "properties": [
                     {
                         "name": "text",

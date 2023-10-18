@@ -43,17 +43,30 @@ class AdvancedVerbaQueryEngine(SimpleVerbaQueryEngine):
         )
 
         openai.api_key = os.environ.get("OPENAI_API_KEY", "")
+        if "OPENAI_API_TYPE" in os.environ:
+            openai.api_type = os.getenv("OPENAI_API_TYPE")
+        if "OPENAI_API_BASE" in os.environ:
+            openai.api_base = os.getenv("OPENAI_API_BASE")
+        if "OPENAI_API_VERSION" in os.environ:
+            openai.api_version = os.getenv("OPENAI_API_VERSION")
+
         try:
             msg.info(f"Starting API call to answer {query_string}")
-            completion = openai.ChatCompletion.create(
-                model=model,
-                messages=[
+            chat_completion_arguments= {
+                "model":model,
+                "messages":[
                     {
                         "role": "system",
                         "content": f"You are a Retrieval Augmented Generation chatbot. Try to answer this user query {query_string} with only the provided context. If the provided documentation does not provide enough information, say so. If the answer requires code examples encapsulate them with ```programming-language-name ```. Don't do pseudo-code.",
                     },
                     {"role": "user", "content": context},
-                ],
+                ]
+            }
+            if openai.api_type=="azure":
+                chat_completion_arguments["deployment_id"]=model
+
+            completion = openai.ChatCompletion.create(
+                **chat_completion_arguments
             )
             system_msg = str(completion["choices"][0]["message"]["content"])
             self.add_semantic_cache(query_string, results, system_msg)

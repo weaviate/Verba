@@ -100,6 +100,16 @@ Regardless of your chosen deployment method, you'll need to specify the followin
 - ```VERBA_URL=http://your-weaviate-server:8080```
 - ```VERBA_API_KEY=your-weaviate-database-key```
 
+## Using Azure OpenAI
+
+You can use Azure OpenAI instead of OpenAI. You simply need to set these environment variables:
+- OPENAI_API_TYPE="azure"
+- OPENAI_API_BASE="<your endpoint>"
+- AZURE_OPENAI_RESOURCE_NAME to your resourceName, which is XXX when your endpoint is http://XXX.openai.azure.com"
+- You might want to set AZURE_WAIT_BETWEEN_QUERIES=10 if you have a query-per-minute quota on your Azure AI account.
+
+You will also have to use a model that is deployed on your AzureAI server. Model can be chosen using the `--model` argument when launching verba.
+
 # 📦 Data Import Guide
 
 Verba offers straightforward commands to import your data for further interaction. Before you proceed, please be aware that importing data will **incur costs** based on your configured OpenAI access key.
