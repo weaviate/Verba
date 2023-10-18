@@ -243,7 +243,7 @@ class VerbaManager:
 
         return schemas
 
-    def retrieve_all_documents(self) -> list:
+    def retrieve_all_documents(self, doc_type: str) -> list:
         """Return all documents from Weaviate
         @returns list - Document list
         """
@@ -252,17 +252,34 @@ class VerbaManager:
             self.embedder_manager.selected_embedder.vectorizer
         )
 
-        print(class_name)
-
-        query_results = (
-            self.client.query.get(
-                class_name=class_name,
-                properties=["doc_name", "doc_type", "doc_link"],
+        if doc_type == "":
+            query_results = (
+                self.client.query.get(
+                    class_name=class_name,
+                    properties=["doc_name", "doc_type", "doc_link"],
+                )
+                .with_additional(properties=["id"])
+                .with_limit(10000)
+                .do()
             )
-            .with_additional(properties=["id"])
-            .with_limit(10000)
-            .do()
-        )
+        else:
+            query_results = (
+                self.client.query.get(
+                    class_name=class_name,
+                    properties=["doc_name", "doc_type", "doc_link"],
+                )
+                .with_additional(properties=["id"])
+                .with_where(
+                    {
+                        "path": ["doc_type"],
+                        "operator": "Equal",
+                        "valueText": doc_type,
+                    }
+                )
+                .with_limit(10000)
+                .do()
+            )
+
         results = query_results["data"]["Get"][class_name]
         return results
 
@@ -340,3 +357,13 @@ class VerbaManager:
                 return (False, f"{env} not set")
 
         return (True, f"Available")
+
+    def delete_document_by_id(self, doc_id: str) -> None:
+        self.embedder_manager.selected_embedder.remove_document_by_id(
+            self.client, doc_id
+        )
+
+    def search_documents(self, query: str, doc_type: str) -> list:
+        return self.embedder_manager.selected_embedder.search_documents(
+            self.client, query, doc_type
+        )

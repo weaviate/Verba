@@ -292,20 +292,21 @@ export default function Home() {
 
             {/* Header */}
             <div className="rounded-t-xl bg-gray-200 p-4 flex justify-between items-center">
+              🐕 RAGtriever Chat
               <div className="text-xs text-white font-mono flex justify-center">
                 <a href="https://github.com/weaviate/Verba" target="_blank" rel="noopener noreferrer">
                   <span
                     className={`rounded-indicator hover-container text-white p-2 ${apiStatus === 'Online'
-                      ? 'bg-gray-400 hover:bg-green-400'
+                      ? 'bg-green-500 hover:bg-green-400'
                       : 'bg-red-500 hover:bg-red-400'
                       }`}
                   >
-                    {apiStatus}
+                    {apiStatus + " v0.3.0"}
                   </span>
                 </a>
                 <a href="https://www.weaviate.io" target="_blank" rel="noopener noreferrer">
                   <span
-                    className="rounded-indicator text-white bg-gray-400 hover:bg-green-400 ml-2 p-2 hover-container">
+                    className="rounded-indicator text-white bg-gray-400 hover:bg-gray-300 ml-2 p-2 hover-container">
                     Powered by Weaviate ❤️
                   </span>
                 </a>

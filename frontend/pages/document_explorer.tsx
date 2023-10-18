@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { DocumentComponent } from "../components/DocumentComponent";
 import { FixedSizeList as List } from "react-window";
+import { Virtuoso } from "react-virtuoso";
 import { DocType, DOC_TYPE_COLORS, DOC_TYPE_COLOR_HOVER, getApiHost } from "@/pages";
 import ImportModalComponent from "../components/ImportModalComponent";
 import { FaPlus } from "react-icons/fa";
@@ -21,7 +22,11 @@ const bgUrl = process.env.NODE_ENV === 'production'
 
 export default function DocumentOnly() {
     const [searchQuery, setSearchQuery] = useState("");
+    const [uniqueDocTypes, setUniqueDocTypes] = useState<string[]>([]);
+    const [selectedDocType, setSelectedDocType] = useState("All types");
     const [showModal, setShowModal] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
     const [documentTitle, setDocumentTitle] = useState("");
     const [documentText, setDocumentText] = useState("");
     const [documentType, setDocumentType] = useState<DocType>("Documentation");
@@ -35,7 +40,7 @@ export default function DocumentOnly() {
                 ? `${apiHost}/api/search_documents`
                 : `${apiHost}/api/get_all_documents`;
 
-            const body = query ? { "query": query } : {};
+            const body = { "query": query, "doc_type": selectedDocType == "All types" ? "" : selectedDocType };
 
             const response = await fetch(endpoint, {
                 method: "POST",
@@ -49,6 +54,11 @@ export default function DocumentOnly() {
 
             // Assuming the data is an array of documents
             setDocuments(data.documents);
+
+            if (data.doc_types) {
+                setUniqueDocTypes(data.doc_types);
+            }
+
         } catch (error) {
             console.error(`Failed to fetch documents: ${error}`);
         }
@@ -86,6 +96,26 @@ export default function DocumentOnly() {
 
         fetchDocument();
     }, [focusedDocument]);
+
+    const handleDeleteDocument = async () => {
+        try {
+            setIsDeleting(true)
+            const response = await fetch(`${apiHost}/api/delete_document`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ document_id: focusedDocument?._additional.id }),
+            });
+            const data = await response.json();
+            console.log(data);  // Log the response for debugging
+            setShowDeleteModal(false);  // Hide the delete confirmation modal
+            setIsDeleting(false);
+            fetchDocuments();  // Refresh the document list
+        } catch (error) {
+            console.error(`Failed to delete document: ${error}`);
+        }
+    };
 
     // Handle form submission
     const handleSearch = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -133,11 +163,22 @@ export default function DocumentOnly() {
                         </div>
                     </div>
                 </div>
-                <div className="flex w-full space-x-4 mt-12">
-                    <div className="flex-1 bg-white bg-opacity-20 rounded-lg shadow-md backdrop-filter max-h-[50vh] backdrop-blur-md p-4 w-1/3 animate-pop-in">
+                <div className="flex w-full space-x-4 mt-28">
+                    <div className="flex-1 bg-white border-2 overflow-y-auto border-black bg-opacity-20 rounded-lg shadow-md backdrop-filter min-h-[50vh] backdrop-blur-md p-4 w-1/3 animate-pop-in">
                         <div className="p-2">
-                            <h2 className="text-lg font-bold mb-4">📚 Documents</h2>
-                            <p className="text-xs font-bold mb-4 text-gray-600">Search through your imported documents</p>
+                            <div className="flex justify-between items-center mb-4"> {/* Container for the title and button */}
+                                <h2 className="text-lg font-bold mb-4">📚 Documents</h2>
+                                {focusedDocument && (
+                                    <button
+                                        className="text-xs bg-gray-400 text-white hover:bg-red-400 hover-container px-3 py-2 rounded-lg"
+                                        onClick={() => setShowDeleteModal(true)}
+                                    >
+                                        ❌ Delete {focusedDocument.doc_name}
+                                    </button>
+                                )}
+                            </div>
+
+                            <p className="text-xs font-bold mb-4 text-gray-600">Search through your {documents.length} imported documents</p>
                             <div className="rounded-lg flex justify- between items-center">
 
                                 <form
@@ -151,28 +192,38 @@ export default function DocumentOnly() {
                                         className="w-full p-2 rounded-md bg-white text-gray-900 placeholder-gray-400"
                                     />
                                 </form>
+
+                                <select
+                                    value={selectedDocType}
+                                    onChange={(e) => setSelectedDocType(e.target.value)}
+                                    className="mr-2 bg-white text-gray-900 p-2 rounded-md"
+                                >
+                                    <option value="All types">All types</option>
+                                    {uniqueDocTypes.map((type) => (
+                                        <option key={type} value={type}>{type}</option>
+                                    ))}
+                                </select>
                             </div>
                             <hr />
                         </div>
                         {documents.length > 0 && (
-
-                            <List
-                                height={528}
-                                itemCount={documents.length}
-                                itemSize={100}
-                                width={550}
-                            >
-                                {({ index, style }) => (
+                            <Virtuoso
+                                style={{ width: '100%', height: '66%' }}  // Set a width and height
+                                totalCount={documents.length}  // Total count of items
+                                itemContent={(index) => (
                                     <CoolButton
                                         key={documents[index].doc_name}
                                         main={documents[index].doc_name}
                                         clipboard={true}
                                         sub={documents[index].doc_type}
+                                        subBgColor="yellow"
+                                        mainBgColor="green"
+                                        isActive={focusedDocument?.doc_name == documents[index].doc_name ? true : false}
                                         onClick={() => setFocusedDocument(documents[index])}
                                         title={documents[index].doc_name}
                                     />
                                 )}
-                            </List>
+                            />
                         )}
                     </div>
                     <div className="w-2/3 space-y-4">
@@ -186,6 +237,22 @@ export default function DocumentOnly() {
                     </div>
                 </div>
             </div>
+            {showDeleteModal && (
+                <div className="fixed inset-0 flex items-center justify-center z-50">
+                    <div className="bg-white p-6 rounded-lg shadow-lg border-2 border-black animate-pop-in">
+                        <h3 className="font-bold mb-4">⚠️ Warning</h3>
+                        <p>Do you want to remove {focusedDocument?.doc_name}</p>
+                        <div className="flex justify-end mt-4">
+                            <button onClick={() => setShowDeleteModal(false)} className="mr-2 px-4 py-2 bg-gray-300 hover:bg-gray-200 rounded">
+                                No
+                            </button>
+                            <button onClick={handleDeleteDocument} className="px-4 py-2 bg-red-500 hover:bg-red-400 text-white rounded">
+                                {isDeleting ? "Deleting..." : "Yes"} {/* Show spinner if loading, otherwise show "Yes" */}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </main>
     );
 }

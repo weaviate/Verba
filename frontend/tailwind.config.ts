@@ -5,6 +5,10 @@ const config: Config = {
     options: {
       safelist: [
         'bg-yellow-300',
+        'bg-gray-300',
+        'bg-gray-400',
+        'bg-zinc-300',
+        'bg-zinc-400',
         'bg-red-300',
         'bg-green-300',
         'bg-cyan-300',
