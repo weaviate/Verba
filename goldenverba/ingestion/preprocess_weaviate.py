@@ -6,7 +6,7 @@ import spacy
 from spacy.tokens import Doc
 from spacy.language import Language
 
-from goldenverba.ingestion.fetch_github import (
+from goldenverba.ingestion.reader.fetch_github import (
     fetch_docs,
     download_file,
     is_link_working,
