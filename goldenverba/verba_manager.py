@@ -212,6 +212,20 @@ class VerbaManager:
         except Exception as e:
             self.installed_libraries["openai"] = False
 
+        try:
+            import transformers
+
+            self.installed_libraries["transformers"] = True
+        except Exception as e:
+            self.installed_libraries["transformers"] = False
+
+        try:
+            import torch
+
+            self.installed_libraries["torch"] = True
+        except Exception as e:
+            self.installed_libraries["torch"] = False
+
     def verify_variables(self) -> None:
         """
         Checks which environment variables are installed and fills out the self.environment_variables dictionary for the frontend to access

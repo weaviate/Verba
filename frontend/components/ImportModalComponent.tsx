@@ -9,7 +9,7 @@ type ImportModalProps = {
     apiHost: string;
 }
 
-type Component = {
+export type Component = {
     name: string;
     description: string;
     input_form: 'UPLOAD' | 'INPUT' | 'CHUNKER' | 'TEXT';

@@ -38,7 +38,7 @@ const CoolButton: React.FC<CoolButtonProps> = ({ main, sub, onClick, clipboard, 
                 <FaCopy size={20} className="text-gray-400 hover:text-white" />
             </div> : ""}
             <span className="block truncate">{main}</span>
-            <span className={`block absolute top-2/3 mt-3 text-sm bg-${subBgColor}-300 rounded-lg px-2 truncate`}>
+            <span className={`block absolute top-2/3 mt-3 text-sm bg-${subBgColor}-300 rounded-lg px-2 truncate text-xs`}>
                 {sub}
             </span>
         </button>
