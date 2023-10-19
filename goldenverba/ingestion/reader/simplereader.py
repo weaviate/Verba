@@ -18,7 +18,7 @@ class SimpleReader(Reader):
         super().__init__()
         self.file_types = [".txt", ".md", ".mdx"]
         self.name = "SimpleReader"
-        self.description = "Reads .txt and .md files"
+        self.description = "Reads text and markdown files"
         self.input_form = InputForm.UPLOAD.value
 
     def load(

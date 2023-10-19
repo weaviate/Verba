@@ -6,7 +6,7 @@ from weaviate import Client
 from goldenverba.ingestion.util import setup_client
 
 VECTORIZERS = set(["text2vec-openai"])  # Needs to match with Weaviate modules
-EMBEDDINGS = set(["SentenceTransformer"])  # Custom Vectors
+EMBEDDINGS = set(["MiniLM"])  # Custom Vectors
 
 
 def strip_non_letters(s: str):
@@ -75,7 +75,7 @@ def init_schemas(
     try:
         init_documents(client, vectorizer, force, check)
         init_cache(client, vectorizer, force, check)
-        init_suggestion(client, vectorizer, force, check)
+        # init_suggestion(client, vectorizer, force, check)
         return True
     except Exception as e:
         msg.fail(f"Schema initialization failed {str(e)}")

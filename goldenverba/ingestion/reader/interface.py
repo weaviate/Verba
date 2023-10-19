@@ -18,11 +18,7 @@ class Reader(VerbaComponent):
 
     def __init__(self):
         super().__init__()
-        self.name = "Reader"
         self.file_types = []
-        self.requires_env = []
-        self.requires_library = []
-        self.description = ""
         self.input_form = InputForm.UPLOAD.value
 
     def load(

@@ -25,17 +25,33 @@ from dotenv import load_dotenv
 load_dotenv()
 
 manager = verba_manager.VerbaManager()
+option_cache = {}
 
 readers = manager.reader_get_readers()
-chunker = manager.chunker_get_chunker()
-embedders = manager.embedder_get_embedder()
+for reader in readers:
+    available, message = manager.check_verba_component(readers[reader])
+    if available:
+        manager.reader_set_reader(reader)
+        option_cache["last_reader"] = reader
+        option_cache["last_document_type"] = "Documentation"
+        break
 
-option_cache = {
-    "last_reader": list(readers.keys())[0],
-    "last_document_type": "Documentation",
-    "last_chunker": list(chunker.keys())[0],
-    "last_embedder": list(embedders.keys())[0],
-}
+chunker = manager.chunker_get_chunker()
+for chunk in chunker:
+    available, message = manager.check_verba_component(chunker[chunk])
+    if available:
+        manager.chunker_set_chunker(chunk)
+        option_cache["last_chunker"] = chunk
+        break
+
+
+embedders = manager.embedder_get_embedder()
+for embedder in embedders:
+    available, message = manager.check_verba_component(embedders[embedder])
+    if available:
+        manager.embedder_set_embedder(embedder)
+        option_cache["last_embedder"] = embedder
+        break
 
 
 def create_reader_payload(key: str, reader: Reader) -> dict:
@@ -135,6 +151,15 @@ class LoadPayload(BaseModel):
     chunkOverlap: int
 
 
+class GetComponentPayload(BaseModel):
+    component: str
+
+
+class SetComponentPayload(BaseModel):
+    component: str
+    selected_component: str
+
+
 @app.get("/")
 @app.head("/")
 async def serve_frontend():
@@ -219,6 +244,37 @@ async def get_components():
     }
 
     return JSONResponse(content=data)
+
+
+@app.post("/api/get_component")
+async def get_component(payload: GetComponentPayload):
+    msg.info(f"Retrieving {payload.component} components")
+
+    data = {"components": []}
+
+    if payload.component == "embedders":
+        data["selected_component"] = create_embedder_payload(
+            manager.embedder_manager.selected_embedder.name,
+            manager.embedder_manager.selected_embedder,
+        )
+
+        for key in embedders:
+            current_embedder = embedders[key]
+            current_embedder_data = create_embedder_payload(key, current_embedder)
+            data["components"].append(current_embedder_data)
+
+    return JSONResponse(content=data)
+
+
+@app.post("/api/set_component")
+async def set_component(payload: SetComponentPayload):
+    msg.info(f"Setting {payload.component} to {payload.selected_component}")
+
+    if payload.component == "embedders":
+        manager.embedder_manager.set_embedder(payload.selected_component)
+        option_cache["last_embedder"] = payload.selected_component
+
+    return JSONResponse(content={})
 
 
 # Get Status meta data
@@ -393,11 +449,21 @@ async def get_all_documents(payload: SearchQueryPayload):
         doc_types = set([document["doc_type"] for document in documents])
 
         return JSONResponse(
-            content={"documents": documents, "doc_types": list(doc_types)}
+            content={
+                "documents": documents,
+                "doc_types": list(doc_types),
+                "current_embedder": manager.embedder_manager.selected_embedder.name,
+            }
         )
     except Exception as e:
         msg.fail(f"All Document retrieval failed: {str(e)}")
-        return JSONResponse(content={"documents": [], "doc_types": []})
+        return JSONResponse(
+            content={
+                "documents": [],
+                "doc_types": [],
+                "current_embedder": manager.embedder_manager.selected_embedder.name,
+            }
+        )
 
 
 ## Search for documentation
@@ -408,6 +474,7 @@ async def search_documents(payload: SearchQueryPayload):
         return JSONResponse(
             content={
                 "documents": documents,
+                "current_embedder": manager.embedder_manager.selected_embedder.name,
             }
         )
     except Exception as e:
@@ -415,6 +482,7 @@ async def search_documents(payload: SearchQueryPayload):
         return JSONResponse(
             content={
                 "documents": [],
+                "current_embedder": manager.embedder_manager.selected_embedder.name,
             }
         )
 

@@ -4,5 +4,7 @@ class VerbaComponent:
     """
 
     def __init__(self):
+        self.name = ""
         self.requires_env = []
         self.requires_library = []
+        self.description = ""

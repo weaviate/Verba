@@ -20,10 +20,8 @@ class Embedder(VerbaComponent):
 
     def __init__(self):
         super().__init__()
-        self.name = ""
         self.input_form = InputForm.TEXT.value  # Default for all Embedders
-        self.description = ""
-        self.vectorizer = "text2vec-openai"
+        self.vectorizer = ""
 
     def embed(documents: list[Document], client: Client, batch_size: int = 100) -> bool:
         """Embed verba documents and its chunks to Weaviate
@@ -33,6 +31,98 @@ class Embedder(VerbaComponent):
         @returns bool - Bool whether the embedding what successful
         """
         raise NotImplementedError("embed method must be implemented by a subclass.")
+
+    def import_data(
+        self,
+        documents: list[Document],
+        client: Client,
+    ) -> bool:
+        """Import verba documents and its chunks to Weaviate
+        @parameter: documents : list[Document] - List of Verba documents
+        @parameter: client : Client - Weaviate Client
+        @parameter: batch_size : int - Batch Size of Input
+        @returns bool - Bool whether the embedding what successful
+        """
+        try:
+            if self.vectorizer not in VECTORIZERS and self.vectorizer not in EMBEDDINGS:
+                msg.fail(f"Vectorizer of {self.name} not found")
+                return False
+
+            for i, document in enumerate(documents):
+                batches = []
+                uuid = ""
+                temp_batch = []
+                token_counter = 0
+                for chunk in document.chunks:
+                    if token_counter + len(chunk.tokens) <= 4000:
+                        token_counter += len(chunk.tokens)
+                        temp_batch.append(chunk)
+                    else:
+                        batches.append(temp_batch.copy())
+                        token_counter = 0
+                        temp_batch = []
+                if len(temp_batch) > 0:
+                    batches.append(temp_batch.copy())
+                    token_counter = 0
+                    temp_batch = []
+
+                msg.info(
+                    f"({i+1}/{len(documents)}) Importing document {document.name} with {len(batches)} batches"
+                )
+
+                with client.batch as batch:
+                    batch.batch_size = 1
+                    properties = {
+                        "text": str(document.text),
+                        "doc_name": str(document.name),
+                        "doc_type": str(document.type),
+                        "doc_link": str(document.link),
+                        "chunk_count": len(document.chunks),
+                        "timestamp": str(document.timestamp),
+                    }
+
+                    class_name = "Document_" + strip_non_letters(self.vectorizer)
+                    uuid = client.batch.add_data_object(properties, class_name)
+
+                    for chunk in document.chunks:
+                        chunk.set_uuid(uuid)
+
+                for batch_id, chunk_batch in enumerate(batches):
+                    with client.batch as batch:
+                        batch.batch_size = len(chunk_batch)
+                        for i, chunk in enumerate(chunk_batch):
+                            msg.info(
+                                f"({i+1}/{len(document.chunks)} of batch ({batch_id+1})) Importing chunk of {document.name} ({self.vectorizer})"
+                            )
+
+                            properties = {
+                                "text": chunk.text,
+                                "doc_name": str(document.name),
+                                "doc_uuid": chunk.doc_uuid,
+                                "doc_type": chunk.doc_type,
+                                "chunk_id": chunk.chunk_id,
+                            }
+                            class_name = "Chunk_" + strip_non_letters(self.vectorizer)
+
+                            # Check if vector already exists
+                            if chunk.vector == None:
+                                client.batch.add_data_object(properties, class_name)
+                            else:
+                                client.batch.add_data_object(
+                                    properties, class_name, vector=chunk.vector
+                                )
+
+                self.check_document_status(
+                    client,
+                    uuid,
+                    document.name,
+                    "Document_" + strip_non_letters(self.vectorizer),
+                    "Chunk_" + strip_non_letters(self.vectorizer),
+                    len(document.chunks),
+                )
+            return True
+        except Exception as e:
+            raise Exception(e)
 
     def check_document_status(
         self,

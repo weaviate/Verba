@@ -3,6 +3,7 @@ from weaviate import Client
 from goldenverba.ingestion.reader.document import Document
 from goldenverba.ingestion.embedding.interface import Embedder
 from goldenverba.ingestion.embedding.ADAEmbedder import ADAEmbedder
+from goldenverba.ingestion.embedding.MiniLMEmbedder import MiniLMEmbedder
 
 from wasabi import msg
 
@@ -10,6 +11,7 @@ from wasabi import msg
 class EmbeddingManager:
     def __init__(self):
         self.embedders: dict[str, Embedder] = {
+            "MiniLMEmbedder": MiniLMEmbedder(),
             "ADAEmbedder": ADAEmbedder(),
         }
         self.selected_embedder: Embedder = self.embedders["ADAEmbedder"]

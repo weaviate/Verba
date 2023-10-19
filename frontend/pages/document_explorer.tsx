@@ -4,6 +4,7 @@ import { FixedSizeList as List } from "react-window";
 import { Virtuoso } from "react-virtuoso";
 import { DocType, DOC_TYPE_COLORS, DOC_TYPE_COLOR_HOVER, getApiHost } from "@/pages";
 import ImportModalComponent from "../components/ImportModalComponent";
+import ConfigModal from "../components/ConfigModal";
 import { FaPlus } from "react-icons/fa";
 import CoolButton from "../components/CoolButton";
 
@@ -33,6 +34,7 @@ export default function DocumentOnly() {
     const [documentLink, setDocumentLink] = useState("#");
     const [documents, setDocuments] = useState<Document[]>([]);
     const [focusedDocument, setFocusedDocument] = useState<Document | null>(null);
+    const [currentEmbedder, setCurrentEmbedder] = useState<string>("");
 
     const fetchDocuments = async (query = "") => {
         try {
@@ -54,6 +56,7 @@ export default function DocumentOnly() {
 
             // Assuming the data is an array of documents
             setDocuments(data.documents);
+            setCurrentEmbedder(data.current_embedder)
 
             if (data.doc_types) {
                 setUniqueDocTypes(data.doc_types);
@@ -111,6 +114,9 @@ export default function DocumentOnly() {
             console.log(data);  // Log the response for debugging
             setShowDeleteModal(false);  // Hide the delete confirmation modal
             setIsDeleting(false);
+            setFocusedDocument(null)
+            setDocumentTitle("");
+            setDocumentText("");
             fetchDocuments();  // Refresh the document list
         } catch (error) {
             console.error(`Failed to delete document: ${error}`);
@@ -161,6 +167,7 @@ export default function DocumentOnly() {
                                 <span>Add Documents</span>
                             </button>
                         </div>
+                        <ConfigModal component="embedders" apiHost={apiHost}></ConfigModal>
                     </div>
                 </div>
                 <div className="flex w-full space-x-4 mt-28">
@@ -178,7 +185,7 @@ export default function DocumentOnly() {
                                 )}
                             </div>
 
-                            <p className="text-xs font-bold mb-4 text-gray-600">Search through your {documents.length} imported documents</p>
+                            <p className="text-xs font-bold mb-4 text-gray-600">Search through all your {documents.length} imported documents embedded by {currentEmbedder}</p>
                             <div className="rounded-lg flex justify- between items-center">
 
                                 <form

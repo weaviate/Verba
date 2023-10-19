@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { ChatComponent, Message } from "../components/ChatComponent";
 import { DocumentComponent } from "../components/DocumentComponent";
 import ImportModalComponent from "../components/ImportModalComponent";
+import ConfigModal from "../components/ConfigModal";
 import { FaPlus } from "react-icons/fa";
 import CountUp from 'react-countup';
 
@@ -258,6 +259,7 @@ export default function Home() {
                 <span>Add Documents</span>
               </button>
             </div>
+            <ConfigModal component="embedders" apiHost={apiHost}></ConfigModal>
           </div>
         </div>
         <div className="p-1 lg:flex overflow-x-auto justify-center h-32 w-full mb-2 hidden">
