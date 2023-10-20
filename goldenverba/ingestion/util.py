@@ -4,11 +4,8 @@ import os
 
 import openai
 import weaviate  # type: ignore[import]
-from weaviate import Client
 from typing import Optional
 from spacy.tokens import Doc
-
-from weaviate.embedded import EmbeddedOptions
 
 from wasabi import msg  # type: ignore[import]
 
@@ -40,7 +37,7 @@ def setup_client() -> Optional[Client]:
         msg.info("VERBA_URL environment variable not set. Using Weaviate Embedded")
         client = weaviate.Client(
             additional_headers={"X-OpenAI-Api-Key": openai.api_key},
-            embedded_options=EmbeddedOptions(
+            embedded_options=weaviate.embedded.EmbeddedOptions(
                 persistence_data_path="./.verba/local/share/",
                 binary_path="./.verba/cache/weaviate-embedded",
             ),
