@@ -84,7 +84,7 @@ export default function StatusPage() {
                         <hr></hr>
                         <div className="grid grid-rows-2 gap-2 mt-4">
                             <CoolButton main="Backend" sub={connected} clipboard={connected == "Online" ? true : false} subBgColor={connected == "Online" ? 'green' : 'red'} onClick={() => console.log("Connected button clicked")} />
-                            <CoolButton main={type} sub={connected} clipboard={connected == "Online" ? true : false} subBgColor={connected == "Online" ? 'green' : 'red'} onClick={() => console.log("Type button clicked")} />
+                            <CoolButton main={type ? type : "Weaviate"} sub={connected} clipboard={connected == "Online" ? true : false} subBgColor={connected == "Online" ? 'green' : 'red'} onClick={() => console.log("Type button clicked")} />
                         </div>
                     </div>
                     {/* Second Section */}
