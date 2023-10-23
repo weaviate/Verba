@@ -18,6 +18,7 @@ const config: Config = {
         'bg-cyan-400',
         'bg-fuchsia-400',
         'bg-red-400',
+        'bg-indigo-400'
         // ... any other dynamically constructed classes
       ],
     },
@@ -30,9 +31,10 @@ const config: Config = {
   theme: {
     screens: {
       sm: '100px',
-      md: '768px',
-      lg: '1024px',
-      xl: '1280px',
+      md: '1024px',
+      lg: '1280px',
+      full: '1700px',
+      xl: '2000px',
       '2xl': '1536px',
     },
     extend: {

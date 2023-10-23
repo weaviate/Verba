@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { DocumentComponent } from "../components/DocumentComponent";
-import { FixedSizeList as List } from "react-window";
 import { Virtuoso } from "react-virtuoso";
-import { DocType, DOC_TYPE_COLORS, DOC_TYPE_COLOR_HOVER, getApiHost } from "@/pages";
+import { getApiHost } from "@/pages";
 import ImportModalComponent from "../components/ImportModalComponent";
 import ConfigModal from "../components/ConfigModal";
 import { FaPlus } from "react-icons/fa";
@@ -10,7 +9,7 @@ import CoolButton from "../components/CoolButton";
 
 type Document = {
     doc_name: string;
-    doc_type: DocType;
+    doc_type: string;
     doc_link: string;
     _additional: { id: string };
 };
@@ -30,7 +29,7 @@ export default function DocumentOnly() {
     const [isDeleting, setIsDeleting] = useState(false);
     const [documentTitle, setDocumentTitle] = useState("");
     const [documentText, setDocumentText] = useState("");
-    const [documentType, setDocumentType] = useState<DocType>("Documentation");
+    const [documentType, setDocumentType] = useState<string>("Documentation");
     const [documentLink, setDocumentLink] = useState("#");
     const [documents, setDocuments] = useState<Document[]>([]);
     const [focusedDocument, setFocusedDocument] = useState<Document | null>(null);
@@ -158,16 +157,16 @@ export default function DocumentOnly() {
                                 </span>
                             </div>
                         </div>
-                        <div className="ml-16 animate-pop-in">
+                        <div className="flex justify-between items-center mx-auto p-4 ml-10">
                             <button
-                                className="flex items-center space-x-2 bg-gray-200 text-black p-3  rounded-lg  hover:bg-green-400 border-2 border-black hover:border-white hover-container shadow-md"
+                                className="flex items-center animate-pop-in space-x-2 mr-8 bg-gray-200 text-black p-3  rounded-lg  hover:bg-green-400 border-2 border-black hover:border-white hover-container shadow-md"
                                 onClick={() => setShowModal(true)}
                             >
                                 <FaPlus />
                                 <span>Add Documents</span>
                             </button>
+                            <ConfigModal component="embedders" apiHost={apiHost}></ConfigModal>
                         </div>
-                        <ConfigModal component="embedders" apiHost={apiHost}></ConfigModal>
                     </div>
                 </div>
                 <div className="flex w-full space-x-4 mt-28">

@@ -8,17 +8,20 @@ from weaviate import Client
 from weaviate.embedded import EmbeddedOptions
 from wasabi import msg
 
-from goldenverba.ingestion.reader.manager import ReaderManager
-from goldenverba.ingestion.chunking.manager import ChunkerManager
-from goldenverba.ingestion.embedding.manager import EmbeddingManager
-from goldenverba.ingestion.reader.document import Document
-from goldenverba.ingestion.reader.interface import Reader
-from goldenverba.ingestion.chunking.interface import Chunker
-from goldenverba.ingestion.embedding.interface import Embedder
+from goldenverba.components.reader.manager import ReaderManager
+from goldenverba.components.chunking.manager import ChunkerManager
+from goldenverba.components.embedding.manager import EmbeddingManager
+from goldenverba.components.retriever.manager import RetrieverManager
+from goldenverba.components.reader.document import Document
+from goldenverba.components.chunking.chunk import Chunk
+from goldenverba.components.reader.interface import Reader
+from goldenverba.components.chunking.interface import Chunker
+from goldenverba.components.embedding.interface import Embedder
+from goldenverba.components.retriever.interface import Retriever
 
-from goldenverba.ingestion.component import VerbaComponent
+from goldenverba.components.component import VerbaComponent
 
-import goldenverba.ingestion.schema.schema_generation as schema_manager
+import goldenverba.components.schema.schema_generation as schema_manager
 
 
 class VerbaManager:
@@ -28,6 +31,7 @@ class VerbaManager:
         self.reader_manager = ReaderManager()
         self.chunker_manager = ChunkerManager()
         self.embedder_manager = EmbeddingManager()
+        self.retriever_manager = RetrieverManager()
         self.environment_variables = {}
         self.installed_libraries = {}
         self.weaviate_type = ""
@@ -117,6 +121,20 @@ class VerbaManager:
 
     def embedder_get_embedder(self) -> dict[str, Embedder]:
         return self.embedder_manager.get_embedders()
+
+    def retriever_set_retriever(self, retriever: str) -> bool:
+        available, message = self.check_verba_component(
+            self.retriever_manager.retrievers[retriever]
+        )
+        if available:
+            msg.good(f"Set Retriever to {retriever}")
+            return self.retriever_manager.set_retriever(retriever)
+        else:
+            msg.warn(message)
+            return False
+
+    def retriever_get_retriever(self) -> dict[str, Retriever]:
+        return self.retriever_manager.get_retrievers()
 
     def setup_client(self) -> Optional[Client]:
         """
@@ -256,6 +274,12 @@ class VerbaManager:
             schemas[_class["class"]] = len(results["data"]["Get"][_class["class"]])
 
         return schemas
+
+    def retrieve_chunks(self, queries: list[str]) -> list[Chunk]:
+        chunks, context = self.retriever_manager.selected_retriever.retrieve(
+            queries, self.client, self.embedder_manager.selected_embedder
+        )
+        return chunks, context
 
     def retrieve_all_documents(self, doc_type: str) -> list:
         """Return all documents from Weaviate

@@ -1,7 +1,7 @@
 import weaviate
 from weaviate import Client
 
-from goldenverba.ingestion.util import setup_client
+from goldenverba.components.util import setup_client
 
 
 class VerbaQueryEngine:

@@ -15,9 +15,10 @@ from pydantic import BaseModel
 from goldenverba.retrieval.advanced_engine import AdvancedVerbaQueryEngine
 from goldenverba import verba_manager
 
-from goldenverba.ingestion.reader.interface import Reader
-from goldenverba.ingestion.chunking.interface import Chunker
-from goldenverba.ingestion.embedding.interface import Embedder
+from goldenverba.components.reader.interface import Reader
+from goldenverba.components.chunking.interface import Chunker
+from goldenverba.components.embedding.interface import Embedder
+from goldenverba.components.retriever.interface import Retriever
 
 
 from dotenv import load_dotenv
@@ -51,6 +52,13 @@ for embedder in embedders:
     if available:
         manager.embedder_set_embedder(embedder)
         option_cache["last_embedder"] = embedder
+        break
+
+retrievers = manager.retriever_get_retriever()
+for retriever in retrievers:
+    available, message = manager.check_verba_component(retrievers[retriever])
+    if available:
+        manager.retriever_set_retriever(retriever)
         break
 
 
@@ -87,6 +95,17 @@ def create_embedder_payload(key: str, embedder: Embedder) -> dict:
         "name": key,
         "description": embedder.description,
         "input_form": embedder.input_form,
+        "available": available,
+        "message": message,
+    }
+
+
+def create_retriever_payload(key: str, retriever: Retriever) -> dict:
+    available, message = manager.check_verba_component(retriever)
+
+    return {
+        "name": key,
+        "description": retriever.description,
         "available": available,
         "message": message,
     }
@@ -263,6 +282,17 @@ async def get_component(payload: GetComponentPayload):
             current_embedder_data = create_embedder_payload(key, current_embedder)
             data["components"].append(current_embedder_data)
 
+    elif payload.component == "retrievers":
+        data["selected_component"] = create_retriever_payload(
+            manager.retriever_manager.selected_retriever.name,
+            manager.retriever_manager.selected_retriever,
+        )
+
+        for key in retrievers:
+            current_retriever = retrievers[key]
+            current_retriever_data = create_retriever_payload(key, current_retriever)
+            data["components"].append(current_retriever_data)
+
     return JSONResponse(content=data)
 
 
@@ -273,6 +303,9 @@ async def set_component(payload: SetComponentPayload):
     if payload.component == "embedders":
         manager.embedder_manager.set_embedder(payload.selected_component)
         option_cache["last_embedder"] = payload.selected_component
+
+    elif payload.component == "retrievers":
+        manager.retriever_manager.set_retriever(payload.selected_component)
 
     return JSONResponse(content={})
 
@@ -373,24 +406,37 @@ async def load_data(payload: LoadPayload):
 # Receive query and return chunks and query answer
 @app.post("/api/query")
 async def query(payload: QueryPayload):
+    msg.good(f"Received query: {payload.query}")
     try:
-        system_msg, results = verba_engine.query(
-            payload.query, os.environ["VERBA_MODEL"]
-        )
+        chunks, context = manager.retrieve_chunks([payload.query])
+
+        results = [
+            {
+                "text": chunk.text,
+                "doc_name": chunk.doc_name,
+                "chunk_id": chunk.chunk_id,
+                "doc_uuid": chunk.doc_uuid,
+                "doc_type": chunk.doc_type,
+                "score": chunk.score,
+            }
+            for chunk in chunks
+        ]
+
         msg.good(f"Succesfully processed query: {payload.query}")
 
         return JSONResponse(
             content={
-                "system": system_msg,
                 "documents": results,
+                "context": context,
             }
         )
+
     except Exception as e:
-        msg.fail(f"Query failed")
-        print(e)
+        msg.fail(f"Query failed: {str(e)}")
         return JSONResponse(
             content={
                 "system": f"Something went wrong! {str(e)}",
+                "context": "",
                 "documents": [],
             }
         )

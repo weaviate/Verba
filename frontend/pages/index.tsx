@@ -24,19 +24,8 @@ type DocumentChunk = {
   doc_name: string;
   chunk_id: number;
   doc_uuid: string;
-  doc_type: DocType;
-  _additional: { score: number };
-};
-
-export type DocType = "Documentation" | "Blog";
-export const DOC_TYPE_COLORS: Record<DocType, string> = {
-  Documentation: "bg-green-300",
-  Blog: "bg-yellow-200",
-};
-
-export const DOC_TYPE_COLOR_HOVER: Record<DocType, string> = {
-  Documentation: "hover:bg-green-400",
-  Blog: "hover:bg-yellow-300",
+  doc_type: string;
+  score: number;
 };
 
 export default function Home() {
@@ -250,19 +239,20 @@ export default function Home() {
                 </span>
               </div>
             </div>
-            <div className="ml-16 animate-pop-in">
+            <div className="flex justify-between items-center mx-auto p-4 ml-10">
               <button
-                className="flex items-center space-x-2 bg-gray-200 text-black p-3  rounded-lg  hover:bg-green-400 border-2 border-black hover:border-white hover-container shadow-md"
+                className="flex items-center animate-pop-in space-x-2 mr-8 bg-gray-200 text-black p-3  rounded-lg  hover:bg-green-400 border-2 border-black hover:border-white hover-container shadow-md"
                 onClick={() => setShowModal(true)}
               >
                 <FaPlus />
                 <span>Add Documents</span>
               </button>
+              <ConfigModal component="embedders" apiHost={apiHost}></ConfigModal>
+              <ConfigModal component="retrievers" apiHost={apiHost}></ConfigModal>
             </div>
-            <ConfigModal component="embedders" apiHost={apiHost}></ConfigModal>
           </div>
         </div>
-        <div className="p-1 lg:flex overflow-x-auto justify-center h-32 w-full mb-2 hidden">
+        <div className="lg:flex md:flex full:justify-center justify-items-start overflow-x-auto h-36 w-full mb-2 hidden">
           {documentChunks.map((chunk, index) => (
             <button
               key={chunk.doc_name + index}
@@ -272,25 +262,24 @@ export default function Home() {
                 className={`bg-none
                   } rounded-lg text-xs hover-container mx-1 h-28 w-48 p-1 animate-pop-in`}
               >
-                <div className={`text-xs mb-1 ${focusedDocument === chunk ? '' : 'fade-in-out'} ${DOC_TYPE_COLORS[chunk.doc_type]} p-2 rounded-lg w-full`}>
+                <div className={`text-xs mb-1 ${focusedDocument === chunk ? '' : 'fade-in-out'} bg-yellow-300 p-2 rounded-lg w-full`}>
                   {chunk.doc_type}
                 </div>
                 <div className="flex space-x-2 mt-1">
-                  <div className={`flex items-center rounded-md bg-gray-200 p-2 truncate h-16 border-2 shadow-md hover:border-white border-black ${focusedDocument === chunk ? DOC_TYPE_COLORS[chunk.doc_type] : DOC_TYPE_COLOR_HOVER[chunk.doc_type]}`}>
-                    <div className={`text-sm font-bold ${DOC_TYPE_COLORS[chunk.doc_type]} p-2 rounded-lg`}>
+                  <div className={`flex items-center rounded-md bg-gray-200 p-2 truncate h-16 border-2 shadow-md hover:border-white border-black ${focusedDocument === chunk ? "bg-green-300" : "bg-gray-300"}`}>
+                    <div className={`text-sm font-bold bg-green-300 p-2 rounded-lg`}>
                       {" "}
-                      <CountUp end={Math.round(chunk._additional.score * 10000)} />
+                      <CountUp end={Math.round(chunk.score * 100)} />
                     </div>
                     <p className="font-bold ml-1">{chunk.doc_name}</p>
                   </div>
-
                 </div>
               </div>
             </button>
           ))}
         </div>
-        <div className="flex w-full space-x-4">
-          <div className="lg:w-1/2 md:w-full sm:w-full p-2 border-2 shadow-lg lg:h-2/3 sm:h-full md:h-full border-gray-900 rounded-xl animate-pop-in">
+        <div className="flex w-full space-x-4 overflow-y-auto">
+          <div className="lg:w-1/2 md:w-full sm:w-full p-2 border-2 shadow-lg border-gray-900 rounded-xl animate-pop-in">
 
             {/* Header */}
             <div className="rounded-t-xl bg-gray-200 p-4 flex justify-between items-center">
@@ -346,7 +335,7 @@ export default function Home() {
               ))}
             </div>
           </div>
-          <div className="w-1/2 space-y-4 hidden lg:block">
+          <div className="w-1/2 space-y-4 hidden lg:block md:block">
             <DocumentComponent
               title={documentTitle}
               text={documentText}

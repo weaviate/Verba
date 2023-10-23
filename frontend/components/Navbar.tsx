@@ -13,7 +13,7 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className="fixed z-10 bottom-5 left-0 right-0 mx-auto animate-pop-in rounded-2xl overflow-hidden w-max transform transition-all duration-500 backdrop-filter backdrop-blur-sm p-4 hidden lg:flex">
+    <nav className="fixed z-10 bottom-5 left-0 right-0 mx-auto animate-pop-in rounded-2xl overflow-hidden w-max transform transition-all duration-500 backdrop-filter backdrop-blur-sm p-4 hidden lg:flex md:flex">
       {links.map((link) => {
         const isActive = router.pathname === link.path;
         return (
