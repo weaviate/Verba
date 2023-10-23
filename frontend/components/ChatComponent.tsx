@@ -85,7 +85,7 @@ export function ChatComponent({
   }, [messageHistory]);
 
   return (
-    <div className="bg-gray-100 p-4 overflow-y-auto h-[350px]">
+    <div className="bg-gray-100 p-4 overflow-y-auto h-[35vh]">
       {messageHistory.map((message, index) => (
         <div
           ref={index === messageHistory.length - 1 ? lastMessageRef : null}

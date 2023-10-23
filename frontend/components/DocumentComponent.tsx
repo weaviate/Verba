@@ -3,12 +3,11 @@ import React from 'react';
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneLight } from "react-syntax-highlighter/dist/cjs/styles/prism";
-import { DocType, DOC_TYPE_COLORS } from "@/pages";
 
 interface DocumentComponentProps {
     title: string;
     text: string;
-    type?: DocType;
+    type?: string;
     extract?: string;
     docLink?: string;
 }
@@ -84,7 +83,7 @@ export function DocumentComponent({
                 {extract && (
                     <div
                         ref={extractRef}
-                        className={`${DOC_TYPE_COLORS[type]} rounded-lg p-3 shadow-lg extract text-sm`}
+                        className={`bg-green-300 rounded-lg p-3 shadow-lg extract text-sm`}
                     >
                         <RenderMarkdown text={text.slice(start, end)} />
                     </div>

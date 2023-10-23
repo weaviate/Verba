@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { TbVectorTriangle } from "react-icons/tb";
+import { LuFileOutput } from "react-icons/lu";
 import { useDropzone } from 'react-dropzone';
 import CoolButton from "../components/CoolButton";
 import HashLoader from "react-spinners/HashLoader";
@@ -65,13 +66,18 @@ const ConfigModal: React.FC<ConfigModalProps> = ({ component = "embedders", apiH
     }, [apiHost]);
 
     return (
-        <div className="ml-16 animate-pop-in">
+        <div className="ml-10 animate-pop-in">
             <div className="flex items-center"> {/* Wrapped button and tooltip in flex container */}
                 <button
                     onClick={toggleListVisibility}
-                    className="flex items-center space-x-2 bg-gray-200 text-black p-3 rounded-lg hover:bg-fuchsia-400 border-2 border-black hover:border-white hover-container shadow-md"
+                    className={`flex items-center space-x-2 bg-gray-200 text-black p-3 rounded-lg ${component === "embedders" ? 'hover:bg-fuchsia-300' : component === "retrievers" ? 'hover:bg-indigo-300' : 'hover:bg-fuchsia-400'} border-2 border-black hover:border-white hover-container shadow-md`}
                 >
-                    <TbVectorTriangle />
+                    {
+                        component === "embedders" ? <TbVectorTriangle /> :
+                            component === "retrievers" ? <LuFileOutput /> :
+                                component === "generators" ? <TbVectorTriangle /> :
+                                    <TbVectorTriangle />
+                    }
                     <span className='truncate'>{selectedComponent?.name ? selectedComponent.name : "None"}</span>
                 </button>
                 <div className="relative ml-2" onMouseEnter={() => setTooltipVisible(true)}  // Show tooltip on mouse enter
