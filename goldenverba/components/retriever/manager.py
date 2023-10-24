@@ -14,8 +14,8 @@ from wasabi import msg
 class RetrieverManager:
     def __init__(self):
         self.retrievers: dict[str, Retriever] = {
-            "SimpleRetriever": SimpleRetriever(),
             "WindowRetriever": WindowRetriever(),
+            "SimpleRetriever": SimpleRetriever(),
         }
         self.selected_retriever: Retriever = self.retrievers["WindowRetriever"]
 

@@ -29,8 +29,6 @@ class WindowRetriever(Retriever):
         @parameter: embedder : Embedder - Current selected Embedder
         @returns list[Chunk] - List of retrieved chunks
         """
-        print("Meow")
-
         chunk_class = embedder.get_chunk_class()
         needs_vectorization = embedder.get_need_vectorization()
         chunks = []

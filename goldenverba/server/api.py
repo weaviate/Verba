@@ -1,9 +1,8 @@
 import os
-import base64
 
 from wasabi import msg  # type: ignore[import]
 
-from fastapi import FastAPI, status
+from fastapi import FastAPI, status, WebSocket
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -19,6 +18,10 @@ from goldenverba.components.reader.interface import Reader
 from goldenverba.components.chunking.interface import Chunker
 from goldenverba.components.embedding.interface import Embedder
 from goldenverba.components.retriever.interface import Retriever
+from goldenverba.components.generation.interface import Generator
+
+from goldenverba.server.ConfigManager import ConfigManager
+from goldenverba.server.util import setup_managers
 
 
 from dotenv import load_dotenv
@@ -26,40 +29,18 @@ from dotenv import load_dotenv
 load_dotenv()
 
 manager = verba_manager.VerbaManager()
-option_cache = {}
+config_manager = ConfigManager()
 
 readers = manager.reader_get_readers()
-for reader in readers:
-    available, message = manager.check_verba_component(readers[reader])
-    if available:
-        manager.reader_set_reader(reader)
-        option_cache["last_reader"] = reader
-        option_cache["last_document_type"] = "Documentation"
-        break
-
 chunker = manager.chunker_get_chunker()
-for chunk in chunker:
-    available, message = manager.check_verba_component(chunker[chunk])
-    if available:
-        manager.chunker_set_chunker(chunk)
-        option_cache["last_chunker"] = chunk
-        break
-
-
 embedders = manager.embedder_get_embedder()
-for embedder in embedders:
-    available, message = manager.check_verba_component(embedders[embedder])
-    if available:
-        manager.embedder_set_embedder(embedder)
-        option_cache["last_embedder"] = embedder
-        break
-
 retrievers = manager.retriever_get_retriever()
-for retriever in retrievers:
-    available, message = manager.check_verba_component(retrievers[retriever])
-    if available:
-        manager.retriever_set_retriever(retriever)
-        break
+generators = manager.generator_get_generator()
+
+setup_managers(
+    manager, config_manager, readers, chunker, embedders, retrievers, generators
+)
+config_manager.save_config()
 
 
 def create_reader_payload(key: str, reader: Reader) -> dict:
@@ -111,6 +92,18 @@ def create_retriever_payload(key: str, retriever: Retriever) -> dict:
     }
 
 
+def create_generator_payload(key: str, generator: Generator) -> dict:
+    available, message = manager.check_verba_component(generator)
+
+    return {
+        "name": key,
+        "description": generator.description,
+        "available": available,
+        "message": message,
+        "streamable": generator.streamable,
+    }
+
+
 # Delete later
 verba_engine = AdvancedVerbaQueryEngine(manager.client)
 
@@ -147,6 +140,17 @@ app.mount("/static", StaticFiles(directory=BASE_DIR / "frontend/out"), name="app
 
 class QueryPayload(BaseModel):
     query: str
+
+
+class ConversationItem(BaseModel):
+    type: str
+    content: str
+
+
+class GeneratePayload(BaseModel):
+    query: str
+    context: str
+    conversation: list[ConversationItem]
 
 
 class SearchQueryPayload(BaseModel):
@@ -251,15 +255,15 @@ async def get_components():
 
     data["default_values"] = {
         "last_reader": create_reader_payload(
-            option_cache["last_reader"], readers[option_cache["last_reader"]]
+            config_manager.get_reader(), readers[config_manager.get_reader()]
         ),
         "last_chunker": create_chunker_payload(
-            option_cache["last_chunker"], chunker[option_cache["last_chunker"]]
+            config_manager.get_chunker(), chunker[config_manager.get_chunker()]
         ),
         "last_embedder": create_embedder_payload(
-            option_cache["last_embedder"], embedders[option_cache["last_embedder"]]
+            config_manager.get_embedder(), embedders[config_manager.get_embedder()]
         ),
-        "last_document_type": option_cache["last_document_type"],
+        "last_document_type": "Documentation",
     }
 
     return JSONResponse(content=data)
@@ -293,6 +297,17 @@ async def get_component(payload: GetComponentPayload):
             current_retriever_data = create_retriever_payload(key, current_retriever)
             data["components"].append(current_retriever_data)
 
+    elif payload.component == "generators":
+        data["selected_component"] = create_generator_payload(
+            manager.generator_manager.selected_generator.name,
+            manager.generator_manager.selected_generator,
+        )
+
+        for key in generators:
+            current_generator = generators[key]
+            current_generator_data = create_generator_payload(key, current_generator)
+            data["components"].append(current_generator_data)
+
     return JSONResponse(content=data)
 
 
@@ -302,10 +317,17 @@ async def set_component(payload: SetComponentPayload):
 
     if payload.component == "embedders":
         manager.embedder_manager.set_embedder(payload.selected_component)
-        option_cache["last_embedder"] = payload.selected_component
+        config_manager.set_embedder(payload.selected_component)
 
     elif payload.component == "retrievers":
         manager.retriever_manager.set_retriever(payload.selected_component)
+        config_manager.set_retriever(payload.selected_component)
+
+    elif payload.component == "generators":
+        manager.generator_manager.set_generator(payload.selected_component)
+        config_manager.set_generator(payload.selected_component)
+
+    config_manager.save_config()
 
     return JSONResponse(content={})
 
@@ -342,12 +364,10 @@ async def load_data(payload: LoadPayload):
     manager.chunker_set_chunker(payload.chunker)
     manager.embedder_set_embedder(payload.embedder)
 
-    global option_cache
-
-    option_cache["last_reader"] = payload.reader
-    option_cache["last_document_type"] = payload.document_type
-    option_cache["last_chunker"] = payload.chunker
-    option_cache["last_embedder"] = payload.embedder
+    config_manager.set_reader(payload.reader)
+    config_manager.set_chunker(payload.chunker)
+    config_manager.set_embedder(payload.embedder)
+    config_manager.save_config()
 
     # Set new default values based on user input
     current_chunker = manager.chunker_get_chunker()[payload.chunker]
@@ -440,6 +460,50 @@ async def query(payload: QueryPayload):
                 "documents": [],
             }
         )
+
+
+# Receive query and return chunks and query answer
+@app.post("/api/generate")
+async def generate(payload: GeneratePayload):
+    msg.good(f"Received generate call for: {payload.query}")
+    try:
+        answer = await manager.generate_answer(
+            [payload.query], [payload.context], payload.conversation
+        )
+
+        msg.good(f"Succesfully generated answer: {payload.query}")
+
+        return JSONResponse(
+            content={
+                "system": answer,
+            }
+        )
+
+    except Exception as e:
+        msg.fail(f"Answer Generation failed: {str(e)}")
+        return JSONResponse(
+            content={
+                "system": f"Something went wrong! {str(e)}",
+            }
+        )
+
+
+@app.websocket("/ws/generate_stream")
+async def websocket_generate_stream(websocket: WebSocket):
+    await websocket.accept()
+    data = await websocket.receive_text()
+    try:
+        # Parse and validate the JSON string using Pydantic model
+        payload = GeneratePayload.model_validate_json(data)
+        msg.good(f"Received generate stream call for: {payload.query}")
+        for chunk in manager.generate_stream_answer(
+            [payload.query], [payload.context], payload.conversation
+        ):
+            print(chunk)
+            await websocket.send_text(chunk)
+    except Exception as e:
+        # Handle the validation error (send an error message, log it, etc.)
+        await websocket.send_text(f"Validation error: {e}")
 
 
 # Retrieve auto complete suggestions based on user input

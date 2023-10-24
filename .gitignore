@@ -11,3 +11,4 @@ build
 .cache
 .verba
 .vscode
+verba_config.json

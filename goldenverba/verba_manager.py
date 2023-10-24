@@ -12,12 +12,14 @@ from goldenverba.components.reader.manager import ReaderManager
 from goldenverba.components.chunking.manager import ChunkerManager
 from goldenverba.components.embedding.manager import EmbeddingManager
 from goldenverba.components.retriever.manager import RetrieverManager
+from goldenverba.components.generation.manager import GeneratorManager
 from goldenverba.components.reader.document import Document
 from goldenverba.components.chunking.chunk import Chunk
 from goldenverba.components.reader.interface import Reader
 from goldenverba.components.chunking.interface import Chunker
 from goldenverba.components.embedding.interface import Embedder
 from goldenverba.components.retriever.interface import Retriever
+from goldenverba.components.generation.interface import Generator
 
 from goldenverba.components.component import VerbaComponent
 
@@ -32,6 +34,7 @@ class VerbaManager:
         self.chunker_manager = ChunkerManager()
         self.embedder_manager = EmbeddingManager()
         self.retriever_manager = RetrieverManager()
+        self.generator_manager = GeneratorManager()
         self.environment_variables = {}
         self.installed_libraries = {}
         self.weaviate_type = ""
@@ -135,6 +138,20 @@ class VerbaManager:
 
     def retriever_get_retriever(self) -> dict[str, Retriever]:
         return self.retriever_manager.get_retrievers()
+
+    def generator_set_generator(self, generator: str) -> bool:
+        available, message = self.check_verba_component(
+            self.generator_manager.generators[generator]
+        )
+        if available:
+            msg.good(f"Set Generator to {generator}")
+            return self.generator_manager.set_generator(generator)
+        else:
+            msg.warn(message)
+            return False
+
+    def generator_get_generator(self) -> dict[str, Generator]:
+        return self.generator_manager.get_generators()
 
     def setup_client(self) -> Optional[Client]:
         """
@@ -335,6 +352,20 @@ class VerbaManager:
             class_name=class_name,
         )
         return document
+
+    async def generate_answer(
+        self, queries: list[str], contexts: list[str], conversation: dict
+    ):
+        return await self.generator_manager.selected_generator.generate(
+            queries, contexts, conversation
+        )
+
+    def generate_stream_answer(
+        self, queries: list[str], contexts: list[str], conversation: dict
+    ):
+        return self.generator_manager.selected_generator.generate_stream(
+            queries, contexts, conversation
+        )
 
     def reset(self):
         self.client.schema.delete_all()

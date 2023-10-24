@@ -7,6 +7,8 @@ import PulseLoader from "react-spinners/PulseLoader";
 interface ChatComponentProps {
   onUserMessageSubmit: Message[];
   isFetching: boolean;
+  setHandleGenerateStreamMessageRef: (ref: React.MutableRefObject<Function | null>) => void;
+  apiHost: string;
 }
 
 export interface Message {
@@ -17,9 +19,73 @@ export interface Message {
 export function ChatComponent({
   onUserMessageSubmit,
   isFetching,
+  setHandleGenerateStreamMessageRef,
+  apiHost,
 }: ChatComponentProps) {
   const [messageHistory, setMessageHistory] = useState<Message[]>([]);
   const lastMessageRef = useRef<null | HTMLDivElement>(null);
+  const [accumulatingMessage, setAccumulatingMessage] = useState<string>("");
+  const [socket, setSocket] = useState<WebSocket | null>(null);
+  const handleGenerateStreamMessageRef = useRef<Function | null>(null);
+
+  useEffect(() => {
+    // Pass the ref up to the parent
+    setHandleGenerateStreamMessageRef(handleGenerateStreamMessageRef);
+  }, [setHandleGenerateStreamMessageRef]);
+
+  useEffect(() => {
+    const localSocket = new WebSocket("ws://" + apiHost + '/ws/generate_stream');
+
+    localSocket.onopen = () => {
+      console.log("WebSocket connection opened.");
+    };
+
+    localSocket.onmessage = (event) => {
+      console.log(event.data)
+      const data = event.data;
+      // Depending on the structure of your server response, 
+      // you might need to extract the message differently.
+      const newMessage = data.message;
+      console.log(accumulatingMessage)
+      setAccumulatingMessage(prev => prev + newMessage);
+
+      // If the message is complete, add it to messageHistory
+      if (data.finish_reason === "stop") {
+        setMessageHistory(prev => [...prev, { type: "system", content: accumulatingMessage }]);
+        setAccumulatingMessage(""); // Reset accumulating message
+      }
+    };
+
+    localSocket.onerror = (error) => {
+      console.error("WebSocket Error:", error);
+    };
+
+    localSocket.onclose = (event) => {
+      if (event.wasClean) {
+        console.log(`WebSocket connection closed cleanly, code=${event.code}, reason=${event.reason}`);
+      } else {
+        console.error("WebSocket connection died");
+      }
+    };
+
+    setSocket(localSocket);
+
+    return () => {
+      if (localSocket.readyState !== WebSocket.CLOSED) {
+        localSocket.close();
+      }
+    };
+  }, []);
+
+
+  handleGenerateStreamMessageRef.current = (query?: string, context?: string) => {
+    if (socket?.readyState === WebSocket.OPEN) {
+      const data = JSON.stringify({ query: query, context: context, conversation: messageHistory });
+      socket.send(data);
+    } else {
+      console.error("WebSocket is not open. ReadyState:", socket?.readyState);
+    }
+  };
 
   type Segment =
     | { type: "text"; content: string }

@@ -17,6 +17,7 @@ export type Component = {
     message: string;
     units?: number,
     overlap?: number
+    streamable?: boolean
 };
 
 const ImportModal: React.FC<ImportModalProps> = ({ onClose, apiHost }) => {
