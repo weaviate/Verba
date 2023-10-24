@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { TbVectorTriangle } from "react-icons/tb";
 import { LuFileOutput } from "react-icons/lu";
+import { MdOutlineQuestionAnswer } from "react-icons/md";
 import { useDropzone } from 'react-dropzone';
 import CoolButton from "../components/CoolButton";
 import HashLoader from "react-spinners/HashLoader";
@@ -10,14 +11,17 @@ import { Component } from "../components/ImportModalComponent";
 interface ConfigModalProps {
     component: string;
     apiHost: string;
+    onGeneratorSelect: (streamable: boolean) => void;
 }
 
-const ConfigModal: React.FC<ConfigModalProps> = ({ component = "embedders", apiHost }) => {
+const ConfigModal: React.FC<ConfigModalProps> = ({ component = "embedders", apiHost, onGeneratorSelect }) => {
 
     const [components, setComponents] = useState<Component[]>([]);
     const [selectedComponent, setSelectedComponent] = useState<Component>();
     const [isListVisible, setListVisible] = useState<boolean>(false);
     const [isTooltipVisible, setTooltipVisible] = useState<boolean>(false);
+
+    const mainButtonRef = React.useRef<HTMLButtonElement | null>(null);
 
     const toggleListVisibility = () => {
         setListVisible(prevState => !prevState);
@@ -40,6 +44,11 @@ const ConfigModal: React.FC<ConfigModalProps> = ({ component = "embedders", apiH
         }
     };
 
+    useEffect(() => {
+        if (component === "generators") {
+            onGeneratorSelect(selectedComponent?.streamable ? selectedComponent.streamable : false);
+        }
+    }, [selectedComponent]);
 
     useEffect(() => {
         // Fetch the list of readers from your API when the component mounts
@@ -69,13 +78,14 @@ const ConfigModal: React.FC<ConfigModalProps> = ({ component = "embedders", apiH
         <div className="ml-10 animate-pop-in">
             <div className="flex items-center"> {/* Wrapped button and tooltip in flex container */}
                 <button
+                    ref={mainButtonRef}
                     onClick={toggleListVisibility}
-                    className={`flex items-center space-x-2 bg-gray-200 text-black p-3 rounded-lg ${component === "embedders" ? 'hover:bg-fuchsia-300' : component === "retrievers" ? 'hover:bg-indigo-300' : 'hover:bg-fuchsia-400'} border-2 border-black hover:border-white hover-container shadow-md`}
+                    className={`flex items-center space-x-2 bg-gray-200 text-black p-3 rounded-lg ${component === "embedders" ? 'hover:bg-fuchsia-300' : component === "retrievers" ? 'hover:bg-indigo-300' : component === "component" ? 'hover:bg-lime-400' : 'hover:bg-lime-400'} border-2 border-black hover:border-white hover-container shadow-md`}
                 >
                     {
                         component === "embedders" ? <TbVectorTriangle /> :
                             component === "retrievers" ? <LuFileOutput /> :
-                                component === "generators" ? <TbVectorTriangle /> :
+                                component === "generators" ? <MdOutlineQuestionAnswer /> :
                                     <TbVectorTriangle />
                     }
                     <span className='truncate'>{selectedComponent?.name ? selectedComponent.name : "None"}</span>
@@ -100,6 +110,7 @@ const ConfigModal: React.FC<ConfigModalProps> = ({ component = "embedders", apiH
                             {components.filter(_component => _component.name !== selectedComponent?.name).map(_component => (
                                 <button
                                     key={_component.name}
+                                    style={{ width: mainButtonRef.current ? `${mainButtonRef.current.offsetWidth}px` : 'auto' }}
                                     onClick={() => handleComponentSelection(_component)}
                                     className='bg-gray-300 rounded-lg p-2 shadow-md animate-pop-in-late hover-container hover:bg-gray-200 truncate'
                                     disabled={!_component.available}

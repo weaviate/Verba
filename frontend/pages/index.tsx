@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { ChatComponent, Message } from "../components/ChatComponent";
 import { DocumentComponent } from "../components/DocumentComponent";
 import ImportModalComponent from "../components/ImportModalComponent";
@@ -9,6 +9,13 @@ import CountUp from 'react-countup';
 export const getApiHost = () => {
   if (process.env.NODE_ENV === 'development') {
     return 'http://localhost:8000';
+  }
+  return "";
+};
+
+export const getApiHostNoHttp = () => {
+  if (process.env.NODE_ENV === 'development') {
+    return 'localhost:8000';
   }
   return "";
 };
@@ -32,6 +39,7 @@ export default function Home() {
   const [showModal, setShowModal] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [userInput, setUserInput] = useState("");
+  const [streamable, setStreamable] = useState(false);
   const [documentTitle, setDocumentTitle] = useState("");
   const [documentText, setDocumentText] = useState("");
   const [documentLink, setDocumentLink] = useState("#");
@@ -42,6 +50,7 @@ export default function Home() {
   );
   const [messages, setMessages] = useState<Message[]>([]);
   const [isFetching, setIsFetching] = useState(false);
+  const handleGenerateStreamMessageRef = useRef<Function | null>(null);
 
   // Function for checking the health of the API
   const checkApiHealth = useCallback(async () => {
@@ -64,6 +73,46 @@ export default function Home() {
     checkApiHealth();
   }, [checkApiHealth]);
 
+  const handleGenerateMessage = async (query?: string, context?: string) => {
+
+    try {
+      const answerResponse = await fetch(apiHost + "/api/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ query: query, context: context, conversation: messages }), // context will be added once we get it from the first API call,
+      });
+
+      const answerData = await answerResponse.json();
+
+      if (answerData.system) {
+        setMessages((prev) => [
+          ...prev,
+          { type: "system", content: answerData.system },
+        ]);
+      }
+    } catch (error) {
+      console.error("Failed to fetch from API:", error);
+    } finally {
+      setIsFetching(false);
+    }
+  }
+
+  const setHandleGenerateStreamMessage = (ref: React.MutableRefObject<Function | null>) => {
+    handleGenerateStreamMessageRef.current = ref.current;
+  };
+
+  const handleGenerateStreamMessage = (query?: string, context?: string) => {
+    if (handleGenerateStreamMessageRef.current) {
+      handleGenerateStreamMessageRef.current(query, context);
+    }
+  };
+
+  const generatorStreamable = (streamable: boolean) => {
+    setStreamable(streamable)
+  }
+
   const handleSendMessage = async (e?: React.FormEvent, message?: string) => {
     e?.preventDefault();
 
@@ -74,39 +123,40 @@ export default function Home() {
 
       // Clear the suggestions list
       setSuggestions([]);
-
       setUserInput("");
 
       // Start the API call
       setIsFetching(true);
 
       try {
-        checkApiHealth()
-        const response = await fetch(apiHost + "/api/query", {
+        checkApiHealth();
+
+        // Start both API calls in parallel
+        const queryResponse = await fetch(apiHost + "/api/query", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ query: sendInput }),
-        });
+        })
 
-        const data = await response.json();
-        checkApiHealth()
+        const queryData = await queryResponse.json();
+        checkApiHealth();
         setDocumentChunks([]);
-        setDocumentChunks(data.documents);
+        setDocumentChunks(queryData.documents);
         setSuggestions([]);
 
-        if (data.system) {
-          setMessages((prev) => [
-            ...prev,
-            { type: "system", content: data.system },
-          ]);
+        if (queryData.context) {
+          if (streamable) {
+            handleGenerateStreamMessage(sendInput, queryData.context)
+          } else {
+            handleGenerateMessage(sendInput, queryData.context)
+          }
         }
+
       } catch (error) {
-        checkApiHealth()
+        checkApiHealth();
         console.error("Failed to fetch from API:", error);
-      } finally {
-        setIsFetching(false);
       }
     }
   };
@@ -183,11 +233,11 @@ export default function Home() {
   };
 
   // Debounce the fetchSuggestions function to prevent rapid requests
-  const debouncedFetchSuggestions = debounce(fetchSuggestions, 200);
+  const debouncedFetchSuggestions = debounce(fetchSuggestions, 400);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUserInput(e.target.value);
-    debouncedFetchSuggestions(e.target.value);
+    //debouncedFetchSuggestions(e.target.value);
   };
 
   const handleSuggestionClick = async (suggestion: string) => {
@@ -239,7 +289,7 @@ export default function Home() {
                 </span>
               </div>
             </div>
-            <div className="flex justify-between items-center mx-auto p-4 ml-10">
+            <div className="lg:flex md:grid md:grid-cols-2 md:gap-x-4 md:gap-y-4 justify-between items-center mx-auto p-4 ml-10">
               <button
                 className="flex items-center animate-pop-in space-x-2 mr-8 bg-gray-200 text-black p-3  rounded-lg  hover:bg-green-400 border-2 border-black hover:border-white hover-container shadow-md"
                 onClick={() => setShowModal(true)}
@@ -247,8 +297,9 @@ export default function Home() {
                 <FaPlus />
                 <span>Add Documents</span>
               </button>
-              <ConfigModal component="embedders" apiHost={apiHost}></ConfigModal>
-              <ConfigModal component="retrievers" apiHost={apiHost}></ConfigModal>
+              <ConfigModal component="embedders" apiHost={apiHost} onGeneratorSelect={generatorStreamable}></ConfigModal>
+              <ConfigModal component="retrievers" apiHost={apiHost} onGeneratorSelect={generatorStreamable}></ConfigModal>
+              <ConfigModal component="generators" apiHost={apiHost} onGeneratorSelect={generatorStreamable}></ConfigModal>
             </div>
           </div>
         </div>
@@ -308,6 +359,8 @@ export default function Home() {
             <ChatComponent
               onUserMessageSubmit={messages}
               isFetching={isFetching}
+              apiHost={getApiHostNoHttp()}
+              setHandleGenerateStreamMessageRef={setHandleGenerateStreamMessage}
             />
 
             {/* Input area */}
