@@ -244,12 +244,6 @@ def init_cache(
                         "dataType": ["text"],
                         "description": "System message",
                     },
-                    {
-                        # Skip
-                        "name": "results",
-                        "dataType": ["text"],
-                        "description": "List of results",
-                    },
                 ],
             }
         ]

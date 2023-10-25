@@ -15,7 +15,8 @@ class GPT4Generator(Generator):
         self.description = "Generator using OpenAI's GPT4 model"
         self.requires_library = ["openai"]
         self.requires_env = ["OPENAI_API_KEY"]
-        self.streamable = False
+        self.streamable = True
+        self.model_name = "gpt-4"
 
     async def generate(
         self,
@@ -38,7 +39,7 @@ class GPT4Generator(Generator):
             openai.api_key = os.getenv("OPENAI_API_KEY")
 
             completion = await asyncio.to_thread(
-                openai.ChatCompletion.create, model="gpt-4", messages=messages
+                openai.ChatCompletion.create, model=self.model_name, messages=messages
             )
             system_msg = str(completion["choices"][0]["message"]["content"])
 
@@ -48,7 +49,7 @@ class GPT4Generator(Generator):
 
         return system_msg
 
-    def generate_stream(
+    async def generate_stream(
         self,
         queries: list[str],
         context: list[str],
@@ -68,18 +69,27 @@ class GPT4Generator(Generator):
 
             openai.api_key = os.getenv("OPENAI_API_KEY")
 
-            completion = openai.ChatCompletion.create(
-                model="gpt-4", messages=messages, stream=True
+            completion = await openai.ChatCompletion.acreate(
+                model=self.model_name, messages=messages, stream=True, temperature=0.2
             )
 
-            for chunk in completion:
-                yield {
-                    "message": chunk["choices"][0]["delta"]["content"],
-                    "finish_reason": chunk["choices"][0]["finish_reason"],
-                }
+            try:
+                while True:
+                    chunk = await completion.__anext__()
+                    if "content" in chunk["choices"][0]["delta"]:
+                        yield {
+                            "message": chunk["choices"][0]["delta"]["content"],
+                            "finish_reason": chunk["choices"][0]["finish_reason"],
+                        }
+                    else:
+                        yield {
+                            "message": "",
+                            "finish_reason": chunk["choices"][0]["finish_reason"],
+                        }
+            except StopAsyncIteration:
+                pass
 
         except Exception as e:
-            print(e)
             raise e
 
     def prepare_messages(self, queries, context, conversation):

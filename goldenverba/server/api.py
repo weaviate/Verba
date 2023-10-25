@@ -11,6 +11,8 @@ from fastapi.responses import FileResponse
 from pathlib import Path
 from pydantic import BaseModel
 
+from starlette.websockets import WebSocketDisconnect
+
 from goldenverba.retrieval.advanced_engine import AdvancedVerbaQueryEngine
 from goldenverba import verba_manager
 
@@ -145,6 +147,7 @@ class QueryPayload(BaseModel):
 class ConversationItem(BaseModel):
     type: str
     content: str
+    typewriter: bool
 
 
 class GeneratePayload(BaseModel):
@@ -357,6 +360,16 @@ async def reset_verba():
     return JSONResponse(status_code=200, content={})
 
 
+# Reset Verba
+@app.get("/api/reset_cache")
+async def reset_verba():
+    msg.info("Resetting cache")
+
+    manager.reset_cache()
+
+    return JSONResponse(status_code=200, content={})
+
+
 # Receive query and return chunks and query answer
 @app.post("/api/load_data")
 async def load_data(payload: LoadPayload):
@@ -491,19 +504,31 @@ async def generate(payload: GeneratePayload):
 @app.websocket("/ws/generate_stream")
 async def websocket_generate_stream(websocket: WebSocket):
     await websocket.accept()
-    data = await websocket.receive_text()
-    try:
-        # Parse and validate the JSON string using Pydantic model
-        payload = GeneratePayload.model_validate_json(data)
-        msg.good(f"Received generate stream call for: {payload.query}")
-        for chunk in manager.generate_stream_answer(
-            [payload.query], [payload.context], payload.conversation
-        ):
-            print(chunk)
-            await websocket.send_text(chunk)
-    except Exception as e:
-        # Handle the validation error (send an error message, log it, etc.)
-        await websocket.send_text(f"Validation error: {e}")
+    while True:  # Start a loop to keep the connection alive.
+        try:
+            data = await websocket.receive_text()
+            # Parse and validate the JSON string using Pydantic model
+            payload = GeneratePayload.model_validate_json(data)
+            msg.good(f"Received generate stream call for {payload.query}")
+            full_text = ""
+            async for chunk in manager.generate_stream_answer(
+                [payload.query], [payload.context], payload.conversation
+            ):
+                full_text += chunk["message"]
+                if chunk["finish_reason"] == "stop":
+                    chunk["full_text"] = full_text
+                await websocket.send_json(chunk)
+
+        except WebSocketDisconnect:
+            msg.warn("WebSocket connection closed by client.")
+            break  # Break out of the loop when the client disconnects
+
+        except Exception as e:
+            msg.fail(f"WebSocket Error: {e}")
+            await websocket.send_json(
+                {"message": e, "finish_reason": "stop", "full_text": e}
+            )
+        msg.good(f"Succesfully streamed answer")
 
 
 # Retrieve auto complete suggestions based on user input

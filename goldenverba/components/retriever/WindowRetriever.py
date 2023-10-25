@@ -104,7 +104,7 @@ class WindowRetriever(Retriever):
 
         for doc in doc_name_map:
             chunk_map = doc_name_map[doc]
-            window = 1
+            window = 2
             added_chunks = {}
             for chunk in chunk_map:
                 chunk_id = int(chunk)

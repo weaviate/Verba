@@ -1,8 +1,11 @@
 from weaviate import Client
+import re
 
 from goldenverba.components.reader.document import Document
 from goldenverba.components.reader.interface import InputForm
 from goldenverba.components.component import VerbaComponent
+
+from weaviate.gql.get import HybridFusion
 
 from goldenverba.components.schema.schema_generation import (
     VECTORIZERS,
@@ -215,6 +218,9 @@ class Embedder(VerbaComponent):
     def get_chunk_class(self) -> str:
         return "Chunk_" + strip_non_letters(self.vectorizer)
 
+    def get_cache_class(self) -> str:
+        return "Cache_" + strip_non_letters(self.vectorizer)
+
     def search_documents(self, client: Client, query: str, doc_type: str) -> list:
         """Search for documents from Weaviate
         @parameter query_string : str - Search query
@@ -264,3 +270,91 @@ class Embedder(VerbaComponent):
         raise NotImplementedError(
             "vectorize_query method must be implemented by a subclass."
         )
+
+    def conversation_to_query(self, queries: list[str], conversation: dict) -> str:
+        query = ""
+
+        for message in conversation:
+            query += message.content + " "
+
+        for _query in queries:
+            query += _query + " "
+        return query.lower()
+
+    def retrieve_semantic_cache(
+        self, client: Client, query: str, dist: float = 0.05
+    ) -> str:
+        """Retrieve results from semantic cache based on query and distance threshold
+        @parameter query - str - User query
+        @parameter dist - float - Distance threshold
+        @returns Optional[dict] - List of results or None
+        """
+        needs_vectorization = self.get_need_vectorization()
+
+        query_results = (
+            client.query.get(
+                class_name=self.get_cache_class(),
+                properties=["query", "system"],
+            )
+            .with_additional(properties=["distance"])
+            .with_autocut(1)
+        )
+
+        if needs_vectorization:
+            vector = self.vectorize_query(query)
+            query_results = query_results.with_near_vector(
+                content={"vector": vector},
+            ).do()
+
+        else:
+            query_results = query_results.with_near_text(
+                content={"concepts": [query]},
+            ).do()
+
+        if "data" not in query_results:
+            msg.warn(query_results)
+            return None
+
+        results = query_results["data"]["Get"][self.get_cache_class()]
+
+        if not results:
+            return None
+
+        result = results[0]
+
+        if query == result["query"]:
+            msg.good(f"Direct match from cache")
+            return f"Cached results: {result['system']} "
+
+        elif float(result["_additional"]["distance"]) <= dist:
+            msg.good(f"Retrieved similar from cache")
+            return f"Cached results ({float(result['_additional']['distance'])}): {result['system']} "
+
+        else:
+            return None
+
+    def add_to_semantic_cache(self, client: Client, query: str, system: str):
+        """Add results to semantic cache
+        @parameter query : str - User query
+        @parameter results : list[dict] - Results from Weaviate
+        @parameter system : str - System message
+        @returns None
+        """
+
+        needs_vectorization = self.get_need_vectorization()
+
+        with client.batch as batch:
+            batch.batch_size = 1
+            properties = {
+                "query": str(query),
+                "system": system,
+            }
+            msg.good(f"Saved to cache")
+
+            if needs_vectorization:
+                vector = self.vectorize_query(query)
+                client.batch.add_data_object(
+                    properties, self.get_cache_class(), vector=vector
+                )
+            else:
+                client.batch.add_data_object(properties, self.get_cache_class())

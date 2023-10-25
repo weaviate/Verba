@@ -24,7 +24,7 @@ class Generator(VerbaComponent):
         """
         raise NotImplementedError("generate method must be implemented by a subclass.")
 
-    def generate_stream(
+    async def generate_stream(
         self,
         queries: list[str],
         context: list[str],

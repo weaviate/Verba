@@ -31,7 +31,9 @@ class RetrieverManager:
         @parameter: embedder : Embedder - Current selected Embedder
         @returns list[Chunk] - List of retrieved chunks
         """
-        return self.selected_retriever.retrieve(queries, client, embedder)
+        chunks, context = self.selected_retriever.retrieve(queries, client, embedder)
+        managed_context = self.selected_retriever.cutoff_text(context)
+        return chunks, managed_context
 
     def set_retriever(self, retriever: str) -> bool:
         if retriever in self.retrievers:
