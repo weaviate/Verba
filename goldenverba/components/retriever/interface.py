@@ -2,6 +2,8 @@ from goldenverba.components.chunking.chunk import Chunk
 from goldenverba.components.component import VerbaComponent
 from goldenverba.components.embedding.interface import Embedder
 
+import tiktoken
+
 from weaviate import Client
 
 
@@ -29,3 +31,17 @@ class Retriever(VerbaComponent):
 
     def sort_chunks(self, chunks: list[Chunk]) -> list[Chunk]:
         return sorted(chunks, key=lambda chunk: (chunk.doc_uuid, int(chunk.chunk_id)))
+
+    def cutoff_text(self, text: str) -> str:
+        encoding = tiktoken.encoding_for_model("gpt-3.5-turbo")
+
+        # Tokenize the input text
+        encoded_tokens = encoding.encode(text, disallowed_special=())
+
+        # Check if we need to truncate
+        if len(encoded_tokens) > 2500:
+            encoded_tokens = encoded_tokens[:2500]
+            truncated_text = encoding.decode(encoded_tokens)
+            return truncated_text
+        else:
+            return text

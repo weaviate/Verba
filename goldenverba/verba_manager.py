@@ -293,7 +293,7 @@ class VerbaManager:
         return schemas
 
     def retrieve_chunks(self, queries: list[str]) -> list[Chunk]:
-        chunks, context = self.retriever_manager.selected_retriever.retrieve(
+        chunks, context = self.retriever_manager.retrieve(
             queries, self.client, self.embedder_manager.selected_embedder
         )
         return chunks, context
@@ -356,16 +356,44 @@ class VerbaManager:
     async def generate_answer(
         self, queries: list[str], contexts: list[str], conversation: dict
     ):
-        return await self.generator_manager.selected_generator.generate(
+        semantic_query = self.embedder_manager.selected_embedder.conversation_to_query(
+            queries, conversation
+        )
+
+        full_text = await self.generator_manager.selected_generator.generate(
             queries, contexts, conversation
         )
 
-    def generate_stream_answer(
+        self.embedder_manager.selected_embedder.add_to_semantic_cache(
+            self.client, semantic_query, full_text
+        )
+        return full_text
+
+    async def generate_stream_answer(
         self, queries: list[str], contexts: list[str], conversation: dict
     ):
-        return self.generator_manager.selected_generator.generate_stream(
-            queries, contexts, conversation
+        semantic_query = self.embedder_manager.selected_embedder.conversation_to_query(
+            queries, conversation
         )
+        semantic_result = (
+            self.embedder_manager.selected_embedder.retrieve_semantic_cache(
+                self.client, semantic_query
+            )
+        )
+
+        if semantic_result != None:
+            yield {"message": str(semantic_result), "finish_reason": "stop"}
+        else:
+            full_text = ""
+            async for result in self.generator_manager.selected_generator.generate_stream(
+                queries, contexts, conversation
+            ):
+                full_text += result["message"]
+                yield result
+
+            self.embedder_manager.selected_embedder.add_to_semantic_cache(
+                self.client, semantic_query, full_text
+            )
 
     def reset(self):
         self.client.schema.delete_all()
@@ -374,6 +402,18 @@ class VerbaManager:
             schema_manager.init_schemas(self.client, vectorizer, False, True)
 
         for embedding in schema_manager.EMBEDDINGS:
+            schema_manager.init_schemas(self.client, embedding, False, True)
+
+    def reset_cache(self):
+        # Check if all schemas exist for all possible vectorizers
+        for vectorizer in schema_manager.VECTORIZERS:
+            class_name = "Cache_" + schema_manager.strip_non_letters(vectorizer)
+            self.client.schema.delete_class(class_name)
+            schema_manager.init_schemas(self.client, vectorizer, False, True)
+
+        for embedding in schema_manager.EMBEDDINGS:
+            class_name = "Cache_" + schema_manager.strip_non_letters(embedding)
+            self.client.schema.delete_class(class_name)
             schema_manager.init_schemas(self.client, embedding, False, True)
 
     def check_if_document_exits(self, document: Document) -> bool:

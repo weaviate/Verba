@@ -35,6 +35,10 @@ export default function DocumentOnly() {
     const [focusedDocument, setFocusedDocument] = useState<Document | null>(null);
     const [currentEmbedder, setCurrentEmbedder] = useState<string>("");
 
+    const generatorStreamable = (streamable: boolean) => {
+        console.log("Set Streamable")
+    }
+
     const fetchDocuments = async (query = "") => {
         try {
             const endpoint = query
@@ -165,7 +169,7 @@ export default function DocumentOnly() {
                                 <FaPlus />
                                 <span>Add Documents</span>
                             </button>
-                            <ConfigModal component="embedders" apiHost={apiHost}></ConfigModal>
+                            <ConfigModal component="embedders" apiHost={apiHost} onGeneratorSelect={generatorStreamable}></ConfigModal>
                         </div>
                     </div>
                 </div>

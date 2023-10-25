@@ -16,6 +16,7 @@ export default function StatusPage() {
     const [variables, setVariables] = useState({});
     const [schemas, setSchemas] = useState({});
     const [showModal, setShowModal] = useState(false);
+    const [showCacheModal, setCacheModal] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
     const handleReset = () => {
@@ -34,6 +35,21 @@ export default function StatusPage() {
             });
     };
 
+    const handleCacheReset = () => {
+        setIsLoading(true); // Start loading
+        fetch(apiHost + "/api/reset_cache")
+            .then(response => response.json())
+            .then(data => {
+                console.log('Reset successful:', data);
+                setShowModal(false);
+                setIsLoading(false);
+                window.location.reload();  // Refresh page
+            })
+            .catch(error => {
+                console.error('Error during reset:', error);
+                setIsLoading(false); // Stop loading if there's an error
+            });
+    };
 
     useEffect(() => {
         fetch(apiHost + "/api/get_status")
@@ -122,6 +138,9 @@ export default function StatusPage() {
                             <button onClick={() => setShowModal(true)} className="text-xs bg-gray-400 text-white hover:bg-red-400 hover-container px-3 py-2 rounded-lg">
                                 ❌ Reset Verba
                             </button>
+                            <button onClick={() => setCacheModal(true)} className="text-xs bg-gray-400 text-white hover:bg-red-400 hover-container px-3 py-2 rounded-lg">
+                                ❌ Reset Cache
+                            </button>
                         </div>
                         <p className="text-xs font-bold mb-4 text-gray-600">This view shows all schemas and their object count</p>
                         <hr />
@@ -150,6 +169,22 @@ export default function StatusPage() {
                                 No
                             </button>
                             <button onClick={handleReset} className="px-4 py-2 bg-red-500 hover:bg-red-400 text-white rounded">
+                                {isLoading ? "Resetting..." : "Yes"} {/* Show spinner if loading, otherwise show "Yes" */}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {showCacheModal && (
+                <div className="fixed inset-0 flex items-center justify-center z-50">
+                    <div className="bg-white p-6 rounded-lg shadow-lg border-2 border-black animate-pop-in">
+                        <h3 className="font-bold mb-4">⚠️ Warning</h3>
+                        <p>Are you sure? This will remove all cached data.</p>
+                        <div className="flex justify-end mt-4">
+                            <button onClick={() => setCacheModal(false)} className="mr-2 px-4 py-2 bg-gray-300 hover:bg-gray-200 rounded">
+                                No
+                            </button>
+                            <button onClick={handleCacheReset} className="px-4 py-2 bg-red-500 hover:bg-red-400 text-white rounded">
                                 {isLoading ? "Resetting..." : "Yes"} {/* Show spinner if loading, otherwise show "Yes" */}
                             </button>
                         </div>

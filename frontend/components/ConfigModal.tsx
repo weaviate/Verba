@@ -80,7 +80,7 @@ const ConfigModal: React.FC<ConfigModalProps> = ({ component = "embedders", apiH
                 <button
                     ref={mainButtonRef}
                     onClick={toggleListVisibility}
-                    className={`flex items-center space-x-2 bg-gray-200 text-black p-3 rounded-lg ${component === "embedders" ? 'hover:bg-fuchsia-300' : component === "retrievers" ? 'hover:bg-indigo-300' : component === "component" ? 'hover:bg-lime-400' : 'hover:bg-lime-400'} border-2 border-black hover:border-white hover-container shadow-md`}
+                    className={`flex items-center md:w-44 sm:w-32 space-x-2 bg-gray-200 text-black p-3 rounded-lg ${component === "embedders" ? 'hover:bg-fuchsia-300' : component === "retrievers" ? 'hover:bg-indigo-300' : component === "component" ? 'hover:bg-lime-400' : 'hover:bg-lime-400'} border-2 border-black hover:border-white hover-container shadow-md`}
                 >
                     {
                         component === "embedders" ? <TbVectorTriangle /> :

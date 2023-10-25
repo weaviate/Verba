@@ -14,6 +14,7 @@ interface ChatComponentProps {
 export interface Message {
   type: "user" | "system";
   content: string;
+  typewriter: boolean
 }
 
 export function ChatComponent({
@@ -27,6 +28,9 @@ export function ChatComponent({
   const [accumulatingMessage, setAccumulatingMessage] = useState<string>("");
   const [socket, setSocket] = useState<WebSocket | null>(null);
   const handleGenerateStreamMessageRef = useRef<Function | null>(null);
+  const [previewMessage, setPreviewMessage] = useState("");
+
+
 
   useEffect(() => {
     // Pass the ref up to the parent
@@ -41,18 +45,21 @@ export function ChatComponent({
     };
 
     localSocket.onmessage = (event) => {
-      console.log(event.data)
-      const data = event.data;
-      // Depending on the structure of your server response, 
-      // you might need to extract the message differently.
-      const newMessage = data.message;
-      console.log(accumulatingMessage)
-      setAccumulatingMessage(prev => prev + newMessage);
+      let data;
 
-      // If the message is complete, add it to messageHistory
+      try {
+        data = JSON.parse(event.data);
+      } catch (e) {
+        console.error("Received data is not valid JSON:", event.data);
+        return; // Exit early if data isn't valid JSON
+      }
+      const newMessageContent = data.message;
+      setPreviewMessage(prev => prev + newMessageContent);
+
       if (data.finish_reason === "stop") {
-        setMessageHistory(prev => [...prev, { type: "system", content: accumulatingMessage }]);
-        setAccumulatingMessage(""); // Reset accumulating message
+        const full_text = data.full_text
+        setMessageHistory(prev => [...prev, { type: "system", content: full_text, typewriter: false }]);
+        setPreviewMessage("");  // Reset for the next message
       }
     };
 
@@ -164,7 +171,7 @@ export function ChatComponent({
           >
             {message.type === "system"
               ? parseMessage(message.content).map((segment, segIndex) => {
-                if (segment.type === "text") {
+                if (segment.type === "text" && message.typewriter) {
                   return (
                     <Typewriter
                       key={segIndex}
@@ -175,6 +182,10 @@ export function ChatComponent({
                       }}
                       options={{ delay: 15 }}
                     />
+                  );
+                } else if (segment.type === "text" && !message.typewriter) {
+                  return (
+                    <p key={segIndex}>{segment.content}</p>
                   );
                 } else if (segment.type === "code") {
                   return (
@@ -194,6 +205,29 @@ export function ChatComponent({
           </span>
         </div>
       ))}
+
+      {/* Render the preview message if available */}
+      {previewMessage && (
+        <div className="mb-4">
+          <span className="inline-block p-3 rounded-xl animate-press-in shadow-md font-mono text-sm bg-white">
+            {parseMessage(previewMessage).map((segment, segIndex) => {
+              if (segment.type === "text") {
+                return (
+                  <p key={segIndex}>{segment.content}</p>
+                );
+              } else if (segment.type === "code") {
+                return (
+                  <SyntaxHighlighter key={segIndex} language={segment.language} style={oneLight} className="rounded p-2">
+                    {segment.content}
+                  </SyntaxHighlighter>
+                );
+              }
+              return null;
+            })}
+          </span>
+        </div>
+      )}
+
       {isFetching && (
         <div className="flex items-center pl-4 mb-4">
           <PulseLoader color={"#292929"} loading={true} size={10} speedMultiplier={0.75} />
