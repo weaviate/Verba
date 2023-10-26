@@ -359,15 +359,28 @@ class VerbaManager:
         semantic_query = self.embedder_manager.selected_embedder.conversation_to_query(
             queries, conversation
         )
-
-        full_text = await self.generator_manager.selected_generator.generate(
-            queries, contexts, conversation
+        (
+            semantic_result,
+            distance,
+        ) = self.embedder_manager.selected_embedder.retrieve_semantic_cache(
+            self.client, semantic_query
         )
+        if semantic_result != None:
+            return {
+                "message": str(semantic_result),
+                "finish_reason": "stop",
+                "cached": True,
+                "distance": distance,
+            }
 
-        self.embedder_manager.selected_embedder.add_to_semantic_cache(
-            self.client, semantic_query, full_text
-        )
-        return full_text
+        else:
+            full_text = await self.generator_manager.selected_generator.generate(
+                queries, contexts, conversation
+            )
+            self.embedder_manager.selected_embedder.add_to_semantic_cache(
+                self.client, semantic_query, full_text
+            )
+            return full_text
 
     async def generate_stream_answer(
         self, queries: list[str], contexts: list[str], conversation: dict
@@ -375,14 +388,20 @@ class VerbaManager:
         semantic_query = self.embedder_manager.selected_embedder.conversation_to_query(
             queries, conversation
         )
-        semantic_result = (
-            self.embedder_manager.selected_embedder.retrieve_semantic_cache(
-                self.client, semantic_query
-            )
+        (
+            semantic_result,
+            distance,
+        ) = self.embedder_manager.selected_embedder.retrieve_semantic_cache(
+            self.client, semantic_query
         )
 
         if semantic_result != None:
-            yield {"message": str(semantic_result), "finish_reason": "stop"}
+            yield {
+                "message": str(semantic_result),
+                "finish_reason": "stop",
+                "cached": True,
+                "distance": distance,
+            }
         else:
             full_text = ""
             async for result in self.generator_manager.selected_generator.generate_stream(
