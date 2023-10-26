@@ -10,8 +10,13 @@ All notable changes to this project will be documented in this file.
 - Add Readers (SimpleReader, PathReader)
 - Add Chunkers (WordChunker, SentenceChunker)
 - Add Embedders (ADAEmbedder,SentenceTransformer)
+- Add Generators (GPT3, GPT4, LLama)
 - Status Page
 - Reset functionality
+- Streaming Generation
+- Lazy Document Loading
+- Add Copy and Cached Tag
+- Improved Semantic Cache
 
 ### Fixed
 - Error handling for data ingestion (handling chunk size)
