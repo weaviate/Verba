@@ -62,8 +62,8 @@ class Embedder(VerbaComponent):
                         temp_batch.append(chunk)
                     else:
                         batches.append(temp_batch.copy())
-                        token_counter = 0
-                        temp_batch = []
+                        token_counter = len(chunk.tokens)
+                        temp_batch = [chunk]
                 if len(temp_batch) > 0:
                     batches.append(temp_batch.copy())
                     token_counter = 0
@@ -90,13 +90,15 @@ class Embedder(VerbaComponent):
                     for chunk in document.chunks:
                         chunk.set_uuid(uuid)
 
+                chunk_count = 0
                 for batch_id, chunk_batch in enumerate(batches):
                     with client.batch as batch:
                         batch.batch_size = len(chunk_batch)
                         for i, chunk in enumerate(chunk_batch):
                             msg.info(
-                                f"({i+1}/{len(document.chunks)} of batch ({batch_id+1})) Importing chunk of {document.name} ({self.vectorizer})"
+                                f"({i+1}/{len(chunk_batch)} of batch ({batch_id+1})) Importing chunk of {document.name} ({self.vectorizer})"
                             )
+                            chunk_count += 1
 
                             properties = {
                                 "text": chunk.text,
@@ -173,7 +175,7 @@ class Embedder(VerbaComponent):
                 # Rollback if fails
                 self.remove_document(client, doc_name, doc_class_name, chunk_class_name)
                 raise Exception(
-                    f"Chunk mismatch for {doc_uuid} {len(results['data']['Get'])} != {chunk_count}"
+                    f"Chunk mismatch for {doc_uuid} {len(results['data']['Get'][chunk_class_name])} != {chunk_count}"
                 )
         else:
             raise Exception(f"Document {doc_uuid} not found {document}")
