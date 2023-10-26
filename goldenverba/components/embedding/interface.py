@@ -313,25 +313,25 @@ class Embedder(VerbaComponent):
 
         if "data" not in query_results:
             msg.warn(query_results)
-            return None
+            return None, None
 
         results = query_results["data"]["Get"][self.get_cache_class()]
 
         if not results:
-            return None
+            return None, None
 
         result = results[0]
 
         if query == result["query"]:
             msg.good(f"Direct match from cache")
-            return f"Cached results: {result['system']} "
+            return result["system"], float(result["_additional"]["distance"])
 
         elif float(result["_additional"]["distance"]) <= dist:
             msg.good(f"Retrieved similar from cache")
-            return f"Cached results ({float(result['_additional']['distance'])}): {result['system']} "
+            return result["system"], float(result["_additional"]["distance"])
 
         else:
-            return None
+            return None, None
 
     def add_to_semantic_cache(self, client: Client, query: str, system: str):
         """Add results to semantic cache

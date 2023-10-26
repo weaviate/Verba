@@ -3,6 +3,8 @@ import Typewriter from "typewriter-effect";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneLight } from "react-syntax-highlighter/dist/cjs/styles/prism";
 import PulseLoader from "react-spinners/PulseLoader";
+import { FaCopy } from 'react-icons/fa';
+import { BsDatabaseFillCheck } from 'react-icons/bs';
 
 interface ChatComponentProps {
   onUserMessageSubmit: Message[];
@@ -14,7 +16,9 @@ interface ChatComponentProps {
 export interface Message {
   type: "user" | "system";
   content: string;
-  typewriter: boolean
+  typewriter: boolean;
+  cached?: boolean;
+  distance?: string;
 }
 
 export function ChatComponent({
@@ -25,11 +29,40 @@ export function ChatComponent({
 }: ChatComponentProps) {
   const [messageHistory, setMessageHistory] = useState<Message[]>([]);
   const lastMessageRef = useRef<null | HTMLDivElement>(null);
-  const [accumulatingMessage, setAccumulatingMessage] = useState<string>("");
   const [socket, setSocket] = useState<WebSocket | null>(null);
   const handleGenerateStreamMessageRef = useRef<Function | null>(null);
   const [previewMessage, setPreviewMessage] = useState("");
+  const [showNotification, setShowNotification] = useState(false);
 
+  const getWebSocketApiHost = () => {
+    if (process.env.NODE_ENV === 'development') {
+      return 'ws://localhost:8000/ws/generate_stream';
+    }
+
+    // If you're serving the app directly through FastAPI, generate the WebSocket URL based on the current location.
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const host = window.location.host;
+    return `${protocol}//${host}/ws/generate_stream`;
+  };
+
+  const handleCopyToBillboard = (text: string) => {
+    navigator.clipboard.writeText(text).then(
+      function () {
+        console.log('Text successfully copied to clipboard!');
+
+        // Show the notification
+        setShowNotification(true);
+
+        // Hide the notification after 3 seconds
+        setTimeout(() => {
+          setShowNotification(false);
+        }, 3000);
+      },
+      function (err) {
+        console.error('Unable to copy text: ', err);
+      }
+    );
+  };
 
 
   useEffect(() => {
@@ -38,7 +71,7 @@ export function ChatComponent({
   }, [setHandleGenerateStreamMessageRef]);
 
   useEffect(() => {
-    const localSocket = new WebSocket("ws://" + apiHost + '/ws/generate_stream');
+    const localSocket = new WebSocket(getWebSocketApiHost());
 
     localSocket.onopen = () => {
       console.log("WebSocket connection opened.");
@@ -58,7 +91,12 @@ export function ChatComponent({
 
       if (data.finish_reason === "stop") {
         const full_text = data.full_text
-        setMessageHistory(prev => [...prev, { type: "system", content: full_text, typewriter: false }]);
+        if (data.cached && data.distance) {
+          const distance = data.distance
+          setMessageHistory(prev => [...prev, { type: "system", content: full_text, typewriter: false, cached: true, distance: distance }]);
+        } else {
+          setMessageHistory(prev => [...prev, { type: "system", content: full_text, typewriter: false }]);
+        }
         setPreviewMessage("");  // Reset for the next message
       }
     };
@@ -165,6 +203,25 @@ export function ChatComponent({
           key={index}
           className={`mb-4 ${message.type === "user" ? "text-right" : ""}`}
         >
+          <div className="flex">
+            {message.type === "system" && (<button
+              onClick={() => handleCopyToBillboard(message.content)}
+              className={`rounded-md flex py-2 px-3 bg-gray-200 text-black hover-container mb-1 hover:bg-green-300`}
+            >
+              <FaCopy size={15} />
+              <span className="text-xs ml-2">
+                Copy
+              </span>
+            </button>)}
+            {message.type === "system" && message.cached && (<button
+              className={`rounded-md flex ml-2 py-2 px-3 bg-gray-200 text-black hover-container mb-1 hover:bg-green-300`}
+            >
+              <BsDatabaseFillCheck size={15} />
+              <span className="text-xs ml-2">
+                Cached ({message.distance})
+              </span>
+            </button>)}
+          </div>
           <span
             className={`inline-block p-3 rounded-xl animate-press-in shadow-md font-mono text-sm ${message.type === "user" ? "bg-yellow-200" : "bg-white"
               }`}
@@ -231,6 +288,11 @@ export function ChatComponent({
       {isFetching && (
         <div className="flex items-center pl-4 mb-4">
           <PulseLoader color={"#292929"} loading={true} size={10} speedMultiplier={0.75} />
+        </div>
+      )}
+      {showNotification && (
+        <div className="fixed bottom-5 left-5 animate-pop-in bg-green-500 text-white px-4 py-2 rounded text-sm shadow-md mt-4 mr-4 transition-opacity opacity-100">
+          Text copied!
         </div>
       )}
     </div>
