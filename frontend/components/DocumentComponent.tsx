@@ -1,8 +1,9 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import React from 'react';
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneLight } from "react-syntax-highlighter/dist/cjs/styles/prism";
+import { GrDocumentDownload } from 'react-icons/gr';
 
 interface DocumentComponentProps {
     title: string;
@@ -22,16 +23,39 @@ export function DocumentComponent({
     docLink,
 }: DocumentComponentProps) {
     const extractRef = useRef(null);
+    const containerRef = useRef<HTMLDivElement | null>(null)  // Add a ref for the container
+    const [displayedChunks, setDisplayedChunks] = useState(1);
+    const [hasScrolledToExtract, setHasScrolledToExtract] = useState(false);
+    const CHUNK_SIZE = 1500; // Number of characters per chunk. Adjust as needed.
+
 
     useEffect(() => {
-        if (extractRef.current) {
+        setDisplayedChunks(1);
+    }, [text]);
+
+    const start = extract ? text.indexOf(extract) : -1;
+    const extractChunk = start !== -1 ? Math.ceil(start / CHUNK_SIZE) : 0;
+
+    useEffect(() => {
+        if (extract && extractChunk > displayedChunks) {
+            setDisplayedChunks(extractChunk + 1); // Load up to the chunk containing the extract
+        }
+    }, [extract, extractChunk]);
+
+    useEffect(() => {
+        if (extractRef.current && !hasScrolledToExtract) {
             const element = extractRef.current as HTMLElement;
             element.scrollIntoView({
                 behavior: "smooth",
                 block: "center",
             });
+            setHasScrolledToExtract(true); // Set to true after scrolling
         }
     }, [text, extract]);
+
+    useEffect(() => {
+        setHasScrolledToExtract(false); // Reset the flag when text or extract changes
+    }, [text, extract])
 
     const RenderMarkdown = React.memo(function RenderMarkdown({ text }: { text: string; }) {
         return (
@@ -61,25 +85,25 @@ export function DocumentComponent({
         );
     });
 
+    const handleLoadMore = () => {
+        setDisplayedChunks(prev => prev + 1);
+    }
+
     if (!title) return <div className=""></div>;
 
-    const start = extract ? text.indexOf(extract) : -1;
     const end = extract ? start + extract.length : -1;
 
     return (
-        <div className="border-2 border-gray-900 shadow-lg rounded-xl bg-gray-100 p-2 animate-pop-in overflow-y-auto max-h-[50vh] document-container">
-            <div
-                className={`bg-gray-300 text-black p-4 rounded-t-xl w-full sticky top-0 z-10 shadow-md`}
-            >
+        <div ref={containerRef} className="border-2 border-gray-900 shadow-lg rounded-xl bg-gray-100 p-2 animate-pop-in overflow-y-auto max-h-[50vh]">
+            <div className={`bg-gray-300 text-black p-4 rounded-t-xl w-full sticky top-0 z-10 shadow-md`}>
                 <span className="mr-4 bg-yellow-300 p-2 rounded-lg shadow-md ">{type}</span>
                 <a href={docLink || "#"} target="_blank" rel="noopener noreferrer">
                     {title || "Placeholder Title"}
                 </a>
             </div>
             <div className="p-4 my-markdown-styles text-sm font-mono">
-                {start !== -1 && (
-                    <RenderMarkdown text={text.slice(0, start)} />
-                )}
+                <RenderMarkdown text={extract ? text.slice(0, start) : text.slice(0, displayedChunks * CHUNK_SIZE)} />
+
                 {extract && (
                     <div
                         ref={extractRef}
@@ -88,12 +112,16 @@ export function DocumentComponent({
                         <RenderMarkdown text={text.slice(start, end)} />
                     </div>
                 )}
-                {start !== -1 ? (
-                    <div className="pt-3">
-                        <RenderMarkdown text={text.slice(end)} />
+                <RenderMarkdown text={text.slice(end, displayedChunks * CHUNK_SIZE)} />
+
+                {/* Load More Button */}
+                {displayedChunks * CHUNK_SIZE < text.length && (
+                    <div className="flex items-center justify-center">
+                        <button className="flex mt-4 bg-yellow-400 hover:bg-yellow-300 text-xs text-black p-3 rounded-lg shadow-md" onClick={handleLoadMore}>
+                            <GrDocumentDownload size={15} />
+                            <span className="ml-2">Load More</span>
+                        </button>
                     </div>
-                ) : (
-                    <RenderMarkdown text={text} />
                 )}
             </div>
         </div>
