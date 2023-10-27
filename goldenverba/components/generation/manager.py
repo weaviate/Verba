@@ -1,6 +1,7 @@
 from goldenverba.components.generation.interface import Generator
 from goldenverba.components.generation.GPT4Generator import GPT4Generator
 from goldenverba.components.generation.GPT3Generator import GPT3Generator
+from goldenverba.components.generation.Llama2Generator import Llama2Generator
 
 import tiktoken
 
@@ -13,8 +14,9 @@ class GeneratorManager:
         self.generators: dict[str, Generator] = {
             "GPT4Generator": GPT4Generator(),
             "GPT3Generator": GPT3Generator(),
+            "Llama2Generator": Llama2Generator(),
         }
-        self.selected_generator: Generator = self.generators["GPT4Generator"]
+        self.selected_generator: Generator = self.generators["GPT3Generator"]
 
     async def generate(
         self,

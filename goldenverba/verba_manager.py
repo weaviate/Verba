@@ -25,6 +25,10 @@ from goldenverba.components.component import VerbaComponent
 
 import goldenverba.components.schema.schema_generation as schema_manager
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 
 class VerbaManager:
     """Manages all Verba Components"""
@@ -248,6 +252,13 @@ class VerbaManager:
             self.installed_libraries["openai"] = False
 
         try:
+            import huggingface_hub
+
+            self.installed_libraries["huggingface_hub"] = True
+        except Exception as e:
+            self.installed_libraries["huggingface_hub"] = False
+
+        try:
             import transformers
 
             self.installed_libraries["transformers"] = True
@@ -271,6 +282,12 @@ class VerbaManager:
             self.environment_variables["OPENAI_API_KEY"] = True
         else:
             self.environment_variables["OPENAI_API_KEY"] = False
+
+        # OpenAI API Key
+        if os.environ.get("HUGGINGFACE_TOKEN", "") != "":
+            self.environment_variables["HUGGINGFACE_TOKEN"] = True
+        else:
+            self.environment_variables["HUGGINGFACE_TOKEN"] = False
 
     def get_schemas(self) -> dict:
         """
@@ -365,6 +382,7 @@ class VerbaManager:
         ) = self.embedder_manager.selected_embedder.retrieve_semantic_cache(
             self.client, semantic_query
         )
+
         if semantic_result != None:
             return {
                 "message": str(semantic_result),
@@ -402,6 +420,7 @@ class VerbaManager:
                 "cached": True,
                 "distance": distance,
             }
+
         else:
             full_text = ""
             async for result in self.generator_manager.selected_generator.generate_stream(

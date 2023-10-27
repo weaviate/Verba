@@ -15,4 +15,6 @@ tiktoken
 sentence-transformer
 transformers
 torch
+huggingface_hub
 asyncio
+accelerate
