@@ -70,7 +70,7 @@ class GPT4Generator(Generator):
             openai.api_key = os.getenv("OPENAI_API_KEY")
 
             completion = await openai.ChatCompletion.acreate(
-                model=self.model_name, messages=messages, stream=True, temperature=0.2
+                model=self.model_name, messages=messages, stream=True, temperature=0.0
             )
 
             try:
