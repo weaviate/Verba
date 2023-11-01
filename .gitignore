@@ -12,3 +12,4 @@ build
 .verba
 .vscode
 verba_config.json
+text-generation-inference

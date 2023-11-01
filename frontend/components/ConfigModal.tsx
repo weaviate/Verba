@@ -112,7 +112,7 @@ const ConfigModal: React.FC<ConfigModalProps> = ({ component = "embedders", apiH
                                     key={_component.name}
                                     style={{ width: mainButtonRef.current ? `${mainButtonRef.current.offsetWidth}px` : 'auto' }}
                                     onClick={() => handleComponentSelection(_component)}
-                                    className='bg-gray-300 rounded-lg p-2 shadow-md animate-pop-in-late hover-container hover:bg-gray-200 truncate'
+                                    className={`bg-gray-300 rounded-lg p-2 shadow-md animate-pop-in-late hover-container ${_component.available ? 'bg-gray-300 hover:bg-green-200' : 'bg-red-300 hover:bg-red-200'} truncate`}
                                     disabled={!_component.available}
                                 >
                                     <span>{_component.name}</span>

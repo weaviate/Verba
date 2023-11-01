@@ -1,7 +1,7 @@
-import os
 from goldenverba.components.generation.interface import Generator
 from wasabi import msg
 import asyncio
+import os
 
 
 class Llama2Generator(Generator):
@@ -14,42 +14,43 @@ class Llama2Generator(Generator):
         self.name = "Llama2Generator"
         self.description = "Generator using Meta's Llama-2-7b-chat-hf model"
         self.requires_library = ["huggingface_hub", "transformers"]
-        self.requires_env = ["HUGGINGFACE_TOKEN"]
+        self.requires_env = ["HF_TOKEN", "LLAMA2-7B-CHAT-HF"]
         self.streamable = True
-        try:
-            from huggingface_hub import login
-            from transformers import AutoTokenizer, AutoModelForCausalLM
-            import torch
+        self.model = None
+        self.tokenizer = None
+        self.device = None
+        if os.environ.get("LLAMA2-7B-CHAT-HF", False):
+            try:
+                from transformers import AutoTokenizer, AutoModelForCausalLM
+                import torch
 
-            def get_device():
-                if torch.cuda.is_available():
-                    msg.info("CUDA is available. Using CUDA...")
-                    return torch.device("cuda")
-                elif (
-                    torch.backends.mps.is_available()
-                ):  # Assuming torch.has_mps is a function to check for MPS availability
-                    msg.info("MPS is available. Using MPS...")
-                    return torch.device("mps")
-                else:
-                    msg.info("Neither CUDA nor MPS is available. Using CPU...")
-                    return torch.device("cpu")
+                def get_device():
+                    if torch.cuda.is_available():
+                        msg.info("CUDA is available. Using CUDA...")
+                        return torch.device("cuda")
+                    elif (
+                        torch.backends.mps.is_available()
+                    ):  # Assuming torch.has_mps is a function to check for MPS availability
+                        msg.info("MPS is available. Using MPS...")
+                        return torch.device("mps")
+                    else:
+                        msg.info("Neither CUDA nor MPS is available. Using CPU...")
+                        return torch.device("cpu")
 
-            self.device = get_device()
+                self.device = get_device()
 
-            login(token=os.environ.get("HUGGINGFACE_TOKEN", ""))
-
-            self.model = AutoModelForCausalLM.from_pretrained(
-                "meta-llama/Llama-2-7b-chat-hf",
-                device_map=self.device,
-            )
-            self.tokenizer = AutoTokenizer.from_pretrained(
-                "meta-llama/Llama-2-7b-chat-hf",
-                device_map=self.device,
-            )
-            self.model = self.model.to(self.device)
-            msg.info("Loading Llama Model")
-        except Exception as e:
-            msg.warn(str(e))
+                self.model = AutoModelForCausalLM.from_pretrained(
+                    "meta-llama/Llama-2-7b-chat-hf",
+                    device_map=self.device,
+                )
+                self.tokenizer = AutoTokenizer.from_pretrained(
+                    "meta-llama/Llama-2-7b-chat-hf",
+                    device_map=self.device,
+                )
+                self.model = self.model.to(self.device)
+                msg.info("Loading Llama Model")
+            except Exception as e:
+                msg.warn(str(e))
 
     async def generate_stream(
         self,
@@ -153,18 +154,14 @@ class Llama2Generator(Generator):
     def prepare_messages(self, queries, context, conversation):
         llama_prompt = f"""
         <s>[INST] <<SYS>>
-        You are a Retrieval Augmented Generation chatbot. Please answer user queries only their provided context. If the provided documentation does not provide enough information, say so. If the answer requires code examples encapsulate them with ```programming-language-name ```. Don't do pseudo-code. \n<</SYS>>\n\n
+        You are a Retrieval Augmented Generation chatbot. Answer user queries using only the provided context. If the context does not provide enough information, say so. If the answer requires code examples encapsulate them with ```programming-language-name ```. Don't do pseudo-code. \n<</SYS>>\n\n
         """
-
-        for message in conversation:
-            if message.type == "user":
-                llama_prompt += message.content + " [/INST] "
-            else:
-                llama_prompt += message.content + " </s> <s> [INST] "
 
         query = " ".join(queries)
         user_context = " ".join(context)
 
-        llama_prompt += f"Please answer this query: '{query}' with this provided context: {user_context} [/INST] "
+        llama_prompt += (
+            f"Answer this query: '{query}' with this context: {user_context} [/INST] "
+        )
 
         return llama_prompt
