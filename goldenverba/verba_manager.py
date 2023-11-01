@@ -253,6 +253,9 @@ class VerbaManager:
 
         try:
             import huggingface_hub
+            from huggingface_hub import login
+
+            login(token=os.environ.get("HF_TOKEN", ""), add_to_git_credential=True)
 
             self.installed_libraries["huggingface_hub"] = True
         except Exception as e:
@@ -283,11 +286,17 @@ class VerbaManager:
         else:
             self.environment_variables["OPENAI_API_KEY"] = False
 
-        # OpenAI API Key
-        if os.environ.get("HUGGINGFACE_TOKEN", "") != "":
-            self.environment_variables["HUGGINGFACE_TOKEN"] = True
+        # HuggingFace Key
+        if os.environ.get("HF_TOKEN", "") != "":
+            self.environment_variables["HF_TOKEN"] = True
         else:
-            self.environment_variables["HUGGINGFACE_TOKEN"] = False
+            self.environment_variables["HF_TOKEN"] = False
+
+        # LLAMA2-7B-CHAT-HF
+        if os.environ.get("LLAMA2-7B-CHAT-HF", "") != "":
+            self.environment_variables["LLAMA2-7B-CHAT-HF"] = True
+        else:
+            self.environment_variables["LLAMA2-7B-CHAT-HF"] = False
 
     def get_schemas(self) -> dict:
         """
