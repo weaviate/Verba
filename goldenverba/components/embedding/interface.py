@@ -167,7 +167,7 @@ class Embedder(VerbaComponent):
                         "valueText": doc_uuid,
                     }
                 )
-                .with_limit(chunk_count)
+                .with_limit(chunk_count + 1)
                 .do()
             )
 

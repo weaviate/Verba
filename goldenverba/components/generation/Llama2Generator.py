@@ -71,7 +71,7 @@ class Llama2Generator(Generator):
             import torch
 
             prompt = messages
-            output_length = 200
+            output_length = 500
 
             # Ensure the tokenizer has a padding token defined
             if self.tokenizer.pad_token is None:

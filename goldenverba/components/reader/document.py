@@ -1,4 +1,4 @@
-import pickle
+import json
 from goldenverba.components.chunking.chunk import Chunk
 
 
@@ -56,19 +56,37 @@ class Document:
     def meta(self):
         return self._meta
 
-    @classmethod
-    def serialize_to_verba(cls, document, file_path: str) -> None:
-        """Serialize the document to a binary .verba file"""
-        if not file_path.endswith(".verba"):
-            raise ValueError("The file extension must be .verba")
-        with open(file_path, "wb") as f:
-            pickle.dump(document, f)
+    @staticmethod
+    def to_json(document) -> dict:
+        """Convert the Document object to a JSON dict."""
+        doc_dict = {
+            "text": document.text,
+            "type": document.type,
+            "name": document.name,
+            "path": document.path,
+            "link": document.link,
+            "timestamp": document.timestamp,
+            "reader": document.reader,
+            "meta": document.meta,
+            "chunks": [chunk.to_dict() for chunk in document.chunks],
+        }
+        return doc_dict
 
-    @classmethod
-    def deserialize_verba(cls, file_path: str):
-        """Deserialize a .verba file to a Document object"""
-        if not file_path.endswith(".verba"):
-            raise ValueError("The file extension must be .verba")
-        with open(file_path, "rb") as f:
-            document = pickle.load(f)
+    @staticmethod
+    def from_json(doc_dict: dict):
+        """Convert a JSON string to a Document object."""
+        document = Document(
+            text=doc_dict.get("text", ""),
+            type=doc_dict.get("type", ""),
+            name=doc_dict.get("name", ""),
+            path=doc_dict.get("path", ""),
+            link=doc_dict.get("link", ""),
+            timestamp=doc_dict.get("timestamp", ""),
+            reader=doc_dict.get("reader", ""),
+            meta=doc_dict.get("meta", {}),
+        )
+        # Assuming Chunk has a from_dict method
+        document.chunks = [
+            Chunk.from_dict(chunk_data) for chunk_data in doc_dict.get("chunks", [])
+        ]
         return document

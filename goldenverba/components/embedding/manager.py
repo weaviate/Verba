@@ -4,6 +4,7 @@ from goldenverba.components.reader.document import Document
 from goldenverba.components.embedding.interface import Embedder
 from goldenverba.components.embedding.ADAEmbedder import ADAEmbedder
 from goldenverba.components.embedding.MiniLMEmbedder import MiniLMEmbedder
+from goldenverba.components.embedding.CohereEmbedder import CohereEmbedder
 
 from wasabi import msg
 
@@ -13,6 +14,7 @@ class EmbeddingManager:
         self.embedders: dict[str, Embedder] = {
             "MiniLMEmbedder": MiniLMEmbedder(),
             "ADAEmbedder": ADAEmbedder(),
+            "CohereEmbedder": CohereEmbedder(),
         }
         self.selected_embedder: Embedder = self.embedders["ADAEmbedder"]
 

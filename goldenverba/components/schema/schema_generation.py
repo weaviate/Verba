@@ -3,9 +3,10 @@ import re
 from wasabi import msg  # type: ignore[import]
 from weaviate import Client
 
-from goldenverba.components.util import setup_client
 
-VECTORIZERS = set(["text2vec-openai"])  # Needs to match with Weaviate modules
+VECTORIZERS = set(
+    ["text2vec-openai", "text2vec-cohere"]
+)  # Needs to match with Weaviate modules
 EMBEDDINGS = set(["MiniLM"])  # Custom Vectors
 
 

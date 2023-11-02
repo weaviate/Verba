@@ -179,8 +179,13 @@ class VerbaManager:
                 msg.info("OpenAI API key detected")
             else:
                 self.environment_variables["OPENAI_API_KEY"] = False
+
         except Exception as e:
             self.environment_variables["OPENAI_API_KEY"] = False
+
+        cohere_key = os.environ.get("COHERE_API_KEY", "")
+        if cohere_key != "":
+            additional_header["X-Cohere-Api-Key"] = cohere_key
 
         # Check Verba URL ENV
         weaviate_url = os.environ.get("VERBA_URL", "")
@@ -286,6 +291,12 @@ class VerbaManager:
         else:
             self.environment_variables["OPENAI_API_KEY"] = False
 
+        # Cohere API Key
+        if os.environ.get("COHERE_API_KEY", "") != "":
+            self.environment_variables["COHERE_API_KEY"] = True
+        else:
+            self.environment_variables["COHERE_API_KEY"] = False
+
         # HuggingFace Key
         if os.environ.get("HF_TOKEN", "") != "":
             self.environment_variables["HF_TOKEN"] = True
@@ -293,7 +304,7 @@ class VerbaManager:
             self.environment_variables["HF_TOKEN"] = False
 
         # LLAMA2-7B-CHAT-HF
-        if os.environ.get("LLAMA2-7B-CHAT-HF", "") != "":
+        if os.environ.get("LLAMA2-7B-CHAT-HF", "") == "True":
             self.environment_variables["LLAMA2-7B-CHAT-HF"] = True
         else:
             self.environment_variables["LLAMA2-7B-CHAT-HF"] = False
