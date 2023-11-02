@@ -7,13 +7,13 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Refactor modular architecture
 - Add ability to import data through the frontend, CLI, and script
-- Add Readers (SimpleReader, PathReader)
+- Add Readers (SimpleReader, PathReader, GithubReader, PDFReader)
 - Add Chunkers (WordChunker, SentenceChunker)
-- Add Embedders (ADAEmbedder,SentenceTransformer)
-- Add Generators (GPT3, GPT4, LLama)
+- Add Embedders (ADAEmbedder,SentenceTransformer, Cohere)
+- Add Generators (GPT3, GPT4, LLama, Cohere)
 - Status Page
 - Reset functionality
-- Streaming Generation
+- Streaming Token Generation
 - Lazy Document Loading
 - Add Copy and Cached Tag
 - Improved Semantic Cache

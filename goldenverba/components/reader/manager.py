@@ -1,5 +1,6 @@
 from goldenverba.components.reader.simplereader import SimpleReader
-from goldenverba.components.reader.pathreader import PathReader
+from goldenverba.components.reader.githubreader import GithubReader
+from goldenverba.components.reader.pdfreader import PDFReader
 from goldenverba.components.reader.interface import Reader
 from goldenverba.components.reader.document import Document
 
@@ -10,7 +11,8 @@ class ReaderManager:
     def __init__(self):
         self.readers: dict[str, Reader] = {
             "SimpleReader": SimpleReader(),
-            "PDFReader": PathReader(),
+            "GithubReader": GithubReader(),
+            "PDFReader": PDFReader(),
         }
         self.selected_reader: Reader = self.readers["SimpleReader"]
 

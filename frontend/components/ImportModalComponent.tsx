@@ -125,7 +125,6 @@ const ImportModal: React.FC<ImportModalProps> = ({ onClose, apiHost }) => {
             if (response.ok) {
                 // Clear files and path after successful import
                 setDroppedFiles([]);
-                setFilePath("");
 
                 // Reset the input file by changing its key
                 setInputFileKey(Date.now());
@@ -149,7 +148,7 @@ const ImportModal: React.FC<ImportModalProps> = ({ onClose, apiHost }) => {
     const { getRootProps, getInputProps } = useDropzone({
         onDrop,
         accept: {
-            'text/txt': ['.txt', '.md', '.mdx'],
+            'text/txt': ['.txt', '.md', '.mdx', '.pdf'],
             'text/json': ['.json']
         }
     });
@@ -285,14 +284,27 @@ const ImportModal: React.FC<ImportModalProps> = ({ onClose, apiHost }) => {
                                 </div>
                             ) : selectedOption === "Reader" && selectedReader && selectedReader.input_form === 'INPUT' ? (
                                 <div className=''>
-                                    <h3 className='mb-2'>Provide File Path</h3>
+                                    <h3 className='mb-2'>Provide Path</h3>
                                     <input
                                         type="text"
                                         value={filePath}
-                                        placeholder="Enter absolute path"
+                                        placeholder="Enter path"
                                         onChange={handleFilePathInput}
                                         className='p-2 rounded-lg w-full'
                                     />
+                                    <div className="mb-2 mt-4">
+                                        <label htmlFor="docType" className="block text-sm font-medium text-gray-700">Document Type</label>
+                                        <input
+                                            type="text"
+                                            id="docType"
+                                            name="docType"
+                                            value={docType}
+                                            onChange={(e) => setDocType(e.target.value)}
+                                            className="mt-1 focus:ring-yellow p-3
+                                            -500 focus:border-yellow-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                                            placeholder="Documentation"
+                                        />
+                                    </div>
                                 </div>
                             ) : selectedOption === "Chunking" && selectedChunker?.input_form === 'CHUNKER' ? (
                                 <div className='flex space-x-2'>

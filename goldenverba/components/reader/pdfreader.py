@@ -2,6 +2,8 @@ from datetime import datetime
 import glob
 import base64
 import json
+import os
+import requests
 
 from wasabi import msg
 from pathlib import Path
@@ -10,16 +12,17 @@ from goldenverba.components.reader.interface import Reader, InputForm
 from goldenverba.components.reader.document import Document
 
 
-class SimpleReader(Reader):
+class PDFReader(Reader):
     """
-    SimpleReader that receives a list of strings, it's used to receive loaded documents directly from the frontend
+    PDFReader for verba
     """
 
     def __init__(self):
         super().__init__()
-        self.file_types = [".txt", ".md", ".mdx", ".json"]
-        self.name = "SimpleReader"
-        self.description = "Reads text, markdown, and json files"
+        self.file_types = [".pdf"]
+        self.requires_env = ["UNSTRUCTURED_API_KEY"]
+        self.name = "PDFReader"
+        self.description = "Reads PDF files"
         self.input_form = InputForm.UPLOAD.value
 
     def load(
@@ -58,31 +61,7 @@ class SimpleReader(Reader):
         if len(bytes) > 0:
             if len(bytes) == len(fileNames):
                 for byte, fileName in zip(bytes, fileNames):
-                    decoded_bytes = base64.b64decode(byte)
-                    try:
-                        original_text = decoded_bytes.decode("utf-8")
-                    except UnicodeDecodeError:
-                        msg.fail(
-                            f"Error decoding text for file {fileName}. The file might not be a text file."
-                        )
-                        continue
-
-                    if ".json" in fileName:
-                        json_obj = json.loads(original_text)
-                        try:
-                            document = Document.from_json(json_obj)
-                        except Exception as e:
-                            raise Exception(f"Loading JSON failed {e}")
-
-                    else:
-                        document = Document(
-                            name=fileName,
-                            text=original_text,
-                            type=document_type,
-                            timestamp=str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
-                            reader=self.name,
-                        )
-                    documents.append(document)
+                    documents += self.load_bytes(byte, fileName, document_type)
 
         # If content exist
         if len(contents) > 0:
@@ -100,6 +79,55 @@ class SimpleReader(Reader):
         msg.good(f"Loaded {len(documents)} documents")
         return documents
 
+    def load_bytes(self, bytes_string, fileName, document_type: str) -> list[Document]:
+        """Loads a pdf bytes file
+        @param dir_path : Path - Path to directory
+        @param document_type : str - Document Type
+        @returns list[Document] - Lists of documents
+        """
+        documents = []
+
+        url = "https://api.unstructured.io/general/v0/general"
+
+        headers = {
+            "accept": "application/json",
+            "unstructured-api-key": os.environ.get("UNSTRUCTURED_API_KEY", ""),
+        }
+
+        data = {
+            "strategy": "auto",
+        }
+
+        decoded_bytes = base64.b64decode(bytes_string)
+        with open("reconstructed.pdf", "wb") as file:
+            file.write(decoded_bytes)
+
+        file_data = {"files": open("reconstructed.pdf", "rb")}
+
+        response = requests.post(url, headers=headers, data=data, files=file_data)
+
+        json_response = response.json()
+
+        full_content = ""
+
+        for chunk in json_response:
+            if "text" in chunk:
+                text = chunk["text"]
+                full_content += text + " "
+
+        document = Document(
+            text=full_content,
+            type=document_type,
+            name=str(fileName),
+            link=str(fileName),
+            timestamp=str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
+            reader=self.name,
+        )
+        documents.append(document)
+        msg.good(f"Loaded {str(fileName)}")
+        os.remove("reconstructed.pdf")
+        return documents
+
     def load_file(self, file_path: Path, document_type: str) -> list[Document]:
         """Loads text file
         @param dir_path : Path - Path to directory
@@ -112,26 +140,41 @@ class SimpleReader(Reader):
             msg.warn(f"{file_path.suffix} not supported")
             return []
 
-        with open(file_path, "r", encoding="utf-8") as f:
-            msg.info(f"Reading {str(file_path)}")
+        url = "https://api.unstructured.io/general/v0/general"
 
-            if file_path.suffix == ".json":
-                json_obj = json.loads(f.read())
-                try:
-                    document = Document.from_json(json_obj)
-                except Exception as e:
-                    raise Exception(f"Loading JSON failed {e}")
+        headers = {
+            "accept": "application/json",
+            "unstructured-api-key": os.environ.get("UNSTRUCTURED_API_KEY", ""),
+        }
 
-            else:
-                document = Document(
-                    text=f.read(),
-                    type=document_type,
-                    name=str(file_path),
-                    link=str(file_path),
-                    timestamp=str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
-                    reader=self.name,
-                )
-            documents.append(document)
+        data = {
+            "strategy": "auto",
+        }
+
+        file_data = {"files": open(file_path, "rb")}
+
+        response = requests.post(url, headers=headers, data=data, files=file_data)
+
+        file_data["files"].close()
+
+        json_response = response.json()
+
+        full_content = ""
+
+        for chunk in json_response:
+            if "text" in chunk:
+                text = chunk["text"]
+                full_content += text + " "
+
+        document = Document(
+            text=full_content,
+            type=document_type,
+            name=str(file_path),
+            link=str(file_path),
+            timestamp=str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
+            reader=self.name,
+        )
+        documents.append(document)
         msg.good(f"Loaded {str(file_path)}")
         return documents
 
@@ -157,16 +200,7 @@ class SimpleReader(Reader):
             for file in files:
                 msg.info(f"Reading {str(file)}")
                 with open(file, "r", encoding="utf-8") as f:
-                    document = Document(
-                        text=f.read(),
-                        type=document_type,
-                        name=str(file),
-                        link=str(file),
-                        timestamp=str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
-                        reader=self.name,
-                    )
-
-                    documents.append(document)
+                    documents += self.load_file(file, document_type=document_type)
 
         msg.good(f"Loaded {len(documents)} documents")
         return documents

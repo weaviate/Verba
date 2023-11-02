@@ -303,6 +303,18 @@ class VerbaManager:
         else:
             self.environment_variables["HF_TOKEN"] = False
 
+        # Github Token Key
+        if os.environ.get("GITHUB_TOKEN", "") != "":
+            self.environment_variables["GITHUB_TOKEN"] = True
+        else:
+            self.environment_variables["GITHUB_TOKEN"] = False
+
+        # Unstructured Token Key
+        if os.environ.get("UNSTRUCTURED_API_KEY", "") != "":
+            self.environment_variables["UNSTRUCTURED_API_KEY"] = True
+        else:
+            self.environment_variables["UNSTRUCTURED_API_KEY"] = False
+
         # LLAMA2-7B-CHAT-HF
         if os.environ.get("LLAMA2-7B-CHAT-HF", "") == "True":
             self.environment_variables["LLAMA2-7B-CHAT-HF"] = True
