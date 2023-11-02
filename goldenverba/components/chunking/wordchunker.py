@@ -1,4 +1,5 @@
 from wasabi import msg
+from tqdm import tqdm
 
 try:
     import spacy
@@ -37,7 +38,9 @@ class WordChunker(Chunker):
         @parameter: overlap : int - How much overlap between the chunks
         @returns list[str] - List of documents that contain the chunks
         """
-        for document in documents:
+        for document in tqdm(
+            documents, total=len(documents), desc="Chunking documents"
+        ):
             # Skip if document already contains chunks
             if len(document.chunks) > 0:
                 continue
@@ -45,10 +48,12 @@ class WordChunker(Chunker):
             doc = self.nlp(document.text)
 
             if units > len(doc) or units < 1:
-                msg.warn(
-                    f"Unit value either exceeds length of actual document or is below 1 ({units}/{len(doc)})"
+                doc_chunk = Chunk(
+                    text=doc.text,
+                    doc_name=document.name,
+                    doc_type=document.type,
+                    chunk_id=0,
                 )
-                continue
 
             if overlap >= units:
                 msg.warn(

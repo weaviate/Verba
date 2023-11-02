@@ -17,6 +17,7 @@ All notable changes to this project will be documented in this file.
 - Lazy Document Loading
 - Add Copy and Cached Tag
 - Improved Semantic Cache
+- Added LLama 2 and Cohere support
 
 ### Fixed
 - Error handling for data ingestion (handling chunk size)

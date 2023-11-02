@@ -1,6 +1,7 @@
 from datetime import datetime
 import glob
 import base64
+import json
 
 from wasabi import msg
 from pathlib import Path
@@ -16,9 +17,9 @@ class SimpleReader(Reader):
 
     def __init__(self):
         super().__init__()
-        self.file_types = [".txt", ".md", ".mdx"]
+        self.file_types = [".txt", ".md", ".mdx", ".json"]
         self.name = "SimpleReader"
-        self.description = "Reads text and markdown files"
+        self.description = "Reads text, markdown, and json files"
         self.input_form = InputForm.UPLOAD.value
 
     def load(
@@ -66,13 +67,21 @@ class SimpleReader(Reader):
                         )
                         continue
 
-                    document = Document(
-                        name=fileName,
-                        text=original_text,
-                        type=document_type,
-                        timestamp=str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
-                        reader=self.name,
-                    )
+                    if ".json" in fileName:
+                        json_obj = json.loads(original_text)
+                        try:
+                            document = Document.from_json(json_obj)
+                        except Exception as e:
+                            raise Exception(f"Loading JSON failed {e}")
+
+                    else:
+                        document = Document(
+                            name=fileName,
+                            text=original_text,
+                            type=document_type,
+                            timestamp=str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
+                            reader=self.name,
+                        )
                     documents.append(document)
 
         # If content exist
@@ -105,14 +114,23 @@ class SimpleReader(Reader):
 
         with open(file_path, "r", encoding="utf-8") as f:
             msg.info(f"Reading {str(file_path)}")
-            document = Document(
-                text=f.read(),
-                type=document_type,
-                name=str(file_path),
-                link=str(file_path),
-                timestamp=str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
-                reader=self.name,
-            )
+
+            if file_path.suffix == ".json":
+                json_obj = json.loads(f.read())
+                try:
+                    document = Document.from_json(json_obj)
+                except Exception as e:
+                    raise Exception(f"Loading JSON failed {e}")
+
+            else:
+                document = Document(
+                    text=f.read(),
+                    type=document_type,
+                    name=str(file_path),
+                    link=str(file_path),
+                    timestamp=str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
+                    reader=self.name,
+                )
             documents.append(document)
         msg.good(f"Loaded {str(file_path)}")
         return documents

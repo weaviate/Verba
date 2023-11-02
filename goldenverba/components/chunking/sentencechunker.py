@@ -1,4 +1,5 @@
 from wasabi import msg
+from tqdm import tqdm
 
 try:
     import spacy
@@ -38,7 +39,9 @@ class SentenceChunker(Chunker):
         @parameter: overlap : int - How much overlap between the chunks
         @returns list[str] - List of documents that contain the chunks
         """
-        for document in documents:
+        for document in tqdm(
+            documents, total=len(documents), desc="Chunking documents"
+        ):
             # Skip if document already contains chunks
             if len(document.chunks) > 0:
                 continue

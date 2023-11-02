@@ -1,16 +1,10 @@
 from weaviate import Client
 from wasabi import msg
-import numpy as np
+
+from tqdm import tqdm
 
 from goldenverba.components.embedding.interface import Embedder
 from goldenverba.components.reader.document import Document
-from goldenverba.components.chunking.chunk import Chunk
-from goldenverba.components.reader.interface import InputForm
-from goldenverba.components.schema.schema_generation import (
-    VECTORIZERS,
-    EMBEDDINGS,
-    strip_non_letters,
-)
 
 
 class MiniLMEmbedder(Embedder):
@@ -51,7 +45,9 @@ class MiniLMEmbedder(Embedder):
         @returns bool - Bool whether the embedding what successful
         """
 
-        for document in documents:
+        for document in tqdm(
+            documents, total=len(documents), desc="Vectorizing document chunks"
+        ):
             for chunk in document.chunks:
                 chunk.set_vector(self.vectorize_chunk(chunk.text))
 

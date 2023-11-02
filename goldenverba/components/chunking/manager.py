@@ -26,6 +26,7 @@ class ChunkerManager:
         @returns list[str] - List of documents that contain the chunks
         """
         chunked_docs = self.selected_chunker.chunk(documents, units, overlap)
+        msg.good("Chunking completed")
         if self.check_chunks(chunked_docs):
             return chunked_docs
         return []
