@@ -362,10 +362,20 @@ async def reset_verba():
 
 # Reset Verba
 @app.get("/api/reset_cache")
-async def reset_verba():
+async def reset_cache():
     msg.info("Resetting cache")
 
     manager.reset_cache()
+
+    return JSONResponse(status_code=200, content={})
+
+
+# Reset Verba suggestions
+@app.get("/api/reset_suggestion")
+async def reset_suggestion():
+    msg.info("Resetting suggestions")
+
+    manager.reset_suggestion()
 
     return JSONResponse(status_code=200, content={})
 
@@ -535,7 +545,7 @@ async def websocket_generate_stream(websocket: WebSocket):
 @app.post("/api/suggestions")
 async def suggestions(payload: QueryPayload):
     try:
-        suggestions = verba_engine.get_suggestions(payload.query)
+        suggestions = manager.get_suggestions(payload.query)
 
         return JSONResponse(
             content={

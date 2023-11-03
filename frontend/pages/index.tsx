@@ -50,6 +50,7 @@ export default function Home() {
   );
   const [messages, setMessages] = useState<Message[]>([]);
   const [isFetching, setIsFetching] = useState(false);
+  const [isFetchingSuggestion, setIsFetchingSuggestions] = useState(false);
   const handleGenerateStreamMessageRef = useRef<Function | null>(null);
 
   // Function for checking the health of the API
@@ -76,6 +77,7 @@ export default function Home() {
   const handleGenerateMessage = async (query?: string, context?: string) => {
 
     try {
+      console.log(messages)
       const answerResponse = await fetch(apiHost + "/api/generate", {
         method: "POST",
         headers: {
@@ -213,8 +215,11 @@ export default function Home() {
     };
   }
 
+  const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
   const fetchSuggestions = async (query: string) => {
     try {
+      setIsFetchingSuggestions(true);
       const response = await fetch(apiHost + "/api/suggestions", {
         method: "POST",
         headers: {
@@ -228,17 +233,22 @@ export default function Home() {
       if (userInput != '') {
         setSuggestions(data.suggestions);
       }
+      await delay(1000);
+      setIsFetchingSuggestions(false)
     } catch (error) {
       console.error("Failed to fetch suggestions:", error);
+      setIsFetchingSuggestions(false)
     }
   };
 
   // Debounce the fetchSuggestions function to prevent rapid requests
-  const debouncedFetchSuggestions = debounce(fetchSuggestions, 400);
+  const debouncedFetchSuggestions = debounce(fetchSuggestions, 1500);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUserInput(e.target.value);
-    //debouncedFetchSuggestions(e.target.value);
+    if (!isFetchingSuggestion) {
+      fetchSuggestions(e.target.value);
+    }
   };
 
   const handleSuggestionClick = async (suggestion: string) => {
@@ -381,11 +391,11 @@ export default function Home() {
                 className="w-full p-2 rounded-md bg-white text-gray-900 placeholder-gray-400"
               />
             </form>
-            <div className="absolute mt-2 p-2 z-10 w-1/2 left-5 text-center justify-center">
+            <div className="absolute mt-2 p-2 z-10 w-1/2 left-5 text-center justify-center flex flex-wrap">
               {suggestions.map((suggestion, index) => (
                 <div
                   key={index + suggestion}
-                  className="p-2 hover:bg-green-300 bg-gray-200 cursor-pointer shadow-md rounded-md text-xs animate-press-in mt-2 hover-container"
+                  className="p-2 hover:bg-green-300 bg-gray-200 cursor-pointer shadow-md rounded-md text-xs animate-press-in mt-2 mr-4 hover-container"
                   onClick={() => handleSuggestionClick(suggestion)}
                 >
                   {renderBoldedSuggestion(suggestion, userInput)}

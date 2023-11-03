@@ -17,6 +17,7 @@ export default function StatusPage() {
     const [schemas, setSchemas] = useState({});
     const [showModal, setShowModal] = useState(false);
     const [showCacheModal, setCacheModal] = useState(false);
+    const [showSuggestionModal, setSuggestioneModal] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
     const handleReset = () => {
@@ -41,7 +42,23 @@ export default function StatusPage() {
             .then(response => response.json())
             .then(data => {
                 console.log('Reset successful:', data);
-                setShowModal(false);
+                setCacheModal(false);
+                setIsLoading(false);
+                window.location.reload();  // Refresh page
+            })
+            .catch(error => {
+                console.error('Error during reset:', error);
+                setIsLoading(false); // Stop loading if there's an error
+            });
+    };
+
+    const handleSuggestionReset = () => {
+        setIsLoading(true); // Start loading
+        fetch(apiHost + "/api/reset_suggestion")
+            .then(response => response.json())
+            .then(data => {
+                console.log('Reset successful:', data);
+                setSuggestioneModal(false);
                 setIsLoading(false);
                 window.location.reload();  // Refresh page
             })
@@ -135,14 +152,18 @@ export default function StatusPage() {
                     <div className="flex-1 bg-white border-2 border-black bg-opacity-20 rounded-lg shadow-md backdrop-filter max-h-[50vh] backdrop-blur-md p-4 w-full overflow-y-auto animate-pop-in">
                         <div className="flex justify-between items-center mb-4"> {/* Container for the title and button */}
                             <h2 className="text-lg font-bold">📝 Schemas & Objects</h2>
-                            <button onClick={() => setShowModal(true)} className="text-xs bg-gray-400 text-white hover:bg-red-400 hover-container px-3 py-2 rounded-lg">
-                                ❌ Reset Verba
-                            </button>
-                            <button onClick={() => setCacheModal(true)} className="text-xs bg-gray-400 text-white hover:bg-red-400 hover-container px-3 py-2 rounded-lg">
-                                ❌ Reset Cache
-                            </button>
+
                         </div>
                         <p className="text-xs font-bold mb-4 text-gray-600">This view shows all schemas and their object count</p>
+                        <button onClick={() => setShowModal(true)} className="text-xs bg-gray-400 text-white hover:bg-red-400 hover-container px-3 py-2 rounded-lg mr-2">
+                            ❌ Reset Verba
+                        </button>
+                        <button onClick={() => setCacheModal(true)} className="text-xs bg-gray-400 text-white hover:bg-red-400 hover-container px-3 py-2 rounded-lg mr-2">
+                            ❌ Reset Cache
+                        </button>
+                        <button onClick={() => setSuggestioneModal(true)} className="text-xs bg-gray-400 text-white hover:bg-red-400 hover-container px-3 py-2 rounded-lg">
+                            ❌ Reset Suggestion
+                        </button>
                         <hr />
                         <div className="grid grid-rows-2 gap-2 mt-4">
                             {Object.entries(schemas).map(([key, value]) => (
@@ -185,6 +206,22 @@ export default function StatusPage() {
                                 No
                             </button>
                             <button onClick={handleCacheReset} className="px-4 py-2 bg-red-500 hover:bg-red-400 text-white rounded">
+                                {isLoading ? "Resetting..." : "Yes"} {/* Show spinner if loading, otherwise show "Yes" */}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {showSuggestionModal && (
+                <div className="fixed inset-0 flex items-center justify-center z-50">
+                    <div className="bg-white p-6 rounded-lg shadow-lg border-2 border-black animate-pop-in">
+                        <h3 className="font-bold mb-4">⚠️ Warning</h3>
+                        <p>Are you sure? This will remove all suggestions</p>
+                        <div className="flex justify-end mt-4">
+                            <button onClick={() => setSuggestioneModal(false)} className="mr-2 px-4 py-2 bg-gray-300 hover:bg-gray-200 rounded">
+                                No
+                            </button>
+                            <button onClick={handleSuggestionReset} className="px-4 py-2 bg-red-500 hover:bg-red-400 text-white rounded">
                                 {isLoading ? "Resetting..." : "Yes"} {/* Show spinner if loading, otherwise show "Yes" */}
                             </button>
                         </div>

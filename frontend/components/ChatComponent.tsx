@@ -91,7 +91,7 @@ export function ChatComponent({
 
       if (data.finish_reason === "stop") {
         const full_text = data.full_text
-        if (data.cached && data.distance) {
+        if (data.cached) {
           const distance = data.distance
           setMessageHistory(prev => [...prev, { type: "system", content: full_text, typewriter: false, cached: true, distance: distance }]);
         } else {
@@ -125,6 +125,7 @@ export function ChatComponent({
 
   handleGenerateStreamMessageRef.current = (query?: string, context?: string) => {
     if (socket?.readyState === WebSocket.OPEN) {
+      console.log(messageHistory)
       const data = JSON.stringify({ query: query, context: context, conversation: messageHistory });
       socket.send(data);
     } else {
