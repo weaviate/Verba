@@ -341,6 +341,67 @@ class VerbaManager:
 
         return schemas
 
+    def get_suggestions(self, query: str) -> list[str]:
+        """Retrieve suggestions based on user query
+        @parameter query : str - User query
+        @returns list[str] - List of possible autocomplete suggestions
+        """
+        query_results = (
+            self.client.query.get(
+                class_name="Suggestion",
+                properties=["suggestion"],
+            )
+            .with_bm25(query=query)
+            .with_limit(3)
+            .do()
+        )
+
+        results = query_results["data"]["Get"]["Suggestion"]
+
+        if not results:
+            return []
+
+        suggestions = []
+
+        for result in results:
+            suggestions.append(result["suggestion"])
+
+        return suggestions
+
+    def set_suggestions(self, query: str):
+        """Adds suggestions to the suggestion class
+        @parameter query : str - Query to save in suggestions
+        """
+        check_results = (
+            self.client.query.get(
+                class_name="Suggestion",
+                properties=["suggestion"],
+            )
+            .with_where(
+                {
+                    "path": ["suggestion"],
+                    "operator": "Equal",
+                    "valueText": query,
+                }
+            )
+            .with_limit(1)
+            .do()
+        )
+
+        if "data" in check_results:
+            if len(check_results["data"]["Get"]["Suggestion"]) > 0:
+                if query == check_results["data"]["Get"]["Suggestion"][0]["suggestion"]:
+                    return
+
+        with self.client.batch as batch:
+            batch.batch_size = 1
+            properties = {
+                "suggestion": query,
+            }
+            self.client.batch.add_data_object(properties, "Suggestion")
+
+        msg.info("Added query to suggestions")
+
     def retrieve_chunks(self, queries: list[str]) -> list[Chunk]:
         chunks, context = self.retriever_manager.retrieve(
             queries, self.client, self.embedder_manager.selected_embedder
@@ -430,6 +491,7 @@ class VerbaManager:
             self.embedder_manager.selected_embedder.add_to_semantic_cache(
                 self.client, semantic_query, full_text
             )
+            self.set_suggestions(" ".join(queries))
             return full_text
 
     async def generate_stream_answer(
@@ -460,7 +522,7 @@ class VerbaManager:
             ):
                 full_text += result["message"]
                 yield result
-
+            self.set_suggestions(" ".join(queries))
             self.embedder_manager.selected_embedder.add_to_semantic_cache(
                 self.client, semantic_query, full_text
             )
@@ -485,6 +547,10 @@ class VerbaManager:
             class_name = "Cache_" + schema_manager.strip_non_letters(embedding)
             self.client.schema.delete_class(class_name)
             schema_manager.init_schemas(self.client, embedding, False, True)
+
+    def reset_suggestion(self):
+        self.client.schema.delete_class("Suggestion")
+        schema_manager.init_suggestion(self.client, "", False, True)
 
     def check_if_document_exits(self, document: Document) -> bool:
         """Return a document by it's ID (UUID format) from Weaviate
