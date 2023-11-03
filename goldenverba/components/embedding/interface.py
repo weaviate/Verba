@@ -277,15 +277,19 @@ class Embedder(VerbaComponent):
         query = ""
 
         if len(conversation) > 1:
-            for message in conversation:
-                query += message.content + " "
+            if conversation[-1].type == "system":
+                query += conversation[-1].content + " "
+            elif conversation[-2].type == "system":
+                query += conversation[-2].content + " "
 
         for _query in queries:
             query += _query + " "
+
+        print(query.lower())
         return query.lower()
 
     def retrieve_semantic_cache(
-        self, client: Client, query: str, dist: float = 0.1
+        self, client: Client, query: str, dist: float = 0.04
     ) -> str:
         """Retrieve results from semantic cache based on query and distance threshold
         @parameter query - str - User query
