@@ -76,7 +76,7 @@ def init_schemas(
     try:
         init_documents(client, vectorizer, force, check)
         init_cache(client, vectorizer, force, check)
-        # init_suggestion(client, vectorizer, force, check)
+        init_suggestion(client, vectorizer, force, check)
         return True
     except Exception as e:
         msg.fail(f"Schema initialization failed {str(e)}")
@@ -314,8 +314,8 @@ def init_suggestion(
         ]
     }
 
-    # Add Suffix
-    suggestion_schema, suggestion_name = add_suffix(SCHEMA_SUGGESTION, vectorizer)
+    suggestion_schema = SCHEMA_SUGGESTION
+    suggestion_name = "Suggestion"
 
     if client.schema.exists(suggestion_name):
         if check:

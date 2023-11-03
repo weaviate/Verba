@@ -276,15 +276,16 @@ class Embedder(VerbaComponent):
     def conversation_to_query(self, queries: list[str], conversation: dict) -> str:
         query = ""
 
-        for message in conversation:
-            query += message.content + " "
+        if len(conversation) > 1:
+            for message in conversation:
+                query += message.content + " "
 
         for _query in queries:
             query += _query + " "
         return query.lower()
 
     def retrieve_semantic_cache(
-        self, client: Client, query: str, dist: float = 0.05
+        self, client: Client, query: str, dist: float = 0.1
     ) -> str:
         """Retrieve results from semantic cache based on query and distance threshold
         @parameter query - str - User query
@@ -293,13 +294,42 @@ class Embedder(VerbaComponent):
         """
         needs_vectorization = self.get_need_vectorization()
 
+        match_results = (
+            client.query.get(
+                class_name=self.get_cache_class(),
+                properties=["query", "system"],
+            )
+            .with_where(
+                {
+                    "path": ["query"],
+                    "operator": "Equal",
+                    "valueText": query,
+                }
+            )
+            .with_limit(1)
+        ).do()
+
+        if "data" in match_results:
+            if len(match_results["data"]["Get"][self.get_cache_class()]) > 0:
+                if (
+                    query
+                    == match_results["data"]["Get"][self.get_cache_class()][0]["query"]
+                ):
+                    msg.good(f"Direct match from cache")
+                    return (
+                        match_results["data"]["Get"][self.get_cache_class()][0][
+                            "system"
+                        ],
+                        float(0.0),
+                    )
+
         query_results = (
             client.query.get(
                 class_name=self.get_cache_class(),
                 properties=["query", "system"],
             )
             .with_additional(properties=["distance"])
-            .with_autocut(1)
+            .with_limit(1)
         )
 
         if needs_vectorization:
@@ -324,11 +354,7 @@ class Embedder(VerbaComponent):
 
         result = results[0]
 
-        if query == result["query"]:
-            msg.good(f"Direct match from cache")
-            return result["system"], float(result["_additional"]["distance"])
-
-        elif float(result["_additional"]["distance"]) <= dist:
+        if float(result["_additional"]["distance"]) <= dist:
             msg.good(f"Retrieved similar from cache")
             return result["system"], float(result["_additional"]["distance"])
 

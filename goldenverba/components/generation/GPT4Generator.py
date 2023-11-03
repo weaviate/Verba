@@ -44,7 +44,6 @@ class GPT4Generator(Generator):
             system_msg = str(completion["choices"][0]["message"]["content"])
 
         except Exception as e:
-            print(e)
             raise e
 
         return system_msg

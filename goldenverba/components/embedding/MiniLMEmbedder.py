@@ -105,8 +105,7 @@ class MiniLMEmbedder(Embedder):
             return averaged_embedding_list
 
         except Exception as e:
-            print(e)
-            return []
+            raise (e)
 
     def vectorize_query(self, query: str) -> list[float]:
         return self.vectorize_chunk(query)
