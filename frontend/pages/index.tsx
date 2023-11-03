@@ -318,7 +318,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-        <div className="lg:flex md:flex full:justify-center justify-items-start overflow-x-auto h-36 w-full mb-2 hidden">
+        <div className={`lg:flex md:flex ${documentChunks.length <= 8 ? 'full:justify-center' : ''} justify-items-start overflow-x-auto h-36 w-full mb-2 hidden`}>
           {documentChunks.map((chunk, index) => (
             <button
               key={chunk.doc_name + index}

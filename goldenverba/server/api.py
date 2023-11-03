@@ -13,7 +13,6 @@ from pydantic import BaseModel
 
 from starlette.websockets import WebSocketDisconnect
 
-from goldenverba.retrieval.advanced_engine import AdvancedVerbaQueryEngine
 from goldenverba import verba_manager
 
 from goldenverba.components.reader.interface import Reader
@@ -106,9 +105,6 @@ def create_generator_payload(key: str, generator: Generator) -> dict:
     }
 
 
-# Delete later
-verba_engine = AdvancedVerbaQueryEngine(manager.client)
-
 # FastAPI App
 app = FastAPI()
 
@@ -196,7 +192,7 @@ async def serve_frontend():
 @app.get("/api/health")
 async def root():
     try:
-        if verba_engine.get_client().is_ready():
+        if manager.client.is_ready():
             return JSONResponse(
                 content={
                     "message": "Alive!",
