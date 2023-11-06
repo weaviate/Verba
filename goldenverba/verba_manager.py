@@ -334,7 +334,7 @@ class VerbaManager:
         for _class in schema_info["classes"]:
             results = (
                 self.client.query.get(_class["class"])
-                .with_limit(100000)
+                .with_limit(10000)
                 .with_additional(properties=["id"])
                 .do()
             )

@@ -14,6 +14,7 @@ from goldenverba.components.schema.schema_generation import (
 )
 
 from wasabi import msg
+from tqdm import tqdm
 
 
 class Embedder(VerbaComponent):
@@ -91,13 +92,12 @@ class Embedder(VerbaComponent):
                         chunk.set_uuid(uuid)
 
                 chunk_count = 0
-                for batch_id, chunk_batch in enumerate(batches):
+                for batch_id, chunk_batch in tqdm(
+                    enumerate(batches), total=len(batches), desc="Importing batches"
+                ):
                     with client.batch as batch:
                         batch.batch_size = len(chunk_batch)
                         for i, chunk in enumerate(chunk_batch):
-                            msg.info(
-                                f"({i+1}/{len(chunk_batch)} of batch ({batch_id+1})) Importing chunk of {document.name} ({self.vectorizer})"
-                            )
                             chunk_count += 1
 
                             properties = {
