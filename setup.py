@@ -35,6 +35,7 @@ setup(
         "uvicorn[standard]",
         "click>= 8.1.7",
         "asyncio",
+        "tiktoken>=0.5.1",
     ],
     extras_require={
         "dev": ["pytest", "wheel", "twine", "black>=23.7.0", "setuptools"],
