@@ -8,12 +8,12 @@ Welcome to Verba: The Golden RAGtriever, an open-source application designed to 
 [![Weaviate](https://img.shields.io/static/v1?label=powered%20by&message=Weaviate%20%E2%9D%A4&color=green&style=flat-square)](https://weaviate.io/) 
 [![PyPi downloads](https://static.pepy.tech/personalized-badge/goldenverba?period=total&units=international_system&left_color=grey&right_color=orange&left_text=pip%20downloads)](https://pypi.org/project/goldenverba/) [![Docker support](https://img.shields.io/badge/Docker_support-%E2%9C%93-4c1?style=flat-square&logo=docker&logoColor=white)](https://docs.docker.com/get-started/) [![Demo](https://img.shields.io/badge/Check%20out%20the%20demo!-yellow?&style=flat-square&logo=react&logoColor=white)](https://verba.weaviate.io/)
 
-![Demo of Verba](https://github.com/weaviate/Verba/blob/main/img/verba.gif)
+![Demo of Verba](https://github.com/weaviate/Verba/blob/dev/img/verba.gif)
 
 ## 🎯 What Is Verba?
 Verba is more than just a tool—it's a personal assistant for querying and interacting with your data, **either locally or deployed via cloud**. Have questions about your documents? Need to cross-reference multiple data points? Want to gain insights from your existing knowledge base? Verba empowers you with the combined capabilities of Weaviate's context-aware database and the analytical power of Large Language Models (LLMs). Interact with your data through an intuitive chat interface that refines search results by using the ongoing conversation context to deliver even more accurate and relevant information.
 
-![Demo of Verba](https://github.com/weaviate/Verba/blob/main/img/verba_screen.png)
+![Demo of Verba](https://github.com/weaviate/Verba/blob/dev/img/verba_screen.png)
 
 ## ⚙️ Under the Hood
 Verba is engineered with Weaviate's cutting-edge Generative Search technology at its core, extracting relevant context from your pool of documents to resolve queries with precision. By utilizing the power of Large Language Models, Verba doesn't just search for answers—it understands and provides responses that are contextually rich and informed by the content of your documents, all through an intuitive user interface designed for simplicity and efficiency.
@@ -21,7 +21,7 @@ Verba is engineered with Weaviate's cutting-edge Generative Search technology at
 ## 💡 Effortless Data Import with Weaviate
 Verba offers seamless data import functionality through its frontend, supporting a diverse range of file types including `.txt`, `.md`, `.pdf` and more. Before feeding your data into Weaviate, Verba handles chunking and vectorization to optimize it for search and retrieval. Together with collaborative partners we support popular libraries such as [HuggingFace](https://github.com/huggingface), [Haystack](https://github.com/deepset-ai/haystack), [Unstructured](https://github.com/Unstructured-IO/unstructured) and many more!
 
-![Demo of Verba](https://github.com/weaviate/Verba/blob/main/img/verba_import.png)
+![Demo of Verba](https://github.com/weaviate/Verba/blob/dev/img/verba_import.png)
 
 ## 💥 Advanced Query Resolution with Hybrid Search
 Experience the hybrid search capabilities of Weaviate within Verba, which merges vector and lexical search methodologies for even greater precision. This dual approach not only navigates through your documents to pinpoint exact matches but also understands the nuance of context, enabling the Large Language Models to craft responses that are both comprehensive and contextually aware. It's an advanced technique that redefines document retrieval, providing you with precisely what you need, when you need it.
@@ -57,7 +57,7 @@ Before diving into Verba's capabilities, you'll need to configure access to vari
 
 Once configured, you can monitor your Verba installation's health and status via the 'Status Verba' page. This dashboard provides insights into your deployment type, libraries, environment settings, Weaviate schema counts, and more. It's also your go-to for maintenance tasks like resetting Verba, clearing the cache, or managing auto-complete suggestions.
 
-![Demo of Verba](https://github.com/weaviate/Verba/blob/main/img/verba_status.png)
+![Demo of Verba](https://github.com/weaviate/Verba/blob/dev/img/verba_status.png)
 
 ## 🚀 Quickstart: Deploy with pip
 
