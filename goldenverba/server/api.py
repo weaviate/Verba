@@ -29,6 +29,14 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# Check if runs in production
+production_key = os.environ.get("VERBA_PRODUCTION", "")
+if production_key == "True":
+    msg.info("API runs in Production Mode")
+    production = True
+else:
+    production = False
+
 manager = verba_manager.VerbaManager()
 config_manager = ConfigManager()
 
@@ -230,6 +238,15 @@ async def get_google_tag():
     )
 
 
+@app.get("/api/get_production")
+async def get_production():
+    return JSONResponse(
+        content={
+            "production": production,
+        }
+    )
+
+
 # Get Readers, Chunkers, and Embedders
 @app.get("/api/get_components")
 async def get_components():
@@ -312,6 +329,9 @@ async def get_component(payload: GetComponentPayload):
 
 @app.post("/api/set_component")
 async def set_component(payload: SetComponentPayload):
+    if production:
+        return JSONResponse(content={})
+
     msg.info(f"Setting {payload.component} to {payload.selected_component}")
 
     if payload.component == "embedders":
@@ -349,6 +369,9 @@ async def get_status():
 # Reset Verba
 @app.get("/api/reset")
 async def reset_verba():
+    if production:
+        return JSONResponse(status_code=200, content={})
+
     msg.info("Resetting verba")
 
     manager.reset()
@@ -359,6 +382,8 @@ async def reset_verba():
 # Reset Verba
 @app.get("/api/reset_cache")
 async def reset_cache():
+    if production:
+        return JSONResponse(status_code=200, content={})
     msg.info("Resetting cache")
 
     manager.reset_cache()
@@ -369,6 +394,8 @@ async def reset_cache():
 # Reset Verba suggestions
 @app.get("/api/reset_suggestion")
 async def reset_suggestion():
+    if production:
+        return JSONResponse(status_code=200, content={})
     msg.info("Resetting suggestions")
 
     manager.reset_suggestion()
@@ -379,6 +406,14 @@ async def reset_suggestion():
 # Receive query and return chunks and query answer
 @app.post("/api/load_data")
 async def load_data(payload: LoadPayload):
+    if production:
+        return JSONResponse(
+            content={
+                "status": "200",
+                "status_msg": "Can't add data when in production mode",
+            }
+        )
+
     manager.reader_set_reader(payload.reader)
     manager.chunker_set_chunker(payload.chunker)
     manager.embedder_set_embedder(payload.embedder)
@@ -631,6 +666,9 @@ async def search_documents(payload: SearchQueryPayload):
 # Retrieve specific document based on UUID
 @app.post("/api/delete_document")
 async def delete_document(payload: GetDocumentPayload):
+    if production:
+        return JSONResponse(status_code=200, content={})
+
     msg.info(f"Document ID received: {payload.document_id}")
 
     manager.delete_document_by_id(payload.document_id)

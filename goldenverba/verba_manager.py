@@ -188,10 +188,12 @@ class VerbaManager:
             additional_header["X-Cohere-Api-Key"] = cohere_key
 
         # Check Verba URL ENV
-        weaviate_url = os.environ.get("VERBA_URL", "")
+        weaviate_url = os.environ.get("WEAVIATE_URL_VERBA", "")
         if weaviate_url != "":
-            weaviate_key = os.environ.get("VERBA_API_KEY", "")
-            self.environment_variables["VERBA_URL"] = True
+            weaviate_key = os.environ.get("WEAVIATE_API_KEY_VERBA", "")
+            if weaviate_key != "":
+                self.environment_variables["WEAVIATE_API_KEY_VERBA"] = True
+            self.environment_variables["WEAVIATE_URL_VERBA"] = True
             self.weaviate_type = "Weaviate Cluster"
             auth_config = weaviate.AuthApiKey(api_key=weaviate_key)
             client = weaviate.Client(

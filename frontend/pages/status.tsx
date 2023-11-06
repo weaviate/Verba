@@ -123,7 +123,13 @@ export default function StatusPage() {
                     {/* Second Section */}
                     <div className="flex-1 border-2 border-black bg-white bg-opacity-20 rounded-lg shadow-md backdrop-filter max-h-[50vh] backdrop-blur-md p-4 overflow-y-auto w-full animate-pop-in">
                         <h2 className="text-lg font-bold mb-4">📚 Libraries & Variables</h2>
-                        <p className="text-xs font-bold mb-4 text-gray-600">This view shows the available libraries and set variables</p>
+                        <p className="text-xs font-bold mb-4 text-gray-600">This interface lists all available libraries and defined variables.</p>
+                        <p className="text-xs font-bold mb-4 text-gray-600 mt-2">
+                            To set environment variables, create a <code>.env</code> file and define your variables (e.g., <code>OPENAI_API_KEY=Your-Key</code>). Alternatively, you may configure them system-wide. <a href="https://github.com/weaviate/Verba/blob/main/README.md" className="text-sm text-blue-400">Click here</a> for detailed instructions.
+                        </p>
+                        <p className="text-xs font-bold mb-4 text-gray-600 mt-2">
+                            To install any required libraries that are not present, use the command <code>pip install Your-Library</code> (for example, <code>pip install spacy</code>).
+                        </p>
                         <hr />
                         <div className="grid grid-rows-2 gap-2 mt-4">
                             {Object.entries(libraries).map(([key, value]) => (
