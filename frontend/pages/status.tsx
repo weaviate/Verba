@@ -1,10 +1,16 @@
 import { useState, useEffect } from "react";
 import CoolButton from "../components/CoolButton";
-import { getApiHost } from "@/pages";
 
 export default function StatusPage() {
 
+    const getApiHost = () => {
+        if (process.env.NODE_ENV === 'development') {
+            return 'http://localhost:8000';
+        }
+        return "";
+    };
     const apiHost = getApiHost()
+
     const bgUrl = process.env.NODE_ENV === 'production'
         ? 'static/'
         : '/';
@@ -190,7 +196,7 @@ export default function StatusPage() {
                 <div className="fixed inset-0 flex items-center justify-center z-50">
                     <div className="bg-white p-6 rounded-lg shadow-lg border-2 border-black animate-pop-in">
                         <h3 className="font-bold mb-4">⚠️ Warning</h3>
-                        <p>Are you sure? This will remove all existing data.</p>
+                        <p>Are you sure? This will remove ALL existing data on your Weaviate Instance.</p>
                         <div className="flex justify-end mt-4">
                             <button onClick={() => setShowModal(false)} className="mr-2 px-4 py-2 bg-gray-300 hover:bg-gray-200 rounded">
                                 No
