@@ -2,19 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { TbVectorTriangle } from "react-icons/tb";
 import { LuFileOutput } from "react-icons/lu";
 import { MdOutlineQuestionAnswer } from "react-icons/md";
-import { useDropzone } from 'react-dropzone';
-import CoolButton from "../components/CoolButton";
-import HashLoader from "react-spinners/HashLoader";
 import { Component } from "../components/ImportModalComponent";
 
 
 interface ConfigModalProps {
     component: string;
     apiHost: string;
+    production: boolean;
     onGeneratorSelect: (streamable: boolean) => void;
 }
 
-const ConfigModal: React.FC<ConfigModalProps> = ({ component = "embedders", apiHost, onGeneratorSelect }) => {
+const ConfigModal: React.FC<ConfigModalProps> = ({ component = "embedders", apiHost, onGeneratorSelect, production }) => {
 
     const [components, setComponents] = useState<Component[]>([]);
     const [selectedComponent, setSelectedComponent] = useState<Component>();
@@ -28,6 +26,9 @@ const ConfigModal: React.FC<ConfigModalProps> = ({ component = "embedders", apiH
     };
 
     const handleComponentSelection = async (selectedComponent: Component) => {
+        if (production == true) {
+            return
+        }
         setSelectedComponent(selectedComponent);
         toggleListVisibility()
         try {

@@ -49,6 +49,7 @@ export default function Home() {
     null
   );
   const [messages, setMessages] = useState<Message[]>([]);
+  const [production, setProduction] = useState<boolean>(false);
   const [isFetching, setIsFetching] = useState(false);
   const [isFetchingSuggestion, setIsFetchingSuggestions] = useState(false);
   const handleGenerateStreamMessageRef = useRef<Function | null>(null);
@@ -67,6 +68,33 @@ export default function Home() {
     } catch (error) {
       setApiStatus('Offline');
     }
+  }, []);
+
+  useEffect(() => {
+    const fetchProduction = async () => {
+      try {
+        const response = await fetch(apiHost + "/api/get_production", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        const response_data = await response.json();
+
+        if (response_data.production == true) {
+          console.log("In Production Mode")
+        } else {
+          console.log("In Normal Mode")
+        }
+
+        // Update the document title and text
+        setProduction(response_data.production);
+      } catch (error) {
+        console.error("Failed to fetch document:", error);
+      }
+    }
+
+    fetchProduction();
   }, []);
 
   // UseEffect hook to check the API health on initial load
@@ -312,9 +340,9 @@ export default function Home() {
                   </button>
                 </div>
               </div>
-              <ConfigModal component="embedders" apiHost={apiHost} onGeneratorSelect={generatorStreamable}></ConfigModal>
-              <ConfigModal component="retrievers" apiHost={apiHost} onGeneratorSelect={generatorStreamable}></ConfigModal>
-              <ConfigModal component="generators" apiHost={apiHost} onGeneratorSelect={generatorStreamable}></ConfigModal>
+              <ConfigModal component="embedders" apiHost={apiHost} onGeneratorSelect={generatorStreamable} production={production}></ConfigModal>
+              <ConfigModal component="retrievers" apiHost={apiHost} onGeneratorSelect={generatorStreamable} production={production}></ConfigModal>
+              <ConfigModal component="generators" apiHost={apiHost} onGeneratorSelect={generatorStreamable} production={production}></ConfigModal>
             </div>
           </div>
         </div>

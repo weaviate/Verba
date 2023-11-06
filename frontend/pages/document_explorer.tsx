@@ -32,12 +32,40 @@ export default function DocumentOnly() {
     const [documentType, setDocumentType] = useState<string>("Documentation");
     const [documentLink, setDocumentLink] = useState("#");
     const [documents, setDocuments] = useState<Document[]>([]);
+    const [production, setProduction] = useState<boolean>(false);
     const [focusedDocument, setFocusedDocument] = useState<Document | null>(null);
     const [currentEmbedder, setCurrentEmbedder] = useState<string>("");
 
     const generatorStreamable = (streamable: boolean) => {
         console.log("Set Streamable")
     }
+
+    useEffect(() => {
+        const fetchProduction = async () => {
+            try {
+                const response = await fetch(apiHost + "/api/get_production", {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                });
+                const response_data = await response.json();
+
+                if (response_data.production == true) {
+                    console.log("In Production Mode")
+                } else {
+                    console.log("In Normal Mode")
+                }
+
+                // Update the document title and text
+                setProduction(response_data.production);
+            } catch (error) {
+                console.error("Failed to fetch document:", error);
+            }
+        }
+
+        fetchProduction();
+    }, []);
 
     const fetchDocuments = async (query = "") => {
         try {
@@ -169,7 +197,7 @@ export default function DocumentOnly() {
                                 <FaPlus />
                                 <span>Add Documents</span>
                             </button>
-                            <ConfigModal component="embedders" apiHost={apiHost} onGeneratorSelect={generatorStreamable}></ConfigModal>
+                            <ConfigModal component="embedders" apiHost={apiHost} onGeneratorSelect={generatorStreamable} production={production}></ConfigModal>
                         </div>
                     </div>
                 </div>
