@@ -2,7 +2,7 @@ import os
 
 from wasabi import msg  # type: ignore[import]
 
-from fastapi import FastAPI, status, WebSocket
+from fastapi import FastAPI, status, WebSocket, Request
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -193,6 +193,26 @@ class SetComponentPayload(BaseModel):
 @app.get("/")
 @app.head("/")
 async def serve_frontend():
+    return FileResponse(os.path.join(BASE_DIR, "frontend/out/index.html"))
+
+
+@app.get("/status")
+async def catch_status():
+    # Check if the path corresponds to a file that exists in the static directory
+    file_path = BASE_DIR / "frontend/out" / "status.html"
+    if os.path.isfile(file_path):
+        return FileResponse(file_path)
+    # Otherwise, serve index.html
+    return FileResponse(os.path.join(BASE_DIR, "frontend/out/index.html"))
+
+
+@app.get("/document_explorer")
+async def catch_explorer():
+    # Check if the path corresponds to a file that exists in the static directory
+    file_path = BASE_DIR / "frontend/out" / "document_explorer.html"
+    if os.path.isfile(file_path):
+        return FileResponse(file_path)
+    # Otherwise, serve index.html
     return FileResponse(os.path.join(BASE_DIR, "frontend/out/index.html"))
 
 

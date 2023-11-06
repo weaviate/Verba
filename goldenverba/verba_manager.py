@@ -530,8 +530,14 @@ class VerbaManager:
             )
 
     def reset(self):
-        self.client.schema.delete_all()
+        self.client.schema.delete_class("Suggestion")
         # Check if all schemas exist for all possible vectorizers
+        for vectorizer in schema_manager.VECTORIZERS:
+            schema_manager.reset_schemas(self.client, vectorizer)
+
+        for embedding in schema_manager.EMBEDDINGS:
+            schema_manager.reset_schemas(self.client, vectorizer)
+
         for vectorizer in schema_manager.VECTORIZERS:
             schema_manager.init_schemas(self.client, vectorizer, False, True)
 

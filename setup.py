@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="goldenverba",
-    version="0.2.3",
+    version="0.3.0",
     packages=find_packages(),
     entry_points={
         "console_scripts": [
@@ -26,14 +26,24 @@ setup(
     ],
     include_package_data=True,
     install_requires=[
-        "weaviate-client>=3.23.1",
+        "weaviate-client==3.23.1",
         "python-dotenv>=1.0.0",
         "openai>=0.27.9",
         "wasabi>=1.1.2",
-        "spacy",
+        "spacy>=3.6.1",
         "fastapi>=0.102.0",
         "uvicorn[standard]",
         "click>= 8.1.7",
+        "asyncio",
     ],
-    extras_require={"dev": ["pytest", "wheel", "twine", "black", "setuptools"]},
+    extras_require={
+        "dev": ["pytest", "wheel", "twine", "black>=23.7.0", "setuptools"],
+        "huggingface": [
+            "sentence-transformer",
+            "transformers",
+            "torch",
+            "huggingface_hub",
+            "accelerate",
+        ],
+    },
 )

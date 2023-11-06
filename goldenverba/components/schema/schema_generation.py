@@ -59,6 +59,19 @@ def add_suffix(schema: dict, vectorizer: str) -> tuple[dict, str]:
     return modified_schema, modified_schema["classes"][0]["class"]
 
 
+def reset_schemas(
+    client: Client = None,
+    vectorizer: str = None,
+):
+    doc_name = "Document_" + strip_non_letters(vectorizer)
+    chunk_name = "Chunk_" + strip_non_letters(vectorizer)
+    cache_name = "Cache_" + strip_non_letters(vectorizer)
+
+    client.schema.delete_class(doc_name)
+    client.schema.delete_class(chunk_name)
+    client.schema.delete_class(cache_name)
+
+
 def init_schemas(
     client: Client = None,
     vectorizer: str = None,
