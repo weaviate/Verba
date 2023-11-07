@@ -305,7 +305,9 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-10 text-gray-900">
-      {showModal && <ImportModalComponent onClose={() => setShowModal(false)} apiHost={apiHost} />}
+      {showModal && <ImportModalComponent onClose={() => {
+        setShowModal(false)
+      }} apiHost={apiHost} />}
       <div className="flex flex-col w-full items-start">
         <div className="mb-2">
           <div className="flex justify-between items-center w-full"> {/* <-- flexbox container */}

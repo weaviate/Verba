@@ -189,7 +189,11 @@ const ImportModal: React.FC<ImportModalProps> = ({ onClose, apiHost }) => {
             <div className="absolute w-full h-full bg-black opacity-50"></div>
             <div className="bg-gray-200 border-2 border-black lg:w-2/5 md:w-full md:m-3 z-10 rounded-xl shadow-md animate-pop-in">
                 <div className="flex justify-start items-center mb-4 p-4">
-                    <button onClick={onClose} className="mr-3 bg-red-500 text-white hover:bg-red-600 shadow-md hover-container p-2 rounded-full flex items-center justify-center">
+                    <button onClick={() => {
+                        if (!loadingState) {
+                            onClose()
+                        }
+                    }} disabled={loadingState} className="mr-3 bg-red-500 text-white hover:bg-red-600 shadow-md hover-container p-2 rounded-full flex items-center justify-center">
                         <FaTimes />
                     </button>
                     <button onClick={() => setSelectedOption("Reader")} className={`${"Reader" === selectedOption ? 'bg-yellow-200' : 'bg-gray-200'} text-black text-lg rounded-lg font-bold border-2 border-black animate-pop-in-late truncate p-4 w-full hover-container shadow-md mr-6 hover:bg-yellow-300 hover:border-white`}>{selectedReader?.name}</button>
