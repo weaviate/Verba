@@ -230,15 +230,15 @@ class Embedder(VerbaComponent):
         """
         doc_class_name = "Document_" + strip_non_letters(self.vectorizer)
 
-        if doc_type == "":
+        if doc_type == "" or doc_type == None:
             query_results = (
                 client.query.get(
                     class_name=doc_class_name,
                     properties=["doc_name", "doc_type", "doc_link"],
                 )
-                .with_bm25(query, properties=["doc_name"])
+                .with_bm25(query)
                 .with_additional(properties=["id"])
-                .with_limit(20)
+                .with_limit(100)
                 .do()
             )
         else:
@@ -256,7 +256,7 @@ class Embedder(VerbaComponent):
                     }
                 )
                 .with_additional(properties=["id"])
-                .with_limit(20)
+                .with_limit(100)
                 .do()
             )
 

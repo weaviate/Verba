@@ -28,7 +28,7 @@ setup(
     install_requires=[
         "weaviate-client==3.23.1",
         "python-dotenv>=1.0.0",
-        "openai>=0.27.9",
+        "openai==0.27.9",
         "wasabi>=1.1.2",
         "spacy>=3.6.1",
         "fastapi>=0.102.0",
@@ -40,7 +40,7 @@ setup(
     extras_require={
         "dev": ["pytest", "wheel", "twine", "black>=23.7.0", "setuptools"],
         "huggingface": [
-            "sentence-transformer",
+            "sentence-transformers",
             "transformers",
             "torch",
             "huggingface_hub",
