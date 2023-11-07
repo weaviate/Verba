@@ -153,7 +153,10 @@ If you're a developer looking to contribute to Verba or need the latest features
 3. **Launch Verba**
 - ```verba start```
 
-4. **Create .env file and add environment variables**
+4. **Access Verba**
+- ```Visit localhost:8000```
+
+5. **Create .env file and add environment variables**
 
 # 🛠️ Quickstart: Build from Source
 
@@ -169,7 +172,10 @@ If you're a developer looking to contribute to Verba or need the latest features
 4. **Launch Verba**
 - ```verba start```
 
-5. **Create .env file and add environment variables**
+5. **Access Verba**
+- ```Visit localhost:8000```
+
+6. **Create .env file and add environment variables**
 
 # 🔑 API Keys
 
@@ -292,10 +298,10 @@ Now your data is ready to be used within Verba, enabling you to leverage its pow
 
 Verba utilizes LLM models through APIs. Be advised that the usage costs for these models will be billed to the API access key you provide. Primarily, costs are incurred during data embedding and answer generation processes.
 
-## 🛠️ Project Architecture
-You can learn more about Verba's architecture and implementation in its technical documentation. It's recommended to read the them before making any contributions.
-
 ## 💖 Open Source Contribution
 
-Your contributions are always welcome! Feel free to contribute ideas, feedback, or create issues and bug reports if you find any! Before contributing, please read the Contribution Guide. Visit our [Weaviate Community Forum](https://forum.weaviate.io/) if you need any help!
+Your contributions are always welcome! Feel free to contribute ideas, feedback, or create issues and bug reports if you find any! Before contributing, please read the [Contribution Guide](./CONTRIBUTING.md). Visit our [Weaviate Community Forum](https://forum.weaviate.io/) if you need any help!
+
+### 🛠️ Project Architecture
+You can learn more about Verba's architecture and implementation in its [technical documentation](./TECHNICAL.md) and [frontend documentation](./FRONTEND.md). It's recommended to read them before making any contributions.
 
