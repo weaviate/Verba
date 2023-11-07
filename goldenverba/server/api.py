@@ -518,6 +518,14 @@ async def query(payload: QueryPayload):
 
         msg.good(f"Succesfully processed query: {payload.query}")
 
+        if len(chunks) == 0:
+            return JSONResponse(
+                content={
+                    "documents": [],
+                    "context": "",
+                }
+            )
+
         return JSONResponse(
             content={
                 "documents": results,

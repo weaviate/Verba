@@ -236,7 +236,7 @@ class Embedder(VerbaComponent):
                     class_name=doc_class_name,
                     properties=["doc_name", "doc_type", "doc_link"],
                 )
-                .with_bm25(query)
+                .with_bm25(query, properties=["doc_name"])
                 .with_additional(properties=["id"])
                 .with_limit(100)
                 .do()

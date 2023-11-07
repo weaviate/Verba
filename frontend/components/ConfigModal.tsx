@@ -76,7 +76,7 @@ const ConfigModal: React.FC<ConfigModalProps> = ({ component = "embedders", apiH
     }, [apiHost]);
 
     return (
-        <div className="ml-10 animate-pop-in">
+        <div className="ml-5 animate-pop-in">
             <div className="flex items-center"> {/* Wrapped button and tooltip in flex container */}
                 <button
                     ref={mainButtonRef}
