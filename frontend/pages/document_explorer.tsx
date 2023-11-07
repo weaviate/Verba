@@ -208,7 +208,7 @@ export default function DocumentOnly() {
                                 <h2 className="text-lg font-bold mb-4">📚 Documents</h2>
                                 {focusedDocument && (
                                     <button
-                                        className="text-xs bg-gray-400 text-white hover:bg-red-400 hover-container px-3 py-2 rounded-lg"
+                                        className="text-xs bg-gray-400 text-white hover:bg-red-400 hover-container px-3 py-2 rounded-lg truncate"
                                         onClick={() => setShowDeleteModal(true)}
                                     >
                                         ❌ Delete {focusedDocument.doc_name}

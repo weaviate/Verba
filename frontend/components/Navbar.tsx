@@ -21,7 +21,7 @@ const Navbar = () => {
             return (
               <Link legacyBehavior key={link.name} href={link.path}>
                 <a
-                  className={`mx-4 p-3 rounded-lg text-black text-sm border-2 ${isActive ? "bg-green-300 border-white" : "bg-gray-300 border-black"
+                  className={`mx-4 p-3 w-28 text-center rounded-lg text-black text-sm shadow-sm border-2 ${isActive ? "bg-green-300 border-white" : "bg-gray-300 border-gray-400"
                     } hover:bg-gray-200 transition-colors duration-300`}
                 >
                   {link.name}
