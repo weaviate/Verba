@@ -6,6 +6,8 @@ import tiktoken
 
 from weaviate import Client
 
+from wasabi import msg
+
 
 class Retriever(VerbaComponent):
     """
@@ -32,16 +34,18 @@ class Retriever(VerbaComponent):
     def sort_chunks(self, chunks: list[Chunk]) -> list[Chunk]:
         return sorted(chunks, key=lambda chunk: (chunk.doc_uuid, int(chunk.chunk_id)))
 
-    def cutoff_text(self, text: str) -> str:
+    def cutoff_text(self, text: str, content_length: int) -> str:
         encoding = tiktoken.encoding_for_model("gpt-3.5-turbo")
 
         # Tokenize the input text
         encoded_tokens = encoding.encode(text, disallowed_special=())
 
         # Check if we need to truncate
-        if len(encoded_tokens) > 2500:
-            encoded_tokens = encoded_tokens[:2500]
+        if len(encoded_tokens) > content_length:
+            encoded_tokens = encoded_tokens[:content_length]
             truncated_text = encoding.decode(encoded_tokens)
+            msg.info(f"Truncated Context to {content_length} tokens")
             return truncated_text
         else:
+            msg.info(f"Retrieved Context of {len(encoded_tokens)} tokens")
             return text

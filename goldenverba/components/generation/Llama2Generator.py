@@ -19,6 +19,7 @@ class Llama2Generator(Generator):
         self.model = None
         self.tokenizer = None
         self.device = None
+        self.context_window = 3000
         if os.environ.get("LLAMA2-7B-CHAT-HF", "") == "True":
             try:
                 from transformers import AutoTokenizer, AutoModelForCausalLM

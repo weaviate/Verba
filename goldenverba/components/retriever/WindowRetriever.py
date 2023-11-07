@@ -46,7 +46,7 @@ class WindowRetriever(Retriever):
                     ],
                 )
                 .with_additional(properties=["score"])
-                .with_autocut(1)
+                .with_autocut(2)
             )
 
             if needs_vectorization:

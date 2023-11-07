@@ -406,7 +406,10 @@ class VerbaManager:
 
     def retrieve_chunks(self, queries: list[str]) -> list[Chunk]:
         chunks, context = self.retriever_manager.retrieve(
-            queries, self.client, self.embedder_manager.selected_embedder
+            queries,
+            self.client,
+            self.embedder_manager.selected_embedder,
+            self.generator_manager.selected_generator,
         )
         return chunks, context
 
