@@ -13,20 +13,24 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className="fixed z-10 bottom-5 left-0 right-0 mx-auto animate-pop-in rounded-2xl overflow-hidden w-max transform transition-all duration-500 backdrop-filter backdrop-blur-sm p-4 hidden lg:flex md:flex">
-      {links.map((link) => {
-        const isActive = router.pathname === link.path;
-        return (
-          <Link legacyBehavior key={link.name} href={link.path}>
-            <a
-              className={`mx-12 text-zinc-700 font-thin text-opacity-50 hover:scale-110 transform transition-all duration-500 hover:text-yellow-400 hover:text-opacity-100 ${isActive ? "text-white" : ""
-                }`}
-            >
-              {link.name}
-            </a>
-          </Link>
-        );
-      })}
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-gray-100 p-2 shadow-md">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-center items-center py-2">
+          {links.map((link) => {
+            const isActive = router.pathname === link.path;
+            return (
+              <Link legacyBehavior key={link.name} href={link.path}>
+                <a
+                  className={`mx-4 p-3 rounded-lg text-black text-sm border-2 ${isActive ? "bg-green-300 border-white" : "bg-gray-300 border-black"
+                    } hover:bg-gray-200 transition-colors duration-300`}
+                >
+                  {link.name}
+                </a>
+              </Link>
+            );
+          })}
+        </div>
+      </div>
     </nav>
   );
 };

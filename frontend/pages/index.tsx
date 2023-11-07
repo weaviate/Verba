@@ -176,13 +176,19 @@ export default function Home() {
         setDocumentChunks(queryData.documents);
         setSuggestions([]);
 
-        if (queryData.context) {
+        if (queryData.context != "") {
           if (streamable) {
             handleGenerateStreamMessage(sendInput, queryData.context)
             setIsFetching(false)
           } else {
             handleGenerateMessage(sendInput, queryData.context)
           }
+        } else {
+          setIsFetching(false)
+          setMessages((prev) => [
+            ...prev,
+            { type: "system", content: "Your Verba has no data yet :(", typewriter: true },
+          ]);
         }
 
       } catch (error) {
@@ -331,7 +337,7 @@ export default function Home() {
               </div>
             </div>
             <div className="lg:flex sm:grid sm:grid-cols-2 sm:gap-y-2 md:grid md:grid-cols-2 md:gap-x-4 md:gap-y-4 justify-between items-center mx-auto p-4 ml-10">
-              <div className="ml-10 animate-pop-in">
+              <div className="ml-5 animate-pop-in">
                 <div className="flex items-center">
                   <button
                     className="flex items-center sm:w-32 md:w-44 space-x-2 mr-8 bg-gray-200 text-black p-3  rounded-lg  hover:bg-green-400 border-2 border-black hover:border-white hover-container shadow-md"
@@ -375,7 +381,7 @@ export default function Home() {
           ))}
         </div>
         <div className="flex w-full space-x-4 overflow-y-auto">
-          <div className="lg:w-1/2 md:w-full sm:w-full p-2 border-2 shadow-lg border-gray-900 rounded-xl animate-pop-in">
+          <div className="lg:w-1/2 md:w-full sm:w-full p-2 mb-20 lg:mb-2 border-2 shadow-lg border-gray-900 rounded-xl animate-pop-in">
 
             {/* Header */}
             <div className="rounded-t-xl bg-gray-200 p-4 flex justify-between items-center">
