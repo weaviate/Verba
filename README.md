@@ -36,9 +36,9 @@ Welcome to Verba: The Golden RAGtriever, an open-source application designed to 
   - [Github](#github)
 - [🐳 Quickstart: Deploy with Docker](#🐳-quickstart-deploy-with-docker)
   - [Large Language Model (LLM) Costs](#-large-language-model-llm-costs)
+- [💾 Importing Your Data into Verba](#️💾-Importing-Your-Data-into-Verba)
 - [🛠️ Project Architecture](#️🛠️-project-architecture)
 - [💖 Open Source Contribution](#💖-open-source-contribution)
-
 
 ## 🎯 What Is Verba?
 Verba is more than just a tool—it's a personal assistant for querying and interacting with your data, **either locally or deployed via cloud**. Have questions about your documents? Need to cross-reference multiple data points? Want to gain insights from your existing knowledge base? Verba empowers you with the combined capabilities of Weaviate's context-aware database and the analytical power of Large Language Models (LLMs). Interact with your data through an intuitive chat interface that refines search results by using the ongoing conversation context to deliver even more accurate and relevant information.
@@ -253,6 +253,40 @@ With Docker installed and the Verba repository cloned, navigate to the directory
 
 This command will download the necessary Docker images, create containers, and start Verba.
 Remember, Docker must be installed on your system to use this method. For installation instructions and more details about Docker, visit the official Docker documentation. 
+
+## 💾 Importing Your Data into Verba
+
+With Verba configured, you're ready to import your data and start exploring. Follow these simple steps to get your data into Verba:
+
+![Demo of Verba](https://github.com/weaviate/Verba/blob/dev/img/verba_data.gif)
+
+1. **Initiate the Import Process**
+   - Click on "Add Documents" to begin.
+
+2. **Select Your Data Processing Tools**
+   - At the top, you'll find three tabs labeled `Reader`, `Chunker`, and `Embedder`, each offering different options for handling your data.
+
+3. **Choose a Reader**
+   - The `Reader` is responsible for importing your data. Select from the available options:
+     - `SimpleReader`: For importing `.txt` and `.md` files.
+     - `GitHubReader`: For loading data directly from a GitHub repository by specifying the path (`owner/repo/folder_path`).
+     - `PDFReader`: For importing `.pdf` files.
+
+4. **Select a Chunker**
+   - `Chunkers` break down your data into manageable pieces. Choose a suitable chunker:
+     - `WordChunker`: Chunks the text by words.
+     - `SentenceChunker`: Chunks the text by sentences.
+
+5. **Pick an Embedder**
+   - `Embedders` are crucial for integrating your data into Weaviate. Select one based on your preference:
+     - `AdaEmbedder`: Utilizes OpenAI's ADA model for embedding.
+     - `MiniLMEmbedder`: Employs Sentence Transformers for embedding.
+     - `CohereEmbedder`: Uses Cohere for embedding.
+
+6. **Commence Data Ingestion**
+   - After setting up your preferences, click on "Import" to ingest your data into Verba.
+
+Now your data is ready to be used within Verba, enabling you to leverage its powerful search and retrieval capabilities.
 
 ## 💰 Large Language Model (LLM) Costs
 
