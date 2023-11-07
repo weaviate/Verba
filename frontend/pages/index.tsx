@@ -380,8 +380,8 @@ export default function Home() {
             </button>
           ))}
         </div>
-        <div className="flex w-full space-x-4 overflow-y-auto">
-          <div className="lg:w-1/2 md:w-full sm:w-full p-2 mb-20 lg:mb-2 border-2 shadow-lg border-gray-900 rounded-xl animate-pop-in">
+        <div className="flex w-full space-x-4 overflow-y-auto mb-20">
+          <div className="lg:w-1/2 md:w-full sm:w-full p-2 border-2 shadow-lg border-gray-900 rounded-xl animate-pop-in">
 
             {/* Header */}
             <div className="rounded-t-xl bg-gray-200 p-4 flex justify-between items-center">

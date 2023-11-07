@@ -98,7 +98,7 @@ const ConfigModal: React.FC<ConfigModalProps> = ({ component = "embedders", apiH
                     </button>
                     {/* Tooltip */}
                     {isTooltipVisible && (
-                        <div className="absolute flex transform text-xs mt-2 w-60 bg-gray-200 p-2 rounded-lg shadow-lg text-black z-10">
+                        <div className="absolute flex transform text-xs mt-2 w-60 bg-gray-200 p-2 rounded-lg shadow-lg text-black z-50">
                             {selectedComponent?.description}
                         </div>
                     )}
@@ -109,15 +109,22 @@ const ConfigModal: React.FC<ConfigModalProps> = ({ component = "embedders", apiH
                     <div className="absolute flex p-1 max-h-[50vh] animate-pop-in overflow-y-auto z-10 mt-2 items-center justify-center">
                         <div className="grid grid-rows-1 gap-2">
                             {components.filter(_component => _component.name !== selectedComponent?.name).map(_component => (
-                                <button
-                                    key={_component.name}
-                                    style={{ width: mainButtonRef.current ? `${mainButtonRef.current.offsetWidth}px` : 'auto' }}
-                                    onClick={() => handleComponentSelection(_component)}
-                                    className={`bg-gray-300 rounded-lg p-2 shadow-md animate-pop-in-late hover-container ${_component.available ? 'bg-gray-300 hover:bg-green-200' : 'bg-red-300 hover:bg-red-200'} truncate`}
-                                    disabled={!_component.available}
-                                >
-                                    <span>{_component.name}</span>
-                                </button>
+                                <div key={_component.name} className='text-center items-center justify-center'>
+                                    <button
+                                        key={_component.name}
+                                        style={{ width: mainButtonRef.current ? `${mainButtonRef.current.offsetWidth}px` : 'auto' }}
+                                        onClick={() => handleComponentSelection(_component)}
+                                        className={`bg-gray-300 rounded-lg p-2 shadow-md animate-pop-in-late ${_component.available ? 'bg-gray-300 hover:bg-green-200 hover-container' : 'bg-red-400 hover:bg-red-300'} truncate`}
+                                        disabled={!_component.available}
+                                    >
+                                        <div className='flex flex-col items-center justify-center'>
+                                            <span className='text-center'>{_component.name}</span>
+                                        </div>
+                                    </button>
+                                    {!_component.available && (
+                                        <p className="mt-1 p-1 bg-red-200 text-red-800 text-xs rounded-lg truncate">{_component.message}</p>
+                                    )}
+                                </div>
                             ))}
                         </div>
                     </div>
