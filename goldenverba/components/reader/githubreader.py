@@ -52,7 +52,11 @@ class GithubReader(Reader):
                     files = self.fetch_docs(path)
 
                     for _file in files:
-                        content, link, _path = self.download_file(path, _file)
+                        try:
+                            content, link, _path = self.download_file(path, _file)
+                        except Exception as e:
+                            msg.warn(f"Couldn't load, skipping {_file}: {str(e)}")
+                            continue
 
                         if ".json" in _file:
                             json_obj = json.loads(str(content))

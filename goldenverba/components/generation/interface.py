@@ -9,6 +9,7 @@ class Generator(VerbaComponent):
     def __init__(self):
         super().__init__()
         self.streamable = False
+        self.context_window = 4000
 
     async def generate(
         self,

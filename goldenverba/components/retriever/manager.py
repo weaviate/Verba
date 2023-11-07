@@ -4,6 +4,7 @@ from goldenverba.components.retriever.interface import Retriever
 from goldenverba.components.chunking.chunk import Chunk
 from goldenverba.components.embedding.interface import Embedder
 from goldenverba.components.retriever.interface import Retriever
+from goldenverba.components.generation.interface import Generator
 
 from weaviate import Client
 
@@ -24,6 +25,7 @@ class RetrieverManager:
         queries: list[str],
         client: Client,
         embedder: Embedder,
+        generator: Generator,
     ) -> list[Chunk]:
         """Ingest data into Weaviate
         @parameter: queries : list[str] - List of queries
@@ -32,7 +34,9 @@ class RetrieverManager:
         @returns list[Chunk] - List of retrieved chunks
         """
         chunks, context = self.selected_retriever.retrieve(queries, client, embedder)
-        managed_context = self.selected_retriever.cutoff_text(context)
+        managed_context = self.selected_retriever.cutoff_text(
+            context, generator.context_window
+        )
         return chunks, managed_context
 
     def set_retriever(self, retriever: str) -> bool:
