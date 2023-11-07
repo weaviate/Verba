@@ -18,6 +18,8 @@ All notable changes to this project will be documented in this file.
 - Add Copy and Cached Tag
 - Improved Semantic Cache
 - Added LLama 2 and Cohere support
+- Added new OpenAI models
+- Improved Documentation
 
 ### Fixed
 - Error handling for data ingestion (handling chunk size)
