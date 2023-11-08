@@ -34,6 +34,6 @@ class Reader(VerbaComponent):
         @parameter: paths : list[str] - List of paths to files
         @parameter: fileNames : list[str] - List of file names
         @parameter: document_type : str - Document type
-        @returns list[str] - List of strings
+        @returns list[Document] - Lists of documents
         """
         raise NotImplementedError("load method must be implemented by a subclass.")

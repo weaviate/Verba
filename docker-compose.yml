@@ -9,11 +9,17 @@ services:
     ports:
       - 8000:8000
     environment:
-      - VERBA_URL=http://weaviate:8080
+      - WEAVIATE_URL_VERBA=http://weaviate:8080
+      - OPENAI_API_KEY=$OPENAI_API_KEY
       ## IF YOU WANT AUTHENTICATION, UNCOMENT BELLOW 
       ## AND ADD WEAVIATE SERVICE
-      #- VERBA_API_KEY=adminkey
-      - OPENAI_API_KEY=$OPENAI_API_KEY
+      #- WEAVIATE_API_KEY_VERBA=adminkey
+      #- COHERE_API_KEY=YOUR-COHERE-KEY
+      #- UNSTRUCTURED_API_KEY=YOUR-UNSTRUCTURED-KEY
+      #- GITHUB_TOKEN=YOUR-GITHUB-TOKEN
+      #- HF_TOKEN=YOUR-HUGGINGFACE-TOKEN
+      #- LLAMA2-7B-CHAT-HF=ENABLE-LLAMA2?-(True or False)
+
     volumes:
       - ./data:/data/
     depends_on:
@@ -53,7 +59,7 @@ services:
       AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: 'true'
       PERSISTENCE_DATA_PATH: '/var/lib/weaviate'
       DEFAULT_VECTORIZER_MODULE: 'text2vec-openai'
-      ENABLE_MODULES: 'text2vec-openai, generative-openai, qna-openai'
+      ENABLE_MODULES: 'text2vec-openai, generative-openai, qna-openai, text2vec-cohere'
       CLUSTER_HOSTNAME: 'node1'
       #######IF YOU WANT AUTHENTICATION UNCOMMENT BELOW########
       # AUTHENTICATION_APIKEY_ENABLED: 'true'

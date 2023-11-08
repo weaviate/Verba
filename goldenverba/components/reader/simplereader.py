@@ -1,10 +1,10 @@
-from datetime import datetime
 import glob
 import base64
 import json
 
 from wasabi import msg
 from pathlib import Path
+from datetime import datetime
 
 from goldenverba.components.reader.interface import Reader, InputForm
 from goldenverba.components.reader.document import Document
@@ -12,14 +12,14 @@ from goldenverba.components.reader.document import Document
 
 class SimpleReader(Reader):
     """
-    SimpleReader that receives a list of strings, it's used to receive loaded documents directly from the frontend
+    The SimpleReader reads .txt, .md, .mdx, and .json files. It can handle both paths, content and bytes.
     """
 
     def __init__(self):
         super().__init__()
         self.file_types = [".txt", ".md", ".mdx", ".json"]
         self.name = "SimpleReader"
-        self.description = "Reads text, markdown, and json files"
+        self.description = "Reads text, markdown, and json files."
         self.input_form = InputForm.UPLOAD.value
 
     def load(
@@ -36,7 +36,7 @@ class SimpleReader(Reader):
         @parameter: paths : list[str] - List of paths to files
         @parameter: fileNames : list[str] - List of file names
         @parameter: document_type : str - Document type
-        @returns list[str] - List of strings
+        @returns list[Document] - Lists of documents
         """
 
         documents = []
@@ -102,7 +102,7 @@ class SimpleReader(Reader):
 
     def load_file(self, file_path: Path, document_type: str) -> list[Document]:
         """Loads text file
-        @param dir_path : Path - Path to directory
+        @param file_path : Path - Path to file
         @param document_type : str - Document Type
         @returns list[Document] - Lists of documents
         """

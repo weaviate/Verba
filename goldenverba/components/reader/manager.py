@@ -1,10 +1,10 @@
+from wasabi import msg
+
 from goldenverba.components.reader.simplereader import SimpleReader
 from goldenverba.components.reader.githubreader import GithubReader
 from goldenverba.components.reader.pdfreader import PDFReader
 from goldenverba.components.reader.interface import Reader
 from goldenverba.components.reader.document import Document
-
-from wasabi import msg
 
 
 class ReaderManager:
@@ -30,7 +30,7 @@ class ReaderManager:
         @parameter: paths : list[str] - List of paths to files
         @parameter: fileNames : list[str] - List of file names
         @parameter: document_type : str - Document type
-        @returns list[str] - List of strings
+        @returns list[Document] - Lists of documents
         """
         return self.selected_reader.load(
             bytes, contents, paths, fileNames, document_type
