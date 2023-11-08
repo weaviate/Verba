@@ -1,19 +1,74 @@
+# Verba: The Golden RAGtriever Technical Documentation
 
+## Introduction
+This document provides a comprehensive overview of the technical architecture and implementation details of Verba. Verba is an open-source application engineered to leverage the capabilities of Retrieval-Augmented Generation (RAG) through a user-friendly interface. It is designed to work seamlessly with Weaviate's context-aware database and various Large Language Model (LLM) providers, offering advanced data interaction and query resolution features. Below is a detailed examination of Verba's modular components and their interactions.
 
-01. READER 
+![Demo of Verba](https://github.com/weaviate/Verba/blob/dev/img/verba_architecture.png)
 
-The task of the Reader is to import different data sources and convert them into a Verba Document.
+## System Architecture
+Verba's system is modularly constructed, comprising five primary components: Reader, Chunkers, Embedder, Retrievers, and Generators. Each component is designed with an interface outlining its methods, input expectations, and output specifications. Component Managers oversee the operations of their respective components, ensuring smooth data flow through the system. At the core of the architecture is the Verba Manager, orchestrating the entire process from data input to answer generation.
 
-The Verba Document contains the document text, name, origin, link and other meta data. The Verba Document is one of the essential building block of Verba.
-You can serialize and deserialize Verba documents into .verba binary files if needed
+### 1. Reader
+**Purpose:**
+The Reader module is responsible for loading various data formats into the Verba system.
 
-You can create different Readers that load data from different sources, for example, PDFReader, GithubReader, NotionReader, etc.
-All Readers must inherit the interface Reader class and implement its method. It's important that the outputs of the require methods are aligning with custom Reader. The ReaderManager manages and contains all useable readers, you can use the Manager to control which Reader should be used. The ReaderManager is used in the Verba Manager which orchestrates the whole end-to-end pipeline.
+**Implementation:**
+- Reader Manager: Manages different readers and maintains the current reader in use.
+    - SimpleReader: Loads text and markdown files.
+    - GithubReader: Downloads and processes text from GitHub repositories.
+    - PDFReader: Imports and processes data from PDF files.
 
+### 2. Chunkers
+**Purpose:**
+Chunkers segment larger documents into smaller, manageable chunks suitable for vectorization and retrieval.
 
-How to create a new Reader
-1. Create a new python file within the reader folder
-2. Create a class that inherits the Reader class
-3. Implement it's methods (e.g. load())
-4. Add your new Readerclass to the ReaderManager
-5. Add unit tests and usage examples in the reader/tests folder with example data
+**Implementation:**
+- Chunker Manager: Controls the available chunking strategies and selects the appropriate chunker as needed.
+    - WordChunker: Creates chunk of documents based on words 
+    - SentenceChunker: Creates chunk of documents based on sentences 
+
+### 3. Embedders
+**Purpose:**
+The Embedder takes the chunked data, transforms it into vectorized form, and ingests it into Weaviate.
+
+**Implementation:**
+- Embedder Manager: Manages the embedding process and the selection of the current embedding strategy.
+    - ADAEmbedder: Embeds chunks based on OpenAI's ADA Model
+    - MiniLMEmbedder: Embeds chunks based on Sentence Transformer
+    - CohereEmbedder: Embeds chunks based on Cohere's Embedding Model
+
+### 4. Retrievers
+**Purpose:**
+Retrievers are tasked with locating the most relevant chunks based on user queries using vector search methodologies.
+
+**Implementation:**
+- Retriever Manager: Oversees the retriever components and their retrieval strategies.
+    - WindowRetriever: Retrieves chunks using hybrid search and adds surrounding context of chunks
+    - SimpleRetriever: Retrieves chunks using hybrid search only
+
+### 5. Generators
+**Purpose:**
+Generators synthesize answers by utilizing the retrieved chunks and the context of user queries.
+
+**Implementation:**
+- Generator Manager: Manages different generation strategies and maintains the currently selected generator.
+    - GPT3Generator: Uses OpenAI's GPT3 model to generate responses
+    - GPT4Generator: Uses OpenAI's GPT4 model to generate responses
+    - CohereGenerator: Uses Cohere to generate responses
+    - Llama2Generator: Uses Meta's Llama2 to generate responses
+
+## Core Component: Verba Manager
+### Overview
+The Verba Manager is the heart of the system, holding all Component Managers and facilitating the data flow from reading to answer generation.
+
+### Interaction with FastAPI
+The FastAPI application serves as the interface to the frontend and interacts solely with the Verba Manager.
+This encapsulation ensures a clean and maintainable codebase where the API endpoints communicate with a single point of reference within the Verba ecosystem.
+
+## Data Flow Process
+1. Data Ingestion: The selected Reader loads the data into the system.
+2. Chunking: The chosen Chunker segments the data into smaller parts.
+3. Vectorization: The Embedder transforms these chunks into vector representations.
+4. Retrieval: Based on a user's query, the Retriever identifies the most relevant data chunks.
+5. Answer Generation: The Generator composes an answer leveraging both the retrieved chunks and the contextual understanding of the query.
+
