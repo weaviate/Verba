@@ -1,4 +1,3 @@
-import json
 from goldenverba.components.chunking.chunk import Chunk
 
 

@@ -1,17 +1,17 @@
 weaviate-client==3.23.1
-python-dotenv>=1.0.0
+python-dotenv==1.0.0
 openai==0.27.9
-black>=23.7.0
-wasabi>=1.1.2
-fastapi>=0.102.0
+black==23.7.0
+wasabi==1.1.2
+fastapi==0.102.0
 uvicorn[standard]
-click>= 8.1.7
+click== 8.1.7
 pytest
 setuptools
 wheel
 twine
-spacy>=3.6.1
-tiktoken>=0.5.1
+spacy==3.6.1
+tiktoken==0.5.1
 sentence-transformer
 transformers
 torch

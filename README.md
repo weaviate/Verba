@@ -3,7 +3,9 @@
 
 Welcome to Verba: The Golden RAGtriever, an open-source application designed to offer an end-to-end, streamlined, and user-friendly interface for Retrieval-Augmented Generation (RAG) out of the box. In just a few easy steps, explore your datasets and extract insights with ease, either locally or through LLM providers such as OpenAI, Cohere, and HuggingFace.
 
-```pip install goldenverba```
+```
+pip install goldenverba
+```
 
 [![Weaviate](https://img.shields.io/static/v1?label=powered%20by&message=Weaviate%20%E2%9D%A4&color=green&style=flat-square)](https://weaviate.io/) 
 [![PyPi downloads](https://static.pepy.tech/personalized-badge/goldenverba?period=total&units=international_system&left_color=grey&right_color=orange&left_text=pip%20downloads)](https://pypi.org/project/goldenverba/) [![Docker support](https://img.shields.io/badge/Docker_support-%E2%9C%93-4c1?style=flat-square&logo=docker&logoColor=white)](https://docs.docker.com/get-started/) [![Demo](https://img.shields.io/badge/Check%20out%20the%20demo!-yellow?&style=flat-square&logo=react&logoColor=white)](https://verba.weaviate.io/)
@@ -66,10 +68,15 @@ Verba enhances search efficiency with Weaviate's Semantic Cache, a sophisticated
 Starting your Verba journey is super easy, with multiple deployment options tailored to your preferences. Follow these simple steps to get Verba up and running:
 
 - Deploy with pip [(Quickstart)](##🚀-Quickstart:-Deploy-with-pip)
-    -  `pip install goldenverba`
+```
+pip install goldenverba
+```
 - Build from Source [(Quickstart)](##🛠️-Quickstart:-Build-from-Source)
-    - `git clone https://github.com/weaviate/Verba`
-    - `pip install -e .`
+```
+git clone https://github.com/weaviate/Verba
+
+pip install -e .
+```
 - Use Docker for Deployment [(Quickstart)](##🐳-Quickstart:-Deploy-with-Docker)
 
 **Prerequisites**: If you're not using Docker, ensure that you have `Python >=3.9.0` installed on your system.
@@ -86,10 +93,14 @@ Run the installer and make sure to check the box that says `Add Python to PATH` 
 
 ### For macOS:
 You can install Python using Homebrew, a package manager for macOS, with the following command in the terminal:
-`/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`
+```
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
 
 Then install Python:
-`brew install python`
+```
+brew install python
+```
 
 ### For Linux:
 Python usually comes pre-installed on most Linux distributions. If it's not, you can install it using your distribution's package manager. You can read more about it [here](https://opensource.com/article/20/4/install-python-linux)
@@ -100,19 +111,27 @@ It's recommended to use a virtual environment to avoid conflicts with other proj
 ### Install the virtualenv package:
 First, ensure you have pip installed (it comes with Python if you're using version 3.4 and above).
 Install virtualenv by running:
-`pip install virtualenv`
+```
+pip install virtualenv
+```
 
 ### Create a Virtual Environment:
 Navigate to your project's directory in the terminal.
 Run the following command to create a virtual environment named venv (you can name it anything you like):
-`python3 -m virtualenv venv`
+```
+python3 -m virtualenv venv
+```
 
 ### Activate the Virtual Environment:
 - On Windows, activate the virtual environment by running:
-`venv\Scripts\activate.bat`
+```
+venv\Scripts\activate.bat
+```
 
 - On macOS and Linux, activate it with:
-`source venv/bin/activate`
+```
+source venv/bin/activate
+```
 
 Once your virtual environment is activated, you'll see its name in the terminal prompt. Now you're ready to install Verba using the steps provided in the Quickstart sections.
 
@@ -124,56 +143,80 @@ Verba comes in several installation packages, each tailored for specific use cas
 ## Default Package
 The default package is perfect for getting started quickly and includes support for popular models and services like OpenAI, Cohere, and spaCy. This package is suitable for general use and can be installed easily via pip:
 
-```pip install goldenverba```
+```
+pip install goldenverba
+```
 
 > This will set you up with all you need to integrate Verba with these services without additional configuration.
 
 ## HuggingFace Version
 For those looking to leverage models from the HuggingFace ecosystem, including `SentenceTransformer` and `LLama2`, the HuggingFace version is the ideal choice. This package is optimized for GPU usage to accommodate the high performance demands of these models:
 
-```pip install goldenverba[huggingface]```
+```
+pip install goldenverba[huggingface]
+```
 
 > Note: It's recommended to run this version on a system with a GPU to fully utilize the capabilities of the advanced models.
 
 ## Development Version
 If you're a developer looking to contribute to Verba or need the latest features still in development, the dev version is what you're looking for. This version may be less stable but offers the cutting edge of Verba's capabilities:
 
-```pip install goldenverba[dev]```
+```
+pip install goldenverba[dev]
+```
 
 > Keep in mind that this version is intended for development purposes and may contain experimental features.
 
 # 🚀 Quickstart: Deploy with pip
 
 1. **Initialize a new Python Environment**
-- ```python3 -m virtualenv venv```
+```
+python3 -m virtualenv venv
+```
 
 2. **Install Verba**
-- ```pip install goldenverba```
+```
+pip install goldenverba
+```
 
 3. **Launch Verba**
-- ```verba start```
+```
+verba start
+```
 
 4. **Access Verba**
-- ```Visit localhost:8000```
+```
+Visit localhost:8000
+```
 
 5. **Create .env file and add environment variables**
 
 # 🛠️ Quickstart: Build from Source
 
 1. **Clone the Verba repos**
-- ```git clone https://github.com/weaviate/Verba.git```
+```
+git clone https://github.com/weaviate/Verba.git
+```
 
 2. **Initialize a new Python Environment**
-- ```python3 -m virtualenv venv```
+```
+python3 -m virtualenv venv
+```
 
 3. **Install Verba**
-- ```pip install -e .```
+```
+pip install -e .
+```
 
 4. **Launch Verba**
-- ```verba start```
+```
+verba start
+```
 
 5. **Access Verba**
-- ```Visit localhost:8000```
+```
+Visit localhost:8000
+```
 
 6. **Create .env file and add environment variables**
 
@@ -193,43 +236,59 @@ If you prefer a cloud-based solution, Weaviate Cloud Service (WCS) offers a scal
 **🐳 Docker Deployment**
 Another robust local alternative is deploying Weaviate using Docker. For more details, consult the [Weaviate Docker Guide](https://weaviate.io/developers/weaviate/installation/docker-compose).
 
-- ```WEAVIATE_URL_VERBA=URL-TO-YOUR-WEAVIATE-CLUSTER```
-- ```WEAVIATE_API_KEY_VERBA=API-KEY-OF-YOUR-WEAVIATE-CLUSTER```
+```
+WEAVIATE_URL_VERBA=URL-TO-YOUR-WEAVIATE-CLUSTER
+
+WEAVIATE_API_KEY_VERBA=API-KEY-OF-YOUR-WEAVIATE-CLUSTER
+```
 
 ## OpenAI
 
 Verba supports OpenAI Models such as Ada, GPT3, and GPT4. To use them, you need to specify the `OPENAI_API_KEY` environment variable. You can get it from [OpenAI](https://openai.com/)
 
-- ```OPENAI_API_KEY=YOUR-OPENAI-KEY```
+```
+OPENAI_API_KEY=YOUR-OPENAI-KEY
+```
 
 ## Cohere
 
 Verba supports Cohere Models, to use them, you need to specify the `COHERE_API_KEY` environment variable. You can get it from [Cohere](https://dashboard.cohere.com/)
 
-- ```COHERE_API_KEY=YOUR-COHERE-KEY```
+```
+COHERE_API_KEY=YOUR-COHERE-KEY
+```
 
 ## HuggingFace
 
 Verba supports HuggingFace models, such as SentenceTransformers and Llama2. To use them you need the `HF_TOKEN` environment variable. You can get it from [HuggingFace](https://huggingface.co/)
 
+```
+HF_TOKEN=YOUR-HUGGINGFACE-TOKEN
+```
 
 ### Llama2 
 
 To use the Llama2 model from Meta, you first need to request access to it. Read more about accessing the [Llama model here](https://huggingface.co/blog/llama2). To enable the LLama2 model for Verba use:
 
-- ```LLAMA2-7B-CHAT-HF=True```
+```
+LLAMA2-7B-CHAT-HF=True
+```
 
 ## Unstructured
 
 Verba supports importing documents through Unstructured (e.g .pdf). To use them you need the `UNSTRUCTURED_API_KEY` environment variable. You can get it from [Unstructured](https://unstructured.io/)
 
-- ```UNSTRUCTURED_API_KEY=YOUR-UNSTRUCTURED-KEY```
+```
+UNSTRUCTURED_API_KEY=YOUR-UNSTRUCTURED-KEY
+```
 
 ## Github
 
 If you want to use the Github Reader, you need the `GITHUB_TOKEN` environment variable. You can get it from [GitHub](https://github.com/)
 
-- ```GITHUB_TOKEN=YOUR-GITHUB-TOKEN```
+```
+GITHUB_TOKEN=YOUR-GITHUB-TOKEN
+```
 
 ## Status Page
 
@@ -250,12 +309,16 @@ If you're unfamiliar with Docker, you can learn more about it [here](https://doc
 0. **Clone the Verba repos**
 Ensure you have Git installed on your system. Then, open a terminal or command prompt and run the following command to clone the Verba repository:
 
-- ```git clone https://github.com/weaviate/Verba.git```
+```
+git clone https://github.com/weaviate/Verba.git
+```
 
 1. **Deploy using Docker**
 With Docker installed and the Verba repository cloned, navigate to the directory containing the Docker Compose file in your terminal or command prompt. Run the following command to start the Verba application in detached mode, which allows it to run in the background:
 
-- ``` docker compose up -d ```
+```
+docker compose up -d
+```
 
 This command will download the necessary Docker images, create containers, and start Verba.
 Remember, Docker must be installed on your system to use this method. For installation instructions and more details about Docker, visit the official Docker documentation. 

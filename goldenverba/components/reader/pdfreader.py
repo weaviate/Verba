@@ -1,12 +1,11 @@
-from datetime import datetime
 import glob
 import base64
-import json
 import os
 import requests
 
 from wasabi import msg
 from pathlib import Path
+from datetime import datetime
 
 from goldenverba.components.reader.interface import Reader, InputForm
 from goldenverba.components.reader.document import Document
@@ -14,7 +13,7 @@ from goldenverba.components.reader.document import Document
 
 class PDFReader(Reader):
     """
-    PDFReader for verba
+    The PDFReader reads .pdf files using Unstructured.
     """
 
     def __init__(self):
@@ -22,7 +21,7 @@ class PDFReader(Reader):
         self.file_types = [".pdf"]
         self.requires_env = ["UNSTRUCTURED_API_KEY"]
         self.name = "PDFReader"
-        self.description = "Reads PDF files"
+        self.description = "Reads PDF files powered by unstructured.io"
         self.input_form = InputForm.UPLOAD.value
 
     def load(
@@ -39,7 +38,7 @@ class PDFReader(Reader):
         @parameter: paths : list[str] - List of paths to files
         @parameter: fileNames : list[str] - List of file names
         @parameter: document_type : str - Document type
-        @returns list[str] - List of strings
+        @returns list[Document] - Lists of documents
         """
 
         documents = []
@@ -81,7 +80,8 @@ class PDFReader(Reader):
 
     def load_bytes(self, bytes_string, fileName, document_type: str) -> list[Document]:
         """Loads a pdf bytes file
-        @param dir_path : Path - Path to directory
+        @param bytes_string : str - PDF File bytes coming from the frontend
+        @param fileName : str - Filename
         @param document_type : str - Document Type
         @returns list[Document] - Lists of documents
         """
@@ -129,8 +129,8 @@ class PDFReader(Reader):
         return documents
 
     def load_file(self, file_path: Path, document_type: str) -> list[Document]:
-        """Loads text file
-        @param dir_path : Path - Path to directory
+        """Loads .pdf file
+        @param file_path : Path - Path to file
         @param document_type : str - Document Type
         @returns list[Document] - Lists of documents
         """
@@ -179,7 +179,7 @@ class PDFReader(Reader):
         return documents
 
     def load_directory(self, dir_path: Path, document_type: str) -> list[Document]:
-        """Loads text files from a directory and its subdirectories.
+        """Loads .pdf files from a directory and its subdirectories.
 
         @param dir_path : Path - Path to directory
         @param document_type : str - Document Type

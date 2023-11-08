@@ -1,14 +1,10 @@
-import glob
-from datetime import datetime
+import os
 import base64
 import json
 
 import requests
-
-from pathlib import Path
+from datetime import datetime
 from wasabi import msg
-
-import os
 
 from goldenverba.components.reader.interface import Reader, InputForm
 from goldenverba.components.reader.document import Document
@@ -16,14 +12,14 @@ from goldenverba.components.reader.document import Document
 
 class GithubReader(Reader):
     """
-    GithubReader for Verba
+    The GithubReader downloads files from Github and ingests them into Weaviate
     """
 
     def __init__(self):
         super().__init__()
         self.name = "GithubReader"
         self.requires_env = ["GITHUB_TOKEN"]
-        self.description = "Downloads text files from a github repository. Use this format {owner}/{repo}/{folder}"
+        self.description = "Downloads text files from a GitHub repository and ingests it into Verba. Use this format {owner}/{repo}/{folder}"
         self.input_form = InputForm.INPUT.value
 
     def load(
@@ -40,7 +36,7 @@ class GithubReader(Reader):
         @parameter: paths : list[str] - List of paths to files
         @parameter: fileNames : list[str] - List of file names
         @parameter: document_type : str - Document type
-        @returns list[str] - List of strings
+        @returns list[Document] - Lists of documents
         """
 
         documents = []
@@ -82,12 +78,9 @@ class GithubReader(Reader):
         msg.good(f"Loaded {len(documents)} documents")
         return documents
 
-    def fetch_docs(self, path) -> list:
+    def fetch_docs(self, path: str) -> list:
         """Fetch filenames from Github
-        @parameter owner : str - Repo owner
-        @parameter repo : str - Repo name
-        @parameter folder_path : str - Directory in repo to fetch from
-        @parameter token : str - Github token
+        @parameter path : str - Path to a GitHub repository
         @returns list - List of document names
         """
 
@@ -123,12 +116,10 @@ class GithubReader(Reader):
         )
         return files
 
-    def download_file(self, path, file_path) -> str:
+    def download_file(self, path: str, file_path: str) -> str:
         """Download files from Github based on filename
-        @parameter owner : str - Repo owner
-        @parameter repo : str - Repo name
+        @parameter path : str - Path to a GitHub repository
         @parameter file_path : str - Path of the file in repo
-        @parameter token : str - Github token
         @returns str - Content of the file
         """
         split = path.split("/")

@@ -193,14 +193,22 @@ class VerbaManager:
             weaviate_key = os.environ.get("WEAVIATE_API_KEY_VERBA", "")
             if weaviate_key != "":
                 self.environment_variables["WEAVIATE_API_KEY_VERBA"] = True
+                auth_config = weaviate.AuthApiKey(api_key=weaviate_key)
+                msg.info("Auth information provided")
+                client = weaviate.Client(
+                    url=weaviate_url,
+                    additional_headers=additional_header,
+                    auth_client_secret=auth_config,
+                )
+            else:
+                msg.info("No Auth information provided")
+                client = weaviate.Client(
+                    url=weaviate_url,
+                    additional_headers=additional_header,
+                )
             self.environment_variables["WEAVIATE_URL_VERBA"] = True
             self.weaviate_type = "Weaviate Cluster"
-            auth_config = weaviate.AuthApiKey(api_key=weaviate_key)
-            client = weaviate.Client(
-                url=weaviate_url,
-                additional_headers=additional_header,
-                auth_client_secret=auth_config,
-            )
+
         # Use Weaviate Embedded
         else:
             try:

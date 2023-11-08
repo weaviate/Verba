@@ -24,7 +24,7 @@ We welcome all ideas and feedback. If you're not ready to open an Issue or if yo
 
 ## 📝 Pull Requests
 
-If you're ready to contribute code or documentation, please submit a Pull Request (PR). Here's the process:
+If you're ready to contribute code or documentation, please submit a Pull Request (PR) to the dev branch. Here's the process:
 
 - Fork the repository and create your branch from `main`.
 - Ensure that your code adheres to the existing code style. Use [Black](https://github.com/psf/black) for formatting Python code.
