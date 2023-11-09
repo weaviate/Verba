@@ -176,7 +176,6 @@ class VerbaManager:
                 additional_header["X-OpenAI-Api-Key"] = openai_key
                 self.environment_variables["OPENAI_API_KEY"] = True
                 openai.api_key = openai_key
-                msg.info("OpenAI API key detected")
             else:
                 self.environment_variables["OPENAI_API_KEY"] = False
 
@@ -264,6 +263,13 @@ class VerbaManager:
             self.installed_libraries["openai"] = False
 
         try:
+            import cohere
+
+            self.installed_libraries["cohere"] = True
+        except Exception as e:
+            self.installed_libraries["cohere"] = False
+
+        try:
             import huggingface_hub
             from huggingface_hub import login
 
@@ -282,6 +288,13 @@ class VerbaManager:
 
         try:
             import torch
+
+            if torch.cuda.is_available():
+                msg.info("CUDA is available. Using CUDA...")
+            elif torch.backends.mps.is_available():
+                msg.info("MPS is available. Using MPS...")
+            else:
+                msg.info("Neither CUDA nor MPS is available. Using CPU...")
 
             self.installed_libraries["torch"] = True
         except Exception as e:

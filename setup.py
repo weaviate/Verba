@@ -36,6 +36,7 @@ setup(
         "click== 8.1.7",
         "asyncio",
         "tiktoken==0.5.1",
+        "cohere==4.33",
     ],
     extras_require={
         "dev": ["pytest", "wheel", "twine", "black>=23.7.0", "setuptools"],

@@ -13,7 +13,6 @@ class CohereEmbedder(Embedder):
         super().__init__()
         self.name = "CohereEmbedder"
         self.requires_env = ["COHERE_API_KEY"]
-        self.requires_library = ["openai"]
         self.description = (
             "Embeds and retrieves objects using Cohere's embed-multilingual-v2.0 model"
         )
