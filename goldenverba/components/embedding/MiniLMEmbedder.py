@@ -22,15 +22,31 @@ class MiniLMEmbedder(Embedder):
         self.tokenizer = None
         try:
             from transformers import AutoTokenizer, AutoModel
+            import torch
+
+            def get_device():
+                if torch.cuda.is_available():
+                    msg.info("CUDA is available. Using CUDA...")
+                    return torch.device("cuda")
+                elif torch.backends.mps.is_available():
+                    msg.info("MPS is available. Using MPS...")
+                    return torch.device("mps")
+                else:
+                    msg.info("Neither CUDA nor MPS is available. Using CPU...")
+                    return torch.device("cpu")
+
+            self.device = get_device()
 
             self.model = AutoModel.from_pretrained(
-                "sentence-transformers/all-MiniLM-L6-v2"
+                "sentence-transformers/all-MiniLM-L6-v2", device_map=self.device
             )
             self.tokenizer = AutoTokenizer.from_pretrained(
-                "sentence-transformers/all-MiniLM-L6-v2"
+                "sentence-transformers/all-MiniLM-L6-v2", device_map=self.device
             )
+            self.model = self.model.to(self.device)
 
-        except:
+        except Exception as e:
+            msg.warn(str(e))
             pass
 
     def embed(
