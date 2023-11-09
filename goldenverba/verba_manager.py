@@ -222,10 +222,7 @@ class VerbaManager:
             self.weaviate_type = "Weaviate Embedded"
             client = weaviate.Client(
                 additional_headers={"X-OpenAI-Api-Key": openai.api_key},
-                embedded_options=EmbeddedOptions(
-                    persistence_data_path="./.verba/local/share/",
-                    binary_path="./.verba/cache/weaviate-embedded",
-                ),
+                embedded_options=EmbeddedOptions(),
             )
 
         if client != None:

@@ -222,11 +222,6 @@ def init_documents(
         client.schema.create(chunk_schema)
         msg.good(f"{document_name} and {chunk_name} schemas created")
 
-    # If Weaviate Embedded runs
-    if client._connection.embedded_db:
-        msg.info("Stopping Weaviate Embedded")
-        client._connection.embedded_db.stop()
-
     return document_schema, chunk_schema
 
 
@@ -292,11 +287,6 @@ def init_cache(
         client.schema.create(cache_schema)
         msg.good(f"{cache_name} schema created")
 
-    # If Weaviate Embedded runs
-    if client._connection.embedded_db:
-        msg.info("Stopping Weaviate Embedded")
-        client._connection.embedded_db.stop()
-
     return cache_schema
 
 
@@ -348,10 +338,5 @@ def init_suggestion(
     else:
         client.schema.create(suggestion_schema)
         msg.good(f"{suggestion_name} schema created")
-
-    # If Weaviate Embedded runs
-    if client._connection.embedded_db:
-        msg.info("Stopping Weaviate Embedded")
-        client._connection.embedded_db.stop()
 
     return suggestion_schema
