@@ -562,6 +562,7 @@ async def generate(payload: GeneratePayload):
         )
 
     except Exception as e:
+        raise e
         msg.fail(f"Answer Generation failed: {str(e)}")
         return JSONResponse(
             content={

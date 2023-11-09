@@ -54,7 +54,7 @@ class ConfigManager:
 
     def load_config(self):
         """Load config from file."""
-        msg.info("Config loaded")
+        msg.good("Config loaded")
         with open(self.filename, "r") as file:
             json_obj = json.load(file)
             self.config = Config(

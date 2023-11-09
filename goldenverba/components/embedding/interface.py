@@ -285,7 +285,6 @@ class Embedder(VerbaComponent):
         for _query in queries:
             query += _query + " "
 
-        print(query.lower())
         return query.lower()
 
     def retrieve_semantic_cache(

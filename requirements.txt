@@ -18,3 +18,4 @@ torch
 huggingface_hub
 asyncio
 accelerate
+cohere==4.33
