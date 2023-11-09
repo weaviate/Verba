@@ -1,6 +1,5 @@
 import click
 import uvicorn
-import os
 
 from goldenverba.verba_manager import VerbaManager
 

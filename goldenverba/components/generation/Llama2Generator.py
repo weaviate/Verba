@@ -29,9 +29,7 @@ class Llama2Generator(Generator):
                     if torch.cuda.is_available():
                         msg.info("CUDA is available. Using CUDA...")
                         return torch.device("cuda")
-                    elif (
-                        torch.backends.mps.is_available()
-                    ):  # Assuming torch.has_mps is a function to check for MPS availability
+                    elif torch.backends.mps.is_available():
                         msg.info("MPS is available. Using MPS...")
                         return torch.device("mps")
                     else:
