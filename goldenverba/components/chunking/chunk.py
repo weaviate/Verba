@@ -73,7 +73,7 @@ class Chunk:
             "doc_uuid": self.doc_uuid,
             "chunk_id": self.chunk_id,
             "tokens": self.tokens,
-            "vector": self.vector,  # Note: This assumes that the vector can be serialized to JSON as-is. If not, you'd need a conversion method.
+            "vector": self.vector,
             "score": self.score,
         }
 
