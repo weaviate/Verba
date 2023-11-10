@@ -244,7 +244,7 @@ class VerbaManager:
 
     def verify_installed_libraries(self) -> None:
         """
-        Checks which libraries are installed and fills out the self.installed_libraries dictionary for the frontend to access
+        Checks which libraries are installed and fills out the self.installed_libraries dictionary for the frontend to access, this will be displayed in the status page
         """
 
         # spaCy, used for Chunking
