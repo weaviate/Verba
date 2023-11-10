@@ -1,14 +1,7 @@
 from weaviate import Client
-from wasabi import msg
 
 from goldenverba.components.embedding.interface import Embedder
 from goldenverba.components.reader.document import Document
-from goldenverba.components.reader.interface import InputForm
-from goldenverba.components.schema.schema_generation import (
-    VECTORIZERS,
-    EMBEDDINGS,
-    strip_non_letters,
-)
 
 
 class ADAEmbedder(Embedder):

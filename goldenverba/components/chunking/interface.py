@@ -1,5 +1,3 @@
-from enum import Enum
-
 from goldenverba.components.reader.document import Document
 from goldenverba.components.reader.interface import InputForm
 from goldenverba.components.component import VerbaComponent
