@@ -2,6 +2,33 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.0] - 12.09.2023
+
+### Added
+- Refactor modular architecture
+- Add ability to import data through the frontend, CLI, and script
+- Add Readers (SimpleReader, PathReader, GithubReader, PDFReader)
+- Add Chunkers (WordChunker, SentenceChunker)
+- Add Embedders (ADAEmbedder,SentenceTransformer, Cohere)
+- Add Generators (GPT3, GPT4, LLama, Cohere)
+- Status Page
+- Reset functionality
+- Streaming Token Generation
+- Lazy Document Loading
+- Add Copy and Cached Tag
+- Improved Semantic Cache
+- Added LLama 2 and Cohere support
+- Added new OpenAI models
+- Improved Documentation
+- Added technical docs and contribution guidelines
+
+### Fixed
+- Error handling for data ingestion (handling chunk size)
+- Schmea handling on startup
+
+### Changed
+- Removed Simple- and AdvancedEngine logic
+
 ## [0.2.3] - 05.09.2023
 
 ### Added

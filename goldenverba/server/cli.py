@@ -1,12 +1,12 @@
 import click
 import uvicorn
-import os
 
-from goldenverba.ingestion.cli import init as init_ingest
-from goldenverba.ingestion.cli import clear_cache_command as clear_cache
-from goldenverba.ingestion.cli import clear_all_command as clear_all
-from goldenverba.ingestion.cli import import_data_command as import_data
-from goldenverba.ingestion.cli import import_weaviate_command as import_weaviate
+from goldenverba.verba_manager import VerbaManager
+
+from wasabi import msg
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 @click.group()
@@ -17,23 +17,81 @@ def cli():
 
 @cli.command()
 @click.option(
-    "--model",
-    default="gpt-3.5-turbo",
-    help="Generative OpenAI model",
+    "--port",
+    default=8000,
+    help="FastAPI Port",
 )
-def start(model):
+def start(port):
     """
     Run the FastAPI application.
     """
-    os.environ["VERBA_MODEL"] = model
-    uvicorn.run("goldenverba.server.api:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("goldenverba.server.api:app", host="0.0.0.0", port=port, reload=True)
 
 
-cli.add_command(init_ingest, name="init")
-cli.add_command(import_data, name="import")
-cli.add_command(import_weaviate, name="weaviate")
-cli.add_command(clear_cache, name="clear_cache")
-cli.add_command(clear_all, name="clear")
+@cli.command()
+@click.option(
+    "--reader",
+    default="SimpleReader",
+    help="Reader",
+)
+@click.option(
+    "--type",
+    default="Documentation",
+    help="Document Type",
+)
+@click.option(
+    "--chunker",
+    default="WordChunker",
+    help="Chunker",
+)
+@click.option(
+    "--units",
+    default=100,
+    help="Units per chunk",
+)
+@click.option(
+    "--overlap",
+    default=50,
+    help="Overlap of units per chunk",
+)
+@click.option(
+    "--embedder",
+    default="ADAEmbedder",
+    help="Embedder",
+)
+@click.option(
+    "--path",
+    help="Path to data",
+)
+def load(reader, type, chunker, units, overlap, embedder, path):
+    """
+    Run the FastAPI application.
+    """
+    manager = VerbaManager()
+    manager.reader_set_reader(reader)
+    manager.chunker_set_chunker(chunker)
+    manager.embedder_set_embedder(embedder)
+
+    manager.import_data(
+        bytes=[],
+        contents=[],
+        paths=[path],
+        fileNames=[path],
+        document_type=type,
+        units=units,
+        overlap=overlap,
+    )
+
+
+@cli.command()
+def reset():
+    """
+    Delete all schemas
+    """
+    manager = VerbaManager()
+    manager.reset()
+    msg.warn("Verba Resetted")
+
 
 if __name__ == "__main__":
     cli()
