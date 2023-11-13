@@ -179,7 +179,6 @@ export default function Home() {
         if (queryData.context != "") {
           if (streamable) {
             handleGenerateStreamMessage(sendInput, queryData.context)
-            setIsFetching(false)
           } else {
             handleGenerateMessage(sendInput, queryData.context)
           }
@@ -412,6 +411,7 @@ export default function Home() {
               isFetching={isFetching}
               apiHost={getApiHostNoHttp()}
               setHandleGenerateStreamMessageRef={setHandleGenerateStreamMessage}
+              setIsFetching={setIsFetching}
             />
 
             {/* Input area */}
@@ -423,6 +423,7 @@ export default function Home() {
                 type="text"
                 value={userInput}
                 onChange={handleInputChange}
+                disabled={isFetching}
                 placeholder="What is a vector database?"
                 className="w-full p-2 rounded-md bg-white text-gray-900 placeholder-gray-400"
               />
