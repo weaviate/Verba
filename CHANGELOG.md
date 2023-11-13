@@ -20,6 +20,7 @@ All notable changes to this project will be documented in this file.
 - Added LLama 2 and Cohere support
 - Added new OpenAI models
 - Improved Documentation
+- Added technical docs and contribution guidelines
 
 ### Fixed
 - Error handling for data ingestion (handling chunk size)
