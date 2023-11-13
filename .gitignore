@@ -13,3 +13,5 @@ build
 .vscode
 verba_config.json
 text-generation-inference
+test.py
+cache.txt
