@@ -92,11 +92,6 @@
   animation: pressIn 0.6s ease-out;
 }
 
-.document-container {
-  /* You've already set max-height, just ensure overflow is set */
-  overflow-y: auto;
-}
-
 /* Setting the font-family to PT Mono for all markdown content */
 .my-markdown-styles {
   font-family: "PT Mono", monospace;

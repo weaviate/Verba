@@ -1,0 +1,758 @@
+Cohere
+
+PRODUCTS
+
+FOR BUSINESS
+
+DEVELOPERS
+
+RESEARCH
+
+COMPANY
+TRY NOW
+
+FOR BUSINESS
+
+Build a future without a language barrier between humans and machines
+Cohere helps businesses explore, generate, search for, and act upon information in a new way that’s more intuitive and more natural than ever before.
+
+OUR CUSTOMERS
+
+Hasura Logo
+HyperWrite Logo
+Oracle Logo
+Notion Logo
+Longshot Logo
+Jasper Logo
+Helvia Logo
+BambooHR Logo
+Glean Logo
+Notion Logo
+Oracle Logo
+DeepJudge Logo
+Casetext Logo
+BambooHR Logo
+Flowrite Logo
+Hasura Logo
+HyperWrite Logo
+Oracle Logo
+Notion Logo
+Longshot Logo
+Jasper Logo
+Helvia Logo
+BambooHR Logo
+Glean Logo
+Notion Logo
+Oracle Logo
+DeepJudge Logo
+Casetext Logo
+BambooHR Logo
+Flowrite Logo
+Meet the enterprise conversational AI agent
+
+Power an enterprise chat agent that answers questions grounded in your company’s knowledge, and that can take actions and drive processes.
+
+TALK TO SALES
+
+SKIP
+User Profile
+User Profile
+Which products are gaining the most traction in France?
+
+Our top selling item was Product A, with 4.5m EUR monthly revenue. However, Product B is growing 40% year over year, with 2.3m EUR monthly revenue
+
+source:  EMEA_Q1_2023_QBR_final.ppt
+
+User Profile
+What is the sales outlook for Product A in France?
+
+
+
+
+
+
+
+
+Customer A may sign a 6m EUR annual contract, however, there are issues with support and compliance requirements, so this is a 30% probability. Also, Customer B may move production to Slovakia in Q3, which risks 0.2m EUR in monthly revenue.
+
+
+Our belief
+Cohere’s AI tools are being used broadly across multiple functions today. Don’t see your use case? Reach out and we can discuss.
+
+1
+Top Performing language models
+Our top performing Generative models (HELM benchmarks) are updated weekly to improve performance. Our state-of-the-art multilingual embedding model enables semantic search, classification and sentiment analysis across 109 languages.
+
+2
+Secure, works in your cloud
+Our language models can be deployed to cloud platforms (AWS, Oracle, Google) and VPCs, offering you flexibility, control over your data, and the highest levels of data security and privacy.
+
+3
+Ease of customization
+Our language models are customizable for your unique use case, and can be easily integrated with your applications. No scarce ML experience needed.
+
+4
+Top tier support
+For many customers, language AI is new. Cohere and its growing partner base is dedicated to helping you build solutions that find business value.
+
+How Cohere is being used today
+Cohere’s AI tools are being used broadly across multiple functions today.  Don’t see your use case?  Reach out and we can discuss
+
+
+GENERATE
+
+Write product descriptions, blog posts, articles, and marketing copy with scalable, affordable generative AI tools.
+
+
+SUMMARIZE
+
+Extract concise, accurate summaries of articles, emails, and documents.
+
+
+NEURAL SEARCH
+
+Build accurate, high-performance semantic text search across any document type in English or in 100+ languages.
+
+
+CLASSIFY
+
+Run text classification for customer support routing, intent recognition, sentiment analysis, and more.
+
+
+EMBED
+
+Access a managed embedding model that outperforms OSS and works in both English and 100+ languages to develop your own capabilities.
+
+PRODUCTS
+
+Chat
+Generate
+Summarize
+Embeddings
+Semantic Search
+Rerank
+Classify
+DEVELOPERS
+
+Playground
+LLM University
+Examples
+Documentation
+API Reference
+App Integrations
+Responsible Use
+COMPANY
+
+About
+Blog
+Research
+Careers
+Events
+Newsroom
+Partners
+Pricing
+TRUST CENTER
+
+Privacy
+Terms of Use
+SaaS Agreement
+SLO Agreement
+Responsibility
+Security
+Data Usage Policy
+CONTACT
+
+Twitter
+LinkedIn
+Discord
+Email
+Twitter
+
+LinkedIn
+
+Discord
+
+Email
+
+Privacy
+Terms of Use
+©Cohere 2023
+
+Enterprise Solutions - Advanced NLP for Large Organizations | Cohere
+
+dashboard
+CORAL
+
+DASHBOARD
+
+PLAYGROUND
+
+DOCS
+
+COMMUNITY
+
+
+EXPLORE
+Platform
+Models
+SETTINGS
+Billing & Usage
+API Keys
+Team
+Admin
+Get help
+
+What is Cohere?
+Cohere allows you to implement language AI into your product. Get started and explore Cohere's capabilities with the Playground or Quickstart tutorials.
+
+
+
+NEW
+Coral
+Coral is an AI chat interface that can search the web to cite sources. Use it to help research a new industry, start a draft, or debug code.
+
+Try Coral
+Learn more
+The interface of the Cohere chat product, Coral
+Quickstart tutorials
+Tutorials that will get you from zero-to-one with code.
+
+See all tutorials
+Sort Customer Questions
+Analyze User Sentiment
+Summarize Passages
+Intent Recognition
+A code snippet showcasing example code for Cohere's generate endpoint
+Playground
+Playground allows you to experience the power of NLP without coding a single line.
+
+Go to Playground
+Blog Post Summarization
+LinkedIn Post Generator
+Ad Headline
+Restaurant Customer Inquiries
+Article Title Classifier
+Article Summarization
+An example screenshot of the endpoints available in the playground
+Documentation
+The docs is our knowledge base for everything Cohere. Access how-tos, sample applications, guides, and API & SDK references.
+
+Go to Docs
+An example of a page in the Docs website for the Cohere platform
+
+Jump to Content
+Cohere AI
+Dashboard
+Documentation
+Playground
+Community
+Guides and Concepts
+API Reference
+Release Notes
+Application Examples
+LLMU
+
+COHERE API
+About
+Teams and Roles
+Versioning
+Errors
+API REFERENCE
+
+/generate
+
+/embed
+
+/classify
+
+/chat
+
+/tokenize
+
+/detokenize
+
+/detect-language
+
+/summarize
+
+/rerank
+QUICKSTART TUTORIALS
+Customer Support
+Intent Recognition
+Sentiment Analysis
+Toxicity Detection
+About
+The Cohere platform builds natural language processing and generation into your product with a few lines of code. Our large language models can solve a broad spectrum of natural language use cases, including classification, semantic search, paraphrasing, summarization, and content generation.
+
+By training a custom model, users can customize large language models to their use case and trained on their data.
+
+The models can be accessed through the playground, SDK and the CLI tool.
+
+SDKs
+Python
+Install package:
+
+PYTHON
+
+pip install cohere
+Request Specification
+To make a request to any model, you must pass in the Authorization Header and the request must be made through a POST request.
+The content of Authorization should be in the shape of BEARER [API_KEY]. All request bodies are sent through JSON.
+
+Model names are found within the dashboard, and details about endpoints are available within the documentation.
+Detailed model information can be found in the Model Cards.
+
+Updated 6 months ago
+
+Did this page help you?
+TABLE OF CONTENTS
+SDKs
+Python
+Request Specification
+
+Jump to Content
+Cohere AI
+Dashboard
+Documentation
+Playground
+Community
+Guides and Concepts
+API Reference
+Release Notes
+Application Examples
+LLMU
+
+COHERE API
+About
+Teams and Roles
+Versioning
+Errors
+API REFERENCE
+
+/generate
+Co.Generate
+POST
+
+/embed
+
+/classify
+
+/chat
+
+/tokenize
+
+/detokenize
+
+/detect-language
+
+/summarize
+
+/rerank
+QUICKSTART TUTORIALS
+Customer Support
+Intent Recognition
+Sentiment Analysis
+Toxicity Detection
+Co.Generate
+POST
+https://api.cohere.ai/v1/generate
+This endpoint generates realistic text conditioned on a given input.
+
+BODY PARAMS
+prompt
+string
+required
+The input text that serves as the starting point for generating the response.
+Note: The prompt will be pre-processed and modified before reaching the model.
+
+Please explain to me how LLMs work
+model
+string
+The identifier of the model to generate with. Currently available models are command (default), command-nightly (experimental), command-light, and command-light-nightly (experimental).
+Smaller, "light" models are faster, while larger models will perform better. Custom models can also be supplied with their full ID.
+
+num_generations
+integer
+The maximum number of generations that will be returned. Defaults to 1, min value of 1, max value of 5.
+
+stream
+boolean
+When true, the response will be a JSON stream of events. Streaming is beneficial for user interfaces that render the contents of the response piece by piece, as it gets generated.
+
+The final event will contain the complete response, and will contain an is_finished field set to true. The event will also contain a finish_reason, which can be one of the following:
+
+COMPLETE - the model sent back a finished reply
+MAX_TOKENS - the reply was cut off because the model reached the maximum number of tokens for its context length
+ERROR - something went wrong when generating the reply
+ERROR_TOXIC - the model generated a reply that was deemed toxic
+
+max_tokens
+integer
+The maximum number of tokens the model will generate as part of the response. Note: Setting a low value may result in incomplete generations.
+
+This parameter is off by default, and if it's not specified, the model will continue generating until it emits an EOS completion token. See BPE Tokens for more details.
+
+Can only be set to 0 if return_likelihoods is set to ALL to get the likelihood of the prompt.
+
+truncate
+string
+One of NONE|START|END to specify how the API will handle inputs longer than the maximum token length.
+
+Passing START will discard the start of the input. END will discard the end of the input. In both cases, input is discarded until the remaining input is exactly the maximum input token length for the model.
+
+If NONE is selected, when the input exceeds the maximum input token length an error will be returned.
+
+Default: END
+
+
+END
+temperature
+number
+A non-negative float that tunes the degree of randomness in generation. Lower temperatures mean less random generations. See Temperature for more details.
+Defaults to 0.75, min value of 0.0, max value of 5.0.
+
+preset
+string
+Identifier of a custom preset. A preset is a combination of parameters, such as prompt, temperature etc. You can create presets in the playground.
+When a preset is specified, the prompt parameter becomes optional, and any included parameters will override the preset's parameters.
+
+end_sequences
+array of strings
+The generated text will be cut at the beginning of the earliest occurence of an end sequence. The sequence will be excluded from the text.
+
+
+ADD STRING
+stop_sequences
+array of strings
+The generated text will be cut at the end of the earliest occurence of a stop sequence. The sequence will be included the text.
+
+
+ADD STRING
+k
+integer
+Ensures only the top k most likely tokens are considered for generation at each step.
+Defaults to 0, min value of 0, max value of 500.
+
+p
+number
+Ensures that only the most likely tokens, with total probability mass of p, are considered for generation at each step. If both k and p are enabled, p acts after k.
+Defaults to 0. min value of 0.01, max value of 0.99.
+
+frequency_penalty
+number
+Used to reduce repetitiveness of generated tokens. The higher the value, the stronger a penalty is applied to previously present tokens, proportional to how many times they have already appeared in the prompt or prior generation.'
+
+presence_penalty
+number
+Defaults to 0.0, min value of 0.0, max value of 1.0. Can be used to reduce repetitiveness of generated tokens. Similar to frequency_penalty, except that this penalty is applied equally to all tokens that have already appeared, regardless of their exact frequencies.
+
+return_likelihoods
+string
+One of GENERATION|ALL|NONE to specify how and if the token likelihoods are returned with the response. Defaults to NONE.
+
+If GENERATION is selected, the token likelihoods will only be provided for generated text.
+
+If ALL is selected, the token likelihoods will be provided both for the prompt and the generated text.
+
+Default: NONE
+
+
+NONE
+logit_bias
+object
+Used to prevent the model from generating unwanted tokens or to incentivize it to include desired tokens. The format is {token_id: bias} where bias is a float between -10 and 10. Tokens can be obtained from text using Tokenize.
+
+For example, if the value {'11': -10} is provided, the model will be very unlikely to include the token 11 ("\n", the newline character) anywhere in the generated text. In contrast {'11': 10} will result in generations that nearly only contain that token. Values between -10 and 10 will proportionally affect the likelihood of the token appearing in the generated text.
+
+Note: logit bias may not be supported for all custom models.
+
+
+LOGIT_BIAS OBJECT
+RESPONSES
+
+200
+OK
+
+400
+Bad Request
+
+498
+Blocked Input or Output
+
+500
+Internal Server Error
+
+Updated 1 day ago
+
+Did this page help you?
+LANGUAGE
+PYTHON
+SHELL
+AUTHORIZATION
+BEARER
+eABd6F0yQNUQq9MAniPCwcxkXeB5No9sgehAuWSf
+COHERE PYTHON SDK
+INSTALLATION
+python -m pip install cohere
+REQUEST
+1
+import cohere
+2
+co = cohere.Client('<<apiKey>>')
+3
+​
+4
+response = co.generate(
+5
+  prompt='Please explain to me how LLMs work',
+6
+)
+7
+print(response)
+
+Try It!
+RESPONSE
+Click Try It! to start a request and see the response here! Or choose an example:
+application/json
+
+200
+application/stream+json
+
+200
+
+Jump to Content
+Cohere AI
+Dashboard
+Documentation
+Playground
+Community
+Guides and Concepts
+API Reference
+Release Notes
+Application Examples
+LLMU
+
+COHERE API
+About
+Teams and Roles
+Versioning
+Errors
+API REFERENCE
+
+/generate
+
+/embed
+
+/classify
+
+/chat
+Co.Chat (Beta)
+POST
+
+/tokenize
+
+/detokenize
+
+/detect-language
+
+/summarize
+
+/rerank
+QUICKSTART TUTORIALS
+Customer Support
+Intent Recognition
+Sentiment Analysis
+Toxicity Detection
+Co.Chat (Beta)
+POST
+https://api.cohere.ai/v1/chat
+The chat endpoint allows users to have conversations with a Large Language Model (LLM) from Cohere. Users can send messages as part of a persisted conversation using the conversation_id parameter, or they can pass in their own conversation history using the chat_history parameter.
+The endpoint features additional parameters such as connectors and documents that enable conversations enriched by external knowledge. We call this "Retrieval Augmented Generation", or "RAG".
+If you have questions or require support, we're here to help! Reach out to your Cohere partner to enable access to this API.
+
+BODY PARAMS
+message
+string
+required
+Accepts a string.
+The chat message from the user to the model.
+
+string
+model
+string
+Defaults to command.
+The identifier of the model, which can be one of the existing Cohere models or the full ID for a finetuned custom model.
+Compatible Cohere models are command and command-light as well as the experimental command-nightly and command-light-nightly variants. Read more about Cohere models.
+
+string
+stream
+boolean
+Defaults to false.
+When true, the response will be a JSON stream of events. The final event will contain the complete response, and will have an event_type of "stream-end".
+Streaming is beneficial for user interfaces that render the contents of the response piece by piece, as it gets generated.
+
+
+true
+preamble_override
+string
+When specified, the default Cohere preamble will be replaced with the provided one.
+
+string
+chat_history
+array of objects
+A list of previous messages between the user and the model, meant to give the model conversational context for responding to the user's message.
+
+
+OBJECT
+
+role
+string
+required
+
+CHATBOT
+message
+string
+required
+string
+user_name
+string
+string
+
+ADD OBJECT
+conversation_id
+string
+An alternative to chat_history. Previous conversations can be resumed by providing the conversation's identifier. The contents of message and the model's response will be stored as part of this conversation.
+If a conversation with this id does not already exist, a new conversation will be created.
+
+string
+prompt_truncation
+string
+Defaults to AUTO when connectors are specified and OFF in all other cases.
+Dictates how the prompt will be constructed.
+With prompt_truncation set to "AUTO", some elements from chat_history and documents will be dropped in an attempt to construct a prompt that fits within the model's context length limit.
+With prompt_truncation set to "OFF", no elements will be dropped. If the sum of the inputs exceeds the model's context length limit, a TooManyTokens error will be returned.
+
+
+OFF
+connectors
+array of objects
+Currently only accepts {"id": "web-search"}.
+When specified, the model's reply will be enriched with information found by quering each of the connectors (RAG).
+
+
+OBJECT
+
+id
+string
+required
+The identifier of the connector. Currently only 'web-search' is supported.
+
+string
+options
+object
+Provides the connector with different settings at request time. The key/value pairs of this object are specific to each connector.
+
+The supported options are:
+
+web-search
+
+site - The web search results will be restricted to this domain (and TLD) when specified. Only a single domain is specified, and subdomains are also accepted.
+Examples:
+
+{"options": {"site": "cohere.com"}} would restrict the results to all subdomains at cohere.com
+{"options": {"site": "txt.cohere.com"}} would restrict the results to txt.cohere.com
+
+OPTIONS OBJECT
+
+ADD OBJECT
+search_queries_only
+boolean
+Defaults to false.
+When true, the response will only contain a list of generated search queries, but no search will take place, and no reply from the model to the user's message will be generated.
+
+
+true
+documents
+array of objects
+A list of relevant documents that the model can use to enrich its reply. See 'Document Mode' in the guide for more information.
+
+
+OBJECT
+
+id
+string
+Unique identifier for this document.
+
+string
+string
+additionalProp
+string
+
+ADD FIELD
+
+ADD OBJECT
+citation_quality
+string
+Defaults to "accurate".
+Dictates the approach taken to generating citations as part of the RAG flow by allowing the user to specify whether they want "accurate" results or "fast" results.
+
+
+fast
+temperature
+float
+Defaults to 0.3
+A non-negative float that tunes the degree of randomness in generation. Lower temperatures mean less random generations, and higher temperatures mean more random generations.
+
+0
+RESPONSE
+
+200
+OK
+
+Updated 1 day ago
+
+Did this page help you?
+LANGUAGE
+PYTHON
+SHELL
+AUTHORIZATION
+BEARER
+eABd6F0yQNUQq9MAniPCwcxkXeB5No9sgehAuWSf
+COHERE PYTHON SDK
+INSTALLATION
+python -m pip install cohere
+REQUEST
+Request Example
+Clear Example
+1
+import cohere
+2
+co = cohere.Client('<<apiKey>>')
+3
+response = co.chat(
+4
+  chat_history=[
+5
+    {"role": "USER", "message": "Who discovered gravity?"},
+6
+    {"role": "CHATBOT", "message": "The man who is widely credited with discovering gravity is Sir Isaac Newton"}
+7
+  ],
+8
+  message="What year was he born?",
+9
+  connectors=[{"id": "web-search"}] # perform web search before answering the question
+10
+)
+11
+print(response)
+
+Try It!
+RESPONSE
+Click Try It! to start a request and see the response here! Or choose an example:
+application/json
+
+200
+
+
+
