@@ -10,6 +10,7 @@ interface ChatComponentProps {
   onUserMessageSubmit: Message[];
   isFetching: boolean;
   setHandleGenerateStreamMessageRef: (ref: React.MutableRefObject<Function | null>) => void;
+  setIsFetching: (isFetching: boolean) => void;
   apiHost: string;
 }
 
@@ -26,6 +27,7 @@ export function ChatComponent({
   isFetching,
   setHandleGenerateStreamMessageRef,
   apiHost,
+  setIsFetching,
 }: ChatComponentProps) {
   const [messageHistory, setMessageHistory] = useState<Message[]>([]);
   const lastMessageRef = useRef<null | HTMLDivElement>(null);
@@ -90,6 +92,7 @@ export function ChatComponent({
       setPreviewMessage(prev => prev + newMessageContent);
 
       if (data.finish_reason === "stop") {
+        setIsFetching(false);
         const full_text = data.full_text
         if (data.cached) {
           const distance = data.distance
