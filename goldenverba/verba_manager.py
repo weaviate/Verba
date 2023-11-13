@@ -392,6 +392,10 @@ class VerbaManager:
         """Adds suggestions to the suggestion class
         @parameter query : str - Query to save in suggestions
         """
+        # Don't set new suggestions when in production
+        production_key = os.environ.get("VERBA_PRODUCTION", "")
+        if production_key == "True":
+            return
         check_results = (
             self.client.query.get(
                 class_name="Suggestion",
