@@ -1,6 +1,7 @@
 import glob
 import base64
 import os
+import requests
 
 from wasabi import msg
 from pathlib import Path
@@ -9,13 +10,8 @@ from datetime import datetime
 from goldenverba.components.reader.interface import Reader, InputForm
 from goldenverba.components.reader.document import Document
 
-try:
-    from PyPDF2 import PdfReader
-except Exception as e:
-    msg.warn("PyPDF2 not installed, your base installation might be corrupted.")
 
-
-class PDFReader(Reader):
+class UnstructuredPDF(Reader):
     """
     The PDFReader reads .pdf files using Unstructured.
     """
@@ -23,9 +19,9 @@ class PDFReader(Reader):
     def __init__(self):
         super().__init__()
         self.file_types = [".pdf"]
-        self.requires_library = ["PyPDF2"]
-        self.name = "PDFReader"
-        self.description = "Reads PDF files using the PyPDF2 library"
+        self.requires_env = ["UNSTRUCTURED_API_KEY"]
+        self.name = "UnstructuredPDF"
+        self.description = "Reads PDF files powered by unstructured.io"
         self.input_form = InputForm.UPLOAD.value
 
     def load(
@@ -64,12 +60,7 @@ class PDFReader(Reader):
         if len(bytes) > 0:
             if len(bytes) == len(fileNames):
                 for byte, fileName in zip(bytes, fileNames):
-                    decoded_bytes = base64.b64decode(byte)
-                    with open(f"{fileName}", "wb") as file:
-                        file.write(decoded_bytes)
-
-                    documents += self.load_file(f"{fileName}", document_type)
-                    os.remove(f"{fileName}")
+                    documents += self.load_bytes(byte, fileName, document_type)
 
         # If content exist
         if len(contents) > 0:
@@ -87,6 +78,56 @@ class PDFReader(Reader):
         msg.good(f"Loaded {len(documents)} documents")
         return documents
 
+    def load_bytes(self, bytes_string, fileName, document_type: str) -> list[Document]:
+        """Loads a pdf bytes file
+        @param bytes_string : str - PDF File bytes coming from the frontend
+        @param fileName : str - Filename
+        @param document_type : str - Document Type
+        @returns list[Document] - Lists of documents
+        """
+        documents = []
+
+        url = "https://api.unstructured.io/general/v0/general"
+
+        headers = {
+            "accept": "application/json",
+            "unstructured-api-key": os.environ.get("UNSTRUCTURED_API_KEY", ""),
+        }
+
+        data = {
+            "strategy": "auto",
+        }
+
+        decoded_bytes = base64.b64decode(bytes_string)
+        with open("reconstructed.pdf", "wb") as file:
+            file.write(decoded_bytes)
+
+        file_data = {"files": open("reconstructed.pdf", "rb")}
+
+        response = requests.post(url, headers=headers, data=data, files=file_data)
+
+        json_response = response.json()
+
+        full_content = ""
+
+        for chunk in json_response:
+            if "text" in chunk:
+                text = chunk["text"]
+                full_content += text + " "
+
+        document = Document(
+            text=full_content,
+            type=document_type,
+            name=str(fileName),
+            link=str(fileName),
+            timestamp=str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
+            reader=self.name,
+        )
+        documents.append(document)
+        msg.good(f"Loaded {str(fileName)}")
+        os.remove("reconstructed.pdf")
+        return documents
+
     def load_file(self, file_path: Path, document_type: str) -> list[Document]:
         """Loads .pdf file
         @param file_path : Path - Path to file
@@ -94,14 +135,39 @@ class PDFReader(Reader):
         @returns list[Document] - Lists of documents
         """
         documents = []
-        full_text = ""
-        reader = PdfReader(file_path)
 
-        for page in reader.pages:
-            full_text += page.extract_text() + "\n\n"
+        if file_path.suffix not in self.file_types:
+            msg.warn(f"{file_path.suffix} not supported")
+            return []
+
+        url = "https://api.unstructured.io/general/v0/general"
+
+        headers = {
+            "accept": "application/json",
+            "unstructured-api-key": os.environ.get("UNSTRUCTURED_API_KEY", ""),
+        }
+
+        data = {
+            "strategy": "auto",
+        }
+
+        file_data = {"files": open(file_path, "rb")}
+
+        response = requests.post(url, headers=headers, data=data, files=file_data)
+
+        file_data["files"].close()
+
+        json_response = response.json()
+
+        full_content = ""
+
+        for chunk in json_response:
+            if "text" in chunk:
+                text = chunk["text"]
+                full_content += text + " "
 
         document = Document(
-            text=full_text,
+            text=full_content,
             type=document_type,
             name=str(file_path),
             link=str(file_path),
