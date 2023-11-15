@@ -318,8 +318,8 @@ export default function Home() {
                     <div className="flex justify-between items-center w-full"> {/* <-- flexbox container */}
                         <div className="flex-none">
                             <div
-                                className="border-2 border-gray-800 rounded-lg shadow-lg animate-pop-in hover-container mr-4 ">
-                                <img src={`${bgUrl}verba.png`} alt="Verba Logo" className=" w-24 h-24 shadow-lg"/>
+                                className="animate-pop-in hover-container mr-4 ">
+                                <img src={`${bgUrl}verba.png`} alt="Verba Logo" className=" w-24 h-24"/>
                             </div>
                         </div>
                         <div className="flex-1">
