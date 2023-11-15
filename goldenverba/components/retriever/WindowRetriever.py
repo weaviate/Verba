@@ -69,8 +69,6 @@ class WindowRetriever(Retriever):
                     ],
                 ).do()
 
-            print(query_results)
-
             for chunk in query_results["data"]["Get"][chunk_class]:
                 chunk_obj = Chunk(
                     chunk["text"],
