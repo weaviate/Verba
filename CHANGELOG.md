@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.1] - 15.11.2023
+
+### Added
+- PDFReader powered by PyPDF2
+- TokenChunker powered by tiktoken
+
+### Fixed
+- Added missing dependencies
+- Fixed restart bug
+
 ## [0.3.0] - 12.09.2023
 
 ### Added
