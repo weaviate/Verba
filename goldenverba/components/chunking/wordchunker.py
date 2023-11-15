@@ -26,6 +26,7 @@ class WordChunker(Chunker):
         self.description = "Chunk documents by words. You can specify how many words should overlap between chunks to improve retrieval."
         try:
             self.nlp = spacy.blank("en")
+            self.nlp.max_length = 3000000
         except:
             self.nlp = None
 
@@ -45,6 +46,7 @@ class WordChunker(Chunker):
             if len(document.chunks) > 0:
                 continue
 
+            self.nlp.max_length = 3000000
             doc = self.nlp(document.text)
 
             if units > len(doc) or units < 1:

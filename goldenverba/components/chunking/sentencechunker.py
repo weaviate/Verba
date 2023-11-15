@@ -26,6 +26,7 @@ class SentenceChunker(Chunker):
         self.description = "Chunk documents by sentences. You can specify how many sentences should overlap between chunks to improve retrieval."
         try:
             self.nlp = spacy.blank("en")
+            self.nlp.max_length = 3000000
             self.nlp.add_pipe("sentencizer")
         except:
             self.nlp = None

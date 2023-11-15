@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
-import { DocumentComponent } from "../components/DocumentComponent";
-import { Virtuoso } from "react-virtuoso";
-import { getApiHost } from "@/pages";
+import {useState, useEffect} from "react";
+import {DocumentComponent} from "../components/DocumentComponent";
+import {Virtuoso} from "react-virtuoso";
+import {getApiHost} from "@/pages";
 import ImportModalComponent from "../components/ImportModalComponent";
 import ConfigModal from "../components/ConfigModal";
-import { FaPlus } from "react-icons/fa";
+import {FaPlus} from "react-icons/fa";
 import CoolButton from "../components/CoolButton";
 
 type Document = {
@@ -73,7 +73,7 @@ export default function DocumentOnly() {
                 ? `${apiHost}/api/search_documents`
                 : `${apiHost}/api/get_all_documents`;
 
-            const body = { "query": query, "doc_type": selectedDocType == "All types" ? "" : selectedDocType };
+            const body = {"query": query, "doc_type": selectedDocType == "All types" ? "" : selectedDocType};
 
             const response = await fetch(endpoint, {
                 method: "POST",
@@ -139,7 +139,7 @@ export default function DocumentOnly() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ document_id: focusedDocument?._additional.id }),
+                body: JSON.stringify({document_id: focusedDocument?._additional.id}),
             });
             const data = await response.json();
             console.log(data);  // Log the response for debugging
@@ -166,45 +166,50 @@ export default function DocumentOnly() {
 
     return (
         <main className="flex min-h-screen flex-col items-center justify-between p-10 text-gray-900">
-            {showModal && <ImportModalComponent onClose={() => setShowModal(false)} apiHost={apiHost} />}
+            {showModal && <ImportModalComponent onClose={() => setShowModal(false)} apiHost={apiHost}/>}
             <div className="flex flex-col w-full items-start">
                 <div className="mb-2">
                     <div className="flex justify-between items-center w-full"> {/* <-- flexbox container */}
                         <div className="flex-none">
-                            <div className="bg-yellow-200 border-2 border-gray-800 rounded-lg shadow-lg animate-pop-in hover-container mr-4 ">
-                                <img src={`${bgUrl}verba.png`} alt="Verba Logo" className=" w-24 h-24 shadow-lg" />
+                            <div
+                                className="bg-yellow-200 border-2 border-gray-800 rounded-lg shadow-lg animate-pop-in hover-container mr-4 ">
+                                <img src={`${bgUrl}verba.png`} alt="Verba Logo" className=" w-24 h-24 shadow-lg"/>
                             </div>
                         </div>
                         <div className="flex-1">
-                            <h1 className=" text-6xl font-bold">Verba</h1>
+                            <h1 className=" text-6xl font-bold">Weaviate</h1>
                             <div className="flex text-lg">
                                 <span className="bg-opacity-0 rounded px-2 py-1 hover-container animate-pop-in">
-                                    The
+                                    AWS
                                 </span>
-                                <span className="bg-opacity-0 rounded font-bold px-2 py-1 hover-container animate-pop-in-late">
-                                    Golden
+                                <span
+                                    className="bg-opacity-0 rounded font-bold px-2 py-1 hover-container animate-pop-in-late">
+                                    re:Invent 2023
                                 </span>
                                 <span className="bg-yellow-200 rounded px-2 py-1 hover-container animate-pop-more-late">
-                                    RAGtriever
+                                    Verba
                                 </span>
                             </div>
                         </div>
-                        <div className="flex justify-between items-center mx-auto p-4 ml-10">
-                            <button
-                                className="flex items-center animate-pop-in space-x-2 mr-8 bg-gray-200 text-black p-3  rounded-lg  hover:bg-green-400 border-2 border-black hover:border-white hover-container shadow-md"
-                                onClick={() => setShowModal(true)}
-                            >
-                                <FaPlus />
-                                <span>Add Documents</span>
-                            </button>
-                            <ConfigModal component="embedders" apiHost={apiHost} onGeneratorSelect={generatorStreamable} production={production}></ConfigModal>
-                        </div>
+                        {/*TODO: reinvent - remove button*/}
+                        {/*<div className="flex justify-between items-center mx-auto p-4 ml-10">*/}
+                        {/*    <button*/}
+                        {/*        className="flex items-center animate-pop-in space-x-2 mr-8 bg-gray-200 text-black p-3  rounded-lg  hover:bg-green-400 border-2 border-black hover:border-white hover-container shadow-md"*/}
+                        {/*        onClick={() => setShowModal(true)}*/}
+                        {/*    >*/}
+                        {/*        <FaPlus />*/}
+                        {/*        <span>Add Documents</span>*/}
+                        {/*    </button>*/}
+                        {/*    <ConfigModal component="embedders" apiHost={apiHost} onGeneratorSelect={generatorStreamable} production={production}></ConfigModal>*/}
+                        {/*</div>*/}
                     </div>
                 </div>
                 <div className="flex w-full space-x-4 mt-28">
-                    <div className="flex-1 bg-white border-2 overflow-y-auto border-black bg-opacity-20 rounded-lg shadow-md backdrop-filter min-h-[50vh] backdrop-blur-md p-4 w-1/3 animate-pop-in">
+                    <div
+                        className="flex-1 bg-white border-2 overflow-y-auto border-black bg-opacity-20 rounded-lg shadow-md backdrop-filter min-h-[50vh] backdrop-blur-md p-4 w-1/3 animate-pop-in">
                         <div className="p-2">
-                            <div className="flex justify-between items-center mb-4"> {/* Container for the title and button */}
+                            <div
+                                className="flex justify-between items-center mb-4"> {/* Container for the title and button */}
                                 <h2 className="text-lg font-bold mb-4">📚 Documents</h2>
                                 {focusedDocument && (
                                     <button
@@ -216,7 +221,8 @@ export default function DocumentOnly() {
                                 )}
                             </div>
 
-                            <p className="text-xs font-bold mb-4 text-gray-600">Search through all your {documents.length} imported documents embedded by {currentEmbedder}</p>
+                            <p className="text-xs font-bold mb-4 text-gray-600">Search through all
+                                your {documents.length} imported documents embedded by {currentEmbedder}</p>
                             <div className="rounded-lg flex justify- between items-center">
 
                                 <form
@@ -242,11 +248,11 @@ export default function DocumentOnly() {
                                     ))}
                                 </select>
                             </div>
-                            <hr />
+                            <hr/>
                         </div>
                         {documents.length > 0 && (
                             <Virtuoso
-                                style={{ width: '100%', height: '66%' }}  // Set a width and height
+                                style={{width: '100%', height: '66%'}}  // Set a width and height
                                 totalCount={documents.length}  // Total count of items
                                 itemContent={(index) => (
                                     <CoolButton
@@ -281,10 +287,12 @@ export default function DocumentOnly() {
                         <h3 className="font-bold mb-4">⚠️ Warning</h3>
                         <p>Do you want to remove {focusedDocument?.doc_name}</p>
                         <div className="flex justify-end mt-4">
-                            <button onClick={() => setShowDeleteModal(false)} className="mr-2 px-4 py-2 bg-gray-300 hover:bg-gray-200 rounded">
+                            <button onClick={() => setShowDeleteModal(false)}
+                                    className="mr-2 px-4 py-2 bg-gray-300 hover:bg-gray-200 rounded">
                                 No
                             </button>
-                            <button onClick={handleDeleteDocument} className="px-4 py-2 bg-red-500 hover:bg-red-400 text-white rounded">
+                            <button onClick={handleDeleteDocument}
+                                    className="px-4 py-2 bg-red-500 hover:bg-red-400 text-white rounded">
                                 {isDeleting ? "Deleting..." : "Yes"} {/* Show spinner if loading, otherwise show "Yes" */}
                             </button>
                         </div>
