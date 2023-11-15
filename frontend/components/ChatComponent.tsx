@@ -147,17 +147,23 @@ export function ChatComponent({
         | { type: "code"; language: string; content: string };
 
     // Helper function to parse message into segments
-    const parseMessage = (content: string) => {
+    const parseMessage = (content: any) => {
         const regex = /```(.*?)\n([\s\S]*?)```/g; // Matches code blocks and the specified language
         const segments: Segment[] = [];
         let lastEndIndex = 0;
 
-        console.log(content)
-        content.replace(regex, (match, language, codeContent, index) => {
+        const contentToParse = typeof content === 'object' && content !== null && 'message' in content
+            ? content.message
+            : typeof content === 'string'
+                ? content
+                : ''; // If it's neither an object with 'message' nor a string, default to an empty string
+
+
+        contentToParse.replace(regex, (match: string, language: string, codeContent: string, index: number) => {
             if (index > lastEndIndex) {
                 segments.push({
                     type: "text",
-                    content: content.slice(lastEndIndex, index),
+                    content: contentToParse.slice(lastEndIndex, index),
                 });
             }
 
@@ -170,8 +176,8 @@ export function ChatComponent({
             return match;
         });
 
-        if (lastEndIndex < content.length) {
-            segments.push({type: "text", content: content.slice(lastEndIndex)});
+        if (lastEndIndex < contentToParse.length) {
+            segments.push({type: "text", content: contentToParse.slice(lastEndIndex)});
         }
 
         return segments;
