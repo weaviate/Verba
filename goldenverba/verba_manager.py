@@ -256,6 +256,20 @@ class VerbaManager:
             self.installed_libraries["spacy"] = False
 
         try:
+            import PyPDF2
+
+            self.installed_libraries["PyPDF2"] = True
+        except Exception as e:
+            self.installed_libraries["PyPDF2"] = False
+
+        try:
+            import tiktoken
+
+            self.installed_libraries["tiktoken"] = True
+        except Exception as e:
+            self.installed_libraries["tiktoken"] = False
+
+        try:
             import openai
 
             self.installed_libraries["openai"] = True
@@ -561,7 +575,7 @@ class VerbaManager:
             schema_manager.reset_schemas(self.client, vectorizer)
 
         for embedding in schema_manager.EMBEDDINGS:
-            schema_manager.reset_schemas(self.client, vectorizer)
+            schema_manager.reset_schemas(self.client, embedding)
 
         for vectorizer in schema_manager.VECTORIZERS:
             schema_manager.init_schemas(self.client, vectorizer, False, True)
