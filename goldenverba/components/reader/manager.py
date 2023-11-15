@@ -2,6 +2,7 @@ from wasabi import msg
 
 from goldenverba.components.reader.simplereader import SimpleReader
 from goldenverba.components.reader.githubreader import GithubReader
+from goldenverba.components.reader.unstructuredpdf import UnstructuredPDF
 from goldenverba.components.reader.pdfreader import PDFReader
 from goldenverba.components.reader.interface import Reader
 from goldenverba.components.reader.document import Document
@@ -11,8 +12,9 @@ class ReaderManager:
     def __init__(self):
         self.readers: dict[str, Reader] = {
             "SimpleReader": SimpleReader(),
-            "GithubReader": GithubReader(),
             "PDFReader": PDFReader(),
+            "GithubReader": GithubReader(),
+            "UnstructuredPDF": UnstructuredPDF(),
         }
         self.selected_reader: Reader = self.readers["SimpleReader"]
 

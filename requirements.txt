@@ -19,3 +19,5 @@ huggingface_hub
 asyncio
 accelerate
 cohere==4.33
+requests
+pypdf2
