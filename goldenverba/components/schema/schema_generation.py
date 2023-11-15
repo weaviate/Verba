@@ -3,7 +3,6 @@ import re
 from wasabi import msg  # type: ignore[import]
 from weaviate import Client
 
-
 VECTORIZERS = set(
     ["text2vec-openai", "text2vec-cohere"]
 )  # Needs to match with Weaviate modules
@@ -15,7 +14,7 @@ def strip_non_letters(s: str):
 
 
 def verify_vectorizer(
-    schema: dict, vectorizer: str, skip_properties: list[str] = []
+        schema: dict, vectorizer: str, skip_properties: list[str] = []
 ) -> dict:
     """Verifies if the vectorizer is available and adds it to a schema, also skips vectorization if list is provided
     @parameter schema : dict - Schema json
@@ -54,14 +53,14 @@ def add_suffix(schema: dict, vectorizer: str) -> tuple[dict, str]:
     modified_schema = schema.copy()
     # Verify Vectorizer and add suffix
     modified_schema["classes"][0]["class"] = (
-        modified_schema["classes"][0]["class"] + "_" + strip_non_letters(vectorizer)
+            modified_schema["classes"][0]["class"] + "_" + strip_non_letters(vectorizer)
     )
     return modified_schema, modified_schema["classes"][0]["class"]
 
 
 def reset_schemas(
-    client: Client = None,
-    vectorizer: str = None,
+        client: Client = None,
+        vectorizer: str = None,
 ):
     doc_name = "Document_" + strip_non_letters(vectorizer)
     chunk_name = "Chunk_" + strip_non_letters(vectorizer)
@@ -73,10 +72,10 @@ def reset_schemas(
 
 
 def init_schemas(
-    client: Client = None,
-    vectorizer: str = None,
-    force: bool = False,
-    check: bool = False,
+        client: Client = None,
+        vectorizer: str = None,
+        force: bool = False,
+        check: bool = False,
 ) -> bool:
     """Initializes a weaviate client and initializes all required schemas
     @parameter client : Client - Weaviate Client
@@ -97,7 +96,7 @@ def init_schemas(
 
 
 def init_documents(
-    client: Client, vectorizer: str = None, force: bool = False, check: bool = False
+        client: Client, vectorizer: str = None, force: bool = False, check: bool = False
 ) -> tuple[dict, dict]:
     """Initializes the Document and Chunk class
     @parameter client : Client - Weaviate client
@@ -112,6 +111,11 @@ def init_documents(
             {
                 "class": "Chunk",
                 "description": "Chunks of Documentations",
+                "moduleConfig": {
+                    "generative-openai": {
+                        "model": "gpt-3.5-turbo-1106",
+                    }
+                },
                 "properties": [
                     {
                         "name": "text",
@@ -226,7 +230,7 @@ def init_documents(
 
 
 def init_cache(
-    client: Client, vectorizer: str = None, force: bool = False, check: bool = False
+        client: Client, vectorizer: str = None, force: bool = False, check: bool = False
 ) -> dict:
     """Initializes the Cache
     @parameter client : Client - Weaviate client
@@ -291,7 +295,7 @@ def init_cache(
 
 
 def init_suggestion(
-    client: Client, vectorizer: str = None, force: bool = False, check: bool = False
+        client: Client, vectorizer: str = None, force: bool = False, check: bool = False
 ) -> dict:
     """Initializes the Suggestion schema
     @parameter client : Client - Weaviate client

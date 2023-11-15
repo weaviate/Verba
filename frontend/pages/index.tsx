@@ -338,22 +338,22 @@ export default function Home() {
                             </div>
                         </div>
                         {/*TODO: reinvent - remove button*/}
-                        {/*<div className="lg:flex sm:grid sm:grid-cols-2 sm:gap-y-2 md:grid md:grid-cols-2 md:gap-x-4 md:gap-y-4 justify-between items-center mx-auto p-4 ml-10">*/}
-                        {/*  <div className="ml-5 animate-pop-in">*/}
-                        {/*    <div className="flex items-center">*/}
-                        {/*      <button*/}
-                        {/*        className="flex items-center sm:w-32 md:w-44 space-x-2 mr-8 bg-gray-200 text-black p-3  rounded-lg  hover:bg-green-400 border-2 border-black hover:border-white hover-container shadow-md"*/}
-                        {/*        onClick={() => setShowModal(true)}*/}
-                        {/*      >*/}
-                        {/*        <FaPlus />*/}
-                        {/*        <span className='truncate'>Add Documents</span>*/}
-                        {/*      </button>*/}
-                        {/*    </div>*/}
-                        {/*  </div>*/}
-                        {/*  <ConfigModal component="embedders" apiHost={apiHost} onGeneratorSelect={generatorStreamable} production={production}></ConfigModal>*/}
-                        {/*  <ConfigModal component="retrievers" apiHost={apiHost} onGeneratorSelect={generatorStreamable} production={production}></ConfigModal>*/}
-                        {/*  <ConfigModal component="generators" apiHost={apiHost} onGeneratorSelect={generatorStreamable} production={production}></ConfigModal>*/}
-                        {/*</div>*/}
+                        <div className="lg:flex sm:grid sm:grid-cols-2 sm:gap-y-2 md:grid md:grid-cols-2 md:gap-x-4 md:gap-y-4 justify-between items-center mx-auto p-4 ml-10">
+                          <div className="ml-5 animate-pop-in">
+                            <div className="flex items-center">
+                              <button
+                                className="flex items-center sm:w-32 md:w-44 space-x-2 mr-8 bg-gray-200 text-black p-3  rounded-lg  hover:bg-green-400 border-2 border-black hover:border-white hover-container shadow-md"
+                                onClick={() => setShowModal(true)}
+                              >
+                                <FaPlus />
+                                <span className='truncate'>Add Documents</span>
+                              </button>
+                            </div>
+                          </div>
+                          <ConfigModal component="embedders" apiHost={apiHost} onGeneratorSelect={generatorStreamable} production={production}></ConfigModal>
+                          <ConfigModal component="retrievers" apiHost={apiHost} onGeneratorSelect={generatorStreamable} production={production}></ConfigModal>
+                          <ConfigModal component="generators" apiHost={apiHost} onGeneratorSelect={generatorStreamable} production={production}></ConfigModal>
+                        </div>
                     </div>
                 </div>
                 <div
