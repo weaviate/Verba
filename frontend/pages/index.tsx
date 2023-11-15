@@ -435,17 +435,17 @@ export default function Home() {
                                 className="w-full p-2 rounded-md bg-white text-gray-900 placeholder-gray-400"
                             />
                         </form>
-                        <div className="absolute mt-2 p-2 z-10 w-1/2 left-5 text-center justify-center flex flex-wrap">
-                            {suggestions.map((suggestion, index) => (
-                                <div
-                                    key={index + suggestion}
-                                    className="p-2 hover:bg-green-300 bg-gray-200 cursor-pointer shadow-md rounded-md text-xs animate-press-in mt-2 mr-4 hover-container"
-                                    onClick={() => handleSuggestionClick(suggestion)}
-                                >
-                                    {renderBoldedSuggestion(suggestion, userInput)}
-                                </div>
-                            ))}
-                        </div>
+                        {/*<div className="absolute mt-2 p-2 z-10 w-1/2 left-5 text-center justify-center flex flex-wrap">*/}
+                        {/*    {suggestions.map((suggestion, index) => (*/}
+                        {/*        <div*/}
+                        {/*            key={index + suggestion}*/}
+                        {/*            className="p-2 hover:bg-green-300 bg-gray-200 cursor-pointer shadow-md rounded-md text-xs animate-press-in mt-2 mr-4 hover-container"*/}
+                        {/*            onClick={() => handleSuggestionClick(suggestion)}*/}
+                        {/*        >*/}
+                        {/*            {renderBoldedSuggestion(suggestion, userInput)}*/}
+                        {/*        </div>*/}
+                        {/*    ))}*/}
+                        {/*</div>*/}
                     </div>
                     <div className="w-1/2 space-y-4 hidden lg:block md:block">
                         <DocumentComponent
