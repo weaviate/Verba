@@ -1,5 +1,9 @@
 import { useState, useEffect } from "react";
 import CoolButton from "../components/CoolButton";
+import { DocumentComponent } from "../components/DocumentComponent";
+import ImportModalComponent from "../components/ImportModalComponent";
+import ConfigModal from "../components/ConfigModal";
+import { FaPlus } from "react-icons/fa";
 
 export default function StatusPage() {
 
@@ -22,6 +26,7 @@ export default function StatusPage() {
     const [variables, setVariables] = useState({});
     const [schemas, setSchemas] = useState({});
     const [showModal, setShowModal] = useState(false);
+    const [showDocumentModal, setDocumentModal] = useState(false);
     const [showCacheModal, setCacheModal] = useState(false);
     const [showSuggestionModal, setSuggestioneModal] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -91,6 +96,9 @@ export default function StatusPage() {
 
     return (
         <main className="flex min-h-screen flex-col items-center justify-between p-10 text-gray-900">
+            {showDocumentModal && <ImportModalComponent onClose={() => {
+                setDocumentModal(false)
+            }} apiHost={apiHost} />}
             <div className="flex flex-col w-full items-start">
                 <div className="mb-2">
                     <div className="flex justify-between items-center w-full"> {/* <-- flexbox container */}
@@ -112,6 +120,23 @@ export default function StatusPage() {
                                     RAGtriever
                                 </span>
                             </div>
+                        </div>
+
+                        <div className="lg:flex sm:grid sm:grid-cols-2 sm:gap-y-2 md:grid md:grid-cols-2 md:gap-x-4 md:gap-y-4 justify-between items-center mx-auto p-4 ml-10">
+                            <div className="ml-5 animate-pop-in">
+                                <div className="flex items-center">
+                                    <button
+                                        className="flex items-center sm:w-32 md:w-44 space-x-2 mr-8 bg-gray-200 text-black p-3  rounded-lg  hover:bg-green-400 border-2 border-black hover:border-white hover-container shadow-md"
+                                        onClick={() => setDocumentModal(true)}>
+
+                                        <FaPlus />
+                                        <span className='truncate'>Add Documents</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <ConfigModal component="embedders" apiHost={apiHost} onGeneratorSelect={(streamable => { })} production={false}></ConfigModal>
+                            <ConfigModal component="retrievers" apiHost={apiHost} onGeneratorSelect={(streamable => { })} production={false}></ConfigModal>
+                            <ConfigModal component="generators" apiHost={apiHost} onGeneratorSelect={(streamable => { })} production={false}></ConfigModal>
                         </div>
                     </div>
                 </div>
@@ -192,54 +217,60 @@ export default function StatusPage() {
                     </div>
                 </div>
             </div>
-            {showModal && (
-                <div className="fixed inset-0 flex items-center justify-center z-50">
-                    <div className="bg-white p-6 rounded-lg shadow-lg border-2 border-black animate-pop-in">
-                        <h3 className="font-bold mb-4">⚠️ Warning</h3>
-                        <p>Are you sure? This will remove ALL existing data on your Weaviate Instance.</p>
-                        <div className="flex justify-end mt-4">
-                            <button onClick={() => setShowModal(false)} className="mr-2 px-4 py-2 bg-gray-300 hover:bg-gray-200 rounded">
-                                No
-                            </button>
-                            <button onClick={handleReset} className="px-4 py-2 bg-red-500 hover:bg-red-400 text-white rounded">
-                                {isLoading ? "Resetting..." : "Yes"} {/* Show spinner if loading, otherwise show "Yes" */}
-                            </button>
+            {
+                showModal && (
+                    <div className="fixed inset-0 flex items-center justify-center z-50">
+                        <div className="bg-white p-6 rounded-lg shadow-lg border-2 border-black animate-pop-in">
+                            <h3 className="font-bold mb-4">⚠️ Warning</h3>
+                            <p>Are you sure? This will remove ALL existing data on your Weaviate Instance.</p>
+                            <div className="flex justify-end mt-4">
+                                <button onClick={() => setShowModal(false)} className="mr-2 px-4 py-2 bg-gray-300 hover:bg-gray-200 rounded">
+                                    No
+                                </button>
+                                <button onClick={handleReset} className="px-4 py-2 bg-red-500 hover:bg-red-400 text-white rounded">
+                                    {isLoading ? "Resetting..." : "Yes"} {/* Show spinner if loading, otherwise show "Yes" */}
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
-            {showCacheModal && (
-                <div className="fixed inset-0 flex items-center justify-center z-50">
-                    <div className="bg-white p-6 rounded-lg shadow-lg border-2 border-black animate-pop-in">
-                        <h3 className="font-bold mb-4">⚠️ Warning</h3>
-                        <p>Are you sure? This will remove all cached data.</p>
-                        <div className="flex justify-end mt-4">
-                            <button onClick={() => setCacheModal(false)} className="mr-2 px-4 py-2 bg-gray-300 hover:bg-gray-200 rounded">
-                                No
-                            </button>
-                            <button onClick={handleCacheReset} className="px-4 py-2 bg-red-500 hover:bg-red-400 text-white rounded">
-                                {isLoading ? "Resetting..." : "Yes"} {/* Show spinner if loading, otherwise show "Yes" */}
-                            </button>
+                )
+            }
+            {
+                showCacheModal && (
+                    <div className="fixed inset-0 flex items-center justify-center z-50">
+                        <div className="bg-white p-6 rounded-lg shadow-lg border-2 border-black animate-pop-in">
+                            <h3 className="font-bold mb-4">⚠️ Warning</h3>
+                            <p>Are you sure? This will remove all cached data.</p>
+                            <div className="flex justify-end mt-4">
+                                <button onClick={() => setCacheModal(false)} className="mr-2 px-4 py-2 bg-gray-300 hover:bg-gray-200 rounded">
+                                    No
+                                </button>
+                                <button onClick={handleCacheReset} className="px-4 py-2 bg-red-500 hover:bg-red-400 text-white rounded">
+                                    {isLoading ? "Resetting..." : "Yes"} {/* Show spinner if loading, otherwise show "Yes" */}
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
-            {showSuggestionModal && (
-                <div className="fixed inset-0 flex items-center justify-center z-50">
-                    <div className="bg-white p-6 rounded-lg shadow-lg border-2 border-black animate-pop-in">
-                        <h3 className="font-bold mb-4">⚠️ Warning</h3>
-                        <p>Are you sure? This will remove all suggestions</p>
-                        <div className="flex justify-end mt-4">
-                            <button onClick={() => setSuggestioneModal(false)} className="mr-2 px-4 py-2 bg-gray-300 hover:bg-gray-200 rounded">
-                                No
-                            </button>
-                            <button onClick={handleSuggestionReset} className="px-4 py-2 bg-red-500 hover:bg-red-400 text-white rounded">
-                                {isLoading ? "Resetting..." : "Yes"} {/* Show spinner if loading, otherwise show "Yes" */}
-                            </button>
+                )
+            }
+            {
+                showSuggestionModal && (
+                    <div className="fixed inset-0 flex items-center justify-center z-50">
+                        <div className="bg-white p-6 rounded-lg shadow-lg border-2 border-black animate-pop-in">
+                            <h3 className="font-bold mb-4">⚠️ Warning</h3>
+                            <p>Are you sure? This will remove all suggestions</p>
+                            <div className="flex justify-end mt-4">
+                                <button onClick={() => setSuggestioneModal(false)} className="mr-2 px-4 py-2 bg-gray-300 hover:bg-gray-200 rounded">
+                                    No
+                                </button>
+                                <button onClick={handleSuggestionReset} className="px-4 py-2 bg-red-500 hover:bg-red-400 text-white rounded">
+                                    {isLoading ? "Resetting..." : "Yes"} {/* Show spinner if loading, otherwise show "Yes" */}
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
-        </main>
+                )
+            }
+        </main >
     );
 }
