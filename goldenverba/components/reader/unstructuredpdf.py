@@ -87,7 +87,9 @@ class UnstructuredPDF(Reader):
         """
         documents = []
 
-        url = "https://api.unstructured.io/general/v0/general"
+        url = os.environ.get(
+            "UNSTRUCTURED_API_URL", "https://api.unstructured.io/general/v0/general"
+        )
 
         headers = {
             "accept": "application/json",
@@ -140,7 +142,9 @@ class UnstructuredPDF(Reader):
             msg.warn(f"{file_path.suffix} not supported")
             return []
 
-        url = "https://api.unstructured.io/general/v0/general"
+        url = os.environ.get(
+            "UNSTRUCTURED_API_URL", "https://api.unstructured.io/general/v0/general"
+        )
 
         headers = {
             "accept": "application/json",
