@@ -275,12 +275,14 @@ LLAMA2-7B-CHAT-HF=True
 ```
 
 ## Unstructured
-
 Verba supports importing documents through Unstructured (e.g .pdf). To use them you need the `UNSTRUCTURED_API_KEY` environment variable. You can get it from [Unstructured](https://unstructured.io/)
 
 ```
 UNSTRUCTURED_API_KEY=YOUR-UNSTRUCTURED-KEY
+UNSTRUCTURED_API_URL=YOUR-SELF-HOSTED-INSTANCE # If you are self hosting, in the form of `http://localhost:8000/general/v0/general`
 ```
+
+
 
 ## Github
 
