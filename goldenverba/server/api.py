@@ -461,7 +461,7 @@ async def load_data(payload: LoadPayload):
                 return JSONResponse(
                     content={
                         "status": 200,
-                        "status_msg": f"Succesfully imported {document_count} documents and {chunks_count} chunks",
+                        "status_msg": "No documents imported",
                     }
                 )
 
