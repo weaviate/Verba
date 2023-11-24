@@ -1,10 +1,9 @@
 import click
 import uvicorn
+from dotenv import load_dotenv
+from wasabi import msg
 
 from goldenverba.verba_manager import VerbaManager
-
-from wasabi import msg
-from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -86,7 +85,7 @@ def load(reader, type, chunker, units, overlap, embedder, path):
 @cli.command()
 def reset():
     """
-    Delete all schemas
+    Delete all schemas.
     """
     manager = VerbaManager()
     manager.reset()

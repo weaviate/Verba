@@ -1,23 +1,22 @@
-from weaviate import Client
 import re
 
+from tqdm import tqdm
+from wasabi import msg
+from weaviate import Client
+
+from goldenverba.components.component import VerbaComponent
 from goldenverba.components.reader.document import Document
 from goldenverba.components.reader.interface import InputForm
-from goldenverba.components.component import VerbaComponent
-
 from goldenverba.components.schema.schema_generation import (
-    VECTORIZERS,
     EMBEDDINGS,
+    VECTORIZERS,
     strip_non_letters,
 )
-
-from wasabi import msg
-from tqdm import tqdm
 
 
 class Embedder(VerbaComponent):
     """
-    Interface for Verba Embedding
+    Interface for Verba Embedding.
     """
 
     def __init__(self):
@@ -30,7 +29,7 @@ class Embedder(VerbaComponent):
         @parameter: documents : list[Document] - List of Verba documents
         @parameter: client : Client - Weaviate Client
         @parameter: batch_size : int - Batch Size of Input
-        @returns bool - Bool whether the embedding what successful
+        @returns bool - Bool whether the embedding what successful.
         """
         raise NotImplementedError("embed method must be implemented by a subclass.")
 
@@ -43,7 +42,7 @@ class Embedder(VerbaComponent):
         @parameter: documents : list[Document] - List of Verba documents
         @parameter: client : Client - Weaviate Client
         @parameter: batch_size : int - Batch Size of Input
-        @returns bool - Bool whether the embedding what successful
+        @returns bool - Bool whether the embedding what successful.
         """
         try:
             if self.vectorizer not in VECTORIZERS and self.vectorizer not in EMBEDDINGS:
@@ -90,7 +89,7 @@ class Embedder(VerbaComponent):
                         chunk.set_uuid(uuid)
 
                 chunk_count = 0
-                for batch_id, chunk_batch in tqdm(
+                for _batch_id, chunk_batch in tqdm(
                     enumerate(batches), total=len(batches), desc="Importing batches"
                 ):
                     with client.batch as batch:
@@ -108,7 +107,7 @@ class Embedder(VerbaComponent):
                             class_name = "Chunk_" + strip_non_letters(self.vectorizer)
 
                             # Check if vector already exists
-                            if chunk.vector == None:
+                            if chunk.vector is None:
                                 client.batch.add_data_object(properties, class_name)
                             else:
                                 client.batch.add_data_object(
@@ -143,14 +142,14 @@ class Embedder(VerbaComponent):
         @parameter: doc_class_name : str - Class name of Document
         @parameter: chunk_class_name : str - Class name of Chunks
         @parameter: chunk_count : int - Number of expected chunks
-        @returns Optional[Exception] - Raises Exceptions if imported fail, will be catched by the manager
+        @returns Optional[Exception] - Raises Exceptions if imported fail, will be catched by the manager.
         """
         document = client.data_object.get_by_id(
             doc_uuid,
             class_name=doc_class_name,
         )
 
-        if document != None:
+        if document is not None:
             results = (
                 client.query.get(
                     class_name=chunk_class_name,
@@ -185,7 +184,7 @@ class Embedder(VerbaComponent):
         @parameter: client : Client - Weaviate Client
         @parameter: doc_name : str - Document name
         @parameter: doc_class_name : str - Class name of Document
-        @parameter: chunk_class_name : str - Class name of Chunks
+        @parameter: chunk_class_name : str - Class name of Chunks.
         """
         client.batch.delete_objects(
             class_name=doc_class_name,
@@ -224,11 +223,11 @@ class Embedder(VerbaComponent):
     def search_documents(self, client: Client, query: str, doc_type: str) -> list:
         """Search for documents from Weaviate
         @parameter query_string : str - Search query
-        @returns list - Document list
+        @returns list - Document list.
         """
         doc_class_name = "Document_" + strip_non_letters(self.vectorizer)
 
-        if doc_type == "" or doc_type == None:
+        if doc_type == "" or doc_type is None:
             query_results = (
                 client.query.get(
                     class_name=doc_class_name,
@@ -291,7 +290,7 @@ class Embedder(VerbaComponent):
         """Retrieve results from semantic cache based on query and distance threshold
         @parameter query - str - User query
         @parameter dist - float - Distance threshold
-        @returns Optional[dict] - List of results or None
+        @returns Optional[dict] - List of results or None.
         """
         needs_vectorization = self.get_need_vectorization()
 
@@ -310,19 +309,17 @@ class Embedder(VerbaComponent):
             .with_limit(1)
         ).do()
 
-        if "data" in match_results:
-            if len(match_results["data"]["Get"][self.get_cache_class()]) > 0:
-                if (
-                    query
-                    == match_results["data"]["Get"][self.get_cache_class()][0]["query"]
-                ):
-                    msg.good(f"Direct match from cache")
-                    return (
-                        match_results["data"]["Get"][self.get_cache_class()][0][
-                            "system"
-                        ],
-                        float(0.0),
-                    )
+        if "data" in match_results and len(match_results["data"]["Get"][self.get_cache_class()]) > 0 and (
+            query
+            == match_results["data"]["Get"][self.get_cache_class()][0]["query"]
+        ):
+            msg.good("Direct match from cache")
+            return (
+                match_results["data"]["Get"][self.get_cache_class()][0][
+                    "system"
+                ],
+                0.0,
+            )
 
         query_results = (
             client.query.get(
@@ -356,7 +353,7 @@ class Embedder(VerbaComponent):
         result = results[0]
 
         if float(result["_additional"]["distance"]) <= dist:
-            msg.good(f"Retrieved similar from cache")
+            msg.good("Retrieved similar from cache")
             return result["system"], float(result["_additional"]["distance"])
 
         else:
@@ -367,9 +364,8 @@ class Embedder(VerbaComponent):
         @parameter query : str - User query
         @parameter results : list[dict] - Results from Weaviate
         @parameter system : str - System message
-        @returns None
+        @returns None.
         """
-
         needs_vectorization = self.get_need_vectorization()
 
         with client.batch as batch:
@@ -378,7 +374,7 @@ class Embedder(VerbaComponent):
                 "query": str(query),
                 "system": system,
             }
-            msg.good(f"Saved to cache")
+            msg.good("Saved to cache")
 
             if needs_vectorization:
                 vector = self.vectorize_query(query)

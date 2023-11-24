@@ -1,20 +1,20 @@
-from wasabi import msg
+import contextlib
+
 from tqdm import tqdm
+from wasabi import msg
 
-try:
+with contextlib.suppress(Exception):
     import spacy
-except:
-    pass
 
-from goldenverba.components.chunking.interface import Chunker
 from goldenverba.components.chunking.chunk import Chunk
+from goldenverba.components.chunking.interface import Chunker
 from goldenverba.components.reader.document import Document
 from goldenverba.components.reader.interface import InputForm
 
 
 class WordChunker(Chunker):
     """
-    WordChunker for Verba built with spaCy
+    WordChunker for Verba built with spaCy.
     """
 
     def __init__(self):
@@ -36,7 +36,7 @@ class WordChunker(Chunker):
         @parameter: documents : list[Document] - List of Verba documents
         @parameter: units : int - How many units per chunk (words, sentences, etc.)
         @parameter: overlap : int - How much overlap between the chunks
-        @returns list[str] - List of documents that contain the chunks
+        @returns list[str] - List of documents that contain the chunks.
         """
         for document in tqdm(
             documents, total=len(documents), desc="Chunking documents"

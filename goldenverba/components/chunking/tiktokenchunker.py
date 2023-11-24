@@ -1,19 +1,19 @@
-from wasabi import msg
+import contextlib
+
 from tqdm import tqdm
+from wasabi import msg
 
-try:
+with contextlib.suppress(Exception):
     import tiktoken
-except:
-    pass
 
-from goldenverba.components.chunking.interface import Chunker
 from goldenverba.components.chunking.chunk import Chunk
+from goldenverba.components.chunking.interface import Chunker
 from goldenverba.components.reader.document import Document
 
 
 class TokenChunker(Chunker):
     """
-    TokenChunker for Verba built with tiktoken
+    TokenChunker for Verba built with tiktoken.
     """
 
     def __init__(self):
@@ -32,7 +32,7 @@ class TokenChunker(Chunker):
         @parameter: documents : list[Document] - List of Verba documents
         @parameter: units : int - How many units per chunk (words, sentences, etc.)
         @parameter: overlap : int - How much overlap between the chunks
-        @returns list[str] - List of documents that contain the chunks
+        @returns list[str] - List of documents that contain the chunks.
         """
         for document in tqdm(
             documents, total=len(documents), desc="Chunking documents"

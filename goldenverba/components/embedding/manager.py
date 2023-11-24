@@ -1,12 +1,11 @@
+from wasabi import msg
 from weaviate import Client
 
-from goldenverba.components.reader.document import Document
-from goldenverba.components.embedding.interface import Embedder
 from goldenverba.components.embedding.ADAEmbedder import ADAEmbedder
-from goldenverba.components.embedding.MiniLMEmbedder import MiniLMEmbedder
 from goldenverba.components.embedding.CohereEmbedder import CohereEmbedder
-
-from wasabi import msg
+from goldenverba.components.embedding.interface import Embedder
+from goldenverba.components.embedding.MiniLMEmbedder import MiniLMEmbedder
+from goldenverba.components.reader.document import Document
 
 
 class EmbeddingManager:
@@ -25,7 +24,7 @@ class EmbeddingManager:
         @parameter: documents : list[Document] - List of Verba documents
         @parameter: client : Client - Weaviate Client
         @parameter: batch_size : int - Batch Size of Input
-        @returns bool - Bool whether the embedding what successful
+        @returns bool - Bool whether the embedding what successful.
         """
         return self.selected_embedder.embed(documents, client)
 

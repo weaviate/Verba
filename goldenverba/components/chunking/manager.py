@@ -1,12 +1,11 @@
 import tiktoken
-
-from goldenverba.components.chunking.wordchunker import WordChunker
-from goldenverba.components.chunking.tiktokenchunker import TokenChunker
-from goldenverba.components.chunking.sentencechunker import SentenceChunker
-from goldenverba.components.chunking.interface import Chunker
-from goldenverba.components.reader.document import Document
-
 from wasabi import msg
+
+from goldenverba.components.chunking.interface import Chunker
+from goldenverba.components.chunking.sentencechunker import SentenceChunker
+from goldenverba.components.chunking.tiktokenchunker import TokenChunker
+from goldenverba.components.chunking.wordchunker import WordChunker
+from goldenverba.components.reader.document import Document
 
 
 class ChunkerManager:
@@ -21,11 +20,12 @@ class ChunkerManager:
     def chunk(
         self, documents: list[Document], units: int, overlap: int
     ) -> list[Document]:
-        """Chunk verba documents into chunks based on n and overlap
+        """Chunk verba documents into chunks based on n and overlap.
+
         @parameter: documents : list[Document] - List of Verba documents
         @parameter: units : int - How many units per chunk (words, sentences, etc.)
         @parameter: overlap : int - How much overlap between the chunks
-        @returns list[str] - List of documents that contain the chunks
+        @returns list[str] - List of documents that contain the chunks.
         """
         chunked_docs = self.selected_chunker.chunk(documents, units, overlap)
         msg.good("Chunking completed")
@@ -47,7 +47,7 @@ class ChunkerManager:
     def check_chunks(self, documents: list[Document]) -> bool:
         """Checks token count of chunks which are hardcapped to 1000 tokens per chunk
         @parameter: documents : list[Document] - List of Verba documents
-        @returns bool - Whether the chunks are within the token range
+        @returns bool - Whether the chunks are within the token range.
         """
         encoding = tiktoken.encoding_for_model("gpt-3.5-turbo")
 

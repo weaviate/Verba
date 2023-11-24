@@ -1,31 +1,24 @@
-import os
-
-from wasabi import msg  # type: ignore[import]
-
-from fastapi import FastAPI, status, WebSocket, Request
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI, Request, WebSocket, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
 
+import os
 from pathlib import Path
-from pydantic import BaseModel
-
-from starlette.websockets import WebSocketDisconnect
-
-from goldenverba import verba_manager
-
-from goldenverba.components.reader.interface import Reader
-from goldenverba.components.chunking.interface import Chunker
-from goldenverba.components.embedding.interface import Embedder
-from goldenverba.components.retriever.interface import Retriever
-from goldenverba.components.generation.interface import Generator
-
-from goldenverba.server.ConfigManager import ConfigManager
-from goldenverba.server.util import setup_managers
-
 
 from dotenv import load_dotenv
+from pydantic import BaseModel
+from starlette.websockets import WebSocketDisconnect
+from wasabi import msg  # type: ignore[import]
+
+from goldenverba import verba_manager
+from goldenverba.components.chunking.interface import Chunker
+from goldenverba.components.embedding.interface import Embedder
+from goldenverba.components.generation.interface import Generator
+from goldenverba.components.reader.interface import Reader
+from goldenverba.components.retriever.interface import Retriever
+from goldenverba.server.ConfigManager import ConfigManager
+from goldenverba.server.util import setup_managers
 
 load_dotenv()
 
@@ -464,7 +457,7 @@ async def load_data(payload: LoadPayload):
                 payload.chunkOverlap,
             )
 
-            if documents == None:
+            if documents is None:
                 return JSONResponse(
                     content={
                         "status": 200,
@@ -562,7 +555,7 @@ async def generate(payload: GeneratePayload):
         )
 
     except Exception as e:
-        raise e
+        raise
         msg.fail(f"Answer Generation failed: {str(e)}")
         return JSONResponse(
             content={
@@ -598,7 +591,7 @@ async def websocket_generate_stream(websocket: WebSocket):
             await websocket.send_json(
                 {"message": e, "finish_reason": "stop", "full_text": e}
             )
-        msg.good(f"Succesfully streamed answer")
+        msg.good("Succesfully streamed answer")
 
 
 # Retrieve auto complete suggestions based on user input
@@ -612,7 +605,7 @@ async def suggestions(payload: QueryPayload):
                 "suggestions": suggestions,
             }
         )
-    except Exception as e:
+    except Exception:
         return JSONResponse(
             content={
                 "suggestions": [],
@@ -645,13 +638,13 @@ async def get_document(payload: GetDocumentPayload):
 ## Retrieve all documents imported to Weaviate
 @app.post("/api/get_all_documents")
 async def get_all_documents(payload: SearchQueryPayload):
-    msg.info(f"Get all documents request received")
+    msg.info("Get all documents request received")
 
     try:
         documents = manager.retrieve_all_documents(payload.doc_type)
         msg.good(f"Succesfully retrieved document: {len(documents)} documents")
 
-        doc_types = set([document["doc_type"] for document in documents])
+        doc_types = {document["doc_type"] for document in documents}
 
         return JSONResponse(
             content={

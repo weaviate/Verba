@@ -1,7 +1,6 @@
-from weaviate import Client
-from wasabi import msg
-
 from tqdm import tqdm
+from wasabi import msg
+from weaviate import Client
 
 from goldenverba.components.embedding.interface import Embedder
 from goldenverba.components.reader.document import Document
@@ -9,7 +8,7 @@ from goldenverba.components.reader.document import Document
 
 class MiniLMEmbedder(Embedder):
     """
-    MiniLMEmbedder for Verba
+    MiniLMEmbedder for Verba.
     """
 
     def __init__(self):
@@ -21,8 +20,8 @@ class MiniLMEmbedder(Embedder):
         self.model = None
         self.tokenizer = None
         try:
-            from transformers import AutoTokenizer, AutoModel
             import torch
+            from transformers import AutoModel, AutoTokenizer
 
             def get_device():
                 if torch.cuda.is_available():
@@ -55,9 +54,8 @@ class MiniLMEmbedder(Embedder):
         @parameter: documents : list[Document] - List of Verba documents
         @parameter: client : Client - Weaviate Client
         @parameter: batch_size : int - Batch Size of Input
-        @returns bool - Bool whether the embedding what successful
+        @returns bool - Bool whether the embedding what successful.
         """
-
         for document in tqdm(
             documents, total=len(documents), desc="Vectorizing document chunks"
         ):
@@ -117,8 +115,8 @@ class MiniLMEmbedder(Embedder):
 
             return averaged_embedding_list
 
-        except Exception as e:
-            raise (e)
+        except Exception:
+            raise
 
     def vectorize_query(self, query: str) -> list[float]:
         return self.vectorize_chunk(query)

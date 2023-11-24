@@ -1,14 +1,14 @@
-import glob
 import base64
+import glob
 import os
-import requests
-
-from wasabi import msg
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 
-from goldenverba.components.reader.interface import Reader, InputForm
+import requests
+from wasabi import msg
+
 from goldenverba.components.reader.document import Document
+from goldenverba.components.reader.interface import InputForm, Reader
 
 
 class UnstructuredPDF(Reader):
@@ -26,10 +26,10 @@ class UnstructuredPDF(Reader):
 
     def load(
         self,
-        bytes: list[str] = [],
-        contents: list[str] = [],
-        paths: list[str] = [],
-        fileNames: list[str] = [],
+        bytes: list[str] = None,
+        contents: list[str] = None,
+        paths: list[str] = None,
+        fileNames: list[str] = None,
         document_type: str = "Documentation",
     ) -> list[Document]:
         """Ingest data into Weaviate
@@ -38,9 +38,16 @@ class UnstructuredPDF(Reader):
         @parameter: paths : list[str] - List of paths to files
         @parameter: fileNames : list[str] - List of file names
         @parameter: document_type : str - Document type
-        @returns list[Document] - Lists of documents
+        @returns list[Document] - Lists of documents.
         """
-
+        if fileNames is None:
+            fileNames = []
+        if paths is None:
+            paths = []
+        if contents is None:
+            contents = []
+        if bytes is None:
+            bytes = []
         documents = []
 
         # If paths exist
@@ -57,23 +64,21 @@ class UnstructuredPDF(Reader):
                         msg.warn(f"Path {data_path} does not exist")
 
         # If bytes exist
-        if len(bytes) > 0:
-            if len(bytes) == len(fileNames):
-                for byte, fileName in zip(bytes, fileNames):
-                    documents += self.load_bytes(byte, fileName, document_type)
+        if len(bytes) > 0 and len(bytes) == len(fileNames):
+            for byte, fileName in zip(bytes, fileNames):
+                documents += self.load_bytes(byte, fileName, document_type)
 
         # If content exist
-        if len(contents) > 0:
-            if len(contents) == len(fileNames):
-                for content, fileName in zip(contents, fileNames):
-                    document = Document(
-                        name=fileName,
-                        text=content,
-                        type=document_type,
-                        timestamp=str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
-                        reader=self.name,
-                    )
-                    documents.append(document)
+        if len(contents) > 0 and len(contents) == len(fileNames):
+            for content, fileName in zip(contents, fileNames):
+                document = Document(
+                    name=fileName,
+                    text=content,
+                    type=document_type,
+                    timestamp=str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
+                    reader=self.name,
+                )
+                documents.append(document)
 
         msg.good(f"Loaded {len(documents)} documents")
         return documents
@@ -83,7 +88,7 @@ class UnstructuredPDF(Reader):
         @param bytes_string : str - PDF File bytes coming from the frontend
         @param fileName : str - Filename
         @param document_type : str - Document Type
-        @returns list[Document] - Lists of documents
+        @returns list[Document] - Lists of documents.
         """
         documents = []
 
@@ -134,7 +139,7 @@ class UnstructuredPDF(Reader):
         """Loads .pdf file
         @param file_path : Path - Path to file
         @param document_type : str - Document Type
-        @returns list[Document] - Lists of documents
+        @returns list[Document] - Lists of documents.
         """
         documents = []
 
@@ -203,7 +208,7 @@ class UnstructuredPDF(Reader):
             # Loop through each file
             for file in files:
                 msg.info(f"Reading {str(file)}")
-                with open(file, "r", encoding="utf-8") as f:
+                with open(file, encoding="utf-8"):
                     documents += self.load_file(file, document_type=document_type)
 
         msg.good(f"Loaded {len(documents)} documents")

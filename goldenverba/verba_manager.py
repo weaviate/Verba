@@ -1,37 +1,33 @@
 import os
 import ssl
+from typing import Optional
 
 import weaviate
-
-from typing import Optional
+from dotenv import load_dotenv
+from wasabi import msg
 from weaviate import Client
 from weaviate.embedded import EmbeddedOptions
-from wasabi import msg
-
-from goldenverba.components.reader.manager import ReaderManager
-from goldenverba.components.chunking.manager import ChunkerManager
-from goldenverba.components.embedding.manager import EmbeddingManager
-from goldenverba.components.retriever.manager import RetrieverManager
-from goldenverba.components.generation.manager import GeneratorManager
-from goldenverba.components.reader.document import Document
-from goldenverba.components.chunking.chunk import Chunk
-from goldenverba.components.reader.interface import Reader
-from goldenverba.components.chunking.interface import Chunker
-from goldenverba.components.embedding.interface import Embedder
-from goldenverba.components.retriever.interface import Retriever
-from goldenverba.components.generation.interface import Generator
-
-from goldenverba.components.component import VerbaComponent
 
 import goldenverba.components.schema.schema_generation as schema_manager
-
-from dotenv import load_dotenv
+from goldenverba.components.chunking.chunk import Chunk
+from goldenverba.components.chunking.interface import Chunker
+from goldenverba.components.chunking.manager import ChunkerManager
+from goldenverba.components.component import VerbaComponent
+from goldenverba.components.embedding.interface import Embedder
+from goldenverba.components.embedding.manager import EmbeddingManager
+from goldenverba.components.generation.interface import Generator
+from goldenverba.components.generation.manager import GeneratorManager
+from goldenverba.components.reader.document import Document
+from goldenverba.components.reader.interface import Reader
+from goldenverba.components.reader.manager import ReaderManager
+from goldenverba.components.retriever.interface import Retriever
+from goldenverba.components.retriever.manager import RetrieverManager
 
 load_dotenv()
 
 
 class VerbaManager:
-    """Manages all Verba Components"""
+    """Manages all Verba Components."""
 
     def __init__(self) -> None:
         self.reader_manager = ReaderManager()
@@ -157,11 +153,10 @@ class VerbaManager:
     def generator_get_generator(self) -> dict[str, Generator]:
         return self.generator_manager.get_generators()
 
-    def setup_client(self) -> Optional[Client]:
+    def setup_client(self) -> Client | None:
         """
-        @returns Optional[Client] - The Weaviate Client
+        @returns Optional[Client] - The Weaviate Client.
         """
-
         msg.info("Setting up client")
 
         additional_header = {}
@@ -179,7 +174,7 @@ class VerbaManager:
             else:
                 self.environment_variables["OPENAI_API_KEY"] = False
 
-        except Exception as e:
+        except Exception:
             self.environment_variables["OPENAI_API_KEY"] = False
 
         cohere_key = os.environ.get("COHERE_API_KEY", "")
@@ -224,7 +219,7 @@ class VerbaManager:
                 embedded_options=EmbeddedOptions(),
             )
 
-        if client != None:
+        if client is not None:
             msg.good("Connected to Weaviate")
 
             # Batch Configuration
@@ -244,43 +239,42 @@ class VerbaManager:
 
     def verify_installed_libraries(self) -> None:
         """
-        Checks which libraries are installed and fills out the self.installed_libraries dictionary for the frontend to access, this will be displayed in the status page
+        Checks which libraries are installed and fills out the self.installed_libraries dictionary for the frontend to access, this will be displayed in the status page.
         """
-
         # spaCy, used for Chunking
         try:
             import spacy
 
             self.installed_libraries["spacy"] = True
-        except Exception as e:
+        except Exception:
             self.installed_libraries["spacy"] = False
 
         try:
             import PyPDF2
 
             self.installed_libraries["PyPDF2"] = True
-        except Exception as e:
+        except Exception:
             self.installed_libraries["PyPDF2"] = False
 
         try:
             import tiktoken
 
             self.installed_libraries["tiktoken"] = True
-        except Exception as e:
+        except Exception:
             self.installed_libraries["tiktoken"] = False
 
         try:
             import openai
 
             self.installed_libraries["openai"] = True
-        except Exception as e:
+        except Exception:
             self.installed_libraries["openai"] = False
 
         try:
             import cohere
 
             self.installed_libraries["cohere"] = True
-        except Exception as e:
+        except Exception:
             self.installed_libraries["cohere"] = False
 
         try:
@@ -290,14 +284,14 @@ class VerbaManager:
             login(token=os.environ.get("HF_TOKEN", ""), add_to_git_credential=True)
 
             self.installed_libraries["huggingface_hub"] = True
-        except Exception as e:
+        except Exception:
             self.installed_libraries["huggingface_hub"] = False
 
         try:
             import transformers
 
             self.installed_libraries["transformers"] = True
-        except Exception as e:
+        except Exception:
             self.installed_libraries["transformers"] = False
 
         try:
@@ -311,14 +305,13 @@ class VerbaManager:
                 msg.info("Neither CUDA nor MPS is available. Using CPU...")
 
             self.installed_libraries["torch"] = True
-        except Exception as e:
+        except Exception:
             self.installed_libraries["torch"] = False
 
     def verify_variables(self) -> None:
         """
-        Checks which environment variables are installed and fills out the self.environment_variables dictionary for the frontend to access
+        Checks which environment variables are installed and fills out the self.environment_variables dictionary for the frontend to access.
         """
-
         # OpenAI API Key
         if os.environ.get("OPENAI_API_KEY", "") != "":
             self.environment_variables["OPENAI_API_KEY"] = True
@@ -357,9 +350,8 @@ class VerbaManager:
 
     def get_schemas(self) -> dict:
         """
-        @returns dict - A dictionary with the schema names and their object count
+        @returns dict - A dictionary with the schema names and their object count.
         """
-
         schema_info = self.client.schema.get()
         schemas = {}
 
@@ -378,7 +370,7 @@ class VerbaManager:
     def get_suggestions(self, query: str) -> list[str]:
         """Retrieve suggestions based on user query
         @parameter query : str - User query
-        @returns list[str] - List of possible autocomplete suggestions
+        @returns list[str] - List of possible autocomplete suggestions.
         """
         query_results = (
             self.client.query.get(
@@ -404,7 +396,7 @@ class VerbaManager:
 
     def set_suggestions(self, query: str):
         """Adds suggestions to the suggestion class
-        @parameter query : str - Query to save in suggestions
+        @parameter query : str - Query to save in suggestions.
         """
         # Don't set new suggestions when in production
         production_key = os.environ.get("VERBA_PRODUCTION", "")
@@ -426,10 +418,9 @@ class VerbaManager:
             .do()
         )
 
-        if "data" in check_results:
-            if len(check_results["data"]["Get"]["Suggestion"]) > 0:
-                if query == check_results["data"]["Get"]["Suggestion"][0]["suggestion"]:
-                    return
+        if "data" in check_results and len(check_results["data"]["Get"]["Suggestion"]) > 0:
+            if query == check_results["data"]["Get"]["Suggestion"][0]["suggestion"]:
+                return
 
         with self.client.batch as batch:
             batch.batch_size = 1
@@ -451,9 +442,8 @@ class VerbaManager:
 
     def retrieve_all_documents(self, doc_type: str) -> list:
         """Return all documents from Weaviate
-        @returns list - Document list
+        @returns list - Document list.
         """
-
         class_name = "Document_" + schema_manager.strip_non_letters(
             self.embedder_manager.selected_embedder.vectorizer
         )
@@ -492,7 +482,7 @@ class VerbaManager:
     def retrieve_document(self, doc_id: str) -> dict:
         """Return a document by it's ID (UUID format) from Weaviate
         @parameter doc_id : str - Document ID
-        @returns dict - Document dict
+        @returns dict - Document dict.
         """
         class_name = "Document_" + schema_manager.strip_non_letters(
             self.embedder_manager.selected_embedder.vectorizer
@@ -517,7 +507,7 @@ class VerbaManager:
             self.client, semantic_query
         )
 
-        if semantic_result != None:
+        if semantic_result is not None:
             return {
                 "message": str(semantic_result),
                 "finish_reason": "stop",
@@ -548,7 +538,7 @@ class VerbaManager:
             self.client, semantic_query
         )
 
-        if semantic_result != None:
+        if semantic_result is not None:
             yield {
                 "message": str(semantic_result),
                 "finish_reason": "stop",
@@ -602,9 +592,8 @@ class VerbaManager:
     def check_if_document_exits(self, document: Document) -> bool:
         """Return a document by it's ID (UUID format) from Weaviate
         @parameter document : Document - Document object
-        @returns bool - Whether the doc name exist in the cluster
+        @returns bool - Whether the doc name exist in the cluster.
         """
-
         class_name = "Document_" + schema_manager.strip_non_letters(
             self.embedder_manager.selected_embedder.vectorizer
         )
@@ -648,7 +637,7 @@ class VerbaManager:
             else:
                 return (False, f"{env} not set")
 
-        return (True, f"Available")
+        return (True, "Available")
 
     def delete_document_by_id(self, doc_id: str) -> None:
         self.embedder_manager.selected_embedder.remove_document_by_id(
