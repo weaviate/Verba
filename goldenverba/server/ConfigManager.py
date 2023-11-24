@@ -15,16 +15,13 @@ class Config:
         self.generator = generator
 
     def initalized(self) -> bool:
-        if (
+        return (
             self.reader == ""
             or self.chunker == ""
             or self.embedder == ""
             or self.retriever == ""
             or self.generator == ""
-        ):
-            return False
-        else:
-            return True
+        )
 
 
 class ConfigManager:

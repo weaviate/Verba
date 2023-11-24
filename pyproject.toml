@@ -68,17 +68,13 @@ ignore = [
     "S113",
     "B905",
     "PTH123",
-    "PTH107",
     "PTH207",
     "SIM115",
     "SIM102",
-    "SIM103",
     "PTH110",
     "N815",
     "PTH118",
     "PTH113",
-    "F821",
-    "S104",
 ]
 line-length = 120  # Must agree with Black
 
