@@ -1,7 +1,7 @@
 from enum import Enum
 
-from goldenverba.components.reader.document import Document
 from goldenverba.components.component import VerbaComponent
+from goldenverba.components.reader.document import Document
 
 
 class InputForm(Enum):
@@ -13,7 +13,7 @@ class InputForm(Enum):
 
 class Reader(VerbaComponent):
     """
-    Interface for Verba Readers
+    Interface for Verba Readers.
     """
 
     def __init__(self):
@@ -34,6 +34,6 @@ class Reader(VerbaComponent):
         @parameter: paths : list[str] - List of paths to files
         @parameter: fileNames : list[str] - List of file names
         @parameter: document_type : str - Document type
-        @returns list[Document] - Lists of documents
+        @returns list[Document] - Lists of documents.
         """
         raise NotImplementedError("load method must be implemented by a subclass.")

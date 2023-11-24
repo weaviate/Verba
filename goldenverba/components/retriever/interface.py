@@ -1,17 +1,15 @@
+import tiktoken
+from wasabi import msg
+from weaviate import Client
+
 from goldenverba.components.chunking.chunk import Chunk
 from goldenverba.components.component import VerbaComponent
 from goldenverba.components.embedding.interface import Embedder
 
-import tiktoken
-
-from weaviate import Client
-
-from wasabi import msg
-
 
 class Retriever(VerbaComponent):
     """
-    Interface for Verba Retrievers
+    Interface for Verba Retrievers.
     """
 
     def __init__(self):
@@ -27,7 +25,7 @@ class Retriever(VerbaComponent):
         @parameter: queries : list[str] - List of queries
         @parameter: client : Client - Weaviate client
         @parameter: embedder : Embedder - Current selected Embedder
-        @returns tuple(list[Chunk],str) - List of retrieved chunks and the context string
+        @returns tuple(list[Chunk],str) - List of retrieved chunks and the context string.
         """
         raise NotImplementedError("load method must be implemented by a subclass.")
 

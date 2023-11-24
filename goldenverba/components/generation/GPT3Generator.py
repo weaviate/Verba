@@ -3,7 +3,7 @@ from goldenverba.components.generation.GPT4Generator import GPT4Generator
 
 class GPT3Generator(GPT4Generator):
     """
-    GPT3 Generator
+    GPT3 Generator.
     """
 
     def __init__(self):

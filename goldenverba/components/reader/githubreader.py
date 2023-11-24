@@ -1,18 +1,18 @@
-import os
 import base64
 import json
+import os
+from datetime import datetime
 
 import requests
-from datetime import datetime
 from wasabi import msg
 
-from goldenverba.components.reader.interface import Reader, InputForm
 from goldenverba.components.reader.document import Document
+from goldenverba.components.reader.interface import InputForm, Reader
 
 
 class GithubReader(Reader):
     """
-    The GithubReader downloads files from Github and ingests them into Weaviate
+    The GithubReader downloads files from Github and ingests them into Weaviate.
     """
 
     def __init__(self):
@@ -24,10 +24,10 @@ class GithubReader(Reader):
 
     def load(
         self,
-        bytes: list[str] = [],
-        contents: list[str] = [],
-        paths: list[str] = [],
-        fileNames: list[str] = [],
+        bytes: list[str] = None,
+        contents: list[str] = None,
+        paths: list[str] = None,
+        fileNames: list[str] = None,
         document_type: str = "Documentation",
     ) -> list[Document]:
         """Ingest data into Weaviate
@@ -36,9 +36,16 @@ class GithubReader(Reader):
         @parameter: paths : list[str] - List of paths to files
         @parameter: fileNames : list[str] - List of file names
         @parameter: document_type : str - Document type
-        @returns list[Document] - Lists of documents
+        @returns list[Document] - Lists of documents.
         """
-
+        if fileNames is None:
+            fileNames = []
+        if paths is None:
+            paths = []
+        if contents is None:
+            contents = []
+        if bytes is None:
+            bytes = []
         documents = []
 
         # If paths exist
@@ -81,9 +88,8 @@ class GithubReader(Reader):
     def fetch_docs(self, path: str) -> list:
         """Fetch filenames from Github
         @parameter path : str - Path to a GitHub repository
-        @returns list - List of document names
+        @returns list - List of document names.
         """
-
         split = path.split("/")
         owner = split[0]
         repo = split[1]
@@ -120,7 +126,7 @@ class GithubReader(Reader):
         """Download files from Github based on filename
         @parameter path : str - Path to a GitHub repository
         @parameter file_path : str - Path of the file in repo
-        @returns str - Content of the file
+        @returns str - Content of the file.
         """
         split = path.split("/")
         owner = split[0]

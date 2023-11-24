@@ -3,11 +3,8 @@ import re
 from wasabi import msg  # type: ignore[import]
 from weaviate import Client
 
-
-VECTORIZERS = set(
-    ["text2vec-openai", "text2vec-cohere"]
-)  # Needs to match with Weaviate modules
-EMBEDDINGS = set(["MiniLM"])  # Custom Vectors
+VECTORIZERS = {"text2vec-openai", "text2vec-cohere"}  # Needs to match with Weaviate modules
+EMBEDDINGS = {"MiniLM"}  # Custom Vectors
 
 
 def strip_non_letters(s: str):
@@ -15,14 +12,16 @@ def strip_non_letters(s: str):
 
 
 def verify_vectorizer(
-    schema: dict, vectorizer: str, skip_properties: list[str] = []
+    schema: dict, vectorizer: str, skip_properties: list[str] = None
 ) -> dict:
     """Verifies if the vectorizer is available and adds it to a schema, also skips vectorization if list is provided
     @parameter schema : dict - Schema json
     @parameter vectorizer : str - Name of the vectorizer
     @parameter skip_properties: list[str] - List of property names that should not get vectorized
-    @returns dict - Modified schema if vectorizer is available
+    @returns dict - Modified schema if vectorizer is available.
     """
+    if skip_properties is None:
+        skip_properties = []
     modified_schema = schema.copy()
     # Verify Vectorizer
     if vectorizer in VECTORIZERS:
@@ -39,7 +38,7 @@ def verify_vectorizer(
                 property["moduleConfig"] = moduleConfig
     elif vectorizer in EMBEDDINGS:
         pass
-    elif vectorizer != None:
+    elif vectorizer is not None:
         msg.warn(f"Could not find matching vectorizer: {vectorizer}")
 
     return modified_schema
@@ -49,7 +48,7 @@ def add_suffix(schema: dict, vectorizer: str) -> tuple[dict, str]:
     """Adds the suffixof the vectorizer to the schema name
     @parameter schema : dict - Schema json
     @parameter vectorizer : str - Name of the vectorizer
-    @returns dict - Modified schema if vectorizer is available
+    @returns dict - Modified schema if vectorizer is available.
     """
     modified_schema = schema.copy()
     # Verify Vectorizer and add suffix
@@ -83,9 +82,8 @@ def init_schemas(
     @parameter vectorizer : str - Name of the vectorizer
     @parameter force : bool - Delete existing schema without user input
     @parameter check : bool - Only create if not exist
-    @returns tuple[dict, dict] - Tuple of modified schemas
+    @returns tuple[dict, dict] - Tuple of modified schemas.
     """
-
     try:
         init_documents(client, vectorizer, force, check)
         init_cache(client, vectorizer, force, check)
@@ -104,9 +102,8 @@ def init_documents(
     @parameter vectorizer : str - Name of the vectorizer
     @parameter force : bool - Delete existing schema without user input
     @parameter check : bool - Only create if not exist
-    @returns tuple[dict, dict] - Tuple of modified schemas
+    @returns tuple[dict, dict] - Tuple of modified schemas.
     """
-
     SCHEMA_CHUNK = {
         "classes": [
             {
@@ -233,9 +230,8 @@ def init_cache(
     @parameter vectorizer : str - Name of the vectorizer
     @parameter force : bool - Delete existing schema without user input
     @parameter check : bool - Only create if not exist
-    @returns dict - Modified schema
+    @returns dict - Modified schema.
     """
-
     SCHEMA_CACHE = {
         "classes": [
             {
@@ -298,9 +294,8 @@ def init_suggestion(
     @parameter vectorizer : str - Name of the vectorizer
     @parameter force : bool - Delete existing schema without user input
     @parameter check : bool - Only create if not exist
-    @returns dict - Modified schema
+    @returns dict - Modified schema.
     """
-
     SCHEMA_SUGGESTION = {
         "classes": [
             {

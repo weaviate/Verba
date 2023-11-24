@@ -6,7 +6,7 @@ from goldenverba.components.reader.document import Document
 
 class ADAEmbedder(Embedder):
     """
-    ADAEmbedder for Verba
+    ADAEmbedder for Verba.
     """
 
     def __init__(self):
@@ -26,6 +26,6 @@ class ADAEmbedder(Embedder):
         @parameter: documents : list[Document] - List of Verba documents
         @parameter: client : Client - Weaviate Client
         @parameter: batch_size : int - Batch Size of Input
-        @returns bool - Bool whether the embedding what successful
+        @returns bool - Bool whether the embedding what successful.
         """
         return self.import_data(documents, client)
