@@ -100,6 +100,7 @@ class MiniLMEmbedder(Embedder):
                 inputs = self.tokenizer(
                     batch, return_tensors="pt", padding=True, truncation=True
                 )
+                inputs = {k: v.to(self.device) for k, v in inputs.items()}
                 with torch.no_grad():
                     outputs = self.model(**inputs)
                 # Taking the mean of the hidden states to obtain an embedding for the batch

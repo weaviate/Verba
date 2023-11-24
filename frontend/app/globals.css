@@ -95,8 +95,8 @@
 /* Setting the font-family to PT Mono for all markdown content */
 .my-markdown-styles {
   font-family: "PT Mono", monospace;
-  line-height: 1.6;
-  /* Adjust line-height for better readability */
+  line-height: 1.5;
+  white-space: pre-line;
 }
 
 /* Headers */
