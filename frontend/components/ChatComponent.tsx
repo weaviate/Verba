@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Typewriter from "typewriter-effect";
+import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneLight } from "react-syntax-highlighter/dist/cjs/styles/prism";
 import PulseLoader from "react-spinners/PulseLoader";
@@ -232,21 +233,13 @@ export function ChatComponent({
           >
             {message.type === "system"
               ? parseMessage(message.content).map((segment, segIndex) => {
-                if (segment.type === "text" && message.typewriter) {
+                if (segment.type === "text") {
                   return (
-                    <Typewriter
-                      key={segIndex}
-                      onInit={(typewriter) => {
-                        typewriter
-                          .typeString(segment.content || "N/A")
-                          .start();
-                      }}
-                      options={{ delay: 15 }}
-                    />
-                  );
-                } else if (segment.type === "text" && !message.typewriter) {
-                  return (
-                    <p key={segIndex}>{segment.content}</p>
+                    <div key={segIndex} className="my-markdown-styles">
+                      <ReactMarkdown>
+                        {segment.content}
+                      </ReactMarkdown>
+                    </div>
                   );
                 } else if (segment.type === "code") {
                   return (
