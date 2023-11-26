@@ -1,7 +1,10 @@
 import re
-
+import os
+from dotenv import load_dotenv
 from wasabi import msg  # type: ignore[import]
 from weaviate import Client
+
+load_dotenv()
 
 VECTORIZERS = {"text2vec-openai", "text2vec-cohere"}  # Needs to match with Weaviate modules
 EMBEDDINGS = {"MiniLM"}  # Custom Vectors
@@ -23,10 +26,26 @@ def verify_vectorizer(
     if skip_properties is None:
         skip_properties = []
     modified_schema = schema.copy()
+
+    #adding specific config for Azure OpenAI
+    vectorizer_config = None
+    if os.getenv("OPENAI_API_TYPE") == "azure" and vectorizer=="text2vec-openai":
+        resourceName = os.getenv("AZURE_OPENAI_RESOURCE_NAME")
+        model = os.getenv("AZURE_OPENAI_EMBEDDING_MODEL")
+        if resourceName is None or model is None:
+            raise Exception("AZURE_OPENAI_RESOURCE_NAME and AZURE_OPENAI_EMBEDDING_MODEL should be set when OPENAI_API_TYPE is azure. Resource name is XXX in http://XXX.openai.azure.com")
+        vectorizer_config = { 
+            "text2vec-openai": {
+                    "deploymentId": model,
+                    "resourceName": resourceName
+            }
+        }
+
     # Verify Vectorizer
     if vectorizer in VECTORIZERS:
         modified_schema["classes"][0]["vectorizer"] = vectorizer
-
+        if vectorizer_config is not None:
+            modified_schema["classes"][0]["moduleConfig"] = vectorizer_config
         for property in modified_schema["classes"][0]["properties"]:
             if property["name"] in skip_properties:
                 moduleConfig = {
