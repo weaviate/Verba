@@ -24,7 +24,7 @@ def test_init_documents_vectorizer():
     )
 
     assert doc == schema_generation.SCHEMA_DOCUMENT
-    assert "text2vec-openai" == chunk["classes"][0]["vectorizer"]
+    assert chunk["classes"][0]["vectorizer"] == "text2vec-openai"
 
 
 def test_init_cache_no_vectorizer():
@@ -39,4 +39,4 @@ def test_init_cache_vectorizer():
     )
 
     assert cache == schema_generation.SCHEMA_CACHE
-    assert "text2vec-openai" == cache["classes"][0]["vectorizer"]
+    assert cache["classes"][0]["vectorizer"] == "text2vec-openai"

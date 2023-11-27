@@ -1,4 +1,4 @@
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 setup(
     name="goldenverba",
@@ -41,7 +41,7 @@ setup(
         "pypdf2",
     ],
     extras_require={
-        "dev": ["pytest", "wheel", "twine", "black>=23.7.0", "setuptools"],
+        "dev": ["pytest", "wheel", "twine", "black>=23.7.0", "setuptools", "pre-commit"],
         "huggingface": [
             "sentence-transformers",
             "transformers",

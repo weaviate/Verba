@@ -1,15 +1,14 @@
+from weaviate import Client
+from weaviate.gql.get import HybridFusion
+
 from goldenverba.components.chunking.chunk import Chunk
 from goldenverba.components.embedding.interface import Embedder
 from goldenverba.components.retriever.interface import Retriever
 
-from weaviate.gql.get import HybridFusion
-
-from weaviate import Client
-
 
 class SimpleRetriever(Retriever):
     """
-    SimpleRetriver that retrieves chunks through hybrid search, no reranking or additional logic
+    SimpleRetriver that retrieves chunks through hybrid search, no reranking or additional logic.
     """
 
     def __init__(self):
@@ -27,9 +26,8 @@ class SimpleRetriever(Retriever):
         @parameter: queries : list[str] - List of queries
         @parameter: client : Client - Weaviate client
         @parameter: embedder : Embedder - Current selected Embedder
-        @returns list[Chunk] - List of retrieved chunks
+        @returns list[Chunk] - List of retrieved chunks.
         """
-
         chunk_class = embedder.get_chunk_class()
         needs_vectorization = embedder.get_need_vectorization()
         chunks = []

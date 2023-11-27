@@ -15,16 +15,13 @@ class Config:
         self.generator = generator
 
     def initalized(self) -> bool:
-        if (
+        return (
             self.reader == ""
             or self.chunker == ""
             or self.embedder == ""
             or self.retriever == ""
             or self.generator == ""
-        ):
-            return False
-        else:
-            return True
+        )
 
 
 class ConfigManager:
@@ -55,7 +52,7 @@ class ConfigManager:
     def load_config(self):
         """Load config from file."""
         msg.good("Config loaded")
-        with open(self.filename, "r") as file:
+        with open(self.filename) as file:
             json_obj = json.load(file)
             self.config = Config(
                 reader=json_obj["reader"],
@@ -109,7 +106,7 @@ class ConfigManager:
         return self.config.generator
 
     def initialized(self) -> bool:
-        if self.config != None:
+        if self.config is not None:
             return self.config.initalized()
         else:
             return False

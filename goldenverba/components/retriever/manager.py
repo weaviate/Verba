@@ -1,15 +1,12 @@
-from goldenverba.components.retriever.WindowRetriever import WindowRetriever
-from goldenverba.components.retriever.SimpleRetriever import SimpleRetriever
-from goldenverba.components.retriever.interface import Retriever
-from goldenverba.components.chunking.chunk import Chunk
-from goldenverba.components.embedding.interface import Embedder
-from goldenverba.components.retriever.interface import Retriever
-from goldenverba.components.generation.interface import Generator
-
+from wasabi import msg
 from weaviate import Client
 
-
-from wasabi import msg
+from goldenverba.components.chunking.chunk import Chunk
+from goldenverba.components.embedding.interface import Embedder
+from goldenverba.components.generation.interface import Generator
+from goldenverba.components.retriever.interface import Retriever
+from goldenverba.components.retriever.SimpleRetriever import SimpleRetriever
+from goldenverba.components.retriever.WindowRetriever import WindowRetriever
 
 
 class RetrieverManager:
@@ -31,7 +28,7 @@ class RetrieverManager:
         @parameter: queries : list[str] - List of queries
         @parameter: client : Client - Weaviate client
         @parameter: embedder : Embedder - Current selected Embedder
-        @returns list[Chunk] - List of retrieved chunks
+        @returns list[Chunk] - List of retrieved chunks.
         """
         chunks, context = self.selected_retriever.retrieve(queries, client, embedder)
         managed_context = self.selected_retriever.cutoff_text(

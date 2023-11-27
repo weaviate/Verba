@@ -7,10 +7,13 @@ All notable changes to this project will be documented in this file.
 ### Added
 - PDFReader powered by PyPDF2
 - TokenChunker powered by tiktoken
+- Ruff Linting (set as pre-commit)
+- Markdown Formatting for chat messages (https://github.com/weaviate/Verba/issues/48)
 
 ### Fixed
 - Added missing dependencies
 - Fixed restart bug
+- Fixed MiniLM Cuda to_device bug (https://github.com/weaviate/Verba/issues/41)
 
 ## [0.3.0] - 12.09.2023
 

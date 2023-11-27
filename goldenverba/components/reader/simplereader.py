@@ -1,13 +1,13 @@
-import glob
 import base64
+import glob
 import json
+from datetime import datetime
+from pathlib import Path
 
 from wasabi import msg
-from pathlib import Path
-from datetime import datetime
 
-from goldenverba.components.reader.interface import Reader, InputForm
 from goldenverba.components.reader.document import Document
+from goldenverba.components.reader.interface import InputForm, Reader
 
 
 class SimpleReader(Reader):
@@ -24,10 +24,10 @@ class SimpleReader(Reader):
 
     def load(
         self,
-        bytes: list[str] = [],
-        contents: list[str] = [],
-        paths: list[str] = [],
-        fileNames: list[str] = [],
+        bytes: list[str] = None,
+        contents: list[str] = None,
+        paths: list[str] = None,
+        fileNames: list[str] = None,
         document_type: str = "Documentation",
     ) -> list[Document]:
         """Ingest data into Weaviate
@@ -36,9 +36,16 @@ class SimpleReader(Reader):
         @parameter: paths : list[str] - List of paths to files
         @parameter: fileNames : list[str] - List of file names
         @parameter: document_type : str - Document type
-        @returns list[Document] - Lists of documents
+        @returns list[Document] - Lists of documents.
         """
-
+        if fileNames is None:
+            fileNames = []
+        if paths is None:
+            paths = []
+        if contents is None:
+            contents = []
+        if bytes is None:
+            bytes = []
         documents = []
 
         # If paths exist
@@ -55,47 +62,45 @@ class SimpleReader(Reader):
                         msg.warn(f"Path {data_path} does not exist")
 
         # If bytes exist
-        if len(bytes) > 0:
-            if len(bytes) == len(fileNames):
-                for byte, fileName in zip(bytes, fileNames):
-                    decoded_bytes = base64.b64decode(byte)
+        if len(bytes) > 0 and len(bytes) == len(fileNames):
+            for byte, fileName in zip(bytes, fileNames):
+                decoded_bytes = base64.b64decode(byte)
+                try:
+                    original_text = decoded_bytes.decode("utf-8")
+                except UnicodeDecodeError:
+                    msg.fail(
+                        f"Error decoding text for file {fileName}. The file might not be a text file."
+                    )
+                    continue
+
+                if ".json" in fileName:
+                    json_obj = json.loads(original_text)
                     try:
-                        original_text = decoded_bytes.decode("utf-8")
-                    except UnicodeDecodeError:
-                        msg.fail(
-                            f"Error decoding text for file {fileName}. The file might not be a text file."
-                        )
-                        continue
+                        document = Document.from_json(json_obj)
+                    except Exception as e:
+                        raise Exception(f"Loading JSON failed {e}")
 
-                    if ".json" in fileName:
-                        json_obj = json.loads(original_text)
-                        try:
-                            document = Document.from_json(json_obj)
-                        except Exception as e:
-                            raise Exception(f"Loading JSON failed {e}")
-
-                    else:
-                        document = Document(
-                            name=fileName,
-                            text=original_text,
-                            type=document_type,
-                            timestamp=str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
-                            reader=self.name,
-                        )
-                    documents.append(document)
-
-        # If content exist
-        if len(contents) > 0:
-            if len(contents) == len(fileNames):
-                for content, fileName in zip(contents, fileNames):
+                else:
                     document = Document(
                         name=fileName,
-                        text=content,
+                        text=original_text,
                         type=document_type,
                         timestamp=str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
                         reader=self.name,
                     )
-                    documents.append(document)
+                documents.append(document)
+
+        # If content exist
+        if len(contents) > 0 and len(contents) == len(fileNames):
+            for content, fileName in zip(contents, fileNames):
+                document = Document(
+                    name=fileName,
+                    text=content,
+                    type=document_type,
+                    timestamp=str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
+                    reader=self.name,
+                )
+                documents.append(document)
 
         msg.good(f"Loaded {len(documents)} documents")
         return documents
@@ -104,7 +109,7 @@ class SimpleReader(Reader):
         """Loads text file
         @param file_path : Path - Path to file
         @param document_type : str - Document Type
-        @returns list[Document] - Lists of documents
+        @returns list[Document] - Lists of documents.
         """
         documents = []
 
@@ -112,7 +117,7 @@ class SimpleReader(Reader):
             msg.warn(f"{file_path.suffix} not supported")
             return []
 
-        with open(file_path, "r", encoding="utf-8") as f:
+        with open(file_path, encoding="utf-8") as f:
             msg.info(f"Reading {str(file_path)}")
 
             if file_path.suffix == ".json":
@@ -156,7 +161,7 @@ class SimpleReader(Reader):
             # Loop through each file
             for file in files:
                 msg.info(f"Reading {str(file)}")
-                with open(file, "r", encoding="utf-8") as f:
+                with open(file, encoding="utf-8") as f:
                     document = Document(
                         text=f.read(),
                         type=document_type,

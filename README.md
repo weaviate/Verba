@@ -137,6 +137,20 @@ Once your virtual environment is activated, you'll see its name in the terminal 
 
 > Remember to deactivate the virtual environment when you're done working with Verba by simply running deactivate in the terminal.
 
+## Linting
+We use [ruff](https://github.com/astral-sh/ruff) for automatic code formation and linting.
+The process is automated with a pre-commit hook. To install the hook, run:
+```
+pre-commit install
+```
+or for shorthand:
+```bash 
+make pre-commit
+```
+After that all your commits will be automatically linted and formatted. The linting will happen only on the files you changed.
+
+`make pre-commit` formats all files in the repository and install the hooks if needed.
+
 # 📦 Choosing the Right Verba Installation Package
 Verba comes in several installation packages, each tailored for specific use cases and environments. Choose the package that aligns with your requirements:
 
@@ -275,12 +289,14 @@ LLAMA2-7B-CHAT-HF=True
 ```
 
 ## Unstructured
-
 Verba supports importing documents through Unstructured (e.g .pdf). To use them you need the `UNSTRUCTURED_API_KEY` environment variable. You can get it from [Unstructured](https://unstructured.io/)
 
 ```
 UNSTRUCTURED_API_KEY=YOUR-UNSTRUCTURED-KEY
+UNSTRUCTURED_API_URL=YOUR-SELF-HOSTED-INSTANCE # If you are self hosting, in the form of `http://localhost:8000/general/v0/general`
 ```
+
+
 
 ## Github
 

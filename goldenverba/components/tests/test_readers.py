@@ -1,15 +1,15 @@
 import base64
-import pytest
-
 from pathlib import Path
 
-from goldenverba.components.reader.simplereader import SimpleReader
+import pytest
+
 from goldenverba.components.reader.document import Document
+from goldenverba.components.reader.simplereader import SimpleReader
 
 
 @pytest.fixture
 def byte_data():
-    return [base64.b64encode("Test text content.".encode("utf-8")).decode("utf-8")]
+    return [base64.b64encode(b"Test text content.").decode("utf-8")]
 
 
 @pytest.fixture

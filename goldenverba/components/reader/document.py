@@ -11,8 +11,10 @@ class Document:
         link: str = "",
         timestamp: str = "",
         reader: str = "",
-        meta: dict = {},
+        meta: dict = None,
     ):
+        if meta is None:
+            meta = {}
         self._text = text
         self._type = type
         self._name = name
