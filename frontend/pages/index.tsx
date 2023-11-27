@@ -431,7 +431,7 @@ export default function Home() {
                                 value={userInput}
                                 onChange={handleInputChange}
                                 disabled={isFetching}
-                                placeholder="What is a vector database?"
+                                placeholder="What is the most profitable Apple product in 2022?"
                                 className="w-full p-2 rounded-md bg-white text-gray-900 placeholder-gray-400"
                             />
                         </form>
