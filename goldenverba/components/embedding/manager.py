@@ -11,9 +11,9 @@ from goldenverba.components.reader.document import Document
 class EmbeddingManager:
     def __init__(self):
         self.embedders: dict[str, Embedder] = {
-            "MiniLMEmbedder": MiniLMEmbedder(),
+            # "MiniLMEmbedder": MiniLMEmbedder(),
             "ADAEmbedder": ADAEmbedder(),
-            "CohereEmbedder": CohereEmbedder(),
+            # "CohereEmbedder": CohereEmbedder(),
         }
         self.selected_embedder: Embedder = self.embedders["ADAEmbedder"]
 
