@@ -337,7 +337,7 @@ export default function Home() {
                                 </span>
                             </div>
                         </div>
-                        {/*TODO: reinvent - remove button*/}
+                        {/*/!*TODO: reinvent - remove button*!/*/}
                         {/*<div className="lg:flex sm:grid sm:grid-cols-2 sm:gap-y-2 md:grid md:grid-cols-2 md:gap-x-4 md:gap-y-4 justify-between items-center mx-auto p-4 ml-10">*/}
                         {/*  <div className="ml-5 animate-pop-in">*/}
                         {/*    <div className="flex items-center">*/}

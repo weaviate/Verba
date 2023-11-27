@@ -109,6 +109,10 @@ def init_documents(
             {
                 "class": "Chunk",
                 "description": "Chunks of Documentations",
+                "moduleConfig": {
+                    "generative-openai": {
+                    }
+                },
                 "properties": [
                     {
                         "name": "text",

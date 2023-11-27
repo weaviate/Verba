@@ -181,10 +181,11 @@ class VerbaManager:
         if cohere_key != "":
             additional_header["X-Cohere-Api-Key"] = cohere_key
 
+        print("TEST")
         # Check Verba URL ENV
-        weaviate_url = os.environ.get("WEAVIATE_URL_VERBA", "")
+        weaviate_url = "https://gn9i2oziszuyk9ignurw.c0.us-west2.gcp.weaviate.cloud"
         if weaviate_url != "":
-            weaviate_key = os.environ.get("WEAVIATE_API_KEY_VERBA", "")
+            weaviate_key = os.environ.get("WEAVIATE_API_KEY_VERBA", "f2VdbEft7VQeWsj0IpoFIQlZAdPbaWU3Domy")
             if weaviate_key != "":
                 self.environment_variables["WEAVIATE_API_KEY_VERBA"] = True
                 auth_config = weaviate.AuthApiKey(api_key=weaviate_key)
@@ -204,20 +205,20 @@ class VerbaManager:
             self.weaviate_type = "Weaviate Cluster"
 
         # Use Weaviate Embedded
-        else:
-            try:
-                _create_unverified_https_context = ssl._create_unverified_context
-            except AttributeError:
-                pass
-            else:
-                ssl._create_default_https_context = _create_unverified_https_context
-
-            msg.info("Using Weaviate Embedded")
-            self.weaviate_type = "Weaviate Embedded"
-            client = weaviate.Client(
-                additional_headers={"X-OpenAI-Api-Key": openai.api_key},
-                embedded_options=EmbeddedOptions(),
-            )
+        # else:
+        #     try:
+        #         _create_unverified_https_context = ssl._create_unverified_context
+        #     except AttributeError:
+        #         pass
+        #     else:
+        #         ssl._create_default_https_context = _create_unverified_https_context
+        #
+        #     msg.info("Using Weaviate Embedded")
+        #     self.weaviate_type = "Weaviate Embedded"
+        #     client = weaviate.Client(
+        #         additional_headers={"X-OpenAI-Api-Key": openai.api_key},
+        #         embedded_options=EmbeddedOptions(),
+        #     )
 
         if client is not None:
             msg.good("Connected to Weaviate")
