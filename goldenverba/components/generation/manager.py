@@ -13,10 +13,10 @@ from goldenverba.components.generation.Llama2Generator import Llama2Generator
 class GeneratorManager:
     def __init__(self):
         self.generators: dict[str, Generator] = {
-            "GPT4Generator": GPT4Generator(),
+            # "GPT4Generator": GPT4Generator(),
             "GPT3Generator": GPT3Generator(),
-            "CohereGenerator": CohereGenerator(),
-            "Llama2Generator": Llama2Generator(),
+            # "CohereGenerator": CohereGenerator(),
+            # "Llama2Generator": Llama2Generator(),
         }
         self.selected_generator: Generator = self.generators["GPT3Generator"]
 
