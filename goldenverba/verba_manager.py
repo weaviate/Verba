@@ -215,7 +215,7 @@ class VerbaManager:
             msg.info("Using Weaviate Embedded")
             self.weaviate_type = "Weaviate Embedded"
             client = weaviate.Client(
-                additional_headers={"X-OpenAI-Api-Key": openai.api_key},
+                additional_headers=additional_header,
                 embedded_options=EmbeddedOptions(),
             )
 
@@ -418,7 +418,10 @@ class VerbaManager:
             .do()
         )
 
-        if "data" in check_results and len(check_results["data"]["Get"]["Suggestion"]) > 0:
+        if (
+            "data" in check_results
+            and len(check_results["data"]["Get"]["Suggestion"]) > 0
+        ):
             if query == check_results["data"]["Get"]["Suggestion"][0]["suggestion"]:
                 return
 
