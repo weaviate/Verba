@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file.
 - Fixed restart bug
 - Fixed MiniLM Cuda to_device bug (https://github.com/weaviate/Verba/issues/41)
 - Fixed Config Issues (https://github.com/weaviate/Verba/issues/51)
+- Fixed Weaviate Embedded Headers for Cohere 
 
 ## [0.3.0] - 12.09.2023
 
