@@ -282,18 +282,40 @@ async def get_components():
         current_embedder_data = create_embedder_payload(key, current_embedder)
         data["embedder"].append(current_embedder_data)
 
-    data["default_values"] = {
-        "last_reader": create_reader_payload(
-            config_manager.get_reader(), readers[config_manager.get_reader()]
-        ),
-        "last_chunker": create_chunker_payload(
-            config_manager.get_chunker(), chunker[config_manager.get_chunker()]
-        ),
-        "last_embedder": create_embedder_payload(
-            config_manager.get_embedder(), embedders[config_manager.get_embedder()]
-        ),
-        "last_document_type": "Documentation",
-    }
+    try:
+        data["default_values"] = {
+            "last_reader": create_reader_payload(
+                config_manager.get_reader(), readers[config_manager.get_reader()]
+            ),
+            "last_chunker": create_chunker_payload(
+                config_manager.get_chunker(), chunker[config_manager.get_chunker()]
+            ),
+            "last_embedder": create_embedder_payload(
+                config_manager.get_embedder(), embedders[config_manager.get_embedder()]
+            ),
+            "last_document_type": "Documentation",
+        }
+    except KeyError:
+        # Reset Config
+        msg.warn("Mismatched Config detected, resetting managers")
+        config_manager.default_config()
+        config_manager.save_config()
+        setup_managers(
+            manager, config_manager, readers, chunker, embedders, retrievers, generators
+        )
+        config_manager.save_config()
+        data["default_values"] = {
+            "last_reader": create_reader_payload(
+                config_manager.get_reader(), readers[config_manager.get_reader()]
+            ),
+            "last_chunker": create_chunker_payload(
+                config_manager.get_chunker(), chunker[config_manager.get_chunker()]
+            ),
+            "last_embedder": create_embedder_payload(
+                config_manager.get_embedder(), embedders[config_manager.get_embedder()]
+            ),
+            "last_document_type": "Documentation",
+        }
 
     return JSONResponse(content=data)
 
