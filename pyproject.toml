@@ -75,7 +75,9 @@ ignore = [
     "N815",
     "PTH118",
     "PTH113",
-]
+    "S104",
+    "PTH107"]
+
 line-length = 120  # Must agree with Black
 
 [tool.ruff.flake8-bugbear]
