@@ -153,7 +153,7 @@ class VerbaManager:
     def generator_get_generator(self) -> dict[str, Generator]:
         return self.generator_manager.get_generators()
 
-    def setup_client(self) -> Client | None:
+    def setup_client(self):
         """
         @returns Optional[Client] - The Weaviate Client.
         """
