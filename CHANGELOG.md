@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.1] - 05.12.2023
+
+### Fixed
+- Fix Docker Default Vectorizer (https://github.com/weaviate/Verba/issues/50)
+
+
 ## [0.3.1] - 15.11.2023
 
 ### Added
