@@ -318,6 +318,11 @@ class VerbaManager:
         else:
             self.environment_variables["OPENAI_API_KEY"] = False
 
+        if os.environ.get("OPENAI_BASE_URL", "") != "":
+            self.environment_variables["OPENAI_BASE_URL"] = True
+        else:
+            self.environment_variables["OPENAI_BASE_URL"] = False
+
         # Cohere API Key
         if os.environ.get("COHERE_API_KEY", "") != "":
             self.environment_variables["COHERE_API_KEY"] = True

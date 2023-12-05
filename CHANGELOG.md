@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 
 ## [0.3.1] - 05.12.2023
 
+### Added
+- New Environment Variables for OpenAI proxies: OpenAI_BASE_URL (LiteLLM support) (https://github.com/weaviate/Verba/issues/56)
+
 ### Fixed
 - Fix Docker Default Vectorizer (https://github.com/weaviate/Verba/issues/50)
 

@@ -236,7 +236,9 @@ Visit localhost:8000
 
 # 🔑 API Keys
 
-Before diving into Verba's capabilities, you'll need to configure access to various components depending on your chosen technologies, such as OpenAI, Cohere, and HuggingFace. Start by obtaining the necessary API keys and setting them up through a `.env` file based on our provided [example](./.env.example) , or by declaring them as environment variables on your system. Below is a comprehensive list of the API keys and variables you may require:
+Before diving into Verba's capabilities, you'll need to configure access to various components depending on your chosen technologies, such as OpenAI, Cohere, and HuggingFace. Start by obtaining the necessary API keys and setting them up through a `.env` file based on our provided [example](./goldenverba/.env.example) , or by declaring them as environment variables on your system. If you're building from source or using Docker, make sure your `.env` file is within the goldenverba directory.
+
+Below is a comprehensive list of the API keys and variables you may require:
 
 ## Weaviate
 Verba provides flexibility in connecting to Weaviate instances based on your needs. By default, Verba opts for [Weaviate Embedded](https://weaviate.io/developers/weaviate/installation/embedded) if it doesn't detect the `WEAVIATE_URL_VERBA` and `WEAVIATE_API_KEY_VERBA` environment variables. This local deployment is the most straightforward way to launch your Weaviate database for prototyping and testing.
@@ -262,6 +264,12 @@ Verba supports OpenAI Models such as Ada, GPT3, and GPT4. To use them, you need 
 
 ```
 OPENAI_API_KEY=YOUR-OPENAI-KEY
+```
+
+You can also add a `OPENAI_BASE_URL` to use proxies such as LiteLLM (https://github.com/BerriAI/litellm)
+
+```
+OPENAI_BASE_URL=YOUR-OPENAI_BASE_URL
 ```
 
 ## Cohere

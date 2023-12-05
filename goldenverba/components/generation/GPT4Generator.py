@@ -40,6 +40,9 @@ class GPT4Generator(Generator):
             import openai
 
             openai.api_key = os.getenv("OPENAI_API_KEY")
+            base_url = os.environ.get("OPENAI_BASE_URL", "")
+            if base_url:
+                openai.api_base = base_url
 
             completion = await asyncio.to_thread(
                 openai.ChatCompletion.create, model=self.model_name, messages=messages
@@ -71,6 +74,9 @@ class GPT4Generator(Generator):
             import openai
 
             openai.api_key = os.getenv("OPENAI_API_KEY")
+            base_url = os.environ.get("OPENAI_BASE_URL", "")
+            if base_url:
+                openai.api_base = base_url
 
             completion = await openai.ChatCompletion.acreate(
                 model=self.model_name, messages=messages, stream=True, temperature=0.0
