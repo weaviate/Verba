@@ -6,9 +6,11 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 - New Environment Variables for OpenAI proxies: OpenAI_BASE_URL (LiteLLM support) (https://github.com/weaviate/Verba/issues/56)
+- Docker also installs HuggingFace stack (https://github.com/weaviate/Verba/issues/84)
 
 ### Fixed
 - Fix Docker Default Vectorizer (https://github.com/weaviate/Verba/issues/50)
+- Fix requirements.txt spelling error
 
 
 ## [0.3.1] - 15.11.2023
