@@ -1,4 +1,7 @@
 import re
+import os
+import time
+from dotenv import load_dotenv
 
 from tqdm import tqdm
 from wasabi import msg
@@ -13,6 +16,7 @@ from goldenverba.components.schema.schema_generation import (
     strip_non_letters,
 )
 
+load_dotenv()
 
 class Embedder(VerbaComponent):
     """
@@ -113,6 +117,10 @@ class Embedder(VerbaComponent):
                                 client.batch.add_data_object(
                                     properties, class_name, vector=chunk.vector
                                 )
+                            
+                            wait_time_ms = int(os.getenv("WAIT_TIME_BETWEEN_INGESTION_QUERIES_MS","0"))
+                            if wait_time_ms>0:
+                                time.sleep(float(wait_time_ms)/1000)
 
                 self.check_document_status(
                     client,
