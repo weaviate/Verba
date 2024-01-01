@@ -21,3 +21,5 @@ cache.txt
 .ruff_cache
 *_secrets.json
 ollama
+contrib-m.sh
+retroat.sh
