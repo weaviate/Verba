@@ -19,7 +19,7 @@ class GithubReader(Reader):
         super().__init__()
         self.name = "GithubReader"
         self.requires_env = ["GITHUB_TOKEN"]
-        self.description = "Downloads only text files from a GitHub repository and ingests it into Verba. Use this format {owner}/{repo}/{folder}"
+        self.description = "Downloads only text files from a GitHub repository and ingests it into Verba. Use this format {owner}/{repo}/{branch}/{folder}"
         self.input_form = InputForm.INPUT.value
 
     def load(
@@ -93,12 +93,10 @@ class GithubReader(Reader):
         split = path.split("/")
         owner = split[0]
         repo = split[1]
-        folder_path = ""
-        if len(split) > 2:
-            folder_path = "/".join(split[2:])
+        branch = split[2] if len(split) > 2 else "main"
+        folder_path = "/".join(split[3:]) if len(split) > 3 else ""
 
-        # Path should be owner/repo
-        url = f"https://api.github.com/repos/{owner}/{repo}/git/trees/main?recursive=1"
+        url = f"https://api.github.com/repos/{owner}/{repo}/git/trees/{branch}?recursive=1"
         headers = {
             "Authorization": f"token {os.environ.get('GITHUB_TOKEN', '')}",
             "Accept": "application/vnd.github.v3+json",
@@ -131,8 +129,9 @@ class GithubReader(Reader):
         split = path.split("/")
         owner = split[0]
         repo = split[1]
+        branch = split[2] if len(split) > 2 else "main"
 
-        url = f"https://api.github.com/repos/{owner}/{repo}/contents/{file_path}"
+        url = f"https://api.github.com/repos/{owner}/{repo}/contents/{file_path}?ref={branch}"
         headers = {
             "Authorization": f"token {os.environ.get('GITHUB_TOKEN', '')}",
             "Accept": "application/vnd.github.v3+json",
