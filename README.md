@@ -272,6 +272,40 @@ You can also add a `OPENAI_BASE_URL` to use proxies such as LiteLLM (https://git
 OPENAI_BASE_URL=YOUR-OPENAI_BASE_URL
 ```
 
+## Azure OpenAI
+
+To use Azure OpenAI, you need to set 
+
+- The API type:
+```
+OPENAI_API_TYPE="azure"
+```
+
+- The key and the endpoint:
+
+```
+OPENAI_API_KEY=<YOUR_KEY>
+OPENAI_BASE_URL=http://XXX.openai.azure.com
+```
+
+- Azure OpenAI ressource name, which is XXX if your endpoint is XXX.openai.azure.com
+
+```
+AZURE_OPENAI_RESOURCE_NAME=<YOUR_AZURE_RESOURCE_NAME>
+```
+- You need to set the models, for the embeddings and for the query.
+```
+AZURE_OPENAI_EMBEDDING_MODEL="text-embedding-ada-002"
+OPENAI_MODEL="gpt-4" 
+```
+
+- Finally, as Azure is using per-minute quota, you might need to add a waiting time between each chunk upload. For example, if you have a limit of 240k tokens per minute, if your chunks are 
+400 tokens max, then 100ms between queries should be fine. If you get error 429 from weaviate, then increase this value.
+
+```
+WAIT_TIME_BETWEEN_INGESTION_QUERIES_MS="100"
+```
+
 ## Cohere
 
 Verba supports Cohere Models, to use them, you need to specify the `COHERE_API_KEY` environment variable. You can get it from [Cohere](https://dashboard.cohere.com/)
