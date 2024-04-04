@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="goldenverba",
-    version="0.3.0",
+    version="0.3.1",
     packages=find_packages(),
     entry_points={
         "console_scripts": [
@@ -41,7 +41,14 @@ setup(
         "pypdf2",
     ],
     extras_require={
-        "dev": ["pytest", "wheel", "twine", "black>=23.7.0", "setuptools", "pre-commit"],
+        "dev": [
+            "pytest",
+            "wheel",
+            "twine",
+            "black>=23.7.0",
+            "setuptools",
+            "pre-commit",
+        ],
         "huggingface": [
             "sentence-transformers",
             "transformers",

@@ -24,7 +24,7 @@ def start(port):
     """
     Run the FastAPI application.
     """
-    uvicorn.run("goldenverba.server.api:app", host="127.0.0.1", port=port, reload=True)
+    uvicorn.run("goldenverba.server.api:app", host="0.0.0.0", port=port, reload=True)
 
 
 @cli.command()

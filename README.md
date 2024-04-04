@@ -236,7 +236,9 @@ Visit localhost:8000
 
 # 🔑 API Keys
 
-Before diving into Verba's capabilities, you'll need to configure access to various components depending on your chosen technologies, such as OpenAI, Cohere, and HuggingFace. Start by obtaining the necessary API keys and setting them up through a `.env` file based on our provided [example](./.env.example) , or by declaring them as environment variables on your system. Below is a comprehensive list of the API keys and variables you may require:
+Before diving into Verba's capabilities, you'll need to configure access to various components depending on your chosen technologies, such as OpenAI, Cohere, and HuggingFace. Start by obtaining the necessary API keys and setting them up through a `.env` file based on our provided [example](./goldenverba/.env.example) , or by declaring them as environment variables on your system. If you're building from source or using Docker, make sure your `.env` file is within the goldenverba directory.
+
+Below is a comprehensive list of the API keys and variables you may require:
 
 ## Weaviate
 Verba provides flexibility in connecting to Weaviate instances based on your needs. By default, Verba opts for [Weaviate Embedded](https://weaviate.io/developers/weaviate/installation/embedded) if it doesn't detect the `WEAVIATE_URL_VERBA` and `WEAVIATE_API_KEY_VERBA` environment variables. This local deployment is the most straightforward way to launch your Weaviate database for prototyping and testing.
@@ -262,6 +264,46 @@ Verba supports OpenAI Models such as Ada, GPT3, and GPT4. To use them, you need 
 
 ```
 OPENAI_API_KEY=YOUR-OPENAI-KEY
+```
+
+You can also add a `OPENAI_BASE_URL` to use proxies such as LiteLLM (https://github.com/BerriAI/litellm)
+
+```
+OPENAI_BASE_URL=YOUR-OPENAI_BASE_URL
+```
+
+## Azure OpenAI
+
+To use Azure OpenAI, you need to set 
+
+- The API type:
+```
+OPENAI_API_TYPE="azure"
+```
+
+- The key and the endpoint:
+
+```
+OPENAI_API_KEY=<YOUR_KEY>
+OPENAI_BASE_URL=http://XXX.openai.azure.com
+```
+
+- Azure OpenAI ressource name, which is XXX if your endpoint is XXX.openai.azure.com
+
+```
+AZURE_OPENAI_RESOURCE_NAME=<YOUR_AZURE_RESOURCE_NAME>
+```
+- You need to set the models, for the embeddings and for the query.
+```
+AZURE_OPENAI_EMBEDDING_MODEL="text-embedding-ada-002"
+OPENAI_MODEL="gpt-4" 
+```
+
+- Finally, as Azure is using per-minute quota, you might need to add a waiting time between each chunk upload. For example, if you have a limit of 240k tokens per minute, if your chunks are 
+400 tokens max, then 100ms between queries should be fine. If you get error 429 from weaviate, then increase this value.
+
+```
+WAIT_TIME_BETWEEN_INGESTION_QUERIES_MS="100"
 ```
 
 ## Cohere

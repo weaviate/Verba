@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.1] - 05.12.2023
+
+### Added
+- New Environment Variables for OpenAI proxies: OpenAI_BASE_URL (LiteLLM support) (https://github.com/weaviate/Verba/issues/56)
+- Docker also installs HuggingFace stack (https://github.com/weaviate/Verba/issues/84)
+
+### Fixed
+- Fix Docker Default Vectorizer (https://github.com/weaviate/Verba/issues/50)
+- Fix requirements.txt spelling error
+
+
 ## [0.3.1] - 15.11.2023
 
 ### Added
@@ -14,6 +25,8 @@ All notable changes to this project will be documented in this file.
 - Added missing dependencies
 - Fixed restart bug
 - Fixed MiniLM Cuda to_device bug (https://github.com/weaviate/Verba/issues/41)
+- Fixed Config Issues (https://github.com/weaviate/Verba/issues/51)
+- Fixed Weaviate Embedded Headers for Cohere 
 
 ## [0.3.0] - 12.09.2023
 
