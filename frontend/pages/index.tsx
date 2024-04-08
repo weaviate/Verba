@@ -326,11 +326,10 @@ export default function Home() {
                             <h1 className=" text-6xl font-bold">Weaviate</h1>
                             <div className="flex text-lg">
                                 <span className="bg-opacity-0 rounded px-2 py-1 hover-container animate-pop-in">
-                                    AWS
                                 </span>
                                 <span
                                     className="bg-opacity-0 rounded font-bold px-2 py-1 hover-container animate-pop-in-late">
-                                    re:Invent 2023
+                                    Google Next: 2024
                                 </span>
                                 <span className="bg-yellow-200 rounded px-2 py-1 hover-container animate-pop-more-late">
                                     Verba
