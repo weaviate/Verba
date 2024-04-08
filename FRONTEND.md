@@ -16,7 +16,7 @@ To get your local copy of the Verba frontend up and running, please follow these
 3. **Development Server**:
    - Launch the application in development mode by executing `npm run dev`.
    - Open your web browser and visit `http://localhost:3000` to view the application.
-
+ 
 ## 📦 Building Static Pages for FastAPI
 
 If you wish to serve the frontend through FastAPI, you need to build static pages:
