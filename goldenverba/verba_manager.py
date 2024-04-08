@@ -195,7 +195,7 @@ class VerbaManager:
 
         print("TEST")
         # Check Verba URL ENV
-        weaviate_url = "https://gn9i2oziszuyk9ignurw.c0.us-west2.gcp.weaviate.cloud"
+        weaviate_url = "https://veillfwlrscm9n37nacrlg.c0.us-west3.gcp.weaviate.cloud"
         if weaviate_url != "":
             weaviate_key = os.environ.get("WEAVIATE_API_KEY_VERBA", "f2VdbEft7VQeWsj0IpoFIQlZAdPbaWU3Domy")
             if weaviate_key != "":
