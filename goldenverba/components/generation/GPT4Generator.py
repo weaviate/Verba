@@ -1,8 +1,9 @@
 import asyncio
 import os
+from collections.abc import Iterator
+
 from dotenv import load_dotenv
 
-from collections.abc import Iterator
 from goldenverba.components.generation.interface import Generator
 
 load_dotenv()
@@ -48,7 +49,7 @@ class GPT4Generator(Generator):
             if "OPENAI_API_BASE" in os.environ:
                 openai.api_base = os.getenv("OPENAI_API_BASE")
             if "OPENAI_API_VERSION" in os.environ:
-                openai.api_version = os.getenv("OPENAI_API_VERSION")            
+                openai.api_version = os.getenv("OPENAI_API_VERSION")
 
             chat_completion_arguments = {
                 "model":self.model_name,
@@ -57,7 +58,7 @@ class GPT4Generator(Generator):
             if openai.api_type=="azure":
                 chat_completion_arguments["deployment_id"]=self.model_name
 
-            
+
             base_url = os.environ.get("OPENAI_BASE_URL", "")
             if base_url:
                 openai.api_base = base_url
@@ -102,7 +103,7 @@ class GPT4Generator(Generator):
             if "OPENAI_API_BASE" in os.environ:
                 openai.api_base = os.getenv("OPENAI_API_BASE")
             if "OPENAI_API_VERSION" in os.environ:
-                openai.api_version = os.getenv("OPENAI_API_VERSION")            
+                openai.api_version = os.getenv("OPENAI_API_VERSION")
 
             chat_completion_arguments = {
                 "model":self.model_name,
@@ -111,7 +112,7 @@ class GPT4Generator(Generator):
                 "temperature":0.0
             }
             if openai.api_type=="azure":
-                chat_completion_arguments["deployment_id"]=self.model_name            
+                chat_completion_arguments["deployment_id"]=self.model_name
 
             completion = await openai.ChatCompletion.acreate(
                 **chat_completion_arguments

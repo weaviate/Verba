@@ -1,6 +1,0 @@
-repos:
-  - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: 'v0.1.4'
-    hooks:
-      - id: ruff
-        args: ["--fix","--unsafe-fixes"]
