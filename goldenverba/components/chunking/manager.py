@@ -2,9 +2,7 @@ import tiktoken
 from wasabi import msg
 
 from goldenverba.components.chunking.interface import Chunker
-from goldenverba.components.chunking.sentencechunker import SentenceChunker
 from goldenverba.components.chunking.tiktokenchunker import TokenChunker
-from goldenverba.components.chunking.wordchunker import WordChunker
 from goldenverba.components.reader.document import Document
 
 
@@ -12,8 +10,6 @@ class ChunkerManager:
     def __init__(self):
         self.chunker: dict[str, Chunker] = {
             "TokenChunker": TokenChunker(),
-            "WordChunker": WordChunker(),
-            "SentenceChunker": SentenceChunker(),
         }
         self.selected_chunker: Chunker = self.chunker["TokenChunker"]
 

@@ -2,8 +2,9 @@ from setuptools import find_packages, setup
 
 setup(
     name="goldenverba",
-    version="0.3.1",
+    version="0.4.0",
     packages=find_packages(),
+    python_requires='>=3.10.0',
     entry_points={
         "console_scripts": [
             "verba=goldenverba.server.cli:cli",
@@ -28,7 +29,6 @@ setup(
         "python-dotenv==1.0.0",
         "openai==0.27.9",
         "wasabi==1.1.2",
-        "spacy==3.6.1",
         "fastapi==0.102.0",
         "uvicorn[standard]",
         "click==8.1.7",

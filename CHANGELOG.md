@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.0] - 11.04.2024
+
+### Added
+
+### Changed
+- Removed spaCy from project
+
+### Fixed
+
 ## [0.3.1] - 05.12.2023
 
 ### Added

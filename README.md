@@ -79,10 +79,10 @@ pip install -e .
 ```
 - Use Docker for Deployment [(Quickstart)](##🐳-Quickstart:-Deploy-with-Docker)
 
-**Prerequisites**: If you're not using Docker, ensure that you have `Python >=3.9.0` installed on your system.
+**Prerequisites**: If you're not using Docker, ensure that you have `Python >=3.10.0` installed on your system.
 
 # 🐍 Installing Python and Setting Up a Virtual Environment
-Before you can use Verba, you'll need to ensure that `Python >=3.9.0` is installed on your system and that you can create a virtual environment for a safer and cleaner project setup.
+Before you can use Verba, you'll need to ensure that `Python >=3.10.0` is installed on your system and that you can create a virtual environment for a safer and cleaner project setup.
 
 ## Installing Python
 Python is required to run Verba. If you don't have Python installed, follow these steps:

@@ -253,14 +253,6 @@ class VerbaManager:
         """
         Checks which libraries are installed and fills out the self.installed_libraries dictionary for the frontend to access, this will be displayed in the status page.
         """
-        # spaCy, used for Chunking
-        try:
-            import spacy
-
-            self.installed_libraries["spacy"] = True
-        except Exception:
-            self.installed_libraries["spacy"] = False
-
         try:
             import PyPDF2
 
@@ -403,9 +395,6 @@ class VerbaManager:
                 self.environment_variables["OPENAI_MODEL"]
             ):
                 raise EnvironmentError("Missing environment variables. When using Azure OpenAI, you need to set OPENAI_BASE_URL, AZURE_OPENAI_RESOURCE_NAME, AZURE_OPENAI_EMBEDDING_MODEL and OPENAI_MODEL. Please check documentation.")
-
-
-        
 
     def get_schemas(self) -> dict:
         """
