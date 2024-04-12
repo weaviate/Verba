@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaPlus, FaTimes } from "react-icons/fa";
 import { useDropzone } from 'react-dropzone';
-import CoolButton from "../components/CoolButton";
+import CoolButton from "./CoolButton";
 import HashLoader from "react-spinners/HashLoader";
 
 type ImportModalProps = {

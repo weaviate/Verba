@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { DocumentComponent } from "../components/DocumentComponent";
 import { Virtuoso } from "react-virtuoso";
-import { getApiHost } from "@/pages";
 import ImportModalComponent from "../components/ImportModalComponent";
 import ConfigModal from "../components/ConfigModal";
 import { FaPlus } from "react-icons/fa";
@@ -14,7 +13,7 @@ type Document = {
     _additional: { id: string };
 };
 
-const apiHost = getApiHost()
+const apiHost = ""
 const bgUrl = process.env.NODE_ENV === 'production'
     ? 'static/'
     : '/';

@@ -1,3 +1,6 @@
+
+'use client'
+
 import { useState, useEffect, useCallback, useRef } from "react";
 import { ChatComponent, Message } from "../components/ChatComponent";
 import { DocumentComponent } from "../components/DocumentComponent";

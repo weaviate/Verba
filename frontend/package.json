@@ -36,6 +36,7 @@
   "devDependencies": {
     "@types/react-syntax-highlighter": "^15.5.7",
     "@types/react-window": "^1.8.5",
-    "@welldone-software/why-did-you-render": "^7.0.1"
+    "@welldone-software/why-did-you-render": "^7.0.1",
+    "daisyui": "^4.10.1"
   }
 }

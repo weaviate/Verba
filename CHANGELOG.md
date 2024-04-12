@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.0] - Beautiful Verba Update
+
+### Added
+- DaisyUI
+- Reworked Verba Design
+- Customization Capabilities
+- More Configuration
+
+### Changed
+- Changed frontend to AppRouter
+- Change Frontend Font
+
 ## [0.4.0] - 11.04.2024
 
 ### Added

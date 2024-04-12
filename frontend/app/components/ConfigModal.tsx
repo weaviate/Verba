@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { TbVectorTriangle } from "react-icons/tb";
 import { LuFileOutput } from "react-icons/lu";
 import { MdOutlineQuestionAnswer } from "react-icons/md";
-import { Component } from "../components/ImportModalComponent";
+import { Component } from "./ImportModalComponent";
 
 
 interface ConfigModalProps {

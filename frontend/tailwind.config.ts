@@ -1,4 +1,6 @@
 import type { Config } from "tailwindcss";
+const colors = require('tailwindcss/colors')
+
 
 const config: Config = {
   purge: {
@@ -31,11 +33,29 @@ const config: Config = {
   theme: {
     screens: {
       sm: '100px',
-      md: '1024px',
-      lg: '1480px',
+      md: '1000px',
+      lg: '1275px',
       full: '1700px',
-      xl: '2000px',
-      '2xl': '1536px',
+    },
+    colors: {
+      transparent: 'transparent',
+      current: 'currentColor',
+      black: colors.black,
+      white: colors.white,
+      gray: colors.gray,
+      emerald: colors.emerald,
+      indigo: colors.indigo,
+      green: colors.green,
+      blue: colors.blue,
+      yellow: colors.yellow,
+      red: colors.red,
+      "bg-verba": "#FEF7F7",
+      "bg-alt-verba": "#F3F3F3",
+      "primary-verba": "#FDFF91",
+      "secondary-verba": "#90FFA8",
+      "warning-verba": "#FF8399",
+      "text-verba": "#161616",
+      "text-alt-verba": "#8E8E8E"
     },
     extend: {
       backgroundImage: {
@@ -45,6 +65,10 @@ const config: Config = {
       },
     },
   },
-  plugins: [],
+  plugins: [require("daisyui")],
+
+  daisyui: {
+    themes: ["light"],
+  },
 };
 export default config;
