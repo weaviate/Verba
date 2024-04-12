@@ -9,26 +9,6 @@ import ConfigModal from "../components/ConfigModal";
 import { FaPlus } from "react-icons/fa";
 import CountUp from 'react-countup';
 
-export const getApiHost = () => {
-  if (process.env.NODE_ENV === 'development') {
-    return 'http://localhost:8000';
-  }
-  return "";
-};
-
-export const getApiHostNoHttp = () => {
-  if (process.env.NODE_ENV === 'development') {
-    return 'localhost:8000';
-  }
-  return "";
-};
-
-export const apiHost = getApiHost();
-const bgUrl = process.env.NODE_ENV === 'production'
-  ? 'static/'
-  : '/';
-
-
 type DocumentChunk = {
   text: string;
   doc_name: string;
@@ -56,6 +36,9 @@ export default function Home() {
   const [isFetching, setIsFetching] = useState(false);
   const [isFetchingSuggestion, setIsFetchingSuggestions] = useState(false);
   const handleGenerateStreamMessageRef = useRef<Function | null>(null);
+
+  const apiHost = "TO-DO"
+  const bgUrl = "TO-DO"
 
   // Function for checking the health of the API
   const checkApiHealth = useCallback(async () => {
@@ -412,7 +395,7 @@ export default function Home() {
             <ChatComponent
               onUserMessageSubmit={messages}
               isFetching={isFetching}
-              apiHost={getApiHostNoHttp()}
+              apiHost={"TODO"}
               setHandleGenerateStreamMessageRef={setHandleGenerateStreamMessage}
               setIsFetching={setIsFetching}
             />

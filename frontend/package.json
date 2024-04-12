@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build && next export && cp -r out/* ../goldenverba/server/frontend/out/ && rm -r out",
+    "build": "next build && cp -r out/* ../goldenverba/server/frontend/out/ && rm -r out",
     "start": "next start -H 0.0.0.0 -p 8080",
     "lint": "next lint"
   },
@@ -17,7 +17,7 @@
     "autoprefixer": "10.4.15",
     "eslint": "8.47.0",
     "eslint-config-next": "13.4.13",
-    "next": "13.4.13",
+    "next": "^14.2.0",
     "postcss": "8.4.27",
     "react": "18.2.0",
     "react-countup": "^6.4.2",

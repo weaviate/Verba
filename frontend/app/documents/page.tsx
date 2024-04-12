@@ -1,3 +1,5 @@
+'use client'
+
 import { useState, useEffect } from "react";
 import { DocumentComponent } from "../components/DocumentComponent";
 import { Virtuoso } from "react-virtuoso";

@@ -8,9 +8,10 @@ import { HiOutlineStatusOnline } from "react-icons/hi";
 import { IoMdAddCircle } from "react-icons/io";
 import { IoSettingsSharp } from "react-icons/io5";
 import { FaGithub } from "react-icons/fa";
+import { IoBuildSharp } from "react-icons/io5";
 
+import NavbarButton from "./nav_button"
 import { getGitHubStars } from "./actions"
-import { get } from 'http';
 
 interface NavbarProps {
   imageSrc: string;
@@ -18,17 +19,41 @@ interface NavbarProps {
   subtitle: string;
   version: string;
   currentPage: string;
-  setCurrentPage: (page: "CHAT" | "DOCUMENTS" | "STATUS" | "ADD" | "SETTINGS") => void;
+  setCurrentPage: (page: "CHAT" | "DOCUMENTS" | "STATUS" | "ADD" | "SETTINGS" | "RAG") => void;
+}
+
+const formatGitHubNumber = (num: number): string => {
+  if (num >= 1000) {
+    return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
+  }
+  return num.toString();
 }
 
 const Navbar: React.FC<NavbarProps> = ({ imageSrc, title, subtitle, version, currentPage, setCurrentPage }) => {
 
-  const [gitHubStars, setGitHubStars] = useState(0)
+  const [gitHubStars, setGitHubStars] = useState("0")
   const icon_size = 18
 
-
   useEffect(() => {
-    const response = getGitHubStars()
+    // Declare an asynchronous function inside the useEffect
+    const fetchGitHubStars = async () => {
+      try {
+        // Await the asynchronous call to getGitHubStars
+        const response: number = await getGitHubStars();
+
+        if (response) {
+          // Now response is the resolved value of the promise
+          const formatedStars = formatGitHubNumber(response);
+          console.log(formatedStars);
+          setGitHubStars(formatedStars);
+        }
+      } catch (error) {
+        console.error('Failed to fetch GitHub stars:', error);
+      }
+    };
+
+    // Call the async function
+    fetchGitHubStars();
   }, []);
 
   const handleGitHubClick = () => {
@@ -37,7 +62,7 @@ const Navbar: React.FC<NavbarProps> = ({ imageSrc, title, subtitle, version, cur
   };
 
   return (
-    <div className="flex justify-between items-center">
+    <div className="flex justify-between items-center mb-10">
 
       {/* Logo, Title, Subtitle */}
       <div className="sm:hidden md:flex flex-row items-center gap-5">
@@ -54,41 +79,28 @@ const Navbar: React.FC<NavbarProps> = ({ imageSrc, title, subtitle, version, cur
 
         {/* Pages */}
         <div className="flex flex-row items-center sm:gap-1 lg:gap-5 justify-between">
-          <button className={`btn md:btn-sm lg:btn-md flex flex-grow items-center justify-center border-none ${currentPage === "CHAT" ? ("bg-primary-verba hover:bg-white") : "bg-verba-bg text-text-alt-verba"}`} onClick={(e) => { setCurrentPage("CHAT") }}>
-            <IoChatbubbleSharp size={icon_size} />
-            <p className="md:text-xs lg:text-sm sm:hidden md:flex">Chat</p>
-          </button>
-          <button className={`btn md:btn-sm lg:btn-md flex flex-row items-center justify-center border-none ${currentPage === "DOCUMENTS" ? ("bg-primary-verba hover:bg-white") : "bg-verba-bg text-text-alt-verba"}`} onClick={(e) => { setCurrentPage("DOCUMENTS") }}>
-            <IoDocumentSharp size={icon_size} />
-            <p className="md:text-xs lg:text-sm sm:hidden md:flex">Documents</p>
-          </button>
-          <button className={`btn md:btn-sm lg:btn-md flex flex-row items-center justify-center border-none ${currentPage === "STATUS" ? ("bg-primary-verba hover:bg-white") : "bg-verba-bg text-text-alt-verba"}`} onClick={(e) => { setCurrentPage("STATUS") }}>
-            <HiOutlineStatusOnline size={icon_size} />
-            <p className="md:text-xs lg:text-sm sm:hidden md:flex">Status</p>
-          </button>
+          <NavbarButton Icon={IoChatbubbleSharp} iconSize={icon_size} title='Chat' currentPage={currentPage} setCurrentPage={setCurrentPage} setPage='CHAT' />
+          <NavbarButton Icon={IoDocumentSharp} iconSize={icon_size} title='Documents' currentPage={currentPage} setCurrentPage={setCurrentPage} setPage='DOCUMENTS' />
+          <NavbarButton Icon={HiOutlineStatusOnline} iconSize={icon_size} title='Status' currentPage={currentPage} setCurrentPage={setCurrentPage} setPage='STATUS' />
         </div>
-
 
         <div className="hidden sm:block sm:h-[3vh] lg:h-[5vh] bg-text-alt-verba w-px sm:mx-2 md:mx-4"></div>
 
         {/* Menus */}
         <div className="flex flex-row items-center sm:gap-1 lg:gap-5 justify-between">
-          <button className={`btn md:btn-sm lg:btn-md flex items-center justify-center border-none ${currentPage === "ADD" ? ("bg-primary-verba hover:bg-white") : "bg-verba-bg text-text-alt-verba"}`} onClick={(e) => { setCurrentPage("ADD") }}>
-            <IoMdAddCircle size={icon_size} />
-            <p className="md:text-xs lg:text-sm sm:hidden md:flex">Add Documents</p>
-          </button>
-          <button className={`btn md:btn-sm lg:btn-md flex flex-row items-center justify-center border-none ${currentPage === "SETTINGS" ? ("bg-primary-verba hover:bg-white") : "bg-verba-bg text-text-alt-verba"}`} onClick={(e) => { setCurrentPage("SETTINGS") }}>
-            <IoSettingsSharp size={icon_size} />
-            <p className="md:text-xs lg:text-sm sm:hidden md:flex">Settings</p>
-          </button>
+          <NavbarButton Icon={IoMdAddCircle} iconSize={icon_size} title='Add Documents' currentPage={currentPage} setCurrentPage={setCurrentPage} setPage='ADD' />
+          <NavbarButton Icon={IoBuildSharp} iconSize={icon_size} title='RAG' currentPage={currentPage} setCurrentPage={setCurrentPage} setPage='RAG' />
         </div>
 
         <div className="hidden sm:block sm:h-[3vh] lg:h-[5vh] bg-text-alt-verba w-px sm:mx-2 md:mx-4"></div>
 
         {/* Github, Version */}
         <div className="flex flex-row items-center sm:gap-1 lg:gap-5 justify-between">
-          <button className={`btn md:btn-sm lg:btn-md flex items-center justify-center border-none `} onClick={handleGitHubClick}>
-            <FaGithub size={icon_size} />
+          <NavbarButton Icon={IoSettingsSharp} iconSize={icon_size} title='Settings' currentPage={currentPage} setCurrentPage={setCurrentPage} setPage='SETTINGS' />
+
+          <button className={`btn md:btn-sm lg:btn-md flex items-center justify-center border-none bg-secondary-verba hover:bg-white`} onClick={handleGitHubClick}>
+            <FaGithub size={icon_size} className='' />
+            <p className="text-xs sm:hidden md:flex ">{gitHubStars}</p>
           </button>
           <p className="text-sm text-text-alt-verba hidden md:flex">{version}</p>
 
