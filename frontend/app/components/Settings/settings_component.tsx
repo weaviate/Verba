@@ -5,6 +5,8 @@ import { SettingsConfiguration } from "./types"
 import { FaPaintBrush } from "react-icons/fa";
 import { IoChatbubbleSharp } from "react-icons/io5";
 
+import SettingButton from "./settings_button"
+
 interface SettingsComponentProps {
     settingsConfig: SettingsConfiguration
     setSettingsConfig: (settings: SettingsConfiguration) => void;
@@ -12,7 +14,7 @@ interface SettingsComponentProps {
 
 const SettingsComponent: React.FC<SettingsComponentProps> = ({ settingsConfig, setSettingsConfig }) => {
 
-    const [setting, setSetting] = useState("")
+    const [setting, setSetting] = useState<"Customization" | "Chat" | "">("")
 
     const iconSize = 20
 
@@ -22,24 +24,20 @@ const SettingsComponent: React.FC<SettingsComponentProps> = ({ settingsConfig, s
             {/* Setting Options */}
             <div className='flex flex-col gap-5 w-1/4'>
                 <div className='flex flex-col justify-center items-center gap-5'>
-                    <p className='text-lg text-text-alt-verba'>Settings</p>
+                    <p className='md:text-base lg:text-lg text-text-alt-verba'>Settings</p>
                     <div className='flex flex-col w-full bg-white p-5 rounded-lg shadow-lg gap-2'>
-                        <button className={`btn btn-lg flex items-center justify-center border-none ${setting === "Customization" ? ("bg-primary-verba hover:bg-white") : "bg-verba-bg text-text-alt-verba"}`} onClick={(e) => { setSetting("Customization") }}>
-                            <FaPaintBrush size={iconSize} />
-                            <p className="text-lg">Customize Verba</p>
-                        </button>
-                        <button className={`btn btn-lg flex items-center justify-center border-none ${setting === "Chat" ? ("bg-primary-verba hover:bg-white") : "bg-verba-bg text-text-alt-verba"}`} onClick={(e) => { setSetting("Chat") }}>
-                            <IoChatbubbleSharp size={iconSize} />
-                            <p className="text-lg">Chat Settings</p>
-                        </button>
+                        <SettingButton Icon={FaPaintBrush} iconSize={iconSize} title='Customize Verba' currentSetting={setting} setSetting={setSetting} setSettingString='Customization' />
+                        <SettingButton Icon={IoChatbubbleSharp} iconSize={iconSize} title='Chat Settings' currentSetting={setting} setSetting={setSetting} setSettingString='Chat' />
                     </div>
                 </div>
-                <div className='flex flex-col justify-center items-center gap-5'>
-                    <p className='text-lg text-text-alt-verba'>Description</p>
-                    <div className='flex flex-col w-full bg-white p-5 rounded-lg shadow-lg gap-2'>
-                        <p> {settingsConfig[setting] ? settingsConfig[setting].description : ""}</p>
+                {setting != "" && (
+                    <div className='sm:hidden md:flex flex-col justify-center items-center gap-5'>
+                        <p className=' md:text-base lg:text-lg text-text-alt-verba'>Description</p>
+                        <div className='flex flex-col w-full bg-white p-5 rounded-lg shadow-lg gap-2'>
+                            <p className='sm:text-xs md:text-sm lg:text-base'> {settingsConfig[setting] ? settingsConfig[setting].description : ""}</p>
+                        </div>
                     </div>
-                </div>
+                )}
             </div>
 
             {/* Configuration Options */}

@@ -12,7 +12,7 @@ interface NavbarButtonProps {
   setPage: "CHAT" | "DOCUMENTS" | "STATUS" | "ADD" | "SETTINGS" | "RAG";
 }
 
-const Navbar: React.FC<NavbarButtonProps> = ({ Icon, iconSize, title, currentPage, setPage, setCurrentPage }) => {
+const NavbarButton: React.FC<NavbarButtonProps> = ({ Icon, iconSize, title, currentPage, setPage, setCurrentPage }) => {
 
   return (
     <button className={`btn md:btn-sm lg:btn-md flex flex-grow items-center justify-center border-none ${currentPage === setPage ? ("bg-primary-verba hover:bg-white") : "bg-verba-bg text-text-alt-verba"}`} onClick={(e) => { setCurrentPage(setPage) }}>
@@ -22,4 +22,4 @@ const Navbar: React.FC<NavbarButtonProps> = ({ Icon, iconSize, title, currentPag
   );
 };
 
-export default Navbar;
+export default NavbarButton;
