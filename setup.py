@@ -4,7 +4,7 @@ setup(
     name="goldenverba",
     version="0.4.0",
     packages=find_packages(),
-    python_requires='>=3.10.0',
+    python_requires=">=3.10.0",
     entry_points={
         "console_scripts": [
             "verba=goldenverba.server.cli:cli",
@@ -35,17 +35,12 @@ setup(
         "asyncio",
         "tiktoken==0.5.1",
         "cohere==4.33",
+        "accelerate==0.29.2",
         "requests",
         "pypdf2",
     ],
     extras_require={
-        "dev": [
-            "pytest",
-            "wheel",
-            "twine",
-            "black>=23.7.0",
-            "setuptools"
-        ],
+        "dev": ["pytest", "wheel", "twine", "black>=23.7.0", "setuptools"],
         "huggingface": [
             "sentence-transformers",
             "transformers",

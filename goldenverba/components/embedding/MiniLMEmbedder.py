@@ -22,6 +22,9 @@ class MiniLMEmbedder(Embedder):
         try:
             import torch
             from transformers import AutoModel, AutoTokenizer
+            from accelerate import Accelerator
+
+            accelerator = Accelerator()
 
             def get_device():
                 if torch.cuda.is_available():
@@ -32,6 +35,7 @@ class MiniLMEmbedder(Embedder):
                     return torch.device("cpu")
 
             self.device = get_device()
+            self.device = accelerator.device
 
             self.model = AutoModel.from_pretrained(
                 "sentence-transformers/all-MiniLM-L6-v2", device_map=self.device
