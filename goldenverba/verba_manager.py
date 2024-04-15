@@ -1,11 +1,10 @@
 import os
 import ssl
-from typing import Optional
+from collections.abc import AsyncIterator
 
 import weaviate
 from dotenv import load_dotenv
 from wasabi import msg
-from weaviate import Client
 from weaviate.embedded import EmbeddedOptions
 
 import goldenverba.components.schema.schema_generation as schema_manager
@@ -22,6 +21,7 @@ from goldenverba.components.reader.interface import Reader
 from goldenverba.components.reader.manager import ReaderManager
 from goldenverba.components.retriever.interface import Retriever
 from goldenverba.components.retriever.manager import RetrieverManager
+from goldenverba.server.types import ConversationItem, GeneratedMessage
 
 load_dotenv()
 
@@ -548,7 +548,10 @@ class VerbaManager:
         return document
 
     async def generate_answer(
-        self, queries: list[str], contexts: list[str], conversation: dict
+        self,
+        queries: list[str],
+        contexts: list[str],
+        conversation: list[ConversationItem],
     ):
         semantic_query = self.embedder_manager.selected_embedder.conversation_to_query(
             queries, conversation
@@ -579,8 +582,11 @@ class VerbaManager:
             return full_text
 
     async def generate_stream_answer(
-        self, queries: list[str], contexts: list[str], conversation: dict
-    ):
+        self,
+        queries: list[str],
+        contexts: list[str],
+        conversation: list[ConversationItem],
+    ) -> AsyncIterator[GeneratedMessage]:
         semantic_query = self.embedder_manager.selected_embedder.conversation_to_query(
             queries, conversation
         )

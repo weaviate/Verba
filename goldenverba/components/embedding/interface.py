@@ -15,6 +15,7 @@ from goldenverba.components.schema.schema_generation import (
     VECTORIZERS,
     strip_non_letters,
 )
+from goldenverba.server.types import ConversationItem
 
 load_dotenv()
 
@@ -281,7 +282,9 @@ class Embedder(VerbaComponent):
             "vectorize_query method must be implemented by a subclass."
         )
 
-    def conversation_to_query(self, queries: list[str], conversation: dict) -> str:
+    def conversation_to_query(
+        self, queries: list[str], conversation: list[ConversationItem]
+    ) -> str:
         query = ""
 
         if len(conversation) > 1:

@@ -1,10 +1,11 @@
 import asyncio
 import os
-from collections.abc import Iterator
+from collections.abc import AsyncIterator
 
 from wasabi import msg
 
 from goldenverba.components.generation.interface import Generator
+from goldenverba.server.types import ConversationItem, GeneratedMessage
 
 
 class CohereGenerator(Generator):
@@ -26,7 +27,7 @@ class CohereGenerator(Generator):
         self,
         queries: list[str],
         context: list[str],
-        conversation: dict = None,
+        conversation: list[ConversationItem] = None,
     ) -> str:
         """Generate an answer based on a list of queries and list of contexts, and includes conversational context
         @parameter: queries : list[str] - List of queries
@@ -71,8 +72,8 @@ class CohereGenerator(Generator):
         self,
         queries: list[str],
         context: list[str],
-        conversation: dict = None,
-    ) -> Iterator[dict]:
+        conversation: list[ConversationItem] = None,
+    ) -> AsyncIterator[GeneratedMessage]:
         """Generate a stream of response dicts based on a list of queries and list of contexts, and includes conversational context
         @parameter: queries : list[str] - List of queries
         @parameter: context : list[str] - List of contexts

@@ -7,7 +7,6 @@ import os
 from pathlib import Path
 
 from dotenv import load_dotenv
-from pydantic import BaseModel
 from starlette.websockets import WebSocketDisconnect
 from wasabi import msg  # type: ignore[import]
 
@@ -18,6 +17,15 @@ from goldenverba.components.generation.interface import Generator
 from goldenverba.components.reader.interface import Reader
 from goldenverba.components.retriever.interface import Retriever
 from goldenverba.server.ConfigManager import ConfigManager
+from goldenverba.server.types import (
+    GetComponentPayload,
+    SetComponentPayload,
+    LoadPayload,
+    QueryPayload,
+    GeneratePayload,
+    SearchQueryPayload,
+    GetDocumentPayload,
+)
 from goldenverba.server.util import setup_managers
 
 load_dotenv()
@@ -135,52 +143,6 @@ app.mount(
 
 # Serve the main page and other static files
 app.mount("/static", StaticFiles(directory=BASE_DIR / "frontend/out"), name="app")
-
-
-class QueryPayload(BaseModel):
-    query: str
-
-
-class ConversationItem(BaseModel):
-    type: str
-    content: str
-    typewriter: bool
-
-
-class GeneratePayload(BaseModel):
-    query: str
-    context: str
-    conversation: list[ConversationItem]
-
-
-class SearchQueryPayload(BaseModel):
-    query: str
-    doc_type: str
-
-
-class GetDocumentPayload(BaseModel):
-    document_id: str
-
-
-class LoadPayload(BaseModel):
-    reader: str
-    chunker: str
-    embedder: str
-    fileBytes: list[str]
-    fileNames: list[str]
-    filePath: str
-    document_type: str
-    chunkUnits: int
-    chunkOverlap: int
-
-
-class GetComponentPayload(BaseModel):
-    component: str
-
-
-class SetComponentPayload(BaseModel):
-    component: str
-    selected_component: str
 
 
 @app.get("/")

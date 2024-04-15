@@ -1,10 +1,11 @@
 import asyncio
 import os
-from collections.abc import Iterator
+from collections.abc import AsyncIterator
 
 from dotenv import load_dotenv
 
 from goldenverba.components.generation.interface import Generator
+from goldenverba.server.types import ConversationItem, GeneratedMessage
 
 load_dotenv()
 
@@ -74,8 +75,8 @@ class GPT4Generator(Generator):
         self,
         queries: list[str],
         context: list[str],
-        conversation: dict = None,
-    ) -> Iterator[dict]:
+        conversation: list[ConversationItem] = None,
+    ) -> AsyncIterator[GeneratedMessage]:
         """Generate a stream of response dicts based on a list of queries and list of contexts, and includes conversational context
         @parameter: queries : list[str] - List of queries
         @parameter: context : list[str] - List of contexts
