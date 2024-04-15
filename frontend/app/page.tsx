@@ -15,7 +15,7 @@ export default function Home() {
   const [settingsConfig, setSettingsConfig] = useState<SettingsConfiguration>(BaseSettings)
 
   return (
-    <main className="min-h-screen p-2 md:p-6 bg-bg-verba" data-theme="light">
+    <main className="min-h-screen p-5 bg-bg-verba" data-theme="light">
       <Navbar title={settingsConfig.Customization.settings.title.text} subtitle={settingsConfig.Customization.settings.subtitle.text} imageSrc={settingsConfig.Customization.settings.image.encoding} version='v1.0.0' currentPage={currentPage} setCurrentPage={setCurrentPage} />
 
       {currentPage === "SETTINGS" && (
