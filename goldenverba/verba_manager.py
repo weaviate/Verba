@@ -65,11 +65,11 @@ class VerbaManager:
         )
 
         filtered_documents = []
-        # TODO fix this
+
         # Check if document names exist in DB
         for document in loaded_documents:
-            # if not self.check_if_document_exits(document):
-            filtered_documents.append(document)
+            if not self.check_if_document_exits(document):
+                filtered_documents.append(document)
 
         modified_documents = self.chunker_manager.chunk(
             filtered_documents, units, overlap
