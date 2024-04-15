@@ -177,7 +177,7 @@ class VerbaManager:
                 openai.api_version = os.getenv("OPENAI_API_VERSION")
 
             if os.getenv("OPENAI_API_TYPE") == "azure":
-                openai_header_key_name = "X-Azure-Api-Key"            
+                openai_header_key_name = "X-Azure-Api-Key"
 
             if openai_key != "":
                 additional_header[openai_header_key_name] = openai_key
@@ -356,7 +356,7 @@ class VerbaManager:
             self.environment_variables["LLAMA2-7B-CHAT-HF"] = True
         else:
             self.environment_variables["LLAMA2-7B-CHAT-HF"] = False
-        
+
         # OpenAI API Type, should be set to "azure" if using Azure OpenAI
         if os.environ.get("OPENAI_API_TYPE", "") != "":
             self.environment_variables["OPENAI_API_TYPE"] = True
@@ -375,26 +375,28 @@ class VerbaManager:
         else:
             self.environment_variables["AZURE_OPENAI_RESOURCE_NAME"] = False
 
-        #Model used for embeddings. mandatory when using Azure. Typically "text-embedding-ada-002"
+        # Model used for embeddings. mandatory when using Azure. Typically "text-embedding-ada-002"
         if os.environ.get("AZURE_OPENAI_EMBEDDING_MODEL", "") != "":
             self.environment_variables["AZURE_OPENAI_EMBEDDING_MODEL"] = True
         else:
             self.environment_variables["AZURE_OPENAI_EMBEDDING_MODEL"] = False
 
-        #Model used for queries. mandatory when using Azure, but can also be used to change the model used for queries when using OpenAI.
+        # Model used for queries. mandatory when using Azure, but can also be used to change the model used for queries when using OpenAI.
         if os.environ.get("OPENAI_MODEL", "") != "":
             self.environment_variables["OPENAI_MODEL"] = True
         else:
             self.environment_variables["OPENAI_MODEL"] = False
 
-        if os.environ.get("OPENAI_API_TYPE", "")=="azure":
-            if not(
-                self.environment_variables["OPENAI_BASE_URL"] and
-                self.environment_variables["AZURE_OPENAI_RESOURCE_NAME"] and
-                self.environment_variables["AZURE_OPENAI_EMBEDDING_MODEL"] and
-                self.environment_variables["OPENAI_MODEL"]
+        if os.environ.get("OPENAI_API_TYPE", "") == "azure":
+            if not (
+                self.environment_variables["OPENAI_BASE_URL"]
+                and self.environment_variables["AZURE_OPENAI_RESOURCE_NAME"]
+                and self.environment_variables["AZURE_OPENAI_EMBEDDING_MODEL"]
+                and self.environment_variables["OPENAI_MODEL"]
             ):
-                raise EnvironmentError("Missing environment variables. When using Azure OpenAI, you need to set OPENAI_BASE_URL, AZURE_OPENAI_RESOURCE_NAME, AZURE_OPENAI_EMBEDDING_MODEL and OPENAI_MODEL. Please check documentation.")
+                raise EnvironmentError(
+                    "Missing environment variables. When using Azure OpenAI, you need to set OPENAI_BASE_URL, AZURE_OPENAI_RESOURCE_NAME, AZURE_OPENAI_EMBEDDING_MODEL and OPENAI_MODEL. Please check documentation."
+                )
 
     def get_schemas(self) -> dict:
         """

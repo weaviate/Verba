@@ -8,6 +8,7 @@ from goldenverba.components.generation.interface import Generator
 
 load_dotenv()
 
+
 class GPT4Generator(Generator):
     """
     GPT4 Generator.
@@ -20,7 +21,7 @@ class GPT4Generator(Generator):
         self.requires_library = ["openai"]
         self.requires_env = ["OPENAI_API_KEY"]
         self.streamable = True
-        self.model_name = os.getenv("OPENAI_MODEL","gpt-4-1106-preview")
+        self.model_name = os.getenv("OPENAI_MODEL", "gpt-4-1106-preview")
         self.context_window = 10000
 
     async def generate(
@@ -51,18 +52,13 @@ class GPT4Generator(Generator):
             if "OPENAI_API_VERSION" in os.environ:
                 openai.api_version = os.getenv("OPENAI_API_VERSION")
 
-            chat_completion_arguments = {
-                "model":self.model_name,
-                "messages":messages
-            }
-            if openai.api_type=="azure":
-                chat_completion_arguments["deployment_id"]=self.model_name
-
+            chat_completion_arguments = {"model": self.model_name, "messages": messages}
+            if openai.api_type == "azure":
+                chat_completion_arguments["deployment_id"] = self.model_name
 
             base_url = os.environ.get("OPENAI_BASE_URL", "")
             if base_url:
                 openai.api_base = base_url
-
 
             completion = await asyncio.to_thread(
                 openai.ChatCompletion.create, **chat_completion_arguments
@@ -106,13 +102,13 @@ class GPT4Generator(Generator):
                 openai.api_version = os.getenv("OPENAI_API_VERSION")
 
             chat_completion_arguments = {
-                "model":self.model_name,
-                "messages":messages,
-                "stream":True,
-                "temperature":0.0
+                "model": self.model_name,
+                "messages": messages,
+                "stream": True,
+                "temperature": 0.0,
             }
-            if openai.api_type=="azure":
-                chat_completion_arguments["deployment_id"]=self.model_name
+            if openai.api_type == "azure":
+                chat_completion_arguments["deployment_id"] = self.model_name
 
             completion = await openai.ChatCompletion.acreate(
                 **chat_completion_arguments
