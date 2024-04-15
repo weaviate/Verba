@@ -387,6 +387,16 @@ class VerbaManager:
         else:
             self.environment_variables["OPENAI_MODEL"] = False
 
+        if os.environ.get("OLLAMA_API_URL", "") != "":
+            self.environment_variables["OLLAMA_API_URL"] = True
+        else:
+            self.environment_variables["OLLAMA_API_URL"] = False
+
+        if os.environ.get("OLLAMA_MODEL", "") != "":
+            self.environment_variables["OLLAMA_MODEL"] = True
+        else:
+            self.environment_variables["OLLAMA_MODEL"] = False
+
         if os.environ.get("OPENAI_API_TYPE", "") == "azure":
             if not (
                 self.environment_variables["OPENAI_BASE_URL"]
