@@ -65,11 +65,11 @@ class VerbaManager:
         )
 
         filtered_documents = []
-
+        # TODO fix this
         # Check if document names exist in DB
         for document in loaded_documents:
-            if not self.check_if_document_exits(document):
-                filtered_documents.append(document)
+            # if not self.check_if_document_exits(document):
+            filtered_documents.append(document)
 
         modified_documents = self.chunker_manager.chunk(
             filtered_documents, units, overlap
@@ -177,7 +177,7 @@ class VerbaManager:
                 openai.api_version = os.getenv("OPENAI_API_VERSION")
 
             if os.getenv("OPENAI_API_TYPE") == "azure":
-                openai_header_key_name = "X-Azure-Api-Key"            
+                openai_header_key_name = "X-Azure-Api-Key"
 
             if openai_key != "":
                 additional_header[openai_header_key_name] = openai_key
@@ -192,6 +192,14 @@ class VerbaManager:
         cohere_key = os.environ.get("COHERE_API_KEY", "")
         if cohere_key != "":
             additional_header["X-Cohere-Api-Key"] = cohere_key
+
+        google_key = os.environ.get("GOOGLE_API_KEY", "")
+        self.environment_variables["GOOGLE_API_KEY"] = False
+        if google_key != "":
+            additional_header["X-Palm-Api-Key"] = google_key
+            self.environment_variables["GOOGLE_API_KEY"] = True
+
+        google_project = os.environ.get("GOOGLE_CLOUD_PROJECT", "")
 
         # Check Verba URL ENV
         weaviate_url = os.environ.get("WEAVIATE_URL_VERBA", "")
@@ -228,7 +236,12 @@ class VerbaManager:
             self.weaviate_type = "Weaviate Embedded"
             client = weaviate.Client(
                 additional_headers=additional_header,
-                embedded_options=EmbeddedOptions(),
+                embedded_options=EmbeddedOptions(
+                    additional_env_vars={
+                        "ENABLE_MODULES": "text2vec-palm,text2vec-openai,generative-openai,qna-openai,text2vec-cohere,text2vec-palm",
+                        "GOOGLE_CLOUD_PROJECT": google_project,
+                    }
+                ),
             )
 
         if client is not None:
@@ -356,7 +369,7 @@ class VerbaManager:
             self.environment_variables["LLAMA2-7B-CHAT-HF"] = True
         else:
             self.environment_variables["LLAMA2-7B-CHAT-HF"] = False
-        
+
         # OpenAI API Type, should be set to "azure" if using Azure OpenAI
         if os.environ.get("OPENAI_API_TYPE", "") != "":
             self.environment_variables["OPENAI_API_TYPE"] = True
@@ -375,26 +388,28 @@ class VerbaManager:
         else:
             self.environment_variables["AZURE_OPENAI_RESOURCE_NAME"] = False
 
-        #Model used for embeddings. mandatory when using Azure. Typically "text-embedding-ada-002"
+        # Model used for embeddings. mandatory when using Azure. Typically "text-embedding-ada-002"
         if os.environ.get("AZURE_OPENAI_EMBEDDING_MODEL", "") != "":
             self.environment_variables["AZURE_OPENAI_EMBEDDING_MODEL"] = True
         else:
             self.environment_variables["AZURE_OPENAI_EMBEDDING_MODEL"] = False
 
-        #Model used for queries. mandatory when using Azure, but can also be used to change the model used for queries when using OpenAI.
+        # Model used for queries. mandatory when using Azure, but can also be used to change the model used for queries when using OpenAI.
         if os.environ.get("OPENAI_MODEL", "") != "":
             self.environment_variables["OPENAI_MODEL"] = True
         else:
             self.environment_variables["OPENAI_MODEL"] = False
 
-        if os.environ.get("OPENAI_API_TYPE", "")=="azure":
-            if not(
-                self.environment_variables["OPENAI_BASE_URL"] and
-                self.environment_variables["AZURE_OPENAI_RESOURCE_NAME"] and
-                self.environment_variables["AZURE_OPENAI_EMBEDDING_MODEL"] and
-                self.environment_variables["OPENAI_MODEL"]
+        if os.environ.get("OPENAI_API_TYPE", "") == "azure":
+            if not (
+                self.environment_variables["OPENAI_BASE_URL"]
+                and self.environment_variables["AZURE_OPENAI_RESOURCE_NAME"]
+                and self.environment_variables["AZURE_OPENAI_EMBEDDING_MODEL"]
+                and self.environment_variables["OPENAI_MODEL"]
             ):
-                raise EnvironmentError("Missing environment variables. When using Azure OpenAI, you need to set OPENAI_BASE_URL, AZURE_OPENAI_RESOURCE_NAME, AZURE_OPENAI_EMBEDDING_MODEL and OPENAI_MODEL. Please check documentation.")
+                raise EnvironmentError(
+                    "Missing environment variables. When using Azure OpenAI, you need to set OPENAI_BASE_URL, AZURE_OPENAI_RESOURCE_NAME, AZURE_OPENAI_EMBEDDING_MODEL and OPENAI_MODEL. Please check documentation."
+                )
 
     def get_schemas(self) -> dict:
         """
@@ -599,7 +614,9 @@ class VerbaManager:
 
         else:
             full_text = ""
-            async for result in self.generator_manager.selected_generator.generate_stream(
+            async for (
+                result
+            ) in self.generator_manager.selected_generator.generate_stream(
                 queries, contexts, conversation
             ):
                 full_text += result["message"]

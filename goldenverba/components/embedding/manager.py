@@ -5,6 +5,7 @@ from goldenverba.components.embedding.ADAEmbedder import ADAEmbedder
 from goldenverba.components.embedding.CohereEmbedder import CohereEmbedder
 from goldenverba.components.embedding.interface import Embedder
 from goldenverba.components.embedding.MiniLMEmbedder import MiniLMEmbedder
+from goldenverba.components.embedding.GoogleEmbedder import GoogleEmbedder
 from goldenverba.components.reader.document import Document
 
 
@@ -14,6 +15,7 @@ class EmbeddingManager:
             "MiniLMEmbedder": MiniLMEmbedder(),
             "ADAEmbedder": ADAEmbedder(),
             "CohereEmbedder": CohereEmbedder(),
+            "GoogleEmbedder": GoogleEmbedder(),
         }
         self.selected_embedder: Embedder = self.embedders["ADAEmbedder"]
 
