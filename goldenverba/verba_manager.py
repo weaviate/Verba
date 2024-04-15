@@ -607,7 +607,9 @@ class VerbaManager:
 
         else:
             full_text = ""
-            async for result in self.generator_manager.selected_generator.generate_stream(
+            async for (
+                result
+            ) in self.generator_manager.selected_generator.generate_stream(
                 queries, contexts, conversation
             ):
                 full_text += result["message"]

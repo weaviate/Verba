@@ -119,7 +119,7 @@ class Llama2Generator(Generator):
                 current_token = self.tokenizer.convert_ids_to_tokens(
                     [current_token_id], skip_special_tokens=False
                 )
-                if type(current_token) == list:
+                if current_token is list:
                     current_token = " ".join(current_token)
                 current_token = current_token.replace("<0x0A>", "\n").replace("▁", " ")
                 # Update input for next iteration
