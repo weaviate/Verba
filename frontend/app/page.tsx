@@ -16,7 +16,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen p-5 bg-bg-verba" data-theme="light">
-      <Navbar title={settingsConfig.Customization.settings.title.text} subtitle={settingsConfig.Customization.settings.subtitle.text} imageSrc={settingsConfig.Customization.settings.image.encoding} version='v1.0.0' currentPage={currentPage} setCurrentPage={setCurrentPage} />
+      <Navbar title={settingsConfig.Customization.settings.title.text} subtitle={settingsConfig.Customization.settings.subtitle.text} imageSrc={settingsConfig.Customization.settings.image.src} version='v1.0.0' currentPage={currentPage} setCurrentPage={setCurrentPage} />
 
       {currentPage === "SETTINGS" && (
         <SettingsComponent settingsConfig={settingsConfig} setSettingsConfig={setSettingsConfig} />

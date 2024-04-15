@@ -1,9 +1,14 @@
 'use client'
 
 import React, { useState, useEffect } from 'react';
-import { SettingsConfiguration } from "./types"
+import { SettingsConfiguration, TextFieldSetting, ImageFieldSetting, CheckboxSetting, BaseSettings } from "./types"
 import { FaPaintBrush } from "react-icons/fa";
 import { IoChatbubbleSharp } from "react-icons/io5";
+import { FaCheckCircle } from "react-icons/fa";
+import { MdCancel } from "react-icons/md";
+
+import TextFieldComponent from './TextFieldComponent';
+import ImageFieldComponent from './ImageFieldComponent';
 
 import SettingButton from "./settings_button"
 
@@ -14,9 +19,37 @@ interface SettingsComponentProps {
 
 const SettingsComponent: React.FC<SettingsComponentProps> = ({ settingsConfig, setSettingsConfig }) => {
 
-    const [setting, setSetting] = useState<"Customization" | "Chat" | "">("")
+    const [setting, setSetting] = useState<"Customization" | "Chat" | "">("Customization")
+    const [currentSettingsConfig, setCurrentSettingsConfig] = useState<SettingsConfiguration>(JSON.parse(JSON.stringify(settingsConfig)))
 
     const iconSize = 20
+
+    const applyChanges = () => {
+        setSettingsConfig(currentSettingsConfig)
+    }
+
+    const revertChanges = () => {
+        setCurrentSettingsConfig(BaseSettings)
+        setSettingsConfig(BaseSettings)
+    }
+
+    const renderSettingComponent = (title: any, setting_type: TextFieldSetting | ImageFieldSetting | CheckboxSetting) => {
+
+        if (setting === "") {
+            return null
+        }
+
+        switch (setting_type.type) {
+            case 'text':
+                return <TextFieldComponent title={title} setting={setting} TextFieldSetting={setting_type} settingsConfig={currentSettingsConfig} setSettingsConfig={setCurrentSettingsConfig} />;
+            case 'image':
+                return <ImageFieldComponent title={title} setting={setting} ImageFieldSetting={setting_type} settingsConfig={currentSettingsConfig} setSettingsConfig={setCurrentSettingsConfig} />;
+            case 'check':
+                return "Checkbox"
+            default:
+                return null;
+        }
+    };
 
     return (
         <div className="flex justify-between items-start gap-5">
@@ -43,12 +76,25 @@ const SettingsComponent: React.FC<SettingsComponentProps> = ({ settingsConfig, s
             {/* Configuration Options */}
             <div className='flex flex-col justify-center items-center gap-5 w-3/4'>
                 <p className='text-lg text-text-alt-verba'>Configuration</p>
-                <div className='flex flex-col w-full bg-white p-5 rounded-lg shadow-lg h-[70vh] gap-2'>
-
+                <div className='flex flex-col w-full bg-white p-10 rounded-lg shadow-lg h-[70vh] gap-2'>
+                    <p className='font-bold text-2xl mb-5'>{setting}</p>
+                    {setting && Object.entries(settingsConfig[setting].settings).map(([key, settingValue]) => (
+                        renderSettingComponent(key, settingValue)
+                    ))}
+                    <div className='flex justify-end gap-2'>
+                        <button onClick={applyChanges} className="btn flex items-center justify-center border-none text-text-verba bg-secondary-verba hover:bg-white">
+                            <FaCheckCircle />
+                            <p className="">Apply</p>
+                        </button>
+                        <button onClick={revertChanges} className="btn flex items-center justify-center border-none text-text-verba bg-warning-verba hover:bg-white">
+                            <MdCancel />
+                            <p className="">Reset</p>
+                        </button>
+                    </div>
                 </div>
             </div>
 
-        </div>
+        </div >
     );
 };
 
