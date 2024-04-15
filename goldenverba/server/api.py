@@ -600,7 +600,7 @@ async def websocket_generate_stream(websocket: WebSocket):
                 [payload.query], [payload.context], payload.conversation
             ):
                 full_text += chunk["message"]
-                if chunk["finish_reason"] == "stop":
+                if chunk["finish_reason"] == "stop" or chunk["finish_reason"] == "STOP":
                     chunk["full_text"] = full_text
                 await websocket.send_json(chunk)
 
@@ -613,7 +613,7 @@ async def websocket_generate_stream(websocket: WebSocket):
             await websocket.send_json(
                 {"message": e, "finish_reason": "stop", "full_text": e}
             )
-        msg.good("Succesfully streamed answer")
+        msg.good("Successfully streamed answer")
 
 
 # Retrieve auto complete suggestions based on user input

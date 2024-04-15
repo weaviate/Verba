@@ -34,6 +34,7 @@ setup(
         "click==8.1.7",
         "asyncio",
         "tiktoken==0.5.1",
+        "google-cloud-aiplatform==1.47.0",
         "cohere==4.33",
         "requests",
         "pypdf2",
