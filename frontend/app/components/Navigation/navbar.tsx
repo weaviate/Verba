@@ -67,9 +67,9 @@ const Navbar: React.FC<NavbarProps> = ({ imageSrc, title, subtitle, version, cur
 
       {/* Logo, Title, Subtitle */}
       <div className="flex flex-row items-center gap-5">
-        <img src={imageSrc} width={80} className="flex shadow-xl rounded-lg"></img>
+        <img src={imageSrc} width={80} className="flex"></img>
         <div className="flex flex-col lg:flex-row lg:items-end justify-center lg:gap-3">
-          <p className="sm:text-2xl md:text-4xl text-text-verba">{title}</p>
+          <p className="sm:text-2xl md:text-3xl text-text-verba">{title}</p>
           <p className="sm:text-sm text-base text-text-alt-verba font-light">{subtitle}</p>
         </div>
       </div>

@@ -4,7 +4,23 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navigation/navbar'
 import SettingsComponent from "./components/Settings/settings_component"
-import { SettingsConfiguration, Settings, BaseSettings } from "./components/Settings/types"
+import { Settings, BaseSettings } from "./components/Settings/types"
+import { Inter, Plus_Jakarta_Sans, Open_Sans, PT_Mono } from "next/font/google";
+
+// Fonts
+const inter = Inter({ subsets: ["latin"] });
+const plus_jakarta_sans = Plus_Jakarta_Sans({ subsets: ["latin"] });
+const open_sans = Open_Sans({ subsets: ["latin"] });
+const pt_mono = PT_Mono({ subsets: ["latin"], weight: "400" });
+
+type FontKey = "Inter" | "Plus_Jakarta_Sans" | "Open_Sans" | "PT_Mono";
+
+const fonts: Record<FontKey, typeof inter> = {
+  "Inter": inter,
+  "Plus_Jakarta_Sans": plus_jakarta_sans,
+  "Open_Sans": open_sans,
+  "PT_Mono": pt_mono
+}
 
 export default function Home() {
 
@@ -13,29 +29,17 @@ export default function Home() {
 
   // Settings
   const [settingTemplate, setSettingTemplate] = useState("Default")
-  const [settingsConfig, setSettingsConfig] = useState<SettingsConfiguration>(BaseSettings[settingTemplate])
+  const [baseSetting, setBaseSetting] = useState<Settings>(BaseSettings)
 
-  useEffect(() => {
-
-    setSettingsConfig(BaseSettings[settingTemplate])
-
-    document.documentElement.style.setProperty("--primary-verba", settingsConfig.Customization.settings.primary_color.color);
-    document.documentElement.style.setProperty("--secondary-verba", settingsConfig.Customization.settings.secondary_color.color);
-    document.documentElement.style.setProperty("--warning-verba", settingsConfig.Customization.settings.warning_color.color);
-    document.documentElement.style.setProperty("--bg-verba", settingsConfig.Customization.settings.bg_color.color);
-    document.documentElement.style.setProperty("--bg-alt-verba", settingsConfig.Customization.settings.bg_alt_color.color);
-    document.documentElement.style.setProperty("--text-verba", settingsConfig.Customization.settings.text_color.color);
-    document.documentElement.style.setProperty("--text-alt-verba", settingsConfig.Customization.settings.text_alt_color.color);
-    document.documentElement.style.setProperty("--button-verba", settingsConfig.Customization.settings.button_color.color);
-    document.documentElement.style.setProperty("--button-hover-verba", settingsConfig.Customization.settings.button_hover_color.color);
-  }, [settingsConfig, settingTemplate]);
+  const fontKey = baseSetting[settingTemplate].Customization.settings.font.value as FontKey; // Safely cast if you're sure, or use a check
+  const fontClassName = fonts[fontKey]?.className || "";
 
   return (
-    <main className="min-h-screen p-5 bg-bg-verba text-text-verba" data-theme="light">
-      <Navbar title={settingsConfig.Customization.settings.title.text} subtitle={settingsConfig.Customization.settings.subtitle.text} imageSrc={settingsConfig.Customization.settings.image.src} version='v1.0.0' currentPage={currentPage} setCurrentPage={setCurrentPage} />
+    <main className={`min-h-screen p-5 bg-bg-verba text-text-verba ${fontClassName}`} data-theme={baseSetting[settingTemplate].Customization.settings.theme}>
+      <Navbar title={baseSetting[settingTemplate].Customization.settings.title.text} subtitle={baseSetting[settingTemplate].Customization.settings.subtitle.text} imageSrc={baseSetting[settingTemplate].Customization.settings.image.src} version='v1.0.0' currentPage={currentPage} setCurrentPage={setCurrentPage} />
 
       {currentPage === "SETTINGS" && (
-        <SettingsComponent settingsConfig={settingsConfig} setSettingsConfig={setSettingsConfig} settingTemplate={settingTemplate} setSettingTemplate={setSettingTemplate} />
+        <SettingsComponent settingTemplate={settingTemplate} setSettingTemplate={setSettingTemplate} baseSetting={baseSetting} setBaseSetting={setBaseSetting} />
       )}
 
       <footer className="footer footer-center p-4 mt-8 bg-bg-verba text-text-alt-verba">

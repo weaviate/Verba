@@ -15,7 +15,7 @@ interface NavbarButtonProps {
 const NavbarButton: React.FC<NavbarButtonProps> = ({ Icon, iconSize, title, currentPage, setPage, setCurrentPage }) => {
 
   return (
-    <button className={`btn md:btn-sm lg:btn-md flex flex-grow items-center justify-center border-none hover:bg-button-hover-verba ${currentPage === setPage ? ("bg-primary-verba") : "bg-button-verba text-text-alt-verba"}`} onClick={(e) => { setCurrentPage(setPage) }}>
+    <button key={title} className={`btn md:btn-sm lg:btn-md flex flex-grow items-center justify-center border-none hover:bg-button-hover-verba ${currentPage === setPage ? ("bg-primary-verba text-text-verba") : "bg-button-verba text-text-alt-verba"}`} onClick={(e) => { setCurrentPage(setPage) }}>
       <Icon size={iconSize} />
       <p className="md:text-xs lg:text-sm sm:hidden md:flex">{title}</p>
     </button>

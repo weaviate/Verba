@@ -28,6 +28,8 @@ export interface CustomizationSettings extends MetaInformation {
         text_alt_color: ColorSetting;
         button_color: ColorSetting;
         button_hover_color: ColorSetting;
+        font: SelectSetting;
+        theme: "light" | "dark"
     }
 }
 
@@ -64,7 +66,20 @@ export interface ColorSetting {
     description: string;
 }
 
+export interface SelectSetting {
+    type: 'select';
+    options: string[];
+    value: string;
+    description: string;
+}
+
 // Base Settings
+
+const AvailableFonts: string[] = ["Inter", "Plus_Jakarta_Sans", "Open_Sans", "PT_Mono"]
+
+const BaseFonts: SelectSetting = {
+    value: "Plus_Jakarta_Sans", type: "select", options: AvailableFonts, description: "Text Font"
+}
 
 const BaseCustomization: CustomizationSettings = {
     title: "Customization",
@@ -81,7 +96,9 @@ const BaseCustomization: CustomizationSettings = {
         text_color: { color: "#161616", type: "color", description: "Text Color" },
         text_alt_color: { color: "#8E8E8E", type: "color", description: "Alternative Text Color" },
         button_color: { color: "#EFEFEF", type: "color", description: "Button Color" },
-        button_hover_color: { color: "#DCDCDC", type: "color", description: "Button Hover Color" }
+        button_hover_color: { color: "#DCDCDC", type: "color", description: "Button Hover Color" },
+        font: BaseFonts,
+        theme: "light",
     }
 }
 
@@ -100,7 +117,9 @@ const CustomCustomization: CustomizationSettings = {
         text_color: { color: "#161616", type: "color", description: "Text Color" },
         text_alt_color: { color: "#8E8E8E", type: "color", description: "Alternative Text Color" },
         button_color: { color: "#EFEFEF", type: "color", description: "Button Color" },
-        button_hover_color: { color: "#DCDCDC", type: "color", description: "Button Hover Color" }
+        button_hover_color: { color: "#DCDCDC", type: "color", description: "Button Hover Color" },
+        font: BaseFonts,
+        theme: "light",
     }
 }
 
@@ -119,7 +138,11 @@ const DarkModeCustomization: CustomizationSettings = {
         text_color: { color: "#ffffff", type: "color", description: "Text Color" },
         text_alt_color: { color: "#999999", type: "color", description: "Alternative Text Color" },
         button_color: { color: "#3C3C3C", type: "color", description: "Button Color" },
-        button_hover_color: { color: "#2C2C2C", type: "color", description: "Button Hover Color" }
+        button_hover_color: { color: "#2C2C2C", type: "color", description: "Button Hover Color" },
+        font: {
+            value: "Open_Sans", type: "select", options: AvailableFonts, description: "Text Font"
+        },
+        theme: "dark",
     }
 }
 
@@ -138,7 +161,11 @@ const WeaviateCustomization: CustomizationSettings = {
         text_color: { color: "#130C49", type: "color", description: "Text Color" },
         text_alt_color: { color: "#8196A6", type: "color", description: "Alternative Text Color" },
         button_color: { color: "#E6E3E3", type: "color", description: "Button Color" },
-        button_hover_color: { color: "#FFFFFF", type: "color", description: "Button Hover Color" }
+        button_hover_color: { color: "#FFFFFF", type: "color", description: "Button Hover Color" },
+        font: {
+            value: "Inter", type: "select", options: AvailableFonts, description: "Text Font"
+        },
+        theme: "light",
     }
 }
 

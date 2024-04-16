@@ -15,7 +15,7 @@ interface SettingsButtonProps {
 const SettingsButton: React.FC<SettingsButtonProps> = ({ Icon, iconSize, title, currentSetting, setSetting, setSettingString }) => {
 
   return (
-    <button className={`btn lg:btn-lg flex items-center justify-center border-none hover:bg-button-hover-verba ${currentSetting === setSettingString ? ("bg-primary-verba") : "bg-button-verba text-text-alt-verba"}`} onClick={(e) => { setSetting(setSettingString) }}>
+    <button key={title} className={`btn lg:btn-lg flex items-center justify-center border-none hover:bg-button-hover-verba ${currentSetting === setSettingString ? ("bg-primary-verba text-text-verba") : "bg-button-verba text-text-alt-verba"}`} onClick={(e) => { setSetting(setSettingString) }}>
       <Icon size={iconSize} />
       <p className="sm:hidden md:flex md:text-base lg:text-lg">{title}</p>
     </button>

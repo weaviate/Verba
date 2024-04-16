@@ -36,7 +36,7 @@ const ImageFieldComponent: React.FC<ImageFieldComponentProps> = ({ title, ImageF
     };
 
     return (
-        <div className='flex flex-col justify-center gap-1'>
+        <div key={title} className='flex flex-col justify-center gap-1'>
             <div className='flex justify-center items-center'>
                 <p>
                     {ImageFieldSetting.description}
