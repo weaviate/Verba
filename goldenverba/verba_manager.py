@@ -193,6 +193,14 @@ class VerbaManager:
         if cohere_key != "":
             additional_header["X-Cohere-Api-Key"] = cohere_key
 
+        google_key = os.environ.get("GOOGLE_API_KEY", "")
+        self.environment_variables["GOOGLE_API_KEY"] = False
+        if google_key != "":
+            additional_header["X-Palm-Api-Key"] = google_key
+            self.environment_variables["GOOGLE_API_KEY"] = True
+
+        google_project = os.environ.get("GOOGLE_CLOUD_PROJECT", "")
+
         # Check Verba URL ENV
         weaviate_url = os.environ.get("WEAVIATE_URL_VERBA", "")
         if weaviate_url != "":
@@ -228,7 +236,12 @@ class VerbaManager:
             self.weaviate_type = "Weaviate Embedded"
             client = weaviate.Client(
                 additional_headers=additional_header,
-                embedded_options=EmbeddedOptions(),
+                embedded_options=EmbeddedOptions(
+                    additional_env_vars={
+                        "ENABLE_MODULES": "text2vec-palm,text2vec-openai,generative-openai,qna-openai,text2vec-cohere,text2vec-palm",
+                        "GOOGLE_CLOUD_PROJECT": google_project,
+                    }
+                ),
             )
 
         if client is not None:

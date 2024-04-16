@@ -18,6 +18,7 @@ from goldenverba.components.schema.schema_generation import (
 
 load_dotenv()
 
+
 class Embedder(VerbaComponent):
     """
     Interface for Verba Embedding.
@@ -112,15 +113,21 @@ class Embedder(VerbaComponent):
 
                             # Check if vector already exists
                             if chunk.vector is None:
-                                client.batch.add_data_object(properties, class_name)
+                                try:
+                                    client.batch.add_data_object(properties, class_name)
+                                    msg.info("Added chunk to Weaviate")
+                                except Exception as e:
+                                    msg.fail(f"Error adding chunk to Weaviate: {e}")
                             else:
                                 client.batch.add_data_object(
                                     properties, class_name, vector=chunk.vector
                                 )
-                            
-                            wait_time_ms = int(os.getenv("WAIT_TIME_BETWEEN_INGESTION_QUERIES_MS","0"))
-                            if wait_time_ms>0:
-                                time.sleep(float(wait_time_ms)/1000)
+
+                            wait_time_ms = int(
+                                os.getenv("WAIT_TIME_BETWEEN_INGESTION_QUERIES_MS", "0")
+                            )
+                            if wait_time_ms > 0:
+                                time.sleep(float(wait_time_ms) / 1000)
 
                 self.check_document_status(
                     client,
@@ -317,15 +324,17 @@ class Embedder(VerbaComponent):
             .with_limit(1)
         ).do()
 
-        if "data" in match_results and len(match_results["data"]["Get"][self.get_cache_class()]) > 0 and (
-            query
-            == match_results["data"]["Get"][self.get_cache_class()][0]["query"]
+        if (
+            "data" in match_results
+            and len(match_results["data"]["Get"][self.get_cache_class()]) > 0
+            and (
+                query
+                == match_results["data"]["Get"][self.get_cache_class()][0]["query"]
+            )
         ):
             msg.good("Direct match from cache")
             return (
-                match_results["data"]["Get"][self.get_cache_class()][0][
-                    "system"
-                ],
+                match_results["data"]["Get"][self.get_cache_class()][0]["system"],
                 0.0,
             )
 
