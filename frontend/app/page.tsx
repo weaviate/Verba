@@ -4,7 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navigation/navbar'
 import SettingsComponent from "./components/Settings/settings_component"
-import { SettingsConfiguration, BaseSettings } from "./components/Settings/types"
+import { SettingsConfiguration, Settings, BaseSettings } from "./components/Settings/types"
 
 export default function Home() {
 
@@ -12,9 +12,13 @@ export default function Home() {
   const [currentPage, setCurrentPage] = useState<"CHAT" | "DOCUMENTS" | "STATUS" | "ADD" | "SETTINGS" | "RAG">("CHAT")
 
   // Settings
-  const [settingsConfig, setSettingsConfig] = useState<SettingsConfiguration>(BaseSettings)
+  const [settingTemplate, setSettingTemplate] = useState("Default")
+  const [settingsConfig, setSettingsConfig] = useState<SettingsConfiguration>(BaseSettings[settingTemplate])
 
   useEffect(() => {
+
+    setSettingsConfig(BaseSettings[settingTemplate])
+
     document.documentElement.style.setProperty("--primary-verba", settingsConfig.Customization.settings.primary_color.color);
     document.documentElement.style.setProperty("--secondary-verba", settingsConfig.Customization.settings.secondary_color.color);
     document.documentElement.style.setProperty("--warning-verba", settingsConfig.Customization.settings.warning_color.color);
@@ -24,14 +28,14 @@ export default function Home() {
     document.documentElement.style.setProperty("--text-alt-verba", settingsConfig.Customization.settings.text_alt_color.color);
     document.documentElement.style.setProperty("--button-verba", settingsConfig.Customization.settings.button_color.color);
     document.documentElement.style.setProperty("--button-hover-verba", settingsConfig.Customization.settings.button_hover_color.color);
-  }, [settingsConfig]);
+  }, [settingsConfig, settingTemplate]);
 
   return (
     <main className="min-h-screen p-5 bg-bg-verba text-text-verba" data-theme="light">
       <Navbar title={settingsConfig.Customization.settings.title.text} subtitle={settingsConfig.Customization.settings.subtitle.text} imageSrc={settingsConfig.Customization.settings.image.src} version='v1.0.0' currentPage={currentPage} setCurrentPage={setCurrentPage} />
 
       {currentPage === "SETTINGS" && (
-        <SettingsComponent settingsConfig={settingsConfig} setSettingsConfig={setSettingsConfig} />
+        <SettingsComponent settingsConfig={settingsConfig} setSettingsConfig={setSettingsConfig} settingTemplate={settingTemplate} setSettingTemplate={setSettingTemplate} />
       )}
 
       <footer className="footer footer-center p-4 mt-8 bg-bg-verba text-text-alt-verba">

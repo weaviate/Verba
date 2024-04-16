@@ -16,12 +16,24 @@ import SettingButton from "./settings_button"
 interface SettingsComponentProps {
     settingsConfig: SettingsConfiguration
     setSettingsConfig: (settings: SettingsConfiguration) => void;
+
+    settingTemplate: string
+    setSettingTemplate: (s: string) => void;
 }
 
-const SettingsComponent: React.FC<SettingsComponentProps> = ({ settingsConfig, setSettingsConfig }) => {
+const SettingsComponent: React.FC<SettingsComponentProps> = ({ settingsConfig, setSettingsConfig, settingTemplate, setSettingTemplate }) => {
 
     const [setting, setSetting] = useState<"Customization" | "Chat" | "">("Customization")
     const [currentSettingsConfig, setCurrentSettingsConfig] = useState<SettingsConfiguration>(JSON.parse(JSON.stringify(settingsConfig)))
+
+    const [availableTemplate, setAvailableTemplate] = useState<string[]>(Object.keys(BaseSettings))
+
+    useEffect(() => {
+
+        setAvailableTemplate(Object.keys(BaseSettings))
+        setCurrentSettingsConfig(JSON.parse(JSON.stringify(settingsConfig)))
+
+    }, [settingTemplate, settingsConfig]);
 
     const iconSize = 20
 
@@ -30,8 +42,8 @@ const SettingsComponent: React.FC<SettingsComponentProps> = ({ settingsConfig, s
     }
 
     const revertChanges = () => {
-        setCurrentSettingsConfig(BaseSettings)
-        setSettingsConfig(BaseSettings)
+        setCurrentSettingsConfig(BaseSettings[settingTemplate])
+        setSettingsConfig(BaseSettings[settingTemplate])
     }
 
     const renderSettingComponent = (title: any, setting_type: TextFieldSetting | ImageFieldSetting | CheckboxSetting | ColorSetting) => {
@@ -52,6 +64,11 @@ const SettingsComponent: React.FC<SettingsComponentProps> = ({ settingsConfig, s
             default:
                 return null;
         }
+    };
+
+    const handleTemplateChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const name = e.target.value;
+        setSettingTemplate(name); // Update the selected template state
     };
 
     return (
@@ -78,7 +95,14 @@ const SettingsComponent: React.FC<SettingsComponentProps> = ({ settingsConfig, s
 
             {/* Configuration Options */}
             <div className='flex flex-col justify-center items-center gap-5 w-3/4'>
-                <p className='text-lg text-text-alt-verba'>Configuration</p>
+                <div className='flex flex-row gap-2 items-center justify-center'>
+                    <p className='text-lg text-text-alt-verba'>Configuration</p>
+                    <select value={settingTemplate} onChange={handleTemplateChange} className="select select-sm text-xs bg-bg-alt-verba text-text-verba">
+                        {availableTemplate.map((template) => (
+                            <option>{template}</option>
+                        ))}
+                    </select>
+                </div>
                 <div className='flex flex-col w-full bg-bg-alt-verba p-10 rounded-lg shadow-lg h-[70vh] gap-2 overflow-y-scroll'>
                     <p className='font-bold text-2xl mb-5'>{setting}</p>
                     <div className=' flex-coll gap-4 grid grid-cols-3'>
@@ -87,11 +111,11 @@ const SettingsComponent: React.FC<SettingsComponentProps> = ({ settingsConfig, s
                         ))}
                     </div>
                     <div className='flex justify-end gap-2 mt-3'>
-                        <button onClick={applyChanges} className="btn flex items-center justify-center border-none text-text-verba bg-secondary-verba hover:bg-bg-alt-verba">
+                        <button onClick={applyChanges} className="btn flex items-center justify-center border-none text-text-verba bg-secondary-verba hover:bg-button-hover-verba">
                             <FaCheckCircle />
                             <p className="">Apply</p>
                         </button>
-                        <button onClick={revertChanges} className="btn flex items-center justify-center border-none text-text-verba bg-warning-verba hover:bg-bg-alt-verba">
+                        <button onClick={revertChanges} className="btn flex items-center justify-center border-none text-text-verba bg-warning-verba hover:bg-button-hover-verba">
                             <MdCancel />
                             <p className="">Reset</p>
                         </button>
