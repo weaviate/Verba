@@ -411,7 +411,7 @@ export default function Home() {
                 onChange={handleInputChange}
                 disabled={isFetching}
                 placeholder="What is a vector database?"
-                className="w-full p-2 rounded-md bg-white text-gray-900 placeholder-gray-400"
+                className="w-full p-2 rounded-md bg-bg-alt-verba text-gray-900 placeholder-gray-400"
               />
             </form>
             <div className="absolute mt-2 p-2 z-10 w-1/2 left-5 text-center justify-center flex flex-wrap">

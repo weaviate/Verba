@@ -48,16 +48,20 @@ const config: Config = {
       green: colors.green,
       blue: colors.blue,
       yellow: colors.yellow,
-      red: colors.red,
-      "bg-verba": "#FEF7F7",
-      "bg-alt-verba": "#F3F3F3",
-      "primary-verba": "#FDFF91",
-      "secondary-verba": "#90FFA8",
-      "warning-verba": "#FF8399",
-      "text-verba": "#161616",
-      "text-alt-verba": "#8E8E8E"
+      red: colors.red
     },
     extend: {
+      colors: {
+        "bg-verba": "var(--bg-verba, #FEF7F7)",
+        "bg-alt-verba": "var(--bg-alt-verba, #FFFFFF)",
+        "button-verba": "var(--button-verba, #EFEFEF)",
+        "button-hover-verba": "var(--button-hover-verba, #DCDCDC)",
+        "primary-verba": "var(--primary-verba, #FDFF91)",
+        "secondary-verba": "var(--secondary-verba, #90FFA8)",
+        "warning-verba": "var(--warning-verba, #FF8399)",
+        "text-verba": "var(--text-verba, #161616)",
+        "text-alt-verba": "var(--text-alt-verba, #8E8E8E)"
+      },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic":

@@ -90,7 +90,7 @@ const Navbar: React.FC<NavbarProps> = ({ imageSrc, title, subtitle, version, cur
           <NavbarButton Icon={IoSettingsSharp} iconSize={icon_size} title='Settings' currentPage={currentPage} setCurrentPage={setCurrentPage} setPage='SETTINGS' />
           <div className="hidden sm:block sm:h-[3vh] lg:h-[5vh] bg-text-alt-verba w-px mx-1"></div>
 
-          <button className={`md:hidden btn md:btn-sm lg:btn-md lg:flex items-center justify-center border-none bg-secondary-verba hover:bg-white`} onClick={handleGitHubClick}>
+          <button className={`md:hidden btn md:btn-sm lg:btn-md lg:flex items-center justify-center border-none bg-secondary-verba hover:bg-button-hover-verba`} onClick={handleGitHubClick}>
             <FaGithub size={icon_size} className='' />
             <p className="text-xs sm:hidden md:flex ">{gitHubStars}</p>
           </button>

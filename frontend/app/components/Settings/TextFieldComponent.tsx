@@ -31,14 +31,14 @@ const TextFieldComponent: React.FC<TextFieldComponentProps> = ({ title, TextFiel
     };
 
     return (
-        <div className='flex justify-center items-center gap-4'>
-            <div className='flex w-1/3'>
+        <div className='flex flex-col gap-1'>
+            <div className='flex items-center justify-center'>
                 <p>
                     {TextFieldSetting.description}
                 </p>
             </div>
-            <div className='flex w-2/3'>
-                <label className="input input-bordered flex items-center gap-2 w-full">
+            <div className='flex items-center justify-center'>
+                <label className="input input-bordered flex items-center gap-2 w-full bg-bg-verba">
                     <input
                         type="text"
                         className="grow"

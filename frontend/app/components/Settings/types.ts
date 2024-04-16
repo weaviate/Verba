@@ -15,6 +15,15 @@ export interface CustomizationSettings extends MetaInformation {
         title: TextFieldSetting;
         subtitle: TextFieldSetting;
         image: ImageFieldSetting;
+        primary_color: ColorSetting;
+        secondary_color: ColorSetting;
+        warning_color: ColorSetting;
+        bg_color: ColorSetting;
+        bg_alt_color: ColorSetting;
+        text_color: ColorSetting;
+        text_alt_color: ColorSetting;
+        button_color: ColorSetting;
+        button_hover_color: ColorSetting;
     }
 }
 
@@ -45,6 +54,12 @@ export interface CheckboxSetting {
     description: string;
 }
 
+export interface ColorSetting {
+    type: 'color';
+    color: string;
+    description: string;
+}
+
 // Base Settings
 
 export const BaseSettings: SettingsConfiguration = {
@@ -54,7 +69,16 @@ export const BaseSettings: SettingsConfiguration = {
         settings: {
             title: { text: "Verba", type: "text", description: "Title of the Page" },
             subtitle: { text: "The Golden RAGtriever", type: "text", description: "Subtitle of the Page" },
-            image: { src: "https://github.com/weaviate/Verba/blob/main/frontend/public/favicon.png?raw=true", type: "image", description: "Logo of the Page" }
+            image: { src: "https://github.com/weaviate/Verba/blob/main/frontend/public/favicon.png?raw=true", type: "image", description: "Logo of the Page" },
+            primary_color: { color: "#FDFF91", type: "color", description: "Primary Color" },
+            secondary_color: { color: "#90FFA8", type: "color", description: "Secondary Color" },
+            warning_color: { color: "#FF8399", type: "color", description: "Accent Color" },
+            bg_color: { color: "#FEF7F7", type: "color", description: "Background Color" },
+            bg_alt_color: { color: "#FFFFFF", type: "color", description: "Alternative Background Color" },
+            text_color: { color: "#161616", type: "color", description: "Text Color" },
+            text_alt_color: { color: "#8E8E8E", type: "color", description: "Alternative Text Color" },
+            button_color: { color: "#EFEFEF", type: "color", description: "Button Color" },
+            button_hover_color: { color: "#DCDCDC", type: "color", description: "Button Hover Color" }
         }
 
     },

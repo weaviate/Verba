@@ -36,19 +36,19 @@ const ImageFieldComponent: React.FC<ImageFieldComponentProps> = ({ title, ImageF
     };
 
     return (
-        <div className='flex justify-center items-center gap-4'>
-            <div className='flex w-1/3'>
+        <div className='flex flex-col justify-center gap-1'>
+            <div className='flex justify-center items-center'>
                 <p>
                     {ImageFieldSetting.description}
                 </p>
             </div>
-            <div className='flex w-2/3'>
+            <div className='flex justify-center items-center'>
                 <div>
                     <div className="flex justify-center items-center mt-4">
-                        <img src={(settingsConfig[setting].settings as any)[title].src} alt="Logo" className="max-w-xs max-h-52 rounded-xl" />
+                        <img src={(settingsConfig[setting].settings as any)[title].src} alt="Logo" className="max-w-xs max-h-32 rounded-xl" />
                     </div>
                     <div className='flex justify-center items-center mt-1'>
-                        <button onClick={() => document.getElementById("LogoImageInput")?.click()} className="btn text-xs bg-verba text-text-alt-verba">Add Logo</button>
+                        <button onClick={() => document.getElementById("LogoImageInput")?.click()} className="btn border-none text-xs bg-bg-verba text-text-alt-verba">Add Logo</button>
                         <input id={"LogoImageInput"} type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
                     </div>
                 </div>
