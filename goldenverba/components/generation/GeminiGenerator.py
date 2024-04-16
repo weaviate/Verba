@@ -98,6 +98,7 @@ class GeminiGenerator(Generator):
                 system_instruction=self.system_instruction,
             )
             # response = generative_multimodal_model.generate_content(messages)
+            msg.info(f"Generated Messages: {[message.role for message in messages]}")
 
             completion = await generative_multimodal_model.generate_content_async(
                 stream=True, contents=messages
@@ -111,19 +112,15 @@ class GeminiGenerator(Generator):
                 while True:
                     chunk = await iter.__anext__()
                     if len(chunk.candidates) > 0:
-                        msg.info(chunk.candidates[0])
-                        if len(chunk.candidates[0].content.parts[0].text) > 0:
-                            yield {
-                                "message": chunk.candidates[0].content.parts[0].text,
-                                "finish_reason": chunk.candidates[0].finish_reason,
-                            }
-                        else:
-                            yield {
-                                "message": "",
-                                "finish_reason": chunk.candidates[0].finish_reason,
-                            }
+                        yield {
+                            "message": chunk.candidates[0].content.parts[0].text,
+                            "finish_reason": chunk.candidates[0].finish_reason,
+                        }
             except StopAsyncIteration:
-                msg.info("DONE")
+                yield {
+                                "message": "",
+                                "finish_reason": "stop",
+                            }
                 pass
 
         except Exception:
@@ -164,17 +161,32 @@ class GeminiGenerator(Generator):
             )
         )
         
+        # messages.append(
+        #     Content(
+        #         role="model",
+        #         parts=[
+        #             Part.from_text(
+        #                 f"answer:"
+        #             )
+        #         ],
+        #     )
+        # )
+        
         messages = self.ensure_user_model_alteration(messages)
         
-        msg.info(f"Generated Messages: {[message.role for message in messages]}")
-
+       
         return messages
     
     def ensure_user_model_alteration(self, messages: list[Content]) -> list[Content]:
-        
+        msg.info(f"Generated raw Messages: {[message.role for message in messages]}")
+        msg.info(f"Generated raw Messages: {[message.text[:30] for message in messages]}")
         current_role: str = ""
         
         new_messages: list[Content] = []
+        
+        for message in messages:
+            if message.role == "system":
+                message.role = "model"
         
 
         
@@ -184,6 +196,9 @@ class GeminiGenerator(Generator):
             else:
                 new_messages.append(message)
                 current_role = message.role
+                
+        msg.info(f"Generated cleaned Messages: {[message.role for message in new_messages]}")
+        msg.info(f"Generated cleaned Messages: {[message.text[:30] for message in new_messages]}")
         
         return new_messages
                 
