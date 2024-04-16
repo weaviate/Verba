@@ -36,6 +36,7 @@ setup(
         "tiktoken==0.5.1",
         "cohere==4.33",
         "accelerate==0.29.2",
+        "vertexai==1.46.0",
         "requests",
         "pypdf2",
     ],

@@ -286,6 +286,12 @@ class VerbaManager:
             self.installed_libraries["openai"] = True
         except Exception:
             self.installed_libraries["openai"] = False
+        try:
+            import vertexai
+
+            self.installed_libraries["google-cloud-aiplatform"] = True
+        except Exception:
+            self.installed_libraries["google-cloud-aiplatform"] = False
 
         try:
             import cohere
@@ -381,6 +387,21 @@ class VerbaManager:
             self.environment_variables["OPENAI_API_VERSION"] = True
         else:
             self.environment_variables["OPENAI_API_VERSION"] = False
+        # OpenAI API Version
+        if os.environ.get("OPENAI_API_VERSION", "") != "":
+            self.environment_variables["OPENAI_API_VERSION"] = True
+        else:
+            self.environment_variables["OPENAI_API_VERSION"] = False
+        # OpenAI API Version
+        if os.environ.get("GOOGLE_CLOUD_PROJECT", "") != "":
+            self.environment_variables["GOOGLE_CLOUD_PROJECT"] = True
+        else:
+            self.environment_variables["GOOGLE_CLOUD_PROJECT"] = False
+        # OpenAI API Version
+        if os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "") != "":
+            self.environment_variables["GOOGLE_APPLICATION_CREDENTIALS"] = True
+        else:
+            self.environment_variables["GOOGLE_APPLICATION_CREDENTIALS"] = False
 
         # Azure openai ressource name, mandatory when using Azure, should be XXX when endpoint is https://XXX.openai.azure.com
         if os.environ.get("AZURE_OPENAI_RESOURCE_NAME", "") != "":
