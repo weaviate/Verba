@@ -301,6 +301,28 @@ Verba supports Cohere Models, to use them, you need to specify the `COHERE_API_K
 COHERE_API_KEY=YOUR-COHERE-KEY
 ```
 
+## Google Embeddings
+
+For the Google Embeddings, we are using Vertex AI Studio inside Google Cloud. Instructions for obtaining a key are [here](https://cloud.google.com/iam/docs/create-short-lived-credentials-direct). If you have the `gcloud` CLI installed, you can run the following command: `gcloud auth print-access-token`. **Unfortunately, this acccess token must be renewed every hour.**
+
+You also need to set the `GOOGLE_CLOUD_PROJECT` environment variable to the name of your project.
+
+```
+GOOGLE_API_KEY=YOUR-GOOGLE-KEY
+GOOGLE_CLOUD_PROJECT=YOUR-CLOUD-PROJECT-KEY
+```
+
+## Google Gemini
+
+To use Google Gemini, you need a service account key, which is a JSON file. To obtain this, go to "project settings" in your Google Cloud console, then to "service accounts". Create a new service account, then create a new key. Download this key and place it in the route of Verba. Name it `gemini_secrets.json` to have it excluded from git automatically. Set the environment variable `GOOGLE_APPLICATION_CREDENTIALS` to the location of this file, e.g. `gemini_secrets.json`.
+
+You also need to set the `GOOGLE_CLOUD_PROJECT` environment variable to the name of your project.
+
+```
+GOOGLE_APPLICATION_CREDENTIALS=LOCATION-OF-YOUR-KEY
+GOOGLE_CLOUD_PROJECT=YOUR-CLOUD-PROJECT-KEY
+```
+
 ## HuggingFace
 
 Verba supports HuggingFace models, such as SentenceTransformers and Llama2. To use them you need the `HF_TOKEN` environment variable. You can get it from [HuggingFace](https://huggingface.co/)
