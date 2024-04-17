@@ -45,8 +45,7 @@ setup(
             "sentence-transformers",
             "transformers",
             "torch",
-            "huggingface_hub",
-            "accelerate",
+            "huggingface_hub"
         ],
     },
 )
