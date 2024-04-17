@@ -144,7 +144,6 @@ class QueryPayload(BaseModel):
 class ConversationItem(BaseModel):
     type: str
     content: str
-    typewriter: bool
 
 
 class GeneratePayload(BaseModel):
@@ -519,7 +518,7 @@ async def query(payload: QueryPayload):
     try:
         chunks, context = manager.retrieve_chunks([payload.query])
 
-        results = [
+        retrieved_chunks = [
             {
                 "text": chunk.text,
                 "doc_name": chunk.doc_name,
@@ -536,14 +535,14 @@ async def query(payload: QueryPayload):
         if len(chunks) == 0:
             return JSONResponse(
                 content={
-                    "documents": [],
+                    "chunks": [],
                     "context": "",
                 }
             )
 
         return JSONResponse(
             content={
-                "documents": results,
+                "chunks": retrieved_chunks,
                 "context": context,
             }
         )

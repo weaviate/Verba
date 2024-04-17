@@ -2,10 +2,13 @@
 'use client'
 
 import React, { useState, useEffect } from 'react';
-import Navbar from './components/Navigation/navbar'
-import SettingsComponent from "./components/Settings/settings_component"
+import Navbar from './components/Navigation/NavbarComponent'
+import SettingsComponent from "./components/Settings/SettingsComponent"
+import ChatComponent from './components/Chat/ChatComponent';
 import { Settings, BaseSettings } from "./components/Settings/types"
 import { Inter, Plus_Jakarta_Sans, Open_Sans, PT_Mono } from "next/font/google";
+
+import { detectHost } from "./api"
 
 // Fonts
 const inter = Inter({ subsets: ["latin"] });
@@ -34,9 +37,29 @@ export default function Home() {
   const fontKey = baseSetting[settingTemplate].Customization.settings.font.value as FontKey; // Safely cast if you're sure, or use a check
   const fontClassName = fonts[fontKey]?.className || "";
 
+  const [APIHost, setAPIHost] = useState<string | null>(null)
+
+  useEffect(() => {
+    const fetchHost = async () => {
+      try {
+        const host = await detectHost();
+        setAPIHost(host);
+      } catch (error) {
+        console.error('Error detecting host:', error);
+        setAPIHost(null); // Optionally handle the error by setting the state to an empty string or a specific error message
+      }
+    };
+
+    fetchHost();
+  }, []);
+
   return (
     <main className={`min-h-screen p-5 bg-bg-verba text-text-verba ${fontClassName}`} data-theme={baseSetting[settingTemplate].Customization.settings.theme}>
       <Navbar title={baseSetting[settingTemplate].Customization.settings.title.text} subtitle={baseSetting[settingTemplate].Customization.settings.subtitle.text} imageSrc={baseSetting[settingTemplate].Customization.settings.image.src} version='v1.0.0' currentPage={currentPage} setCurrentPage={setCurrentPage} />
+
+      {currentPage === "CHAT" && (
+        <ChatComponent settingConfig={baseSetting[settingTemplate]} APIHost={APIHost} />
+      )}
 
       {currentPage === "SETTINGS" && (
         <SettingsComponent settingTemplate={settingTemplate} setSettingTemplate={setSettingTemplate} baseSetting={baseSetting} setBaseSetting={setBaseSetting} />

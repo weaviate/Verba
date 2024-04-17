@@ -15,7 +15,7 @@ import ColorFieldComponent from './ColorFieldComponent';
 import SelectComponent from './SelectFieldComponent';
 import CheckComponent from './CheckFieldComponent';
 
-import SettingButton from "./settings_button"
+import SettingButton from "./SettingsButton"
 
 interface SettingsComponentProps {
     settingTemplate: string

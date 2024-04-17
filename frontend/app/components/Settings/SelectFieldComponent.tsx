@@ -40,7 +40,7 @@ const SelectComponent: React.FC<SelectComponentProps> = ({ title, SelectSetting,
             <div className='flex items-center justify-center'>
                 <select value={(settingsConfig[setting].settings as any)[title].value} onChange={handleChange} className="select bg-bg-verba">
                     {SelectSetting.options.map((template) => (
-                        <option>{template}</option>
+                        <option key={"Select_" + template} >{template}</option>
                     ))}
                 </select>
             </div>

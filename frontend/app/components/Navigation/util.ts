@@ -7,7 +7,6 @@ export async function getGitHubStars(): Promise<any> {
         const data: any = await response.json()
 
         if (data) {
-            console.log("Stars " + data.stargazers_count)
             return data.stargazers_count
         } else {
             return 0

@@ -11,8 +11,8 @@ import { FaGithub } from "react-icons/fa";
 import { IoBuildSharp } from "react-icons/io5";
 import { LuMenu } from "react-icons/lu";
 
-import NavbarButton from "./nav_button"
-import { getGitHubStars } from "./actions"
+import NavbarButton from "./NavButton"
+import { getGitHubStars } from "./util"
 
 interface NavbarProps {
   imageSrc: string;
@@ -45,7 +45,6 @@ const Navbar: React.FC<NavbarProps> = ({ imageSrc, title, subtitle, version, cur
         if (response) {
           // Now response is the resolved value of the promise
           const formatedStars = formatGitHubNumber(response);
-          console.log(formatedStars);
           setGitHubStars(formatedStars);
         }
       } catch (error) {
@@ -91,8 +90,8 @@ const Navbar: React.FC<NavbarProps> = ({ imageSrc, title, subtitle, version, cur
           <div className="hidden sm:block sm:h-[3vh] lg:h-[5vh] bg-text-alt-verba w-px mx-1"></div>
 
           <button className={`md:hidden btn md:btn-sm lg:btn-md lg:flex items-center justify-center border-none bg-secondary-verba hover:bg-button-hover-verba`} onClick={handleGitHubClick}>
-            <FaGithub size={icon_size} className='' />
-            <p className="text-xs sm:hidden md:flex ">{gitHubStars}</p>
+            <FaGithub size={icon_size} className='text-text-verba' />
+            <p className="text-xs sm:hidden md:flex text-text-verba ">{gitHubStars}</p>
           </button>
           <p className="hidden lg:flex text-xs text-text-alt-verba">{version}</p>
         </div>

@@ -18,6 +18,8 @@ export interface CustomizationSettings extends MetaInformation {
     settings: {
         title: TextFieldSetting;
         subtitle: TextFieldSetting;
+        intro_message: TextFieldSetting;
+        placeholder_message: TextFieldSetting;
         image: ImageFieldSetting;
         primary_color: ColorSetting;
         secondary_color: ColorSetting;
@@ -87,6 +89,8 @@ const BaseCustomization: CustomizationSettings = {
     settings: {
         title: { text: "Verba", type: "text", description: "Title of the Page" },
         subtitle: { text: "The Golden RAGtriever", type: "text", description: "Subtitle of the Page" },
+        intro_message: { text: "Welcome to Verba, your open-source RAG application!", type: "text", description: "Intro Message" },
+        placeholder_message: { text: "Ask Verba anything!", type: "text", description: "Input Placeholder" },
         image: { src: "https://github.com/weaviate/Verba/blob/main/frontend/public/favicon.png?raw=true", type: "image", description: "Logo of the Page" },
         primary_color: { color: "#FDFF91", type: "color", description: "Primary Color" },
         secondary_color: { color: "#90FFA8", type: "color", description: "Secondary Color" },
@@ -108,6 +112,8 @@ const CustomCustomization: CustomizationSettings = {
     settings: {
         title: { text: "My RAG", type: "text", description: "Title of the Page" },
         subtitle: { text: "Powered by Weaviate", type: "text", description: "Subtitle of the Page" },
+        intro_message: { text: "Welcome to Verba, your open-source RAG application!", type: "text", description: "Intro Message" },
+        placeholder_message: { text: "Ask Verba anything!", type: "text", description: "Input Placeholder" },
         image: { src: "https://github.com/weaviate/Verba/blob/main/frontend/public/favicon.png?raw=true", type: "image", description: "Logo of the Page" },
         primary_color: { color: "#FDFF91", type: "color", description: "Primary Color" },
         secondary_color: { color: "#90FFA8", type: "color", description: "Secondary Color" },
@@ -129,6 +135,8 @@ const DarkModeCustomization: CustomizationSettings = {
     settings: {
         title: { text: "Verba", type: "text", description: "Title of the Page" },
         subtitle: { text: "The Dark RAGtriever", type: "text", description: "Subtitle of the Page" },
+        intro_message: { text: "Welcome to the dark mode version of Verba! Spooky, right?", type: "text", description: "Intro Message" },
+        placeholder_message: { text: "Ask anything!", type: "text", description: "Input Placeholder" },
         image: { src: "https://github.com/weaviate/Verba/blob/main/frontend/public/favicon.png?raw=true", type: "image", description: "Logo of the Page" },
         primary_color: { color: "#BB86FC", type: "color", description: "Primary Color" },
         secondary_color: { color: "#008F82", type: "color", description: "Secondary Color" },
@@ -152,6 +160,8 @@ const WeaviateCustomization: CustomizationSettings = {
     settings: {
         title: { text: "Weaviate Verba", type: "text", description: "Title of the Page" },
         subtitle: { text: "Chatbot for Weaviate", type: "text", description: "Subtitle of the Page" },
+        intro_message: { text: "Welcome to Weaviate, your AI-Native vector database. How can I help you with Weaviate today?", type: "text", description: "Intro Message" },
+        placeholder_message: { text: "Ask all questions related to Weaviate", type: "text", description: "Input Placeholder" },
         image: { src: "https://github.com/weaviate/Verba/blob/1.0.0/frontend/public/weaviate.png?raw=true", type: "image", description: "Logo of the Page" },
         primary_color: { color: "#6BDF4A", type: "color", description: "Primary Color" },
         secondary_color: { color: "#7AD6EB", type: "color", description: "Secondary Color" },
