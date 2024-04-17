@@ -1,5 +1,5 @@
 from wasabi import msg
-from weaviate import Client
+from weaviate import WeaviateClient
 
 from goldenverba.components.chunking.chunk import Chunk
 from goldenverba.components.embedding.interface import Embedder
@@ -20,10 +20,10 @@ class RetrieverManager:
     def retrieve(
         self,
         queries: list[str],
-        client: Client,
+        client: WeaviateClient,
         embedder: Embedder,
         generator: Generator,
-    ) -> list[Chunk]:
+    ) -> tuple[list[Chunk], str]:
         """Ingest data into Weaviate
         @parameter: queries : list[str] - List of queries
         @parameter: client : Client - Weaviate client

@@ -5,8 +5,8 @@ from dotenv import load_dotenv
 
 from tqdm import tqdm
 from wasabi import msg
-from weaviate import Client
-
+from weaviate import WeaviateClient, Collection, WeaviateProperties, Filter, UUID
+from verba_types import DocumentType, SuggestionType, VectorizerOrEmbeddingType
 from goldenverba.components.component import VerbaComponent
 from goldenverba.components.reader.document import Document
 from goldenverba.components.reader.interface import InputForm
@@ -18,17 +18,20 @@ from goldenverba.components.schema.schema_generation import (
 
 load_dotenv()
 
+
 class Embedder(VerbaComponent):
     """
     Interface for Verba Embedding.
     """
 
-    def __init__(self):
+    def __init__(self, vectorizer: VectorizerOrEmbeddingType):
         super().__init__()
         self.input_form = InputForm.TEXT.value  # Default for all Embedders
-        self.vectorizer = ""
+        self.vectorizer = vectorizer
 
-    def embed(documents: list[Document], client: Client, batch_size: int = 100) -> bool:
+    def embed(
+        self, documents: list[Document], client: WeaviateClient, batch_size: int = 100
+    ) -> bool:
         """Embed verba documents and its chunks to Weaviate
         @parameter: documents : list[Document] - List of Verba documents
         @parameter: client : Client - Weaviate Client
@@ -37,10 +40,22 @@ class Embedder(VerbaComponent):
         """
         raise NotImplementedError("embed method must be implemented by a subclass.")
 
+    def check_valid_vectorizer(self) -> bool:
+        """Checks if the vectorizer is available in the Weaviate instance
+        @parameter client : WeaviateClient - Weaviate Client
+        @returns bool - Bool whether the vectorizer is available.
+        """
+        # TODO: consider class
+        if self.vectorizer.name not in [
+            vectorizer.name for vectorizer in VECTORIZERS
+        ] and self.vectorizer.name not in [embedding.name for embedding in EMBEDDINGS]:
+            return False
+        return True
+
     def import_data(
         self,
         documents: list[Document],
-        client: Client,
+        client: WeaviateClient,
     ) -> bool:
         """Import verba documents and its chunks to Weaviate
         @parameter: documents : list[Document] - List of Verba documents
@@ -48,8 +63,9 @@ class Embedder(VerbaComponent):
         @parameter: batch_size : int - Batch Size of Input
         @returns bool - Bool whether the embedding what successful.
         """
+        # TODO: target vector
         try:
-            if self.vectorizer not in VECTORIZERS and self.vectorizer not in EMBEDDINGS:
+            if not self.check_valid_vectorizer():
                 msg.fail(f"Vectorizer of {self.name} not found")
                 return False
 
@@ -75,29 +91,25 @@ class Embedder(VerbaComponent):
                     f"({i+1}/{len(documents)}) Importing document {document.name} with {len(batches)} batches"
                 )
 
-                with client.batch as batch:
-                    batch.batch_size = 1
-                    properties = {
-                        "text": str(document.text),
+                doc_class = client.collections.get(self.get_document_class())
+
+                uuid = doc_class.data.insert(
+                    properties={
                         "doc_name": str(document.name),
                         "doc_type": str(document.type),
                         "doc_link": str(document.link),
                         "chunk_count": len(document.chunks),
-                        "timestamp": str(document.timestamp),
                     }
+                )
 
-                    class_name = "Document_" + strip_non_letters(self.vectorizer)
-                    uuid = client.batch.add_data_object(properties, class_name)
-
-                    for chunk in document.chunks:
-                        chunk.set_uuid(uuid)
+                for chunk in document.chunks:
+                    chunk.set_uuid(uuid)
 
                 chunk_count = 0
                 for _batch_id, chunk_batch in tqdm(
                     enumerate(batches), total=len(batches), desc="Importing batches"
                 ):
-                    with client.batch as batch:
-                        batch.batch_size = len(chunk_batch)
+                    with client.batch.fixed_size(len(chunk_batch)) as batch:
                         for i, chunk in enumerate(chunk_batch):
                             chunk_count += 1
 
@@ -108,26 +120,37 @@ class Embedder(VerbaComponent):
                                 "doc_type": chunk.doc_type,
                                 "chunk_id": chunk.chunk_id,
                             }
-                            class_name = "Chunk_" + strip_non_letters(self.vectorizer)
+                            class_name = "Chunk"
 
                             # Check if vector already exists
+                            # Target vector: check how to specify target vector (but not vector itself)
                             if chunk.vector is None:
-                                client.batch.add_data_object(properties, class_name)
-                            else:
-                                client.batch.add_data_object(
-                                    properties, class_name, vector=chunk.vector
+                                batch.add_object(
+                                    collection=class_name,
+                                    properties=properties,
                                 )
-                            
-                            wait_time_ms = int(os.getenv("WAIT_TIME_BETWEEN_INGESTION_QUERIES_MS","0"))
-                            if wait_time_ms>0:
-                                time.sleep(float(wait_time_ms)/1000)
+                            else:
+                                batch.add_object(
+                                    collection=class_name,
+                                    properties=properties,
+                                    vector={
+                                        self.vectorizer.name: chunk.vector,
+                                    },
+                                )
+
+                            wait_time_ms = int(
+                                os.getenv("WAIT_TIME_BETWEEN_INGESTION_QUERIES_MS", "0")
+                            )
+                            if wait_time_ms > 0:
+                                time.sleep(float(wait_time_ms) / 1000)
 
                 self.check_document_status(
                     client,
                     uuid,
                     document.name,
-                    "Document_" + strip_non_letters(self.vectorizer),
-                    "Chunk_" + strip_non_letters(self.vectorizer),
+                    "Document",
+                    "Chunk",
+                    self.vectorizer,
                     len(document.chunks),
                 )
             return True
@@ -136,11 +159,12 @@ class Embedder(VerbaComponent):
 
     def check_document_status(
         self,
-        client: Client,
-        doc_uuid: str,
+        client: WeaviateClient,
+        doc_uuid: UUID,
         doc_name: str,
         doc_class_name: str,
         chunk_class_name: str,
+        target_vector: VectorizerOrEmbeddingType,
         chunk_count: int,
     ):
         """Verifies that imported documents and its chunks exist in the database, if not, remove everything that was added and rollback
@@ -152,41 +176,35 @@ class Embedder(VerbaComponent):
         @parameter: chunk_count : int - Number of expected chunks
         @returns Optional[Exception] - Raises Exceptions if imported fail, will be catched by the manager.
         """
-        document = client.data_object.get_by_id(
-            doc_uuid,
-            class_name=doc_class_name,
-        )
+        # TODO: target vector
+
+        doc_class = client.collections.get(doc_class_name)
+
+        document = doc_class.query.fetch_object_by_id(doc_uuid)
 
         if document is not None:
-            results = (
-                client.query.get(
-                    class_name=chunk_class_name,
-                    properties=[
-                        "doc_name",
-                    ],
-                )
-                .with_where(
-                    {
-                        "path": ["doc_uuid"],
-                        "operator": "Equal",
-                        "valueText": doc_uuid,
-                    }
-                )
-                .with_limit(chunk_count + 1)
-                .do()
+            results = doc_class.query.fetch_objects(
+                filters=Filter.by_property("doc_name").equal(doc_name),
+                limit=chunk_count + 1,
+                return_properties=DocumentType,
+                target_vector=target_vector.name,
             )
 
-            if len(results["data"]["Get"][chunk_class_name]) != chunk_count:
+            if len(results.objects) != chunk_count:
                 # Rollback if fails
                 self.remove_document(client, doc_name, doc_class_name, chunk_class_name)
                 raise Exception(
-                    f"Chunk mismatch for {doc_uuid} {len(results['data']['Get'][chunk_class_name])} != {chunk_count}"
+                    f"Chunk mismatch for {doc_uuid} {len(results.objects)} != {chunk_count}"
                 )
         else:
             raise Exception(f"Document {doc_uuid} not found {document}")
 
     def remove_document(
-        self, client: Client, doc_name: str, doc_class_name: str, chunk_class_name: str
+        self,
+        client: WeaviateClient,
+        doc_name: str,
+        doc_class_name: str,
+        chunk_class_name: str,
     ) -> None:
         """Deletes documents and its chunks
         @parameter: client : Client - Weaviate Client
@@ -194,78 +212,77 @@ class Embedder(VerbaComponent):
         @parameter: doc_class_name : str - Class name of Document
         @parameter: chunk_class_name : str - Class name of Chunks.
         """
-        client.batch.delete_objects(
-            class_name=doc_class_name,
-            where={"path": ["doc_name"], "operator": "Equal", "valueText": doc_name},
+        # TODO: currently deletes ALL vectors!
+
+        doc_collection = client.collections.get(doc_class_name)
+
+        doc_collection.data.delete_many(
+            where=Filter.by_property("doc_name").equal(doc_name)
         )
 
-        client.batch.delete_objects(
-            class_name=chunk_class_name,
-            where={"path": ["doc_name"], "operator": "Equal", "valueText": doc_name},
+        chunk_collection = client.collections.get(chunk_class_name)
+
+        chunk_collection.data.delete_many(
+            where=Filter.by_property("doc_name").equal(doc_name)
         )
 
         msg.warn(f"Deleted document {doc_name} and its chunks")
 
-    def remove_document_by_id(self, client: Client, doc_id: str):
-        doc_class_name = "Document_" + strip_non_letters(self.vectorizer)
-        chunk_class_name = "Chunk_" + strip_non_letters(self.vectorizer)
+    def remove_document_by_id(self, client: WeaviateClient, doc_id: str):
+        # TODO: currently deletes ALL vectors!
+        doc_class_name = "Document"
+        chunk_class_name = "Chunk"
 
-        client.data_object.delete(uuid=doc_id, class_name=doc_class_name)
+        chunk_collection = client.collections.get(chunk_class_name)
 
-        client.batch.delete_objects(
-            class_name=chunk_class_name,
-            where={"path": ["doc_uuid"], "operator": "Equal", "valueText": doc_id},
-        )
+        chunk_collection.data.delete_by_id(doc_id)
+
+        doc_collection = client.collections.get(doc_class_name)
+
+        doc_collection.data.delete_by_id(doc_id)
 
         msg.warn(f"Deleted document {doc_id} and its chunks")
 
     def get_document_class(self) -> str:
-        return "Document_" + strip_non_letters(self.vectorizer)
+        return "Document"
 
     def get_chunk_class(self) -> str:
-        return "Chunk_" + strip_non_letters(self.vectorizer)
+        return "Chunk"
 
     def get_cache_class(self) -> str:
-        return "Cache_" + strip_non_letters(self.vectorizer)
+        return "Cache"
 
-    def search_documents(self, client: Client, query: str, doc_type: str) -> list:
+    def search_documents(
+        self, client: WeaviateClient, query: str, doc_type: str
+    ) -> list:
         """Search for documents from Weaviate
         @parameter query_string : str - Search query
         @returns list - Document list.
         """
-        doc_class_name = "Document_" + strip_non_letters(self.vectorizer)
+        doc_class_name = "Document"
+
+        doc_class = client.collections.get(doc_class_name)
 
         if doc_type == "" or doc_type is None:
-            query_results = (
-                client.query.get(
-                    class_name=doc_class_name,
-                    properties=["doc_name", "doc_type", "doc_link"],
-                )
-                .with_bm25(query, properties=["doc_name"])
-                .with_additional(properties=["id"])
-                .with_limit(100)
-                .do()
+            query_results = doc_class.query.hybrid(
+                query=query,
+                alpha=0,
+                filters=Filter.by_property("doc_type").equal(doc_type),
+                limit=10000,
+                return_properties=DocumentType,
+                target_vector=self.vectorizer.name,
             )
         else:
-            query_results = (
-                client.query.get(
-                    class_name=doc_class_name,
-                    properties=["doc_name", "doc_type", "doc_link"],
-                )
-                .with_bm25(query, properties=["doc_name"])
-                .with_where(
-                    {
-                        "path": ["doc_type"],
-                        "operator": "Equal",
-                        "valueText": doc_type,
-                    }
-                )
-                .with_additional(properties=["id"])
-                .with_limit(100)
-                .do()
+            query_results = doc_class.query.hybrid(
+                query=query,
+                alpha=0,
+                filters=Filter.by_property("doc_type").equal(doc_type),
+                limit=10000,
+                return_properties=DocumentType,
+                target_vector=self.vectorizer.name,
             )
 
-        results = query_results["data"]["Get"][doc_class_name]
+        results = query_results.objects
         return results
 
     def get_need_vectorization(self) -> bool:
@@ -293,7 +310,7 @@ class Embedder(VerbaComponent):
         return query.lower()
 
     def retrieve_semantic_cache(
-        self, client: Client, query: str, dist: float = 0.04
+        self, client: WeaviateClient, query: str, dist: float = 0.04
     ) -> str:
         """Retrieve results from semantic cache based on query and distance threshold
         @parameter query - str - User query
@@ -302,72 +319,57 @@ class Embedder(VerbaComponent):
         """
         needs_vectorization = self.get_need_vectorization()
 
-        match_results = (
-            client.query.get(
-                class_name=self.get_cache_class(),
-                properties=["query", "system"],
-            )
-            .with_where(
-                {
-                    "path": ["query"],
-                    "operator": "Equal",
-                    "valueText": query,
-                }
-            )
-            .with_limit(1)
-        ).do()
+        match_results = client.collections.get(
+            self.get_cache_class()
+        ).query.fetch_objects(
+            filters=Filter.by_property("query").equal(query),
+            limit=1,
+            return_properties=SuggestionType,
+        )
 
-        if "data" in match_results and len(match_results["data"]["Get"][self.get_cache_class()]) > 0 and (
-            query
-            == match_results["data"]["Get"][self.get_cache_class()][0]["query"]
+        cache_class = client.collections.get(self.get_cache_class())
+
+        if (
+            match_results is not None
+            and len(match_results.objects) > 0
+            and (query == match_results.objects[0].properties.get("query"))
         ):
             msg.good("Direct match from cache")
             return (
-                match_results["data"]["Get"][self.get_cache_class()][0][
-                    "system"
-                ],
+                match_results.objects[0].properties.get("system"),
                 0.0,
             )
 
-        query_results = (
-            client.query.get(
-                class_name=self.get_cache_class(),
-                properties=["query", "system"],
-            )
-            .with_additional(properties=["distance"])
-            .with_limit(1)
-        )
-
         if needs_vectorization:
             vector = self.vectorize_query(query)
-            query_results = query_results.with_near_vector(
-                content={"vector": vector},
-            ).do()
+            query_results = cache_class.query.near_vector(
+                near_vector=vector, return_properties=SuggestionType
+            )
 
         else:
-            query_results = query_results.with_near_text(
-                content={"concepts": [query]},
-            ).do()
+            query_results = cache_class.query.near_text(
+                query=query, return_properties=SuggestionType
+            )
 
-        if "data" not in query_results:
+        if len(query_results.objects) == 0:
             msg.warn(query_results)
             return None, None
 
-        results = query_results["data"]["Get"][self.get_cache_class()]
+        results = query_results.objects
 
         if not results:
             return None, None
 
         result = results[0]
 
-        if float(result["_additional"]["distance"]) <= dist:
+        if float(result.metadata.distance) <= dist:
             msg.good("Retrieved similar from cache")
-            return result["system"], float(result["_additional"]["distance"])
+            return result.properties.get("system"), float(result.metadata.distance)
 
         else:
             return None, None
 
-    def add_to_semantic_cache(self, client: Client, query: str, system: str):
+    def add_to_semantic_cache(self, client: WeaviateClient, query: str, system: str):
         """Add results to semantic cache
         @parameter query : str - User query
         @parameter results : list[dict] - Results from Weaviate
@@ -376,18 +378,12 @@ class Embedder(VerbaComponent):
         """
         needs_vectorization = self.get_need_vectorization()
 
-        with client.batch as batch:
-            batch.batch_size = 1
-            properties = {
-                "query": str(query),
-                "system": system,
-            }
-            msg.good("Saved to cache")
+        cache_class = client.collections.get(self.get_cache_class())
 
-            if needs_vectorization:
-                vector = self.vectorize_query(query)
-                client.batch.add_data_object(
-                    properties, self.get_cache_class(), vector=vector
-                )
-            else:
-                client.batch.add_data_object(properties, self.get_cache_class())
+        if needs_vectorization:
+            vector = self.vectorize_query(query)
+            cache_class.data.insert(
+                properties={"query": str(query), "system": system}, vector=vector
+            )
+        else:
+            cache_class.data.insert(properties={"query": str(query), "system": system})

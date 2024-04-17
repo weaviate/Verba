@@ -1,6 +1,6 @@
 import tiktoken
 from wasabi import msg
-from weaviate import Client
+from weaviate import WeaviateClient
 
 from goldenverba.components.chunking.chunk import Chunk
 from goldenverba.components.component import VerbaComponent
@@ -18,7 +18,7 @@ class Retriever(VerbaComponent):
     def retrieve(
         self,
         queries: list[str],
-        client: Client,
+        client: WeaviateClient,
         embedder: Embedder,
     ) -> tuple[list[Chunk], str]:
         """Ingest data into Weaviate

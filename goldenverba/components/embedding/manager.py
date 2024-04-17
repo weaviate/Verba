@@ -1,5 +1,5 @@
 from wasabi import msg
-from weaviate import Client
+from weaviate import WeaviateClient
 
 from goldenverba.components.embedding.ADAEmbedder import ADAEmbedder
 from goldenverba.components.embedding.CohereEmbedder import CohereEmbedder
@@ -18,7 +18,7 @@ class EmbeddingManager:
         self.selected_embedder: Embedder = self.embedders["ADAEmbedder"]
 
     def embed(
-        self, documents: list[Document], client: Client, batch_size: int = 100
+        self, documents: list[Document], client: WeaviateClient, batch_size: int = 100
     ) -> bool:
         """Embed verba documents and its chunks to Weaviate
         @parameter: documents : list[Document] - List of Verba documents

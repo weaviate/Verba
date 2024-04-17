@@ -1,12 +1,14 @@
 import os
 import ssl
-from typing import Optional
-
+from typing import Optional, List, TypedDict
+from weaviate.classes.query import Filter
+from verba_types import SuggestionType, DocumentType
 import weaviate
+from weaviate.connect import ConnectionParams
 from dotenv import load_dotenv
 from wasabi import msg
-from weaviate import Client
-from weaviate.embedded import EmbeddedOptions
+import weaviate
+
 
 import goldenverba.components.schema.schema_generation as schema_manager
 from goldenverba.components.chunking.chunk import Chunk
@@ -44,11 +46,9 @@ class VerbaManager:
         self.verify_variables()
 
         # Check if all schemas exist for all possible vectorizers
-        for vectorizer in schema_manager.VECTORIZERS:
-            schema_manager.init_schemas(self.client, vectorizer, False, True)
 
-        for embedding in schema_manager.EMBEDDINGS:
-            schema_manager.init_schemas(self.client, embedding, False, True)
+        schema_manager.init_schemas(self.client, False, True)
+        schema_manager.init_schemas(self.client, False, True)
 
     def import_data(
         self,
@@ -68,7 +68,7 @@ class VerbaManager:
 
         # Check if document names exist in DB
         for document in loaded_documents:
-            if not self.check_if_document_exits(document):
+            if not self.check_if_document_exists(document):
                 filtered_documents.append(document)
 
         modified_documents = self.chunker_manager.chunk(
@@ -177,7 +177,7 @@ class VerbaManager:
                 openai.api_version = os.getenv("OPENAI_API_VERSION")
 
             if os.getenv("OPENAI_API_TYPE") == "azure":
-                openai_header_key_name = "X-Azure-Api-Key"            
+                openai_header_key_name = "X-Azure-Api-Key"
 
             if openai_key != "":
                 additional_header[openai_header_key_name] = openai_key
@@ -199,17 +199,32 @@ class VerbaManager:
             weaviate_key = os.environ.get("WEAVIATE_API_KEY_VERBA", "")
             if weaviate_key != "":
                 self.environment_variables["WEAVIATE_API_KEY_VERBA"] = True
-                auth_config = weaviate.AuthApiKey(api_key=weaviate_key)
+                auth_config = weaviate.auth.AuthApiKey(api_key=weaviate_key)
                 msg.info("Auth information provided")
-                client = weaviate.Client(
-                    url=weaviate_url,
-                    additional_headers=additional_header,
+                client = weaviate.WeaviateClient(
+                    connection_params=ConnectionParams.from_params(
+                        http_host=weaviate_url,
+                        http_port=8099,
+                        http_secure=False,
+                        grpc_host=weaviate_url,
+                        grpc_port=50052,
+                        grpc_secure=False,
+                    ),
                     auth_client_secret=auth_config,
+                    additional_headers=additional_header,
                 )
+
             else:
                 msg.info("No Auth information provided")
-                client = weaviate.Client(
-                    url=weaviate_url,
+                client = weaviate.WeaviateClient(
+                    connection_params=ConnectionParams.from_params(
+                        http_host=weaviate_url,
+                        http_port=8099,
+                        http_secure=False,
+                        grpc_host=weaviate_url,
+                        grpc_port=50052,
+                        grpc_secure=False,
+                    ),
                     additional_headers=additional_header,
                 )
             self.environment_variables["WEAVIATE_URL_VERBA"] = True
@@ -226,23 +241,21 @@ class VerbaManager:
 
             msg.info("Using Weaviate Embedded")
             self.weaviate_type = "Weaviate Embedded"
-            client = weaviate.Client(
-                additional_headers=additional_header,
-                embedded_options=EmbeddedOptions(),
-            )
+            client = weaviate.connect_to_embedded(headers=additional_header)
 
         if client is not None:
             msg.good("Connected to Weaviate")
 
             # Batch Configuration
-            def batch_callback(logs: dict):
+            def batch_callback(logs: List[dict]):
                 if logs is not None:
                     for result in logs:
                         if "result" in result and "errors" in result["result"]:
                             if "error" in result["result"]["errors"]:
                                 msg.fail(result["result"])
 
-            client.batch.configure(callback=batch_callback)
+            # TODO: migrate
+            # client.batch.configure(callback=batch_callback)
 
         else:
             msg.fail("Connection to Weaviate failed")
@@ -356,7 +369,7 @@ class VerbaManager:
             self.environment_variables["LLAMA2-7B-CHAT-HF"] = True
         else:
             self.environment_variables["LLAMA2-7B-CHAT-HF"] = False
-        
+
         # OpenAI API Type, should be set to "azure" if using Azure OpenAI
         if os.environ.get("OPENAI_API_TYPE", "") != "":
             self.environment_variables["OPENAI_API_TYPE"] = True
@@ -375,43 +388,48 @@ class VerbaManager:
         else:
             self.environment_variables["AZURE_OPENAI_RESOURCE_NAME"] = False
 
-        #Model used for embeddings. mandatory when using Azure. Typically "text-embedding-ada-002"
+        # Model used for embeddings. mandatory when using Azure. Typically "text-embedding-ada-002"
         if os.environ.get("AZURE_OPENAI_EMBEDDING_MODEL", "") != "":
             self.environment_variables["AZURE_OPENAI_EMBEDDING_MODEL"] = True
         else:
             self.environment_variables["AZURE_OPENAI_EMBEDDING_MODEL"] = False
 
-        #Model used for queries. mandatory when using Azure, but can also be used to change the model used for queries when using OpenAI.
+        # Model used for queries. mandatory when using Azure, but can also be used to change the model used for queries when using OpenAI.
         if os.environ.get("OPENAI_MODEL", "") != "":
             self.environment_variables["OPENAI_MODEL"] = True
         else:
             self.environment_variables["OPENAI_MODEL"] = False
 
-        if os.environ.get("OPENAI_API_TYPE", "")=="azure":
-            if not(
-                self.environment_variables["OPENAI_BASE_URL"] and
-                self.environment_variables["AZURE_OPENAI_RESOURCE_NAME"] and
-                self.environment_variables["AZURE_OPENAI_EMBEDDING_MODEL"] and
-                self.environment_variables["OPENAI_MODEL"]
+        if os.environ.get("OPENAI_API_TYPE", "") == "azure":
+            if not (
+                self.environment_variables["OPENAI_BASE_URL"]
+                and self.environment_variables["AZURE_OPENAI_RESOURCE_NAME"]
+                and self.environment_variables["AZURE_OPENAI_EMBEDDING_MODEL"]
+                and self.environment_variables["OPENAI_MODEL"]
             ):
-                raise EnvironmentError("Missing environment variables. When using Azure OpenAI, you need to set OPENAI_BASE_URL, AZURE_OPENAI_RESOURCE_NAME, AZURE_OPENAI_EMBEDDING_MODEL and OPENAI_MODEL. Please check documentation.")
+                raise EnvironmentError(
+                    "Missing environment variables. When using Azure OpenAI, you need to set OPENAI_BASE_URL, AZURE_OPENAI_RESOURCE_NAME, AZURE_OPENAI_EMBEDDING_MODEL and OPENAI_MODEL. Please check documentation."
+                )
 
     def get_schemas(self) -> dict:
         """
         @returns dict - A dictionary with the schema names and their object count.
         """
-        schema_info = self.client.schema.get()
-        schemas = {}
+        schema_info = self.client.collections.list_all()
+        schemas: dict[str, int] = {}
 
-        for _class in schema_info["classes"]:
-            results = (
-                self.client.query.get(_class["class"])
-                .with_limit(10000)
-                .with_additional(properties=["id"])
-                .do()
+        for _, classconfig in schema_info.items():
+
+            count = (
+                self.client.collections.get(classconfig.name)
+                .aggregate.over_all(total_count=True)
+                .total_count
             )
 
-            schemas[_class["class"]] = len(results["data"]["Get"][_class["class"]])
+            if count is None:
+                count = 0
+
+            schemas[classconfig.name] = count
 
         return schemas
 
@@ -420,27 +438,19 @@ class VerbaManager:
         @parameter query : str - User query
         @returns list[str] - List of possible autocomplete suggestions.
         """
-        query_results = (
-            self.client.query.get(
-                class_name="Suggestion",
-                properties=["suggestion"],
-            )
-            .with_bm25(query=query)
-            .with_limit(3)
-            .do()
+
+        query_results = self.client.collections.get("Suggestion").query.bm25(
+            query=query, limit=3, return_properties=SuggestionType
         )
 
-        results = query_results["data"]["Get"]["Suggestion"]
+        results = [
+            result.properties.get("suggestion") for result in query_results.objects
+        ]
 
         if not results:
             return []
 
-        suggestions = []
-
-        for result in results:
-            suggestions.append(result["suggestion"])
-
-        return suggestions
+        return results
 
     def set_suggestions(self, query: str):
         """Adds suggestions to the suggestion class
@@ -450,35 +460,18 @@ class VerbaManager:
         production_key = os.environ.get("VERBA_PRODUCTION", "")
         if production_key == "True":
             return
-        check_results = (
-            self.client.query.get(
-                class_name="Suggestion",
-                properties=["suggestion"],
-            )
-            .with_where(
-                {
-                    "path": ["suggestion"],
-                    "operator": "Equal",
-                    "valueText": query,
-                }
-            )
-            .with_limit(1)
-            .do()
+
+        suggestions_collection = self.client.collections.get("Suggestion")
+
+        check_results = suggestions_collection.query.fetch_objects(
+            filters=Filter.by_property("suggestion").equal(query), limit=1
         )
-
-        if (
-            "data" in check_results
-            and len(check_results["data"]["Get"]["Suggestion"]) > 0
+        if (len(check_results.objects) > 0) and (
+            query == check_results.objects[0].properties.get("suggestion")
         ):
-            if query == check_results["data"]["Get"]["Suggestion"][0]["suggestion"]:
-                return
+            return
 
-        with self.client.batch as batch:
-            batch.batch_size = 1
-            properties = {
-                "suggestion": query,
-            }
-            self.client.batch.add_data_object(properties, "Suggestion")
+        suggestions_collection.data.insert(properties={"suggestion": query})
 
         msg.info("Added query to suggestions")
 
@@ -491,43 +484,34 @@ class VerbaManager:
         )
         return chunks, context
 
-    def retrieve_all_documents(self, doc_type: str) -> list:
+    def retrieve_all_documents(self, doc_type: str) -> List[Object[DocumentType, None]]:
         """Return all documents from Weaviate
         @returns list - Document list.
         """
+
+        documents_collection = self.client.collections.get("Document")
         class_name = "Document_" + schema_manager.strip_non_letters(
             self.embedder_manager.selected_embedder.vectorizer
         )
 
+        vectorizer = self.embedder_manager.selected_embedder.vectorizer
+
         if doc_type == "":
-            query_results = (
-                self.client.query.get(
-                    class_name=class_name,
-                    properties=["doc_name", "doc_type", "doc_link"],
-                )
-                .with_additional(properties=["id"])
-                .with_limit(10000)
-                .do()
+            query_results = documents_collection.query.fetch_objects(
+                filters=Filter.by_property("doc_type").equal(doc_type),
+                limit=10000,
+                return_properties=DocumentType,
+                target_vector=vectorizer
             )
         else:
-            query_results = (
-                self.client.query.get(
-                    class_name=class_name,
-                    properties=["doc_name", "doc_type", "doc_link"],
-                )
-                .with_additional(properties=["id"])
-                .with_where(
-                    {
-                        "path": ["doc_type"],
-                        "operator": "Equal",
-                        "valueText": doc_type,
-                    }
-                )
-                .with_limit(10000)
-                .do()
+            query_results = documents_collection.query.fetch_objects(
+                filters=Filter.by_property("doc_type").equal(doc_type),
+                limit=10000,
+                return_properties=DocumentType
+                target_vector=vectorizer
             )
 
-        results = query_results["data"]["Get"][class_name]
+        results = query_results.objects
         return results
 
     def retrieve_document(self, doc_id: str) -> dict:
@@ -535,15 +519,11 @@ class VerbaManager:
         @parameter doc_id : str - Document ID
         @returns dict - Document dict.
         """
-        class_name = "Document_" + schema_manager.strip_non_letters(
-            self.embedder_manager.selected_embedder.vectorizer
-        )
-
-        document = self.client.data_object.get_by_id(
-            doc_id,
-            class_name=class_name,
-        )
-        return document
+        
+        
+        documents_class = self.client.collections.get("Document")
+        document = documents_class.query.fetch_object_by_id(doc_id)
+        return document.properties.items()
 
     async def generate_answer(
         self, queries: list[str], contexts: list[str], conversation: dict
@@ -599,7 +579,9 @@ class VerbaManager:
 
         else:
             full_text = ""
-            async for result in self.generator_manager.selected_generator.generate_stream(
+            async for (
+                result
+            ) in self.generator_manager.selected_generator.generate_stream(
                 queries, contexts, conversation
             ):
                 full_text += result["message"]
@@ -610,14 +592,11 @@ class VerbaManager:
             )
 
     def reset(self):
-        self.client.schema.delete_class("Suggestion")
+        self.client.collections._delete("Suggestion")
         # Check if all schemas exist for all possible vectorizers
-        for vectorizer in schema_manager.VECTORIZERS:
-            schema_manager.reset_schemas(self.client, vectorizer)
 
-        for embedding in schema_manager.EMBEDDINGS:
-            schema_manager.reset_schemas(self.client, embedding)
-
+        schema_manager.reset_schemas(self.client)
+        
         for vectorizer in schema_manager.VECTORIZERS:
             schema_manager.init_schemas(self.client, vectorizer, False, True)
 
@@ -625,49 +604,33 @@ class VerbaManager:
             schema_manager.init_schemas(self.client, embedding, False, True)
 
     def reset_cache(self):
-        # Check if all schemas exist for all possible vectorizers
-        for vectorizer in schema_manager.VECTORIZERS:
-            class_name = "Cache_" + schema_manager.strip_non_letters(vectorizer)
-            self.client.schema.delete_class(class_name)
-            schema_manager.init_schemas(self.client, vectorizer, False, True)
 
-        for embedding in schema_manager.EMBEDDINGS:
-            class_name = "Cache_" + schema_manager.strip_non_letters(embedding)
-            self.client.schema.delete_class(class_name)
-            schema_manager.init_schemas(self.client, embedding, False, True)
+        self.client.collections._delete("Cache")
+    
+        schema_manager.init_schemas(self.client, vectorizer, False, True)
+
 
     def reset_suggestion(self):
-        self.client.schema.delete_class("Suggestion")
+        self.client.collections._delete("Suggestion")
         schema_manager.init_suggestion(self.client, "", False, True)
 
-    def check_if_document_exits(self, document: Document) -> bool:
+    def check_if_document_exists(self, document: Document) -> bool:
         """Return a document by it's ID (UUID format) from Weaviate
         @parameter document : Document - Document object
         @returns bool - Whether the doc name exist in the cluster.
         """
-        class_name = "Document_" + schema_manager.strip_non_letters(
-            self.embedder_manager.selected_embedder.vectorizer
+       
+        
+        vectorizer = self.embedder_manager.selected_embedder.vectorizer
+
+        results = self.client.collections.get("Document").query.fetch_objects(
+            filters=Filter.by_property("doc_name").equal(document.name),
+            limit=1,
+            return_properties=DocumentType,
+            target_vector=vectorizer
         )
 
-        results = (
-            self.client.query.get(
-                class_name=class_name,
-                properties=[
-                    "doc_name",
-                ],
-            )
-            .with_where(
-                {
-                    "path": ["doc_name"],
-                    "operator": "Equal",
-                    "valueText": document.name,
-                }
-            )
-            .with_limit(1)
-            .do()
-        )
-
-        if results["data"]["Get"][class_name]:
+        if (len(results.objects) > 0):
             msg.warn(f"{document.name} already exists")
             return True
         else:
