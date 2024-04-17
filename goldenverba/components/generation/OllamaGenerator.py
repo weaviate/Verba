@@ -1,9 +1,10 @@
 import json
 import os
-from collections.abc import AsyncIterator
+import httpx
 
 from dotenv import load_dotenv
 
+from collections.abc import AsyncIterator
 from goldenverba.server.types import ConversationItem, GeneratedMessage
 
 load_dotenv()
@@ -22,7 +23,7 @@ class OllamaGenerator:
         self.description = (
             f"Generator using the Ollama API with {self.model_name} model"
         )
-        self.requires_library = ["requests", "httpx"]
+        self.requires_library = ["httpx"]
         self.streamable = True
         self.context_window = 10000
 
@@ -40,14 +41,13 @@ class OllamaGenerator:
         }
 
         try:
-            import requests
-
-            response = requests.post(
-                f"{os.getenv('OLLAMA_API_URL')}/chat", json=payload
-            )
-            response.raise_for_status()
-            completion = response.json()
-            return completion.get("message").get("content")
+            async with httpx.Client() as client:
+                response = await client.post(
+                    f"{os.getenv('OLLAMA_API_URL')}/chat", json=payload, timeout=None
+                )
+                response.raise_for_status()
+                completion = response.json()
+                return completion.get("message").get("content")
         except Exception:
             raise
 
@@ -65,21 +65,18 @@ class OllamaGenerator:
         }
 
         try:
-            import requests
-
-            response = requests.post(
-                f"{os.getenv('OLLAMA_API_URL')}/chat", json=payload, timeout=None
-            )
-            response.raise_for_status()
-            for line in response.iter_lines():
-                if line:
-                    payload = json.loads(line)
-                    print(payload)
-                    message = payload.get("message").get("content")
-                    yield {
-                        "message": message,
-                        "finish_reason": payload.get("done") and "stop" or None,
-                    }
+            async with httpx.AsyncClient() as client:
+                async with client.stream(
+                    'POST', f"{os.getenv('OLLAMA_API_URL')}/chat", json=payload, timeout=None
+                ) as response:
+                    async for line in response.aiter_lines():
+                        if line:
+                            payload = json.loads(line)
+                            message = payload.get("message").get("content")
+                            yield {
+                                "message": message,
+                                "finish_reason": payload.get("done") and "stop" or None,
+                            }
         except Exception:
             raise
 
