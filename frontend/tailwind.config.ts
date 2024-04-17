@@ -33,7 +33,7 @@ const config: Config = {
   theme: {
     screens: {
       sm: '100px',
-      md: '1000px',
+      md: '800px',
       lg: '1330px',
       full: '1700px',
     },

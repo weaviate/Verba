@@ -6,11 +6,14 @@ import { FaPaintBrush } from "react-icons/fa";
 import { IoChatbubbleSharp } from "react-icons/io5";
 import { FaCheckCircle } from "react-icons/fa";
 import { MdCancel } from "react-icons/md";
+import { LuMenu } from "react-icons/lu";
+
 
 import TextFieldComponent from './TextFieldComponent';
 import ImageFieldComponent from './ImageFieldComponent';
 import ColorFieldComponent from './ColorFieldComponent';
 import SelectComponent from './SelectFieldComponent';
+import CheckComponent from './CheckFieldComponent';
 
 import SettingButton from "./settings_button"
 
@@ -76,7 +79,7 @@ const SettingsComponent: React.FC<SettingsComponentProps> = ({ settingTemplate, 
             case 'image':
                 return <ImageFieldComponent title={title} setting={setting} ImageFieldSetting={setting_type} settingsConfig={currentSettingsConfig} setSettingsConfig={setCurrentSettingsConfig} />;
             case 'check':
-                return "Checkbox"
+                return <CheckComponent title={title} setting={setting} CheckboxSetting={setting_type} settingsConfig={currentSettingsConfig} setSettingsConfig={setCurrentSettingsConfig} />;
             case 'select':
                 return <SelectComponent title={title} setting={setting} SelectSetting={setting_type} settingsConfig={currentSettingsConfig} setSettingsConfig={setCurrentSettingsConfig} />;
             case 'color':
@@ -95,7 +98,7 @@ const SettingsComponent: React.FC<SettingsComponentProps> = ({ settingTemplate, 
         <div className="flex justify-between items-start gap-5">
 
             {/* Setting Options */}
-            <div className='flex flex-col gap-5 w-1/4'>
+            <div className='hidden lg:flex lg:flex-col gap-5 lg:w-1/4'>
                 <div className='flex flex-col justify-center items-center gap-5'>
                     <p className='md:text-base lg:text-lg text-text-alt-verba'>Settings</p>
                     <div className='flex flex-col w-full bg-bg-alt-verba p-5 rounded-lg shadow-lg gap-2'>
@@ -114,18 +117,39 @@ const SettingsComponent: React.FC<SettingsComponentProps> = ({ settingTemplate, 
             </div>
 
             {/* Configuration Options */}
-            <div className='flex flex-col justify-center items-center gap-5 w-3/4'>
-                <div className='flex flex-row gap-2 items-center justify-center'>
-                    <p className='text-lg text-text-alt-verba'>Configuration</p>
-                    <select value={settingTemplate} onChange={handleTemplateChange} className="select select-sm text-xs bg-bg-alt-verba text-text-verba">
+            <div className='flex flex-col lg:justify-center justify-start lg:items-center items-start gap-5 w-full lg:w-3/4'>
+                <div className='flex flex-row gap-2 items-center justify-center w-full'>
+                    <div className='lg:hidden sm:flex md:ml-4 sm:mr-8'>
+                        <ul className="menu menu-sm sm:menu-horizontal bg-base-200 rounded-box bg-bg-alt-verba z-40">
+                            <li>
+                                <details>
+                                    <summary><LuMenu size={15} /> Settings</summary>
+                                    <ul className='bg-bg-alt-verba'>
+                                        <li onClick={() => { setSetting("Customization") }}><a>Customize Verba</a></li>
+                                        <li onClick={() => { setSetting("Chat") }}><a>Chat Settings</a></li>
+                                    </ul>
+                                </details>
+                            </li>
+                        </ul>
+                    </div>
+                    <p className='sm:hidden md:flex text-lg text-text-alt-verba'>Configuration</p>
+                    <select value={settingTemplate} onChange={handleTemplateChange} className="select select-md lg:select-sm text-xs bg-bg-alt-verba text-text-verba">
                         {availableTemplate.map((template) => (
                             <option key={"Template" + template}>{template}</option>
                         ))}
                     </select>
                 </div>
                 <div className='flex flex-col w-full bg-bg-alt-verba p-10 rounded-lg shadow-lg h-[70vh] gap-2 overflow-y-scroll'>
-                    <p className='font-bold text-2xl mb-5'>{setting}</p>
-                    <div className=' flex-coll gap-4 grid grid-cols-3'>
+                    <p className='font-bold text-2xl lg:mb-5'>{setting}</p>
+                    {setting != "" && (
+                        <div className='lg:hidden flex flex-col items-start gap-5 mb-5'>
+                            <p className=' md:text-base lg:text-lg text-text-alt-verba'>Description</p>
+                            <div className='flex flex-col w-full gap-2'>
+                                <p className='sm:text-xs md:text-sm lg:text-base'> {BaseSettings[settingTemplate][setting] ? BaseSettings[settingTemplate][setting].description : ""}</p>
+                            </div>
+                        </div>
+                    )}
+                    <div className=' flex-coll gap-4 grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3'>
                         {setting && Object.entries(BaseSettings[settingTemplate][setting].settings).map(([key, settingValue]) => (
                             renderSettingComponent(key, settingValue)
                         ))}

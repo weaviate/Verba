@@ -173,8 +173,8 @@ const BaseChat: ChatSettings = {
     title: "Chat Settings",
     description: "Customize chat settings like caching generated answers in Weaviate or let Weaviate give you autocomplete suggestions.",
     settings: {
-        caching: { checked: true, type: "check", description: "Should Results be cached in Weaviate?" },
-        suggestion: { checked: true, type: "check", description: "Should Weaviate provide suggestions for autocompletion" }
+        caching: { checked: true, type: "check", description: "Enable Caching" },
+        suggestion: { checked: true, type: "check", description: "Enable Autocompletion" }
     }
 
 }

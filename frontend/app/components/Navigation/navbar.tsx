@@ -63,7 +63,7 @@ const Navbar: React.FC<NavbarProps> = ({ imageSrc, title, subtitle, version, cur
   };
 
   return (
-    <div className="flex lg:justify-between justify-start items-center mb-10">
+    <div className="flex justify-between items-center mb-10">
 
       {/* Logo, Title, Subtitle */}
       <div className="flex flex-row items-center gap-5">
@@ -97,29 +97,29 @@ const Navbar: React.FC<NavbarProps> = ({ imageSrc, title, subtitle, version, cur
           <p className="hidden lg:flex text-xs text-text-alt-verba">{version}</p>
         </div>
 
-        {/* Github, Version */}
-        <div className="flex flex-row items-center sm:gap-1 lg:gap-5 justify-between">
-          <div className='lg:hidden sm:flex md:ml-4 sm:mr-8'>
-            <ul className="menu sm:menu-horizontal bg-base-200 rounded-box">
-              <li>
-                <details>
-                  <summary><LuMenu size={20} /></summary>
-                  <ul>
-                    <li onClick={(e) => { setCurrentPage("CHAT") }}><a>Chat</a></li>
-                    <li onClick={(e) => { setCurrentPage("DOCUMENTS") }}><a>Documents</a></li>
-                    <li onClick={(e) => { setCurrentPage("STATUS") }}><a>Status</a></li>
-                    <li onClick={(e) => { setCurrentPage("ADD") }}><a>Add Documents</a></li>
-                    <li onClick={(e) => { setCurrentPage("RAG") }}><a>RAG</a></li>
-                    <li onClick={(e) => { setCurrentPage("SETTINGS") }}><a>Settings</a></li>
-                    <li onClick={handleGitHubClick}><a>GitHub</a></li>
-                    <li className='items-center justify-center text-xs text-text-alt-verba mt-2'>{version}</li>
-                  </ul>
-                </details>
-              </li>
-            </ul>
-          </div>
-        </div>
+      </div>
 
+      {/* Menu */}
+      <div className="flex flex-row items-center sm:gap-1 lg:gap-5 justify-between">
+        <div className='lg:hidden sm:flex md:ml-4 sm:mr-8'>
+          <ul className="menu md:menu-md sm:menu-sm sm:menu-horizontal bg-base-200 rounded-box bg-bg-alt-verba z-50">
+            <li>
+              <details>
+                <summary><LuMenu size={20} /></summary>
+                <ul className='bg-bg-alt-verba'>
+                  <li onClick={(e) => { setCurrentPage("CHAT") }}><a>Chat</a></li>
+                  <li onClick={(e) => { setCurrentPage("DOCUMENTS") }}><a>Documents</a></li>
+                  <li onClick={(e) => { setCurrentPage("STATUS") }}><a>Status</a></li>
+                  <li onClick={(e) => { setCurrentPage("ADD") }}><a>Add Documents</a></li>
+                  <li onClick={(e) => { setCurrentPage("RAG") }}><a>RAG</a></li>
+                  <li onClick={(e) => { setCurrentPage("SETTINGS") }}><a>Settings</a></li>
+                  <li onClick={handleGitHubClick}><a>GitHub</a></li>
+                  <li className='items-center justify-center text-xs text-text-alt-verba mt-2'>{version}</li>
+                </ul>
+              </details>
+            </li>
+          </ul>
+        </div>
       </div>
 
     </div>
