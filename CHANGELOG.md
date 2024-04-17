@@ -5,14 +5,23 @@ All notable changes to this project will be documented in this file.
 ## [1.0.0] - Beautiful Verba Update
 
 ### Added
-- DaisyUI
-- Reworked Verba Design
+- Added DaisyUI
+- Optimized frontend codebase
+- Fully Reworked Verba Design
+    - Fully Responsive, optimized for all screen sizes
 - Customization Capabilities
+    - Added Default, Darkmode, Weaviate themes
+    - Full text, color, image customization
+- Improve Chat Interface
+    - Better formatting of markdown + code
+    - Keep conversations saved in localBrowser storage
+    - Better Debugging by providing more information about current states
 - More Configuration
+    - Enable/Disable Caching and Autocomplete Suggestions
 
 ### Changed
-- Changed frontend to AppRouter
-- Change Frontend Font
+- Changed to AppRouter framework
+- Changed frontend project structure
 
 ## [0.4.0] - 11.04.2024
 

@@ -18,7 +18,7 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ APIHost, settingConfig })
         <div className="flex sm:flex-col justify-between items-start gap-5">
 
             {/* Chat Interface */}
-            <div className='sm:w-full md:w-1/2 lg:w-2/6 h-[80vh]'>
+            <div className='sm:w-full md:w-1/2 lg:w-2/6'>
                 <ChatInterfaceComponent settingConfig={settingConfig} APIHost={APIHost} setChunks={setChunks} />
             </div>
 
