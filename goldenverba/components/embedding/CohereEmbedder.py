@@ -1,7 +1,10 @@
 from weaviate import Client
 
+from verba_types import VectorizerType, EmbeddingType
 from goldenverba.components.embedding.interface import Embedder
 from goldenverba.components.reader.document import Document
+
+import weaviate.classes.config as wvc
 
 
 class CohereEmbedder(Embedder):
@@ -10,7 +13,12 @@ class CohereEmbedder(Embedder):
     """
 
     def __init__(self):
-        super().__init__()
+        super().__init__(
+            vectorizer=VectorizerType(
+                name="text2veccohere",
+                config_class=wvc.Configure.NamedVectors.text2vec_cohere,
+            )
+        )
         self.name = "CohereEmbedder"
         self.requires_env = ["COHERE_API_KEY"]
         self.description = (

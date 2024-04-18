@@ -16,7 +16,7 @@ class ADAEmbedder(Embedder):
     def __init__(self):
         super().__init__(
             vectorizer=VectorizerType(
-                name="text2vec-openai",
+                name="text2vecopenai",
                 config_class=wvc.Configure.NamedVectors.text2vec_openai,
             )
         )

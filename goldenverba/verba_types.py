@@ -1,7 +1,8 @@
 from typing import TypedDict
 from dataclasses import dataclass
-from weaviate import _NamedVectorConfigCreate
-from typing import Union
+
+# from weaviate.collections.classes.config_named_vectors import _NamedVectorConfigCreate
+from typing import Union, Any
 
 
 class SuggestionType(TypedDict):
@@ -27,7 +28,7 @@ class ChunkType(TypedDict):
 @dataclass
 class VectorizerType:
     name: str
-    config_class: _NamedVectorConfigCreate
+    config_class: Any
 
 
 @dataclass

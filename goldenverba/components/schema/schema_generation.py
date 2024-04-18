@@ -4,10 +4,9 @@ from dotenv import load_dotenv
 from wasabi import msg  # type: ignore[import]
 from weaviate import (
     WeaviateClient,
-    _NamedVectorConfigCreate,
-    Collection,
-    WeaviateProperties,
 )
+from weaviate.collections.collections import Collection
+from weaviate.collections.classes.types import WeaviateProperties
 import weaviate.classes.config as wvc
 from typing import TypedDict, List, Union
 from dataclasses import dataclass
@@ -19,10 +18,10 @@ load_dotenv()
 
 VECTORIZERS: List[VectorizerType] = [
     VectorizerType(
-        name="text2vec-openai", config_class=wvc.Configure.NamedVectors.text2vec_openai
+        name="text2vecopenai", config_class=wvc.Configure.NamedVectors.text2vec_openai
     ),
     VectorizerType(
-        name="text2vec-cohere", config_class=wvc.Configure.NamedVectors.text2vec_cohere
+        name="text2veccohere", config_class=wvc.Configure.NamedVectors.text2vec_cohere
     ),
 ]  # Needs to match with Weaviate modules
 EMBEDDINGS: List[EmbeddingType] = [EmbeddingType(name="MiniLM")]  # Custom Vectors
@@ -100,6 +99,7 @@ def init_schemas(
     @returns tuple[dict, dict] - Tuple of modified schemas.
     """
     try:
+
         init_documents(client, force, check)
         init_cache(client, force, check)
         init_suggestion(client, force, check)
@@ -123,27 +123,27 @@ def init_documents(
     chunk_properties = [
         wvc.Property(
             name="text",
-            data_type=wvc.DataType.TEXT_ARRAY,
+            data_type=wvc.DataType.TEXT,
             description="Content of the document",
         ),
         wvc.Property(
             name="doc_name",
-            data_type=wvc.DataType.TEXT_ARRAY,
+            data_type=wvc.DataType.TEXT,
             description="Document name",
         ),
         wvc.Property(
             name="doc_type",
-            data_type=wvc.DataType.TEXT_ARRAY,
+            data_type=wvc.DataType.TEXT,
             description="Document type",
         ),
         wvc.Property(
             name="doc_uuid",
-            data_type=wvc.DataType.TEXT_ARRAY,
+            data_type=wvc.DataType.TEXT,
             description="Document UUID",
         ),
         wvc.Property(
             name="chunk_id",
-            data_type=wvc.DataType.NUMBER_ARRAY,
+            data_type=wvc.DataType.NUMBER,
             description="Document chunk from the whole document",
         ),
     ]
@@ -151,32 +151,32 @@ def init_documents(
     document_properties = [
         wvc.Property(
             name="text",
-            data_type=wvc.DataType.TEXT_ARRAY,
+            data_type=wvc.DataType.TEXT,
             description="Content of the document",
         ),
         wvc.Property(
             name="doc_name",
-            data_type=wvc.DataType.TEXT_ARRAY,
+            data_type=wvc.DataType.TEXT,
             description="Document name",
         ),
         wvc.Property(
             name="doc_type",
-            data_type=wvc.DataType.TEXT_ARRAY,
+            data_type=wvc.DataType.TEXT,
             description="Document type",
         ),
         wvc.Property(
             name="doc_link",
-            data_type=wvc.DataType.TEXT_ARRAY,
+            data_type=wvc.DataType.TEXT,
             description="Link to document",
         ),
         wvc.Property(
             name="timestamp",
-            data_type=wvc.DataType.TEXT_ARRAY,
+            data_type=wvc.DataType.TEXT,
             description="Timestamp of document",
         ),
         wvc.Property(
             name="chunk_count",
-            data_type=wvc.DataType.NUMBER_ARRAY,
+            data_type=wvc.DataType.NUMBER,
             description="Number of chunks",
         ),
     ]

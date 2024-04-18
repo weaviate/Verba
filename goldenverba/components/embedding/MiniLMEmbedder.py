@@ -1,7 +1,7 @@
 from tqdm import tqdm
 from wasabi import msg
 from weaviate import Client
-
+from verba_types import VectorizerType, EmbeddingType
 from goldenverba.components.embedding.interface import Embedder
 from goldenverba.components.reader.document import Document
 
@@ -12,11 +12,10 @@ class MiniLMEmbedder(Embedder):
     """
 
     def __init__(self):
-        super().__init__()
+        super().__init__(vectorizer=EmbeddingType(name="MiniLM"))
         self.name = "MiniLMEmbedder"
         self.requires_library = ["torch", "transformers"]
         self.description = "Embeds and retrieves objects using SentenceTransformer's all-MiniLM-L6-v2 model"
-        self.vectorizer = "MiniLM"
         self.model = None
         self.tokenizer = None
         try:

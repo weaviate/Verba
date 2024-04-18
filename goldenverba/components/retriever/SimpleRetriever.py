@@ -1,5 +1,5 @@
 from weaviate import WeaviateClient
-from weaviate import HybridFusion
+from weaviate.collections.classes.grpc import HybridFusion
 from verba_types import DocumentType, ChunkType
 from goldenverba.components.chunking.chunk import Chunk
 from goldenverba.components.embedding.interface import Embedder
@@ -42,7 +42,7 @@ class SimpleRetriever(Retriever):
                     vector=vector,
                     fusion_type=HybridFusion.RELATIVE_SCORE,
                     return_properties=ChunkType,
-                    target_vector=embedder.vectorizer,
+                    target_vector=embedder.vectorizer.name,
                 )
 
             else:
@@ -51,7 +51,7 @@ class SimpleRetriever(Retriever):
                     query=query,
                     fusion_type=HybridFusion.RELATIVE_SCORE,
                     return_properties=ChunkType,
-                    target_vector=embedder.vectorizer,
+                    target_vector=embedder.vectorizer.name,
                 )
 
             for chunk in query_results.objects:

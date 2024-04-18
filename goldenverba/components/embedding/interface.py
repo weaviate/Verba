@@ -5,7 +5,9 @@ from dotenv import load_dotenv
 
 from tqdm import tqdm
 from wasabi import msg
-from weaviate import WeaviateClient, Collection, WeaviateProperties, Filter, UUID
+from weaviate import WeaviateClient
+from weaviate.classes.query import Filter
+from weaviate.types import UUID
 from verba_types import DocumentType, SuggestionType, VectorizerOrEmbeddingType
 from goldenverba.components.component import VerbaComponent
 from goldenverba.components.reader.document import Document

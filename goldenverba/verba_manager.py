@@ -1,6 +1,7 @@
 import os
 import ssl
 from typing import Optional, List, TypedDict
+from weaviate.collections.classes.internal import Object
 from weaviate.classes.query import Filter
 from verba_types import SuggestionType, DocumentType
 import weaviate
@@ -195,24 +196,28 @@ class VerbaManager:
 
         # Check Verba URL ENV
         weaviate_url = os.environ.get("WEAVIATE_URL_VERBA", "")
-        if weaviate_url != "":
+        weaviate_url_grpc = os.environ.get("WEAVIATE_GRPC_URL_VERBA", "")
+        if weaviate_url != "" and weaviate_url_grpc != "":
             weaviate_key = os.environ.get("WEAVIATE_API_KEY_VERBA", "")
             if weaviate_key != "":
                 self.environment_variables["WEAVIATE_API_KEY_VERBA"] = True
                 auth_config = weaviate.auth.AuthApiKey(api_key=weaviate_key)
                 msg.info("Auth information provided")
+                msg.info(weaviate_url)
                 client = weaviate.WeaviateClient(
                     connection_params=ConnectionParams.from_params(
                         http_host=weaviate_url,
-                        http_port=8099,
-                        http_secure=False,
-                        grpc_host=weaviate_url,
-                        grpc_port=50052,
-                        grpc_secure=False,
+                        http_port=443,
+                        http_secure=True,
+                        grpc_host=weaviate_url_grpc,
+                        grpc_port=443,
+                        grpc_secure=True,
                     ),
                     auth_client_secret=auth_config,
                     additional_headers=additional_header,
                 )
+                client.connect()
+                msg.info(client)
 
             else:
                 msg.info("No Auth information provided")
@@ -227,6 +232,7 @@ class VerbaManager:
                     ),
                     additional_headers=additional_header,
                 )
+                client.connect()
             self.environment_variables["WEAVIATE_URL_VERBA"] = True
             self.weaviate_type = "Weaviate Cluster"
 
@@ -490,9 +496,6 @@ class VerbaManager:
         """
 
         documents_collection = self.client.collections.get("Document")
-        class_name = "Document_" + schema_manager.strip_non_letters(
-            self.embedder_manager.selected_embedder.vectorizer
-        )
 
         vectorizer = self.embedder_manager.selected_embedder.vectorizer
 
@@ -501,14 +504,14 @@ class VerbaManager:
                 filters=Filter.by_property("doc_type").equal(doc_type),
                 limit=10000,
                 return_properties=DocumentType,
-                target_vector=vectorizer
+                # target_vector=vectorizer.name,
             )
         else:
             query_results = documents_collection.query.fetch_objects(
                 filters=Filter.by_property("doc_type").equal(doc_type),
                 limit=10000,
-                return_properties=DocumentType
-                target_vector=vectorizer
+                return_properties=DocumentType,
+                # target_vector=vectorizer.name,
             )
 
         results = query_results.objects
@@ -519,8 +522,7 @@ class VerbaManager:
         @parameter doc_id : str - Document ID
         @returns dict - Document dict.
         """
-        
-        
+
         documents_class = self.client.collections.get("Document")
         document = documents_class.query.fetch_object_by_id(doc_id)
         return document.properties.items()
@@ -596,19 +598,16 @@ class VerbaManager:
         # Check if all schemas exist for all possible vectorizers
 
         schema_manager.reset_schemas(self.client)
-        
-        for vectorizer in schema_manager.VECTORIZERS:
-            schema_manager.init_schemas(self.client, vectorizer, False, True)
 
-        for embedding in schema_manager.EMBEDDINGS:
-            schema_manager.init_schemas(self.client, embedding, False, True)
+        schema_manager.init_schemas(self.client, False, True)
+
+        schema_manager.init_schemas(self.client, False, True)
 
     def reset_cache(self):
 
         self.client.collections._delete("Cache")
-    
-        schema_manager.init_schemas(self.client, vectorizer, False, True)
 
+        schema_manager.init_schemas(self.client, vectorizer, False, True)
 
     def reset_suggestion(self):
         self.client.collections._delete("Suggestion")
@@ -619,18 +618,17 @@ class VerbaManager:
         @parameter document : Document - Document object
         @returns bool - Whether the doc name exist in the cluster.
         """
-       
-        
+
         vectorizer = self.embedder_manager.selected_embedder.vectorizer
 
         results = self.client.collections.get("Document").query.fetch_objects(
             filters=Filter.by_property("doc_name").equal(document.name),
             limit=1,
             return_properties=DocumentType,
-            target_vector=vectorizer
+            # target_vector=vectorizer.name,
         )
 
-        if (len(results.objects) > 0):
+        if len(results.objects) > 0:
             msg.warn(f"{document.name} already exists")
             return True
         else:
