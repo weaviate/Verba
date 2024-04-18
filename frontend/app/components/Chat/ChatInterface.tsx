@@ -9,16 +9,20 @@ import ChatMessage from './ChatMessage';
 import { SettingsConfiguration } from "../Settings/types"
 import { GrPowerReset } from "react-icons/gr";
 
+import StatusLabel from './StatusLabel';
+
 interface ChatInterfaceComponentProps {
     settingConfig: SettingsConfiguration;
     APIHost: string | null;
     setChunks: (c: DocumentChunk[]) => void
+    setChunkTime: (t: number) => void
 }
 
 const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
     APIHost,
     settingConfig,
-    setChunks
+    setChunks,
+    setChunkTime
 }) => {
 
     const [previewText, setPreviewText] = useState("");
@@ -80,7 +84,7 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
 
         localSocket.onopen = () => {
             console.log("WebSocket connection opened to " + socketHost);
-            triggerNotification("WebSocket Connected")
+            triggerNotification("WebSocket Online")
         };
 
         localSocket.onmessage = (event) => {
@@ -110,6 +114,7 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
 
         localSocket.onerror = (error) => {
             console.error("WebSocket Error:", error);
+            triggerNotification("WebSocket Error: " + error, true)
         };
 
         localSocket.onclose = (event) => {
@@ -118,7 +123,7 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
             } else {
                 console.error("WebSocket connection died");
             }
-            triggerNotification("WebSocket Connection Died", true)
+            triggerNotification("WebSocket Connection Offline", true)
             setIsFetching(false)
         };
 
@@ -228,8 +233,14 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
                 const data: QueryPayload = await response.json();
 
                 if (data) {
+
+                    if (data.error !== "") {
+                        triggerNotification(data.error, true)
+                    }
+
                     setChunks(data.chunks);
                     setSuggestions([]);
+                    setChunkTime(data.took);
 
                     if (data.context) {
                         streamResponses(sendInput, data.context)
@@ -302,22 +313,12 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
             {/*Chat Messages*/}
             <div className="flex flex-col bg-bg-alt-verba rounded-lg shadow-lg p-5 text-text-verba gap-5 h-[55vh] overflow-auto">
 
-                <div className='flex gap-2'>
-                    <div className={`p-2 rounded-lg text-text-verba text-sm ${APIHost !== null ? ("bg-secondary-verba") : ("bg-warning-verba")}`}>
-                        <p className={`text-xs ${APIHost !== null ? ("text-text-verba") : ("text-text-verba")}`}>
-                            {APIHost === null ? ("Offline") : ("Online")}
-                        </p>
-                    </div>
-                    <div className={`p-2 rounded-lg text-text-verba text-sm ${settingConfig.Chat.settings.caching.checked ? ("bg-secondary-verba") : ("bg-bg-alt-verba text-text-alt-verba")}`}>
-                        <p className={` text-xs ${settingConfig.Chat.settings.caching.checked ? ("text-text-verba") : ("text-text-alt-verba")}`}>
-                            {settingConfig.Chat.settings.caching.checked ? ("Caching") : ("No Caching")}
-                        </p>
-                    </div>
-                    <div className={`p-2 rounded-lg text-text-verba text-sm ${settingConfig.Chat.settings.suggestion.checked ? ("bg-secondary-verba") : ("bg-bg-alt-verba text-text-alt-verba")}`}>
-                        <p className={`text-xs ${settingConfig.Chat.settings.suggestion.checked ? ("text-text-verba") : ("text-text-alt-verba")}`}>
-                            {settingConfig.Chat.settings.suggestion.checked ? ("Suggestions") : ("No Suggestions")}
-                        </p>
-                    </div>
+                <div className='flex gap-2 items-center'>
+                    <StatusLabel status={APIHost !== null && socket !== null} true_text='Online' false_text='Connecting...' />
+                    <StatusLabel status={true} true_text='GPT-4' false_text='Connecting...' />
+                    <div className="hidden sm:block sm:h-[3vh] lg:h-[2vh] bg-text-alt-verba w-px mx-1"></div>
+                    <StatusLabel status={settingConfig.Chat.settings.caching.checked} true_text='Caching' false_text='No Caching' />
+                    <StatusLabel status={settingConfig.Chat.settings.suggestion.checked} true_text='Suggestions' false_text='No Suggestions' />
                 </div>
 
                 <div className='flex flex-col'>
@@ -354,7 +355,7 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
                     <button type='submit' className='btn btn-circle border-none shadow-none bg-bg-alt-verba hover:bg-secondary-verba'>
                         <IoMdSend size={18} />
                     </button>
-                    <div className="tooltip" data-tip="Reset Conversation">
+                    <div className="tooltip text-text-verba" data-tip="Reset Conversation">
                         <button type='button' onClick={() => { removeMessagesFromLocalStorage("VERBA_CONVERSATION"); setMessages([]); setUserInput(""); setSuggestions([]) }} className='btn btn-circle border-none shadow-none bg-bg-alt-verba hover:bg-secondary-verba'>
                             <GrPowerReset size={18} />
                         </button>

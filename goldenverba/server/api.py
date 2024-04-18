@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 from pydantic import BaseModel
 from starlette.websockets import WebSocketDisconnect
 from wasabi import msg  # type: ignore[import]
+import time
 
 from goldenverba import verba_manager
 from goldenverba.components.chunking.interface import Chunker
@@ -515,8 +516,12 @@ async def load_data(payload: LoadPayload):
 @app.post("/api/query")
 async def query(payload: QueryPayload):
     msg.good(f"Received query: {payload.query}")
+    start_time = time.time()  # Start timing
     try:
         chunks, context = manager.retrieve_chunks([payload.query])
+
+        # Sort chunks based on score in descending order
+        chunks = sorted(chunks, key=lambda x: x.score, reverse=True)
 
         retrieved_chunks = [
             {
@@ -530,20 +535,25 @@ async def query(payload: QueryPayload):
             for chunk in chunks
         ]
 
-        msg.good(f"Succesfully processed query: {payload.query}")
+        elapsed_time = round(time.time() - start_time , 2) # Calculate elapsed time
+        msg.good(f"Succesfully processed query: {payload.query} in {elapsed_time}s")
 
         if len(chunks) == 0:
             return JSONResponse(
                 content={
                     "chunks": [],
+                    "took": 0,
                     "context": "",
+                    "error": "Chunks could be retrieved"
                 }
             )
 
         return JSONResponse(
             content={
+                "error": "",
                 "chunks": retrieved_chunks,
                 "context": context,
+                "took": elapsed_time
             }
         )
 
@@ -551,7 +561,7 @@ async def query(payload: QueryPayload):
         msg.fail(f"Query failed: {str(e)}")
         return JSONResponse(
             content={
-                "system": f"Something went wrong! {str(e)}",
+                "error": f"Something went wrong! {str(e)}",
                 "context": "",
                 "documents": [],
             }

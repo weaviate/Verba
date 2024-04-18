@@ -1,3 +1,8 @@
+export interface SettingsPayload {
+    selectedTheme: string
+    themes: Settings
+}
+
 interface MetaInformation {
     title: string;
     description: string;
@@ -207,3 +212,4 @@ export const BaseSettings: Settings = {
         Chat: BaseChat
     }
 }
+

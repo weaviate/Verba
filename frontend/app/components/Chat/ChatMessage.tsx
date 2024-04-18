@@ -55,7 +55,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, handleCopyToBillboar
                         onClick={() => handleCopyToBillboard(message.content)}
                         className={`btn border-none shadow-none flex gap-1 bg-bg-alt-verba hover:bg-secondary-verba hover:text-text-verba text-text-alt-verba`}
                     >
-                        <FaCopy size={12} />
+
                         <p className='text-xs'>Copy</p>
 
                     </button>)}

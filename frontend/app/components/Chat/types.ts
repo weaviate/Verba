@@ -10,6 +10,8 @@ export interface Message {
 export type QueryPayload = {
     chunks: DocumentChunk[]
     context: string;
+    error: string;
+    took: number;
 }
 
 export type Segment =
