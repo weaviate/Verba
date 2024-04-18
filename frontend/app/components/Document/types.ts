@@ -6,3 +6,26 @@ export type DocumentChunk = {
     doc_type: string;
     score: number;
 };
+
+export type DocumentPayload = {
+    error: string
+    document: Document
+};
+
+
+export type Document = {
+    text: string;
+    name: string;
+    chunks: number;
+    uuid: string;
+    type: string;
+    class: string;
+    timestamp: string;
+    link: string;
+};
+
+export type FormattedDocument = {
+    beginning: string;
+    substring: string;
+    ending: string;
+};
