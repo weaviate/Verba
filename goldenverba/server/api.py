@@ -651,17 +651,31 @@ async def get_document(payload: GetDocumentPayload):
 
     try:
         document = manager.retrieve_document(payload.document_id)
+        document_properties = document.get("properties",{})
+        document_obj = {
+            "class":document.get("class","No Class"),
+            "id":document.get("id",payload.document_id),
+            "chunks":document_properties.get("chunk_count", 0),
+            "link":document_properties.get("doc_link", ""),
+            "name":document_properties.get("doc_name", "No name"),
+            "type":document_properties.get("doc_type", "No type"),
+            "text":document_properties.get("text", "No text"),
+            "timestamp":document_properties.get("timestamp", ""),
+        }
+
         msg.good(f"Succesfully retrieved document: {payload.document_id}")
         return JSONResponse(
             content={
-                "document": document,
+                "error": "",
+                "document": document_obj,
             }
         )
     except Exception as e:
         msg.fail(f"Document retrieval failed: {str(e)}")
         return JSONResponse(
             content={
-                "document": {},
+                "error": str(e),
+                "document": None,
             }
         )
 

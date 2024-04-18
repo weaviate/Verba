@@ -33,6 +33,7 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
     const [userInput, setUserInput] = useState("")
     const [messages, setMessages] = useState<Message[]>([]);
     const [isFetching, setIsFetching] = useState(false);
+    const [fetchingStatus, setFetchingStatus] = useState<"DONE" | "CHUNKS" | "RESPONSE">("DONE")
     const [isFetchingSuggestion, setIsFetchingSuggestions] = useState(false);
     const [suggestions, setSuggestions] = useState<string[]>([])
 
@@ -78,6 +79,7 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
     useEffect(() => {
 
         setMessages(getMessagesFromLocalStorage("VERBA_CONVERSATION"))
+        setChunks(getChunksFromLocalStorage("VERBA_CHUNKS"))
 
         const socketHost = getWebSocketApiHost()
         const localSocket = new WebSocket(socketHost);
@@ -101,6 +103,7 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
 
             if (data.finish_reason === "stop") {
                 setIsFetching(false);
+                setFetchingStatus("DONE")
                 const full_text = data.full_text
                 if (data.cached) {
                     const distance = data.distance
@@ -115,6 +118,8 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
         localSocket.onerror = (error) => {
             console.error("WebSocket Error:", error);
             triggerNotification("WebSocket Error: " + error, true)
+            setIsFetching(false)
+            setFetchingStatus("DONE")
         };
 
         localSocket.onclose = (event) => {
@@ -125,6 +130,7 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
             }
             triggerNotification("WebSocket Connection Offline", true)
             setIsFetching(false)
+            setFetchingStatus("DONE")
         };
 
         setSocket(localSocket);
@@ -191,8 +197,32 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
         }
     };
 
+    const saveChunksToLocalStorage = (key: string, value: DocumentChunk[]) => {
+        if (typeof window !== 'undefined') { // Check if window is defined
+            localStorage.setItem(key, JSON.stringify(value));
+        }
+    };
+
+    const getChunksFromLocalStorage = (key: string) => {
+        if (typeof window !== 'undefined') {
+            const saved = localStorage.getItem(key);
+            if (saved && JSON.parse(saved).length > 0) {
+                return JSON.parse(saved);
+            }
+        }
+        return []; // Return a default value or null if not found
+    };
+
+    const removeChunksFromLocalStorage = (key: string) => {
+        if (typeof window !== 'undefined') {
+            localStorage.removeItem(key);
+        }
+    };
+
     const handleSendMessage = async (e?: React.FormEvent) => {
         e?.preventDefault();
+
+        setSuggestions([])
 
         if (APIHost === null) {
             triggerNotification("No connection to server")
@@ -220,6 +250,7 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
             try {
                 // Start the API call
                 setIsFetching(true);
+                setFetchingStatus("CHUNKS")
 
                 // Start both API calls in parallel
                 const response = await fetch(APIHost + "/api/query", {
@@ -239,21 +270,25 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
                     }
 
                     setChunks(data.chunks);
+                    saveChunksToLocalStorage("VERBA_CHUNKS", data.chunks)
                     setSuggestions([]);
                     setChunkTime(data.took);
 
                     if (data.context) {
                         streamResponses(sendInput, data.context)
+                        setFetchingStatus("RESPONSE")
                     }
                 } else {
                     triggerNotification("Failed to fetch from API: No data received", true)
                     setIsFetching(false);
+                    setFetchingStatus("DONE")
                 }
 
             } catch (error) {
                 console.error("Failed to fetch from API:", error);
                 triggerNotification("Failed to fetch from API: " + error, true)
                 setIsFetching(false);
+                setFetchingStatus("DONE")
             }
         }
     };
@@ -338,8 +373,16 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
                 </div>
 
                 {isFetching && (
-                    <div className="flex items-center pl-4 mb-4">
+                    <div className="flex items-center pl-4 mb-4 gap-3">
                         <PulseLoader color={settingConfig.Customization.settings.text_color.color} loading={true} size={10} speedMultiplier={0.75} />
+                        <p>
+                            {fetchingStatus === "CHUNKS" && (
+                                "Retrieving chunks"
+                            )}
+                            {fetchingStatus === "RESPONSE" && (
+                                "Generating answer"
+                            )}
+                        </p>
                     </div>
                 )}
             </div >
@@ -356,7 +399,7 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
                         <IoMdSend size={18} />
                     </button>
                     <div className="tooltip text-text-verba" data-tip="Reset Conversation">
-                        <button type='button' onClick={() => { removeMessagesFromLocalStorage("VERBA_CONVERSATION"); setMessages([]); setUserInput(""); setSuggestions([]) }} className='btn btn-circle border-none shadow-none bg-bg-alt-verba hover:bg-secondary-verba'>
+                        <button type='button' onClick={() => { removeMessagesFromLocalStorage("VERBA_CONVERSATION"); removeChunksFromLocalStorage("VERBA_CHUNKS"); setChunks([]); setMessages([]); setUserInput(""); setSuggestions([]) }} className='btn btn-circle border-none shadow-none bg-bg-alt-verba hover:bg-secondary-verba'>
                             <GrPowerReset size={18} />
                         </button>
                     </div>

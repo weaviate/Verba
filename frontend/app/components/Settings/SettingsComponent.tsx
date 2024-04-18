@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react';
-import { SettingsConfiguration, TextFieldSetting, ImageFieldSetting, CheckboxSetting, ColorSetting, BaseSettings, Settings, SelectSetting } from "./types"
+import { SettingsConfiguration, TextFieldSetting, ImageFieldSetting, CheckboxSetting, ColorSetting, BaseSettings, Settings, SelectSetting, NumberFieldSetting } from "./types"
 import { FaPaintBrush } from "react-icons/fa";
 import { IoChatbubbleSharp } from "react-icons/io5";
 import { FaCheckCircle } from "react-icons/fa";
@@ -14,6 +14,7 @@ import ImageFieldComponent from './ImageFieldComponent';
 import ColorFieldComponent from './ColorFieldComponent';
 import SelectComponent from './SelectFieldComponent';
 import CheckComponent from './CheckFieldComponent';
+import NumberFieldComponent from './NumberFieldComponent';
 
 import SettingButton from "./SettingsButton"
 
@@ -67,7 +68,7 @@ const SettingsComponent: React.FC<SettingsComponentProps> = ({ settingTemplate, 
         setBaseSetting(BaseSettings)
     }
 
-    const renderSettingComponent = (title: any, setting_type: TextFieldSetting | ImageFieldSetting | CheckboxSetting | ColorSetting | SelectSetting) => {
+    const renderSettingComponent = (title: any, setting_type: TextFieldSetting | ImageFieldSetting | CheckboxSetting | ColorSetting | SelectSetting | NumberFieldSetting) => {
 
         if (setting === "") {
             return null
@@ -84,6 +85,8 @@ const SettingsComponent: React.FC<SettingsComponentProps> = ({ settingTemplate, 
                 return <SelectComponent title={title} setting={setting} SelectSetting={setting_type} settingsConfig={currentSettingsConfig} setSettingsConfig={setCurrentSettingsConfig} />;
             case 'color':
                 return <ColorFieldComponent title={title} setting={setting} ColorSetting={setting_type} settingsConfig={currentSettingsConfig} setSettingsConfig={setCurrentSettingsConfig} />;
+            case 'number':
+                return <NumberFieldComponent title={title} setting={setting} NumberFieldSetting={setting_type} settingsConfig={currentSettingsConfig} setSettingsConfig={setCurrentSettingsConfig} />;
             default:
                 return null;
         }

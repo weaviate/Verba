@@ -44,6 +44,7 @@ export interface ChatSettings extends MetaInformation {
     settings: {
         caching: CheckboxSetting;
         suggestion: CheckboxSetting;
+        max_document_size: NumberFieldSetting;
     }
 }
 
@@ -52,6 +53,12 @@ export interface ChatSettings extends MetaInformation {
 export interface TextFieldSetting {
     type: 'text';
     text: string;
+    description: string;
+}
+
+export interface NumberFieldSetting {
+    type: 'number';
+    value: number;
     description: string;
 }
 
@@ -189,7 +196,8 @@ const BaseChat: ChatSettings = {
     description: "Customize chat settings like caching generated answers in Weaviate or let Weaviate give you autocomplete suggestions.",
     settings: {
         caching: { checked: true, type: "check", description: "Enable Caching" },
-        suggestion: { checked: true, type: "check", description: "Enable Autocompletion" }
+        suggestion: { checked: true, type: "check", description: "Enable Autocompletion" },
+        max_document_size: { value: 10000, type: "number", description: "Max characters to show Documents" },
     }
 
 }

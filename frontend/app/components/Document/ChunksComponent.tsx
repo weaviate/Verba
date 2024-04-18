@@ -9,7 +9,7 @@ interface ChunksComponentComponentProps {
     chunks: DocumentChunk[]
     selectedChunk: DocumentChunk | null
     chunkTime: number;
-    setSelectedChunk: (c: DocumentChunk) => void;
+    setSelectedChunk: (c: DocumentChunk | null) => void;
 }
 
 const ChunksComponent: React.FC<ChunksComponentComponentProps> = ({
@@ -22,6 +22,8 @@ const ChunksComponent: React.FC<ChunksComponentComponentProps> = ({
     useEffect(() => {
         if (chunks.length > 0) {
             setSelectedChunk(chunks[0])
+        } else {
+            setSelectedChunk(null)
         }
     }, [chunks]);
 
