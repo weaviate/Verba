@@ -228,12 +228,13 @@ class Embedder(VerbaComponent):
     def get_cache_class(self) -> str:
         return "Cache_" + strip_non_letters(self.vectorizer)
 
-    def search_documents(self, client: Client, query: str, doc_type: str) -> list:
+    def search_documents(self, client: Client, query: str, doc_type: str, page:int, pageSize: int) -> list:
         """Search for documents from Weaviate
         @parameter query_string : str - Search query
         @returns list - Document list.
         """
         doc_class_name = "Document_" + strip_non_letters(self.vectorizer)
+        offset = pageSize * (page - 1)
 
         if doc_type == "" or doc_type is None:
             query_results = (
@@ -243,9 +244,11 @@ class Embedder(VerbaComponent):
                 )
                 .with_bm25(query, properties=["doc_name"])
                 .with_additional(properties=["id"])
-                .with_limit(100)
+                .with_limit(pageSize)
+                .with_offset(offset)
                 .do()
             )
+            print(query_results)
         else:
             query_results = (
                 client.query.get(
@@ -260,11 +263,13 @@ class Embedder(VerbaComponent):
                         "valueText": doc_type,
                     }
                 )
+                .with_offset(offset)
                 .with_additional(properties=["id"])
                 .with_limit(100)
                 .do()
             )
 
+        # TODO Better Error Handling, what if error occur?
         results = query_results["data"]["Get"][doc_class_name]
         return results
 

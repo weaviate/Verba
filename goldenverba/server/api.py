@@ -156,6 +156,8 @@ class GeneratePayload(BaseModel):
 class SearchQueryPayload(BaseModel):
     query: str
     doc_type: str
+    page: int
+    pageSize: int
 
 
 class GetDocumentPayload(BaseModel):
@@ -647,6 +649,7 @@ async def suggestions(payload: QueryPayload):
 # Retrieve specific document based on UUID
 @app.post("/api/get_document")
 async def get_document(payload: GetDocumentPayload):
+    # TODO Standarize Document Creation
     msg.info(f"Document ID received: {payload.document_id}")
 
     try:
@@ -683,19 +686,55 @@ async def get_document(payload: GetDocumentPayload):
 ## Retrieve all documents imported to Weaviate
 @app.post("/api/get_all_documents")
 async def get_all_documents(payload: SearchQueryPayload):
+    # TODO Standarize Document Creation
     msg.info("Get all documents request received")
+    start_time = time.time()  # Start timing
 
     try:
-        documents = manager.retrieve_all_documents(payload.doc_type)
-        msg.good(f"Succesfully retrieved document: {len(documents)} documents")
+        if payload.query == "":
+            documents = manager.retrieve_all_documents(payload.doc_type, payload.page, payload.pageSize)
+        else:
+            documents = manager.search_documents(payload.query, payload.doc_type, payload.page, payload.pageSize)
 
-        doc_types = {document["doc_type"] for document in documents}
+        if not documents:
+             return JSONResponse(
+            content={
+                "documents": [],
+                "doc_types": [],
+                "current_embedder": manager.embedder_manager.selected_embedder.name,
+                "error": f"No Results found!",
+                "took": 0
+            }
+        )
+            
+        documents_obj = []
+        for document in documents:
+
+            _additional = document["_additional"]
+
+            documents_obj.append({
+            "class":"No Class",
+            "uuid":_additional.get("id","none"),
+            "chunks":document.get("chunk_count", 0),
+            "link":document.get("doc_link", ""),
+            "name":document.get("doc_name", "No name"),
+            "type":document.get("doc_type", "No type"),
+            "text":document.get("text", "No text"),
+            "timestamp":document.get("timestamp", ""),
+        })
+            
+        elapsed_time = round(time.time() - start_time , 2) # Calculate elapsed time
+        msg.good(f"Succesfully retrieved document: {len(documents)} documents in {elapsed_time}s")
+
+        doc_types = manager.retrieve_all_document_types()
 
         return JSONResponse(
             content={
-                "documents": documents,
+                "documents": documents_obj,
                 "doc_types": list(doc_types),
                 "current_embedder": manager.embedder_manager.selected_embedder.name,
+                "error": "",
+                "took": elapsed_time
             }
         )
     except Exception as e:
@@ -705,27 +744,8 @@ async def get_all_documents(payload: SearchQueryPayload):
                 "documents": [],
                 "doc_types": [],
                 "current_embedder": manager.embedder_manager.selected_embedder.name,
-            }
-        )
-
-
-## Search for documentation
-@app.post("/api/search_documents")
-async def search_documents(payload: SearchQueryPayload):
-    try:
-        documents = manager.search_documents(payload.query, payload.doc_type)
-        return JSONResponse(
-            content={
-                "documents": documents,
-                "current_embedder": manager.embedder_manager.selected_embedder.name,
-            }
-        )
-    except Exception as e:
-        msg.fail(f"All Document retrieval failed: {str(e)}")
-        return JSONResponse(
-            content={
-                "documents": [],
-                "current_embedder": manager.embedder_manager.selected_embedder.name,
+                "error": f"All Document retrieval failed: {str(e)}",
+                "took": 0
             }
         )
 

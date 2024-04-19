@@ -35,7 +35,7 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ APIHost, settingConfig })
 
                 {/* Document Viewer */}
                 <div className='sm:w-full lg:w-3/4'>
-                    <DocumentComponent selectedChunk={selectedChunk} APIhost={APIHost} settingConfig={settingConfig} />
+                    <DocumentComponent selectedChunk={selectedChunk} APIhost={APIHost} settingConfig={settingConfig} deletable={false} selectedDocument={null} />
                 </div>
             </div>
 

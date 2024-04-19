@@ -82,7 +82,7 @@ const Navbar: React.FC<NavbarProps> = ({ imageSrc, title, subtitle, version, cur
           <div className="hidden sm:block sm:h-[3vh] lg:h-[5vh] bg-text-alt-verba w-px mx-1"></div>
           <NavbarButton Icon={IoChatbubbleSharp} iconSize={icon_size} title='Chat' currentPage={currentPage} setCurrentPage={setCurrentPage} setPage='CHAT' />
           <NavbarButton Icon={IoDocumentSharp} iconSize={icon_size} title='Documents' currentPage={currentPage} setCurrentPage={setCurrentPage} setPage='DOCUMENTS' />
-          <NavbarButton Icon={HiOutlineStatusOnline} iconSize={icon_size} title='Status' currentPage={currentPage} setCurrentPage={setCurrentPage} setPage='STATUS' />
+          <NavbarButton Icon={HiOutlineStatusOnline} iconSize={icon_size} title='Overview' currentPage={currentPage} setCurrentPage={setCurrentPage} setPage='STATUS' />
           <div className="hidden sm:block sm:h-[3vh] lg:h-[5vh] bg-text-alt-verba w-px mx-1"></div>
           <NavbarButton Icon={IoMdAddCircle} iconSize={icon_size} title='Add Documents' currentPage={currentPage} setCurrentPage={setCurrentPage} setPage='ADD' />
           <NavbarButton Icon={IoBuildSharp} iconSize={icon_size} title='RAG' currentPage={currentPage} setCurrentPage={setCurrentPage} setPage='RAG' />

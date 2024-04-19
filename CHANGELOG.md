@@ -16,6 +16,10 @@ All notable changes to this project will be documented in this file.
     - Better formatting of markdown + code
     - Keep conversations saved in localBrowser storage
     - Better Debugging by providing more information about current states
+- Improve Document Viewer Interface
+    - Add Pagination
+    - Add Sorting
+    - Use Aggregation for Filtering
 - More Configuration
     - Enable/Disable Caching and Autocomplete Suggestions
 

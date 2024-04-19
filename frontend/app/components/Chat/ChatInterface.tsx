@@ -7,7 +7,7 @@ import { Message, QueryPayload } from './types'
 import { getWebSocketApiHost } from "./util"
 import ChatMessage from './ChatMessage';
 import { SettingsConfiguration } from "../Settings/types"
-import { GrPowerReset } from "react-icons/gr";
+import { IoIosRefresh } from "react-icons/io";
 
 import StatusLabel from './StatusLabel';
 
@@ -400,7 +400,7 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
                     </button>
                     <div className="tooltip text-text-verba" data-tip="Reset Conversation">
                         <button type='button' onClick={() => { removeMessagesFromLocalStorage("VERBA_CONVERSATION"); removeChunksFromLocalStorage("VERBA_CHUNKS"); setChunks([]); setMessages([]); setUserInput(""); setSuggestions([]) }} className='btn btn-circle border-none shadow-none bg-bg-alt-verba hover:bg-secondary-verba'>
-                            <GrPowerReset size={18} />
+                            <IoIosRefresh size={18} />
                         </button>
                     </div>
                 </form>

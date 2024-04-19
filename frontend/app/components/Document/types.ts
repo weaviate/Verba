@@ -12,6 +12,14 @@ export type DocumentPayload = {
     document: Document
 };
 
+export type AllDocumentsPayload = {
+    error: string
+    documents: Document[]
+    doc_types: string[],
+    current_embedder: string
+    took: number
+};
+
 
 export type Document = {
     text: string;

@@ -491,13 +491,15 @@ class VerbaManager:
         )
         return chunks, context
 
-    def retrieve_all_documents(self, doc_type: str) -> list:
+    def retrieve_all_documents(self, doc_type: str, page: int, pageSize: int) -> list:
         """Return all documents from Weaviate
         @returns list - Document list.
         """
         class_name = "Document_" + schema_manager.strip_non_letters(
             self.embedder_manager.selected_embedder.vectorizer
         )
+
+        offset = pageSize * (page - 1)
 
         if doc_type == "":
             query_results = (
@@ -506,7 +508,14 @@ class VerbaManager:
                     properties=["doc_name", "doc_type", "doc_link"],
                 )
                 .with_additional(properties=["id"])
-                .with_limit(10000)
+                .with_limit(pageSize)
+                .with_offset(offset)
+                .with_sort([
+                {
+                    'path': ['doc_name'],
+                    'order': 'asc',
+                }
+                 ])
                 .do()
             )
         else:
@@ -523,11 +532,33 @@ class VerbaManager:
                         "valueText": doc_type,
                     }
                 )
-                .with_limit(10000)
+                .with_limit(pageSize)
+                .with_offset(offset)
+                .with_sort([
+                {
+                    'path': ['doc_name'],
+                    'order': 'asc',
+                }
+                 ])
                 .do()
             )
 
         results = query_results["data"]["Get"][class_name]
+        return results
+    
+    def retrieve_all_document_types(self) -> list:
+        """Aggreagtes and returns all document types from Weaviate
+        @returns list - Document list.
+        """
+        class_name = "Document_" + schema_manager.strip_non_letters(
+            self.embedder_manager.selected_embedder.vectorizer
+        )
+
+        query_results = (
+            self.client.query.aggregate(class_name).with_fields("doc_type {count topOccurrences {value occurs}}").do()
+        )
+  
+        results = [doc_type["value"] for doc_type in query_results["data"]["Aggregate"][class_name][0]["doc_type"]["topOccurrences"]]
         return results
 
     def retrieve_document(self, doc_id: str) -> dict:
@@ -695,7 +726,8 @@ class VerbaManager:
             self.client, doc_id
         )
 
-    def search_documents(self, query: str, doc_type: str) -> list:
+
+    def search_documents(self, query: str, doc_type: str, page: int, pageSize: int) -> list:
         return self.embedder_manager.selected_embedder.search_documents(
-            self.client, query, doc_type
+            self.client, query, doc_type, page, pageSize
         )
