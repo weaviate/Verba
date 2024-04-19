@@ -393,14 +393,30 @@ async def set_component(payload: SetComponentPayload):
 async def get_status():
     msg.info("Retrieving status")
 
-    data = {
-        "type": manager.weaviate_type,
-        "libraries": manager.installed_libraries,
-        "variables": manager.environment_variables,
-        "schemas": manager.get_schemas(),
-    }
+    try:
 
-    return JSONResponse(content=data)
+        schemas = manager.get_schemas()
+        sorted_schemas = dict(sorted(schemas.items(), key=lambda item: item[1], reverse=True))
+
+        data = {
+            "type": manager.weaviate_type,
+            "libraries": manager.installed_libraries,
+            "variables": manager.environment_variables,
+            "schemas": sorted_schemas,
+            "error": ""
+        }
+
+        return JSONResponse(content=data)
+    except Exception as e:
+        data = {
+            "type": "",
+            "libraries": {},
+            "variables": {},
+            "schemas": {},
+            "error": f"Status retrieval failed: {str(e)}"
+        }
+        msg.fail(f"Status retrieval failed: {str(e)}")
+        return JSONResponse(content=data)
 
 
 # Reset Verba

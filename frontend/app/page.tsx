@@ -6,6 +6,7 @@ import Navbar from './components/Navigation/NavbarComponent'
 import SettingsComponent from "./components/Settings/SettingsComponent"
 import ChatComponent from './components/Chat/ChatComponent';
 import DocumentViewerComponent from './components/Document/DocumentViewerComponent';
+import StatusComponent from './components/Status/StatusComponent';
 import { Settings, BaseSettings } from "./components/Settings/types"
 import { Inter, Plus_Jakarta_Sans, Open_Sans, PT_Mono } from "next/font/google";
 
@@ -64,6 +65,10 @@ export default function Home() {
 
       {currentPage === "DOCUMENTS" && (
         <DocumentViewerComponent settingConfig={baseSetting[settingTemplate]} APIHost={APIHost} />
+      )}
+
+      {currentPage === "STATUS" && (
+        <StatusComponent settingConfig={baseSetting[settingTemplate]} APIHost={APIHost} />
       )}
 
       {currentPage === "SETTINGS" && (
