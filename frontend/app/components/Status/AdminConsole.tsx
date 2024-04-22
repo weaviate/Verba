@@ -27,13 +27,15 @@ const AdminConsoleComponent: React.FC<AdminConsoleComponentProps> = ({
 
     return (
         <div className='flex flex-col gap-2' >
-            <div className="flex flex-col bg-bg-alt-verba rounded-lg shadow-lg p-5 text-text-verba gap-6 overflow-auto">
-                <div className='flex gap-2'>
+            <div className="flex flex-col bg-bg-alt-verba rounded-lg shadow-lg p-5 text-text-verba gap-6 h-[65vh] overflow-auto">
+                <div className='flex lg:flex-row flex-col gap-2'>
                     <p className='text-text-verba font-bold text-lg'>
                         Admin Console
                     </p>
-                    <StatusLabel status={type !== null} true_text={type ? type : ""} false_text={type ? type : ""} />
-                    <StatusLabel status={connected === "Online"} true_text={connected} false_text="Connecting..." />
+                    <div className='flex gap-2'>
+                        <StatusLabel status={type !== null} true_text={type ? type : ""} false_text={type ? type : ""} />
+                        <StatusLabel status={connected === "Online"} true_text={connected} false_text="Connecting..." />
+                    </div>
                 </div>
 
                 {isFetching && (
@@ -45,41 +47,51 @@ const AdminConsoleComponent: React.FC<AdminConsoleComponentProps> = ({
                     </div>
                 )}
 
-
-                <div className='grid grid-cols-2 gap-2'>
-                    {schemas && Object.entries(schemas).map(([key, value]) => (
-                        <StatusCard title={key} value={value} checked={false} />
-                    ))}
-
-                </div>
                 {connected === "Online" && (
                     <div className='gap-2 grid grid-cols-2'>
                         <button className='btn bg-button-verba hover:bg-warning-verba flex gap-2'>
-                            <MdDelete />
-                            <p className='sm:hidden md:flex text-xs'>
+                            <div className='hidden lg:flex'>
+                                <MdDelete />
+                            </div>
+                            <p className='flex text-xs'>
                                 Reset Verba
                             </p>
                         </button>
                         <button className='btn bg-button-verba hover:bg-warning-verba flex gap-2'>
-                            <MdDelete />
-                            <p className='sm:hidden md:flex text-xs'>
+                            <div className='hidden lg:flex'>
+                                <MdDelete />
+                            </div>
+                            <p className='flex text-xs'>
                                 Reset Documents
                             </p>
                         </button>
                         <button className='btn bg-button-verba hover:bg-warning-verba flex gap-2'>
-                            <MdDelete />
-                            <p className='sm:hidden md:flex text-xs'>
+                            <div className='hidden lg:flex'>
+                                <MdDelete />
+                            </div>
+                            <p className='flex text-xs'>
                                 Reset Cache
                             </p>
                         </button>
                         <button className='btn bg-button-verba hover:bg-warning-verba flex gap-2'>
-                            <MdDelete />
-                            <p className='sm:hidden md:flex text-xs'>
+                            <div className='hidden lg:flex'>
+                                <MdDelete />
+                            </div>
+                            <p className='flex text-xs'>
                                 Reset Suggestion
                             </p>
                         </button>
                     </div>
                 )}
+
+
+                <div className='flex flex-col gap-2'>
+                    {schemas && Object.entries(schemas).map(([key, value]) => (
+                        <StatusCard key={key + "SCHEMA"} title={key} value={value} checked={false} />
+                    ))}
+
+                </div>
+
             </div>
         </div >
     );

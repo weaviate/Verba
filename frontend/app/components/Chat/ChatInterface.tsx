@@ -347,9 +347,8 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
         <div className='flex flex-col gap-2' >
             {/*Chat Messages*/}
             <div className="flex flex-col bg-bg-alt-verba rounded-lg shadow-lg p-5 text-text-verba gap-5 h-[55vh] overflow-auto">
-
                 <div className='flex gap-2 items-center'>
-                    <StatusLabel status={APIHost !== null && socket !== null} true_text='Online' false_text='Connecting...' />
+                    <StatusLabel status={APIHost !== null && socket !== null && socket.readyState !== WebSocket.CLOSED} true_text='Online' false_text='Connecting...' />
                     <StatusLabel status={true} true_text='GPT-4' false_text='Connecting...' />
                     <div className="hidden sm:block sm:h-[3vh] lg:h-[2vh] bg-text-alt-verba w-px mx-1"></div>
                     <StatusLabel status={settingConfig.Chat.settings.caching.checked} true_text='Caching' false_text='No Caching' />
@@ -388,7 +387,7 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
             </div >
 
             {/*Chat Input*/}
-            <div className="flex flex-col bg-bg-alt-verba rounded-lg shadow-lg p-5 text-text-verba gap-5">
+            <div className="flex flex-col bg-bg-alt-verba rounded-lg shadow-lg p-5 text-text-verba gap-5 min-h-[9.3vh]">
 
                 <form
                     className='flex justify-between w-full items-center gap-3'
@@ -405,6 +404,7 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
                     </div>
                 </form>
             </div >
+
             <div className="flex flex-col gap-2">
                 {suggestions.map((suggestion, index) => (
                     <button
@@ -416,6 +416,7 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
                     </button>
                 ))}
             </div>
+
             {/*Chat Notification*/}
             <div className={`animate-pop-in ${showNotification ? ("opacity-100") : ("opacity-0")} ${notificationState === "GOOD" ? ("bg-secondary-verba") : ("bg-warning-verba")} text-text-verba p-3 rounded text-sm transition-opacity`}>
                 <p>{notificationText}</p>

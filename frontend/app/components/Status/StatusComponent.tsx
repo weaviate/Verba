@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { SettingsConfiguration } from "../Settings/types"
 
 import AdminConsoleComponent from './AdminConsole';
+import StatusConsoleComponent from './StatusConsole';
 
 import { StatusPayload, Status, SchemaStatus } from './types';
 
@@ -75,16 +76,16 @@ const StatusComponent: React.FC<StatusComponentComponentProps> = ({ APIHost, set
     return (
         <div className="flex sm:flex-col md:flex-row justify-center items-start gap-3 ">
 
-            <div className='w-2/3'>
+            <div className='w-full md:w-1/3'>
                 <AdminConsoleComponent settingConfig={settingConfig} type={type} isFetching={isFetching} connected={connected} schemas={schemas} />
             </div>
 
-            <div className='w-1/3'>
-
+            <div className='w-full md:w-1/3'>
+                <StatusConsoleComponent settingConfig={settingConfig} title="Libraries" isFetching={isFetching} status={libraries} />
             </div>
 
-            <div className='w-1/3'>
-
+            <div className='w-full md:w-1/3'>
+                <StatusConsoleComponent settingConfig={settingConfig} title="Variables" isFetching={isFetching} status={variables} />
             </div>
 
         </div >

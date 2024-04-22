@@ -401,17 +401,12 @@ class VerbaManager:
         @returns dict - A dictionary with the schema names and their object count.
         """
         schema_info = self.client.schema.get()
+
         schemas = {}
 
         for _class in schema_info["classes"]:
-            results = (
-                self.client.query.get(_class["class"])
-                .with_limit(10000)
-                .with_additional(properties=["id"])
-                .do()
-            )
-
-            schemas[_class["class"]] = len(results["data"]["Get"][_class["class"]])
+            results= self.client.query.aggregate(_class["class"]).with_meta_count().do()
+            schemas[_class["class"]] = results.get("data",{}).get("Aggregate",{}).get(_class["class"],[{}])[0].get("meta",{}).get("count",0)
 
         return schemas
 

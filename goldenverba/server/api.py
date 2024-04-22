@@ -398,10 +398,13 @@ async def get_status():
         schemas = manager.get_schemas()
         sorted_schemas = dict(sorted(schemas.items(), key=lambda item: item[1], reverse=True))
 
+        sorted_libraries = dict(sorted(manager.installed_libraries.items(), key=lambda item: (not item[1], item[0])))
+        sorted_variables = dict(sorted(manager.environment_variables.items(), key=lambda item: (not item[1], item[0])))
+
         data = {
             "type": manager.weaviate_type,
-            "libraries": manager.installed_libraries,
-            "variables": manager.environment_variables,
+            "libraries": sorted_libraries,
+            "variables": sorted_variables,
             "schemas": sorted_schemas,
             "error": ""
         }

@@ -20,6 +20,10 @@ All notable changes to this project will be documented in this file.
     - Add Pagination
     - Add Sorting
     - Use Aggregation for Filtering
+- Improve Status Overview
+    - Reworked Frontend + Optimize Code
+    - Sort status entries
+    - Improve Loading Speed by using Aggregation
 - More Configuration
     - Enable/Disable Caching and Autocomplete Suggestions
 

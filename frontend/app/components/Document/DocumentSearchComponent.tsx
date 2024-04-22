@@ -132,23 +132,29 @@ const DocumentSearchComponent: React.FC<DocumentSearchComponentProps> = ({
 
     return (
         <div className='flex flex-col gap-2' >
-            <div className="flex flex-col bg-bg-alt-verba rounded-lg shadow-lg p-5 text-text-verba gap-5">
+            <div className="flex flex-col bg-bg-alt-verba rounded-lg shadow-lg p-5 text-text-verba md:gap-5 min-h-[15vh] md:min-h-[9.3vh]">
                 {/*Search Bar*/}
                 <form
-                    className='flex justify-between w-full items-center gap-3'
+                    className='flex md:justify-between w-full items-center justify-center gap-2 md:gap-3'
                     onSubmit={handleSearch}
                 >
-                    <StatusLabel status={true} true_text='ADAEmbedder' false_text='No Caching' />
-                    <textarea rows={1} cols={10} onKeyDown={handleKeyDown} value={userInput} onChange={(e) => { setUserInput(e.target.value) }} className=" bg-bg-alt-verba textarea textarea-xs p-2 text-sm md:text-base w-full" placeholder={`Search for documents`}></textarea>
-                    <button type='button' onClick={handleSearch} className='btn btn-circle border-none shadow-none bg-bg-alt-verba hover:bg-secondary-verba'>
-                        <FaSearch size={18} />
-                    </button>
-                    <button type='button' onClick={clearSearch} className='btn btn-circle border-none shadow-none bg-bg-alt-verba hover:bg-secondary-verba'>
-                        <IoIosRefresh size={18} />
-                    </button>
+                    <div className='flex md:flex-row flex-col gap-2 md:gap-5 sm:w-full'>
+                        <div>
+                            <StatusLabel status={true} true_text='ADAEmbedder' false_text='No Caching' />
+                        </div>
+                        <textarea rows={1} cols={10} onKeyDown={handleKeyDown} value={userInput} onChange={(e) => { setUserInput(e.target.value) }} className=" bg-bg-alt-verba textarea textarea-xs p-2 text-sm md:text-base w-full" placeholder={`Search for documents`}></textarea>
+                    </div>
+                    <div className='flex md:flex-row flex-col gap-2 md:gap-5'>
+                        <button type='button' onClick={handleSearch} className='btn btn-circle border-none shadow-none bg-bg-alt-verba hover:bg-secondary-verba'>
+                            <FaSearch size={18} />
+                        </button>
+                        <button type='button' onClick={clearSearch} className='btn btn-circle border-none shadow-none bg-bg-alt-verba hover:bg-secondary-verba'>
+                            <IoIosRefresh size={18} />
+                        </button>
+                    </div>
                 </form>
 
-            </div>
+            </div >
             <div className="flex flex-col bg-bg-alt-verba rounded-lg shadow-lg p-5 text-text-verba gap-3 sm:h-[35vh] md:h-[40vh] lg:h-[55vh] overflow-auto">
                 <div className='flex gap-2 items-center justify-center'>
                     <div className='flex items-center justify-center'>

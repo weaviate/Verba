@@ -14,7 +14,7 @@ const StatusCard: React.FC<StatusCardProps> = ({ title, value, checked }) => {
         <div className={`flex p-3 rounded-lg ${checked ? ("bg-secondary-verba") : ("bg-bg-verba")}`}>
             <div className='flex gap-2 text-text-verba items-center'>
                 <p>{title}</p>
-                <div className='text-sm text-text-alt-verba'>
+                <div className='text-xs lg:text-sm text-text-alt-verba'>
                     {value !== null ? (
                         <p>{value}</p>
                     ) : (
