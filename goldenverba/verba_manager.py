@@ -299,6 +299,13 @@ class VerbaManager:
             self.installed_libraries["transformers"] = False
 
         try:
+            import httpx
+
+            self.installed_libraries["httpx"] = True
+        except Exception:
+            self.installed_libraries["httpx"] = False
+
+        try:
             import torch
 
             if torch.cuda.is_available():
@@ -396,6 +403,9 @@ class VerbaManager:
             self.environment_variables["OLLAMA_MODEL"] = True
         else:
             self.environment_variables["OLLAMA_MODEL"] = False
+
+        self.environment_variables["ATLASSIAN_URL"] = (os.environ.get("ATLASSIAN_URL", "") != "")
+        self.environment_variables["CONFLUENCE_TOKEN"] = (os.environ.get("CONFLUENCE_TOKEN", "") != "")
 
         if os.environ.get("OPENAI_API_TYPE", "") == "azure":
             if not (

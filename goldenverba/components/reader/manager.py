@@ -1,5 +1,6 @@
 from wasabi import msg
 
+from goldenverba.components.reader.ConfluenceReader import ConfluenceReader
 from goldenverba.components.reader.document import Document
 from goldenverba.components.reader.githubreader import GithubReader
 from goldenverba.components.reader.interface import Reader
@@ -15,6 +16,7 @@ class ReaderManager:
             "PDFReader": PDFReader(),
             "GithubReader": GithubReader(),
             "UnstructuredPDF": UnstructuredPDF(),
+            "ConfluenceReader": ConfluenceReader(),
         }
         self.selected_reader: Reader = self.readers["SimpleReader"]
 
