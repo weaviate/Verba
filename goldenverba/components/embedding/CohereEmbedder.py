@@ -1,7 +1,7 @@
 from weaviate import Client
 
-from goldenverba.components.embedding.interface import Embedder
-from goldenverba.components.reader.document import Document
+from goldenverba.components.interfaces import Embedder
+from goldenverba.components.document import Document
 
 
 class CohereEmbedder(Embedder):

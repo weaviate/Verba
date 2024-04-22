@@ -6,9 +6,9 @@ from wasabi import msg
 with contextlib.suppress(Exception):
     import tiktoken
 
-from goldenverba.components.chunking.chunk import Chunk
-from goldenverba.components.chunking.interface import Chunker
-from goldenverba.components.reader.document import Document
+from goldenverba.components.chunk import Chunk
+from goldenverba.components.interfaces import Chunker
+from goldenverba.components.document import Document
 
 
 class TokenChunker(Chunker):
@@ -20,9 +20,7 @@ class TokenChunker(Chunker):
         super().__init__()
         self.name = "TokenChunker"
         self.requires_library = ["tiktoken"]
-        self.default_units = 250
-        self.default_overlap = 50
-        self.description = "Chunk documents by tokens powered by tiktoken. You can specify how many tokens should overlap between chunks to improve retrieval."
+        self.description = "Chunks documents by word tokens. Choose between the chunk size and their overlap."
         self.encoding = tiktoken.encoding_for_model("gpt-3.5-turbo")
 
     def chunk(

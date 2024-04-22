@@ -9,6 +9,9 @@ import DocumentViewerComponent from './components/Document/DocumentViewerCompone
 import StatusComponent from './components/Status/StatusComponent';
 import { Settings, BaseSettings } from "./components/Settings/types"
 import { Inter, Plus_Jakarta_Sans, Open_Sans, PT_Mono } from "next/font/google";
+import RAGComponent from './components/RAG/RAGComponent';
+
+import { RAGConfig, RAGResponse } from './components/RAG/types';
 
 import { detectHost } from "./api"
 
@@ -39,6 +42,9 @@ export default function Home() {
   const fontKey = baseSetting[settingTemplate].Customization.settings.font.value as FontKey; // Safely cast if you're sure, or use a check
   const fontClassName = fonts[fontKey]?.className || "";
 
+  // RAG Config
+  const [RAGConfig, setRAGConfig] = useState<RAGConfig | null>(null)
+
   const [APIHost, setAPIHost] = useState<string | null>(null)
 
   useEffect(() => {
@@ -46,6 +52,31 @@ export default function Home() {
       try {
         const host = await detectHost();
         setAPIHost(host);
+        if (host === "" || host === "http://localhost:8000") {
+          try {
+            const response = await fetch(host + "/api/config", {
+              method: "GET",
+            });
+            const data: RAGResponse = await response.json();
+
+            if (data) {
+
+              if (data.error) {
+                console.log(data.error)
+              }
+
+              console.log(data.data)
+
+              setRAGConfig(data.data)
+
+            } else {
+              console.warn("Configuration could not be retrieved")
+            }
+          } catch (error) {
+            console.error("Failed to fetch configuration:", error);
+            setRAGConfig(null)
+          }
+        }
       } catch (error) {
         console.error('Error detecting host:', error);
         setAPIHost(null); // Optionally handle the error by setting the state to an empty string or a specific error message
@@ -69,6 +100,14 @@ export default function Home() {
 
       {currentPage === "STATUS" && (
         <StatusComponent settingConfig={baseSetting[settingTemplate]} APIHost={APIHost} />
+      )}
+
+      {currentPage === "ADD" && (
+        <RAGComponent buttonTitle="Import" settingConfig={baseSetting[settingTemplate]} APIHost={APIHost} RAGConfig={RAGConfig} setRAGConfig={setRAGConfig} showComponents={["Reader", "Chunker", "Embedder"]} />
+      )}
+
+      {currentPage === "RAG" && (
+        <RAGComponent buttonTitle="Save" settingConfig={baseSetting[settingTemplate]} APIHost={APIHost} RAGConfig={RAGConfig} setRAGConfig={setRAGConfig} showComponents={["Embedder", "Retriever", "Generator"]} />
       )}
 
       {currentPage === "SETTINGS" && (

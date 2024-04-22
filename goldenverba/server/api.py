@@ -7,19 +7,14 @@ import os
 from pathlib import Path
 
 from dotenv import load_dotenv
-from pydantic import BaseModel
 from starlette.websockets import WebSocketDisconnect
 from wasabi import msg  # type: ignore[import]
 import time
 
 from goldenverba import verba_manager
-from goldenverba.components.chunking.interface import Chunker
-from goldenverba.components.embedding.interface import Embedder
-from goldenverba.components.generation.interface import Generator
-from goldenverba.components.reader.interface import Reader
-from goldenverba.components.retriever.interface import Retriever
 from goldenverba.server.ConfigManager import ConfigManager
-from goldenverba.server.util import setup_managers
+from goldenverba.server.types import GetComponentPayload, SetComponentPayload, LoadPayload, QueryPayload, GeneratePayload, GetDocumentPayload, SearchQueryPayload, ImportPayload
+from goldenverba.server.util import setup_managers, create_reader_payload, create_chunker_payload, create_embedder_payload, create_generator_payload, create_retriever_payload
 
 load_dotenv()
 
@@ -44,68 +39,6 @@ setup_managers(
     manager, config_manager, readers, chunker, embedders, retrievers, generators
 )
 config_manager.save_config()
-
-
-def create_reader_payload(key: str, reader: Reader) -> dict:
-    available, message = manager.check_verba_component(reader)
-
-    return {
-        "name": key,
-        "description": reader.description,
-        "input_form": reader.input_form,
-        "available": available,
-        "message": message,
-    }
-
-
-def create_chunker_payload(key: str, chunker: Chunker) -> dict:
-    available, message = manager.check_verba_component(chunker)
-
-    return {
-        "name": key,
-        "description": chunker.description,
-        "input_form": chunker.input_form,
-        "units": chunker.default_units,
-        "overlap": chunker.default_overlap,
-        "available": available,
-        "message": message,
-    }
-
-
-def create_embedder_payload(key: str, embedder: Embedder) -> dict:
-    available, message = manager.check_verba_component(embedder)
-
-    return {
-        "name": key,
-        "description": embedder.description,
-        "input_form": embedder.input_form,
-        "available": available,
-        "message": message,
-    }
-
-
-def create_retriever_payload(key: str, retriever: Retriever) -> dict:
-    available, message = manager.check_verba_component(retriever)
-
-    return {
-        "name": key,
-        "description": retriever.description,
-        "available": available,
-        "message": message,
-    }
-
-
-def create_generator_payload(key: str, generator: Generator) -> dict:
-    available, message = manager.check_verba_component(generator)
-
-    return {
-        "name": key,
-        "description": generator.description,
-        "available": available,
-        "message": message,
-        "streamable": generator.streamable,
-    }
-
 
 # FastAPI App
 app = FastAPI()
@@ -138,78 +71,10 @@ app.mount(
 app.mount("/static", StaticFiles(directory=BASE_DIR / "frontend/out"), name="app")
 
 
-class QueryPayload(BaseModel):
-    query: str
-
-
-class ConversationItem(BaseModel):
-    type: str
-    content: str
-
-
-class GeneratePayload(BaseModel):
-    query: str
-    context: str
-    conversation: list[ConversationItem]
-
-
-class SearchQueryPayload(BaseModel):
-    query: str
-    doc_type: str
-    page: int
-    pageSize: int
-
-
-class GetDocumentPayload(BaseModel):
-    document_id: str
-
-
-class LoadPayload(BaseModel):
-    reader: str
-    chunker: str
-    embedder: str
-    fileBytes: list[str]
-    fileNames: list[str]
-    filePath: str
-    document_type: str
-    chunkUnits: int
-    chunkOverlap: int
-
-
-class GetComponentPayload(BaseModel):
-    component: str
-
-
-class SetComponentPayload(BaseModel):
-    component: str
-    selected_component: str
-
-
 @app.get("/")
 @app.head("/")
 async def serve_frontend():
     return FileResponse(os.path.join(BASE_DIR, "frontend/out/index.html"))
-
-
-@app.get("/status")
-async def catch_status():
-    # Check if the path corresponds to a file that exists in the static directory
-    file_path = BASE_DIR / "frontend/out" / "status.html"
-    if os.path.isfile(file_path):
-        return FileResponse(file_path)
-    # Otherwise, serve index.html
-    return FileResponse(os.path.join(BASE_DIR, "frontend/out/index.html"))
-
-
-@app.get("/document_explorer")
-async def catch_explorer():
-    # Check if the path corresponds to a file that exists in the static directory
-    file_path = BASE_DIR / "frontend/out" / "document_explorer.html"
-    if os.path.isfile(file_path):
-        return FileResponse(file_path)
-    # Otherwise, serve index.html
-    return FileResponse(os.path.join(BASE_DIR, "frontend/out/index.html"))
-
 
 # Define health check endpoint
 @app.get("/api/health")
@@ -236,7 +101,6 @@ async def root():
             },
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
         )
-
 
 # Define health check endpoint
 @app.get("/api/get_google_tag")
@@ -271,29 +135,29 @@ async def get_components():
 
     for key in readers:
         current_reader = readers[key]
-        current_reader_data = create_reader_payload(key, current_reader)
+        current_reader_data = create_reader_payload(manager, key, current_reader)
         data["readers"].append(current_reader_data)
 
     for key in chunker:
         current_chunker = chunker[key]
-        current_chunker_data = create_chunker_payload(key, current_chunker)
+        current_chunker_data = create_chunker_payload(manager, key, current_chunker)
         data["chunker"].append(current_chunker_data)
 
     for key in embedders:
         current_embedder = embedders[key]
-        current_embedder_data = create_embedder_payload(key, current_embedder)
+        current_embedder_data = create_embedder_payload(manager, key, current_embedder)
         data["embedder"].append(current_embedder_data)
 
     try:
         data["default_values"] = {
             "last_reader": create_reader_payload(
-                config_manager.get_reader(), readers[config_manager.get_reader()]
+                manager, config_manager.get_reader(), readers[config_manager.get_reader()]
             ),
             "last_chunker": create_chunker_payload(
-                config_manager.get_chunker(), chunker[config_manager.get_chunker()]
+                manager, config_manager.get_chunker(), chunker[config_manager.get_chunker()]
             ),
             "last_embedder": create_embedder_payload(
-                config_manager.get_embedder(), embedders[config_manager.get_embedder()]
+                manager, config_manager.get_embedder(), embedders[config_manager.get_embedder()]
             ),
             "last_document_type": "Documentation",
         }
@@ -321,6 +185,36 @@ async def get_components():
 
     return JSONResponse(content=data)
 
+# Get Configuration
+@app.get("/api/config")
+async def get_config():
+    msg.info("Retrieving configuration")
+
+    try:
+        readers = manager.reader_manager.get_readers()
+        reader_config = {"components":{reader: readers[reader].get_meta() for reader in readers}, "selected": manager.reader_manager.selected_reader}
+
+        chunkers = manager.chunker_manager.get_chunkers()
+        chunkers_config = {"components":{chunker: chunkers[chunker].get_meta() for chunker in chunkers}, "selected": manager.chunker_manager.selected_chunker}
+
+        embedders = manager.embedder_manager.get_embedders()
+        embedder_config = {"components":{embedder: embedders[embedder].get_meta() for embedder in embedders}, "selected": manager.embedder_manager.selected_embedder}
+
+        retrievers = manager.retriever_manager.get_retrievers()
+        retrievers_config = {"components":{retriever: retrievers[retriever].get_meta() for retriever in retrievers}, "selected": manager.retriever_manager.selected_retriever}
+
+        generators = manager.generator_manager.get_generators()
+        generator_config = {"components":{generator: generators[generator].get_meta() for generator in generators}, "selected": manager.generator_manager.selected_generator}
+
+        config = {"Reader": reader_config, "Chunker":chunkers_config, "Embedder":embedder_config, "Retriever":retrievers_config, "Generator": generator_config}
+
+        return JSONResponse(status_code=200, content={"data":config, "error":""})
+
+    except Exception as e:
+        msg.warn(f"Could not retrieve configuration: {str(e)}")
+        return JSONResponse(status_code=200, content={"data":{}, "error":f"Could not retrieve configuration: {str(e)}"})
+
+
 
 @app.post("/api/get_component")
 async def get_component(payload: GetComponentPayload):
@@ -330,7 +224,7 @@ async def get_component(payload: GetComponentPayload):
 
     if payload.component == "embedders":
         data["selected_component"] = create_embedder_payload(
-            manager.embedder_manager.selected_embedder.name,
+            manager.embedder_manager.selected_embedder,
             manager.embedder_manager.selected_embedder,
         )
 
@@ -458,6 +352,16 @@ async def reset_suggestion():
 
     return JSONResponse(status_code=200, content={})
 
+# Receive query and return chunks and query answer
+@app.post("/api/import")
+async def import_data(payload: ImportPayload):
+
+    return JSONResponse(
+        content={
+            "status": "200",
+            "status_msg": "No documents received",
+        }
+    )
 
 # Receive query and return chunks and query answer
 @app.post("/api/load_data")
@@ -720,7 +624,7 @@ async def get_all_documents(payload: SearchQueryPayload):
             content={
                 "documents": [],
                 "doc_types": [],
-                "current_embedder": manager.embedder_manager.selected_embedder.name,
+                "current_embedder": manager.embedder_manager.selected_embedder,
                 "error": f"No Results found!",
                 "took": 0
             }
@@ -751,7 +655,7 @@ async def get_all_documents(payload: SearchQueryPayload):
             content={
                 "documents": documents_obj,
                 "doc_types": list(doc_types),
-                "current_embedder": manager.embedder_manager.selected_embedder.name,
+                "current_embedder": manager.embedder_manager.selected_embedder,
                 "error": "",
                 "took": elapsed_time
             }
@@ -762,7 +666,7 @@ async def get_all_documents(payload: SearchQueryPayload):
             content={
                 "documents": [],
                 "doc_types": [],
-                "current_embedder": manager.embedder_manager.selected_embedder.name,
+                "current_embedder": manager.embedder_manager.selected_embedder,
                 "error": f"All Document retrieval failed: {str(e)}",
                 "took": 0
             }

@@ -4,7 +4,7 @@ from collections.abc import Iterator
 
 from wasabi import msg
 
-from goldenverba.components.generation.interface import Generator
+from goldenverba.components.interfaces import Generator
 
 
 class Llama2Generator(Generator):

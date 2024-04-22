@@ -1,5 +1,5 @@
 from goldenverba.components.chunking.wordchunker import WordChunker
-from goldenverba.components.reader.document import Document
+from goldenverba.components.document import Document
 
 chunker = WordChunker()
 

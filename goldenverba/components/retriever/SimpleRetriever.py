@@ -1,9 +1,8 @@
 from weaviate import Client
 from weaviate.gql.get import HybridFusion
 
-from goldenverba.components.chunking.chunk import Chunk
-from goldenverba.components.embedding.interface import Embedder
-from goldenverba.components.retriever.interface import Retriever
+from goldenverba.components.chunk import Chunk
+from goldenverba.components.interfaces import Embedder, Retriever
 
 
 class SimpleRetriever(Retriever):

@@ -2,6 +2,36 @@ import json
 import os
 
 from wasabi import msg
+from pydantic import BaseModel
+
+class Components(BaseModel):
+    reader: str
+    chunker: str
+    embedder: str
+    retriever: str
+    generator: str
+
+class VerbaConfig(BaseModel):
+    components: Components
+    settings: dict
+
+def save_config(conf : VerbaConfig, filename: str = "verba_config.json"):
+    """Save config to file."""
+    msg.good("Saved Config")
+    with open(filename, "w") as file:
+        json.dump(conf, file, indent=4)
+
+def load_config(filename: str = "verba_config.json") -> VerbaConfig:
+    """Save config to file."""
+    msg.good("Saved Config")
+    if os.path.exists(filename):
+        with open(filename, "r") as file:
+            config = json.load(file)
+            return config
+    else:
+        config_data = {"components": {"reader": "", "chunker": "", "embedder":"", "retriever":"", "generator": ""}, "settings": {}}
+        config = VerbaConfig(**config_data)
+        return config
 
 
 class Config:
@@ -22,7 +52,6 @@ class Config:
             or self.retriever == ""
             or self.generator == ""
         )
-
 
 class ConfigManager:
     def __init__(

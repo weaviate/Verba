@@ -1,89 +1,83 @@
 import base64
 import json
-import os
 from datetime import datetime
-
+import time
+import io
 import requests
+
 from wasabi import msg
 
-from goldenverba.components.reader.document import Document
-from goldenverba.components.reader.interface import InputForm, Reader
+from goldenverba.components.document import Document
+from goldenverba.components.interfaces import Reader
+from goldenverba.components.types import FileData
 
 
-class GithubReader(Reader):
+class GitHubReader(Reader):
     """
     The GithubReader downloads files from Github and ingests them into Weaviate.
     """
 
     def __init__(self):
         super().__init__()
-        self.name = "GithubReader"
+        self.name = "GitHubReader"
         self.requires_env = ["GITHUB_TOKEN"]
-        self.description = "Downloads only text files from a GitHub repository and ingests it into Verba. Use this format {owner}/{repo}/{branch}/{folder}"
-        self.input_form = InputForm.INPUT.value
+        self.description = "Retrieves all text files (.txt, .md, .mdx, .json) from a GitHub Repository and imports them into Verba. Use this format {owner}/{repo}/{branch}/{folder}"
 
     def load(
         self,
-        bytes: list[str] = None,
-        contents: list[str] = None,
-        paths: list[str] = None,
-        fileNames: list[str] = None,
-        document_type: str = "Documentation",
-    ) -> list[Document]:
-        """Ingest data into Weaviate
-        @parameter: bytes : list[str] - List of bytes
-        @parameter: contents : list[str] - List of string content
-        @parameter: paths : list[str] - List of paths to files
-        @parameter: fileNames : list[str] - List of file names
-        @parameter: document_type : str - Document type
-        @returns list[Document] - Lists of documents.
-        """
-        if fileNames is None:
-            fileNames = []
-        if paths is None:
-            paths = []
-        if contents is None:
-            contents = []
-        if bytes is None:
-            bytes = []
+        fileData: list[FileData],
+        config: dict
+    ) -> tuple[list[Document], list[str]]:
+
+        start_time = time.time()  # Start timing
         documents = []
+        logging = []
+        logging.append(["INFO",f"Starting loading in {len(fileData)} files"])
 
-        # If paths exist
-        if len(paths) > 0:
-            for path in paths:
-                if path != "":
-                    files = self.fetch_docs(path)
+        for _config in self.config:
+            if _config in config and self.config[_config] != config[_config]:
+                msg.info(f"Updating BasicReader Config {_config} : {self.config[_config]} -> {config[_config]}")
+                logging.append(["INFO",f"Updating BasicReader Config {_config} : {self.config[_config]} -> {config[_config]}"])
+                self.config[_config] = config[_config]
 
-                    for _file in files:
-                        try:
-                            content, link, _path = self.download_file(path, _file)
-                        except Exception as e:
-                            msg.warn(f"Couldn't load, skipping {_file}: {str(e)}")
-                            continue
+        data = fileData[0]
+        docs = self.fetch_docs(data.content)
 
-                        if ".json" in _file:
-                            json_obj = json.loads(str(content))
-                            try:
-                                document = Document.from_json(json_obj)
-                            except Exception as e:
-                                raise Exception(f"Loading JSON failed {e}")
+        for _file in docs:
+            try:
+                logging.append(["INFO",f"Downloading in {_file}"])
+                content, link, _path = self.download_file(data.content, _file)
+                if ".json" in _file:
+                    json_obj = json.loads(str(content))
+                    try:
+                        document = Document.from_json(json_obj)
+                    except Exception as e:
+                        raise Exception(f"Loading JSON failed {e}")
 
-                        else:
-                            document = Document(
-                                text=content,
-                                type=document_type,
-                                name=_file,
-                                link=link,
-                                path=_path,
-                                timestamp=str(
-                                    datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                                ),
-                                reader=self.name,
-                            )
-                        documents.append(document)
+                else:
+                    document = Document(
+                        text=content,
+                        type=self.config["document_type"],
+                        name=_file,
+                        link=link,
+                        path=_path,
+                        timestamp=str(
+                            datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                        ),
+                        reader=self.name,
+                    )
 
-        msg.good(f"Loaded {len(documents)} documents")
-        return documents
+                documents.append(document)
+
+            except Exception as e:
+                msg.warn(f"Couldn't load, skipping {_file}: {str(e)}")
+                continue
+
+        elapsed_time = round(time.time() - start_time , 2) # Calculate elapsed time
+        msg.good(f"Loaded {len(documents)} documents in {elapsed_time}s")
+        logging.append(["SUCCESS",f"Loaded {len(documents)} documents in {elapsed_time}s"])
+
+
 
     def fetch_docs(self, path: str) -> list:
         """Fetch filenames from Github

@@ -1,5 +1,4 @@
-from goldenverba.components.chunking.chunk import Chunk
-
+from goldenverba.components.chunk import Chunk
 
 class Document:
     def __init__(

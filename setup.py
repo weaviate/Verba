@@ -36,7 +36,7 @@ setup(
         "tiktoken==0.5.1",
         "cohere==4.33",
         "requests",
-        "pypdf2",
+        "pypdf==4.2.0",
     ],
     extras_require={
         "dev": [

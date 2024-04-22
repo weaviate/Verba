@@ -3,8 +3,8 @@ from pathlib import Path
 
 import pytest
 
-from goldenverba.components.reader.document import Document
-from goldenverba.components.reader.simplereader import SimpleReader
+from goldenverba.components.document import Document
+from goldenverba.components.reader.BasicReader import SimpleReader
 
 
 @pytest.fixture

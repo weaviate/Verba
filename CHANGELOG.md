@@ -24,6 +24,11 @@ All notable changes to this project will be documented in this file.
     - Reworked Frontend + Optimize Code
     - Sort status entries
     - Improve Loading Speed by using Aggregation
+- Improve Component Selection for both Ingestion and RAG
+    - Added new configuraiton that will be passed between frontend and backend
+    - Cleaned codebase, merged interfaces and managers to single files
+    - Added clean endpoints for better code readability
+    - Reworked on interfaces
 - More Configuration
     - Enable/Disable Caching and Autocomplete Suggestions
 

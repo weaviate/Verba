@@ -27,3 +27,4 @@ export const detectHost = async (): Promise<string> => {
 
     throw new Error('Both health checks failed');
 };
+

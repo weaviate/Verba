@@ -4,7 +4,7 @@ from collections.abc import Iterator
 
 from dotenv import load_dotenv
 
-from goldenverba.components.generation.interface import Generator
+from goldenverba.components.interfaces import Generator
 
 load_dotenv()
 

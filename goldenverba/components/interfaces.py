@@ -1,4 +1,7 @@
-import re
+from goldenverba.components.document import Document
+from goldenverba.components.chunk import Chunk
+from goldenverba.components.types import InputText, FileData, InputNumber
+
 import os
 import time
 from dotenv import load_dotenv
@@ -7,9 +10,11 @@ from tqdm import tqdm
 from wasabi import msg
 from weaviate import Client
 
-from goldenverba.components.component import VerbaComponent
-from goldenverba.components.reader.document import Document
-from goldenverba.components.reader.interface import InputForm
+try:
+    import tiktoken
+except Exception:
+    msg.warn("tiktoken not installed, your base installation might be corrupted.")
+
 from goldenverba.components.schema.schema_generation import (
     EMBEDDINGS,
     VECTORIZERS,
@@ -18,6 +23,64 @@ from goldenverba.components.schema.schema_generation import (
 
 load_dotenv()
 
+class VerbaComponent:
+    """
+    Base Class for Verba Readers, Chunkers, Embedders, Retrievers, and Generators.
+    """
+
+    def __init__(self):
+        self.name = ""
+        self.requires_env = []
+        self.requires_library = []
+        self.description = ""
+        self.config = {}
+        self.type = ""
+
+    def get_meta(self) -> dict:
+        return {"name": self.name, "variables": self.requires_env, "library": self.requires_library , "description": self.description , "type": self.type, "config": {_c :  self.config[_c].dict() for _c in self.config} }
+    
+class Reader(VerbaComponent):
+    """
+    Interface for Verba Readers.
+    """
+
+    def __init__(self):
+        super().__init__()
+        self.type = "UPLOAD" # "LINK"
+        self.config = {"document_type": InputText(type="text", text="Document", description="Choose a label for your documents for filtering")}
+
+    def load(
+        fileData: list[FileData],
+        config: dict
+    ) -> tuple[list[Document], list[str]]:
+        """Ingest data into Weaviate
+        @parameter: fileData : list[FileData] - List of filename x bytes pairs
+        @parameter: document_type : str - Document type
+        @returns tuple[list[Document], list[str]] - A tuple of a list of documents and a list of strings displayed as logging on the frontend.
+        """
+        raise NotImplementedError("load method must be implemented by a subclass.")
+    
+class Chunker(VerbaComponent):
+    """
+    Interface for Verba Chunking.
+    """
+
+    def __init__(self):
+        super().__init__()
+        self.config = {"units": InputNumber(type="number", value=100, description="Choose the units per chunks"), "overlap": InputNumber(type="number", value=50, description="Choose the units for overlap between chunks")}
+
+    def chunk(
+        self, documents: list[Document], units: int, overlap: int
+    ) -> list[Document]:
+        """Chunk verba documents into chunks based on units and overlap.
+
+        @parameter: documents : list[Document] - List of Verba documents
+        @parameter: units : int - How many units per chunk (words, sentences, etc.)
+        @parameter: overlap : int - How much overlap between the chunks
+        @returns list[str] - List of documents that contain the chunks.
+        """
+        raise NotImplementedError("chunk method must be implemented by a subclass.")
+
 class Embedder(VerbaComponent):
     """
     Interface for Verba Embedding.
@@ -25,7 +88,6 @@ class Embedder(VerbaComponent):
 
     def __init__(self):
         super().__init__()
-        self.input_form = InputForm.TEXT.value  # Default for all Embedders
         self.vectorizer = ""
 
     def embed(documents: list[Document], client: Client, batch_size: int = 100) -> bool:
@@ -396,3 +458,106 @@ class Embedder(VerbaComponent):
                 )
             else:
                 client.batch.add_data_object(properties, self.get_cache_class())
+
+class Retriever(VerbaComponent):
+    """
+    Interface for Verba Retrievers.
+    """
+
+    def __init__(self):
+        super().__init__()
+
+    def retrieve(
+        self,
+        queries: list[str],
+        client: Client,
+        embedder: Embedder,
+    ) -> tuple[list[Chunk], str]:
+        """Ingest data into Weaviate
+        @parameter: queries : list[str] - List of queries
+        @parameter: client : Client - Weaviate client
+        @parameter: embedder : Embedder - Current selected Embedder
+        @returns tuple(list[Chunk],str) - List of retrieved chunks and the context string.
+        """
+        raise NotImplementedError("load method must be implemented by a subclass.")
+
+    def sort_chunks(self, chunks: list[Chunk]) -> list[Chunk]:
+        return sorted(chunks, key=lambda chunk: (chunk.doc_uuid, int(chunk.chunk_id)))
+
+    def cutoff_text(self, text: str, content_length: int) -> str:
+        encoding = tiktoken.encoding_for_model("gpt-3.5-turbo")
+
+        # Tokenize the input text
+        encoded_tokens = encoding.encode(text, disallowed_special=())
+
+        # Check if we need to truncate
+        if len(encoded_tokens) > content_length:
+            encoded_tokens = encoded_tokens[:content_length]
+            truncated_text = encoding.decode(encoded_tokens)
+            msg.info(f"Truncated Context to {content_length} tokens")
+            return truncated_text
+        else:
+            msg.info(f"Retrieved Context of {len(encoded_tokens)} tokens")
+            return text
+
+class Generator(VerbaComponent):
+    """
+    Interface for Verba Generators.
+    """
+
+    def __init__(self):
+        super().__init__()
+        self.streamable = False
+        self.context_window = 4000
+
+    async def generate(
+        self,
+        queries: list[str],
+        context: list[str],
+        conversation: dict = None,
+    ) -> str:
+        """Generate an answer based on a list of queries and list of contexts, and includes conversational context
+        @parameter: queries : list[str] - List of queries
+        @parameter: context : list[str] - List of contexts
+        @parameter: conversation : dict - Conversational context
+        @returns str - Answer generated by the Generator.
+        """
+        if conversation is None:
+            conversation = {}
+        raise NotImplementedError("generate method must be implemented by a subclass.")
+
+    async def generate_stream(
+        self,
+        queries: list[str],
+        context: list[str],
+        conversation: dict = None,
+    ):
+        """Generate a stream of response dicts based on a list of queries and list of contexts, and includes conversational context
+        @parameter: queries : list[str] - List of queries
+        @parameter: context : list[str] - List of contexts
+        @parameter: conversation : dict - Conversational context
+        @returns Iterator[dict] - Token response generated by the Generator in this format {system:TOKEN, finish_reason:stop or empty}.
+        """
+        if conversation is None:
+            conversation = {}
+        raise NotImplementedError(
+            "generate_stream method must be implemented by a subclass."
+        )
+
+    def prepare_messages(
+        self, queries: list[str], context: list[str], conversation: dict[str, str]
+    ) -> any:
+        """
+        Prepares a list of messages formatted for a Retrieval Augmented Generation chatbot system, including system instructions, previous conversation, and a new user query with context.
+
+        @parameter queries: A list of strings representing the user queries to be answered.
+        @parameter context: A list of strings representing the context information provided for the queries.
+        @parameter conversation: A list of previous conversation messages that include the role and content.
+
+        @returns A list or of message dictionaries or whole prompts formatted for the chatbot. This includes an initial system message, the previous conversation messages, and the new user query encapsulated with the provided context.
+
+        Each message in the list is a dictionary with 'role' and 'content' keys, where 'role' is either 'system' or 'user', and 'content' contains the relevant text. This will depend on the LLM used.
+        """
+        raise NotImplementedError(
+            "prepare_messages method must be implemented by a subclass."
+        )

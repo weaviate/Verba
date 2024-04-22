@@ -9,22 +9,14 @@ from weaviate import Client
 from weaviate.embedded import EmbeddedOptions
 
 import goldenverba.components.schema.schema_generation as schema_manager
-from goldenverba.components.chunking.chunk import Chunk
-from goldenverba.components.chunking.interface import Chunker
-from goldenverba.components.chunking.manager import ChunkerManager
-from goldenverba.components.component import VerbaComponent
-from goldenverba.components.embedding.interface import Embedder
-from goldenverba.components.embedding.manager import EmbeddingManager
-from goldenverba.components.generation.interface import Generator
-from goldenverba.components.generation.manager import GeneratorManager
-from goldenverba.components.reader.document import Document
-from goldenverba.components.reader.interface import Reader
-from goldenverba.components.reader.manager import ReaderManager
-from goldenverba.components.retriever.interface import Retriever
-from goldenverba.components.retriever.manager import RetrieverManager
+
+from goldenverba.components.chunk import Chunk
+from goldenverba.components.document import Document
+
+from goldenverba.components.interfaces import VerbaComponent, Reader, Chunker, Embedder, Retriever, Generator
+from goldenverba.components.managers import ReaderManager, ChunkerManager, EmbeddingManager, RetrieverManager, GeneratorManager
 
 load_dotenv()
-
 
 class VerbaManager:
     """Manages all Verba Components."""
@@ -254,11 +246,11 @@ class VerbaManager:
         Checks which libraries are installed and fills out the self.installed_libraries dictionary for the frontend to access, this will be displayed in the status page.
         """
         try:
-            import PyPDF2
+            import pypdf
 
-            self.installed_libraries["PyPDF2"] = True
+            self.installed_libraries["pypdf"] = True
         except Exception:
-            self.installed_libraries["PyPDF2"] = False
+            self.installed_libraries["pypdf"] = False
 
         try:
             import tiktoken
@@ -491,7 +483,7 @@ class VerbaManager:
         @returns list - Document list.
         """
         class_name = "Document_" + schema_manager.strip_non_letters(
-            self.embedder_manager.selected_embedder.vectorizer
+            self.embedder_manager.embedders[self.embedder_manager.selected_embedder].vectorizer
         )
 
         offset = pageSize * (page - 1)
@@ -546,7 +538,7 @@ class VerbaManager:
         @returns list - Document list.
         """
         class_name = "Document_" + schema_manager.strip_non_letters(
-            self.embedder_manager.selected_embedder.vectorizer
+            self.embedder_manager.embedders[self.embedder_manager.selected_embedder].vectorizer
         )
 
         query_results = (
@@ -562,7 +554,7 @@ class VerbaManager:
         @returns dict - Document dict.
         """
         class_name = "Document_" + schema_manager.strip_non_letters(
-            self.embedder_manager.selected_embedder.vectorizer
+            self.embedder_manager.embedders[self.embedder_manager.selected_embedder].vectorizer
         )
 
         document = self.client.data_object.get_by_id(
@@ -672,7 +664,7 @@ class VerbaManager:
         @returns bool - Whether the doc name exist in the cluster.
         """
         class_name = "Document_" + schema_manager.strip_non_letters(
-            self.embedder_manager.selected_embedder.vectorizer
+            self.embedder_manager.embedders[self.embedder_manager.selected_embedder].vectorizer
         )
 
         results = (
