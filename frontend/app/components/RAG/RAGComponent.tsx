@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { SettingsConfiguration } from "../Settings/types"
 import RAGConfigComponent from './RAGConfigComponent';
 import { RAGConfig } from './types';
+import { FaFileImport } from "react-icons/fa";
+import { MdCancel } from "react-icons/md";
 
 interface RAGComponentProps {
     settingConfig: SettingsConfiguration;
@@ -27,22 +29,24 @@ const RAGComponent: React.FC<RAGComponentProps> = ({ APIHost, settingConfig, RAG
                     </div>
                 )
             ))}
-            <div className='flex flex-col gap-2  w-full md:w-1/4 items-start justify-end'>
+            <div className='flex flex-col gap-2 w-full md:w-1/4 items-end'>
+                <div className='flex flex-row gap-2 w-full'>
+                    <button className='btn w-1/2 btn-lg text-base flex gap-2 bg-secondary-verba hover:bg-button-hover-verba text-text-verba'>
+                        <FaFileImport />
+                        {buttonTitle}
+                    </button>
+                    <button className='btn w-1/2 btn-lg text-base text-text-verba bg-warning-verba hover:bg-button-hover-verba'>
+                        <MdCancel />
+                        Clear
+                    </button>
+                </div>
                 {buttonTitle === "Import" && (
-                    <div className='flex flex-col bg-bg-alt-verba rounded-lg shadow-lg p-5 text-text-verba gap-5 h-[65vh] overflow-auto w-full'>
+                    <div className='flex flex-col bg-bg-alt-verba rounded-lg shadow-lg p-5 text-text-verba gap-5 h-[58.5vh] overflow-auto w-full'>
                         <div className='flex flex-col'>
                             <p className='text-lg'>Console</p>
                         </div>
                     </div>
                 )}
-                <div className='flex justify-center gap-2'>
-                    <button className='btn bg-secondary-verba hover:bg-button-hover-verba'>
-                        {buttonTitle}
-                    </button>
-                    <button className='btn text-bg-verba bg-warning-verba hover:bg-button-hover-verba'>
-                        Clear
-                    </button>
-                </div>
             </div>
 
         </div>

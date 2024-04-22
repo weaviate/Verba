@@ -68,7 +68,7 @@ const RAGConfigComponent: React.FC<RAGConfigComponentProps> = ({ APIHost, settin
 
                 <div className='grid grid-cols-1 lg:grid-cols-2 gap-2'>
                     {RAGComponents && Object.entries(RAGComponents.components).map(([key, value]) => (
-                        <button onClick={() => { onSelectComponent(key) }} className={`btn ${key === RAGComponents.selected ? ("bg-secondary-verba") : ("bg-button-verba")} hover:bg-button-hover-verba`}>
+                        <button onClick={() => { onSelectComponent(key) }} className={`btn border-none ${key === RAGComponents.selected ? ("bg-secondary-verba text-text-verba") : ("bg-button-verba text-text-alt-verba")} hover:bg-button-hover-verba `}>
                             <p>
                                 {key}
                             </p>
@@ -94,7 +94,7 @@ const RAGConfigComponent: React.FC<RAGConfigComponentProps> = ({ APIHost, settin
                     <div className='flex lg:flex-row flex-col gap-3'>
                         <div className='flex flex-col gap-2 items-center'>
                             <div className='flex'>
-                                <button onClick={() => document.getElementById(RAGConfigTitle + RAGComponents.selected + "_upload")?.click()} className="btn border-none bg-button-verba hover:bg-secondary-verba ">Add Files</button>
+                                <button onClick={() => document.getElementById(RAGConfigTitle + RAGComponents.selected + "_upload")?.click()} className="btn border-none bg-button-verba hover:bg-secondary-verba text-text-verba">Add Files</button>
                                 <input id={RAGConfigTitle + RAGComponents.selected + "_upload"} type="file" onChange={handleUploadFiles} className="hidden" multiple />
                             </div>
                             {files && (

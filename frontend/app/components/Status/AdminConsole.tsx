@@ -49,7 +49,7 @@ const AdminConsoleComponent: React.FC<AdminConsoleComponentProps> = ({
 
                 {connected === "Online" && (
                     <div className='gap-2 grid grid-cols-2'>
-                        <button className='btn bg-button-verba hover:bg-warning-verba flex gap-2'>
+                        <button className='btn bg-button-verba text-text-verba hover:bg-warning-verba flex gap-2'>
                             <div className='hidden lg:flex'>
                                 <MdDelete />
                             </div>
@@ -57,7 +57,7 @@ const AdminConsoleComponent: React.FC<AdminConsoleComponentProps> = ({
                                 Reset Verba
                             </p>
                         </button>
-                        <button className='btn bg-button-verba hover:bg-warning-verba flex gap-2'>
+                        <button className='btn bg-button-verba text-text-verba hover:bg-warning-verba flex gap-2'>
                             <div className='hidden lg:flex'>
                                 <MdDelete />
                             </div>
@@ -65,7 +65,7 @@ const AdminConsoleComponent: React.FC<AdminConsoleComponentProps> = ({
                                 Reset Documents
                             </p>
                         </button>
-                        <button className='btn bg-button-verba hover:bg-warning-verba flex gap-2'>
+                        <button className='btn bg-button-verba text-text-verba hover:bg-warning-verba flex gap-2'>
                             <div className='hidden lg:flex'>
                                 <MdDelete />
                             </div>
@@ -73,7 +73,7 @@ const AdminConsoleComponent: React.FC<AdminConsoleComponentProps> = ({
                                 Reset Cache
                             </p>
                         </button>
-                        <button className='btn bg-button-verba hover:bg-warning-verba flex gap-2'>
+                        <button className='btn bg-button-verba text-text-verba hover:bg-warning-verba flex gap-2'>
                             <div className='hidden lg:flex'>
                                 <MdDelete />
                             </div>
