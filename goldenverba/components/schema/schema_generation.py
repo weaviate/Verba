@@ -222,6 +222,12 @@ def init_documents(
             msg.warn(
                 f"Skipped deleting {document_name} and {chunk_name} schema, nothing changed"
             )
+    # coll = client.collections.get("Document")
+    # coll.config.update(
+    #     vectorizer_config=wvc.Reconfigure.NamedVectors.update(
+
+    #     )
+    # )
     else:
         client.collections.create(
             "Document",

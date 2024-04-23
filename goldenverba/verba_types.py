@@ -25,6 +25,11 @@ class ChunkType(TypedDict):
     chunk_id: int
 
 
+class CacheType(TypedDict):
+    query: str
+    system: str
+
+
 @dataclass
 class VectorizerType:
     name: str

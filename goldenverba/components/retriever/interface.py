@@ -30,7 +30,9 @@ class Retriever(VerbaComponent):
         raise NotImplementedError("load method must be implemented by a subclass.")
 
     def sort_chunks(self, chunks: list[Chunk]) -> list[Chunk]:
-        return sorted(chunks, key=lambda chunk: (chunk.doc_uuid, int(chunk.chunk_id)))
+        return sorted(
+            chunks, key=lambda chunk: (chunk.doc_uuid, int(float(chunk.chunk_id)))
+        )
 
     def cutoff_text(self, text: str, content_length: int) -> str:
         encoding = tiktoken.encoding_for_model("gpt-3.5-turbo")

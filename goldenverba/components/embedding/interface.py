@@ -8,7 +8,13 @@ from wasabi import msg
 from weaviate import WeaviateClient
 from weaviate.classes.query import Filter
 from weaviate.types import UUID
-from verba_types import DocumentType, SuggestionType, VectorizerOrEmbeddingType
+from verba_types import (
+    DocumentType,
+    SuggestionType,
+    VectorizerOrEmbeddingType,
+    ChunkType,
+    CacheType,
+)
 from goldenverba.components.component import VerbaComponent
 from goldenverba.components.reader.document import Document
 from goldenverba.components.reader.interface import InputForm
@@ -17,6 +23,7 @@ from goldenverba.components.schema.schema_generation import (
     VECTORIZERS,
     strip_non_letters,
 )
+from typing import Tuple
 
 load_dotenv()
 
@@ -94,20 +101,26 @@ class Embedder(VerbaComponent):
                 )
 
                 doc_class = client.collections.get(self.get_document_class())
-
+                vectors = {
+                    vectorizer.name: [0.0]
+                    for vectorizer in VECTORIZERS
+                    if vectorizer.name != self.vectorizer.name
+                }
                 uuid = doc_class.data.insert(
                     properties={
                         "doc_name": str(document.name),
                         "doc_type": str(document.type),
                         "doc_link": str(document.link),
                         "chunk_count": len(document.chunks),
-                    }
+                    },
+                    vector=vectors,
                 )
 
                 for chunk in document.chunks:
                     chunk.set_uuid(uuid)
 
                 chunk_count = 0
+
                 for _batch_id, chunk_batch in tqdm(
                     enumerate(batches), total=len(batches), desc="Importing batches"
                 ):
@@ -127,17 +140,31 @@ class Embedder(VerbaComponent):
                             # Check if vector already exists
                             # Target vector: check how to specify target vector (but not vector itself)
                             if chunk.vector is None:
+                                vectors = {
+                                    vectorizer.name: [0.0]
+                                    # else chunk.vector
+                                    for vectorizer in VECTORIZERS
+                                    if vectorizer.name != self.vectorizer.name
+                                }
                                 batch.add_object(
                                     collection=class_name,
                                     properties=properties,
+                                    vector=vectors,
                                 )
                             else:
+                                vectors = {
+                                    vectorizer.name: (
+                                        [0.0]
+                                        if vectorizer.name != self.vectorizer.name
+                                        else chunk.vector
+                                    )
+                                    for vectorizer in VECTORIZERS
+                                }
+                                msg.info(f"Vector: {chunk.vector}")
                                 batch.add_object(
                                     collection=class_name,
                                     properties=properties,
-                                    vector={
-                                        self.vectorizer.name: chunk.vector,
-                                    },
+                                    vector=vectors,
                                 )
 
                             wait_time_ms = int(
@@ -145,7 +172,7 @@ class Embedder(VerbaComponent):
                             )
                             if wait_time_ms > 0:
                                 time.sleep(float(wait_time_ms) / 1000)
-
+                msg.info(f"Chunks: {chunk_count}")
                 self.check_document_status(
                     client,
                     uuid,
@@ -181,15 +208,16 @@ class Embedder(VerbaComponent):
         # TODO: target vector
 
         doc_class = client.collections.get(doc_class_name)
+        chunk_class = client.collections.get(chunk_class_name)
 
         document = doc_class.query.fetch_object_by_id(doc_uuid)
 
         if document is not None:
-            results = doc_class.query.fetch_objects(
+            results = chunk_class.query.fetch_objects(
                 filters=Filter.by_property("doc_name").equal(doc_name),
                 limit=chunk_count + 1,
-                return_properties=DocumentType,
-                target_vector=target_vector.name,
+                return_properties=ChunkType,
+                # target_vector=target_vector.name,
             )
 
             if len(results.objects) != chunk_count:
@@ -313,7 +341,7 @@ class Embedder(VerbaComponent):
 
     def retrieve_semantic_cache(
         self, client: WeaviateClient, query: str, dist: float = 0.04
-    ) -> str:
+    ) -> Tuple[str, float]:
         """Retrieve results from semantic cache based on query and distance threshold
         @parameter query - str - User query
         @parameter dist - float - Distance threshold
@@ -326,7 +354,7 @@ class Embedder(VerbaComponent):
         ).query.fetch_objects(
             filters=Filter.by_property("query").equal(query),
             limit=1,
-            return_properties=SuggestionType,
+            return_properties=CacheType,
         )
 
         cache_class = client.collections.get(self.get_cache_class())
@@ -345,12 +373,16 @@ class Embedder(VerbaComponent):
         if needs_vectorization:
             vector = self.vectorize_query(query)
             query_results = cache_class.query.near_vector(
-                near_vector=vector, return_properties=SuggestionType
+                near_vector=vector,
+                return_properties=CacheType,
+                target_vector=self.vectorizer.name,
             )
 
         else:
             query_results = cache_class.query.near_text(
-                query=query, return_properties=SuggestionType
+                query=query,
+                return_properties=CacheType,
+                target_vector=self.vectorizer.name,
             )
 
         if len(query_results.objects) == 0:
@@ -359,7 +391,12 @@ class Embedder(VerbaComponent):
 
         results = query_results.objects
 
-        if not results:
+        if (
+            not results
+            or len(results) < 1
+            or results[0] is None
+            or results[0].metadata.distance is None
+        ):
             return None, None
 
         result = results[0]
@@ -388,4 +425,11 @@ class Embedder(VerbaComponent):
                 properties={"query": str(query), "system": system}, vector=vector
             )
         else:
-            cache_class.data.insert(properties={"query": str(query), "system": system})
+            cache_class.data.insert(
+                properties={"query": str(query), "system": system},
+                vector={
+                    vectorizer.name: [0.0]
+                    for vectorizer in VECTORIZERS
+                    if vectorizer.name != self.vectorizer.name
+                },
+            )

@@ -26,6 +26,12 @@ from goldenverba.components.reader.manager import ReaderManager
 from goldenverba.components.retriever.interface import Retriever
 from goldenverba.components.retriever.manager import RetrieverManager
 
+from goldenverba.components.schema.schema_generation import (
+    EMBEDDINGS,
+    VECTORIZERS,
+    strip_non_letters,
+)
+
 load_dotenv()
 
 
@@ -476,8 +482,16 @@ class VerbaManager:
             query == check_results.objects[0].properties.get("suggestion")
         ):
             return
-
-        suggestions_collection.data.insert(properties={"suggestion": query})
+        vectors = {
+            vectorizer.name: [0.0]
+            # else chunk.vector
+            for vectorizer in VECTORIZERS
+            if vectorizer.name
+            != self.embedder_manager.selected_embedder.vectorizer.name
+        }
+        suggestions_collection.data.insert(
+            properties={"suggestion": query}, vector=vectors
+        )
 
         msg.info("Added query to suggestions")
 
@@ -525,7 +539,12 @@ class VerbaManager:
 
         documents_class = self.client.collections.get("Document")
         document = documents_class.query.fetch_object_by_id(doc_id)
-        return document.properties.items()
+
+        return_dict = {}
+
+        for key, value in document.properties.items():
+            return_dict[key] = value
+        return return_dict
 
     async def generate_answer(
         self, queries: list[str], contexts: list[str], conversation: dict

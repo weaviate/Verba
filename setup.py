@@ -4,7 +4,7 @@ setup(
     name="goldenverba",
     version="0.4.0",
     packages=find_packages(),
-    python_requires='>=3.10.0',
+    python_requires=">=3.10.0",
     entry_points={
         "console_scripts": [
             "verba=goldenverba.server.cli:cli",
@@ -25,7 +25,7 @@ setup(
     ],
     include_package_data=True,
     install_requires=[
-        "weaviate-client==3.23.1",
+        "weaviate-client",
         "python-dotenv==1.0.0",
         "openai==0.27.9",
         "wasabi==1.1.2",
@@ -39,13 +39,7 @@ setup(
         "pypdf2",
     ],
     extras_require={
-        "dev": [
-            "pytest",
-            "wheel",
-            "twine",
-            "black>=23.7.0",
-            "setuptools"
-        ],
+        "dev": ["pytest", "wheel", "twine", "black>=23.7.0", "setuptools"],
         "huggingface": [
             "sentence-transformers",
             "transformers",
