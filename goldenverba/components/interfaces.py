@@ -48,20 +48,18 @@ class VerbaComponent:
                         self.config[_k].text = new_config[_k].get("text","")
                         msg.info(f"Updating {self.name} config ({_k}) {self.config[_k].text} -> {new_config[_k].get('text','')}")
                 if self.config[_k].type == "number":
-                    if self.config[_k].value != new_config[_k].get("value",0):
+                    if self.config[_k].value != int(new_config[_k].get("value",0)):
                         msg.info(f"Updating {self.name} config ({_k}) {self.config[_k].value} -> {new_config[_k].get('value',0)}")
-                        self.config[_k].value = new_config[_k].get("value",0)
+                        self.config[_k].value = int(new_config[_k].get("value",0))
 
     def check_available(self, envs, libs) -> bool:
         if self.requires_env:
             for _env in self.requires_env:
                 if _env not in envs or not envs.get(_env,False):
-                    msg.info(f"({self.name}): {_env} missing in {envs}")
                     return False
         if self.requires_library:
             for _lib in self.requires_library:
                 if _lib not in libs or not libs.get(_lib,False):
-                    msg.info(f"({self.name}): {_lib} missing in {libs}")
                     return False
         return True
 

@@ -594,6 +594,22 @@ class VerbaManager:
         for embedding in schema_manager.EMBEDDINGS:
             schema_manager.init_schemas(self.client, embedding, False, True)
 
+    def reset_documents(self):
+        # Check if all schemas exist for all possible vectorizers
+        for vectorizer in schema_manager.VECTORIZERS:
+            document_class_name = "Document_" + schema_manager.strip_non_letters(vectorizer)
+            chunk_class_name = "Chunk_" + schema_manager.strip_non_letters(vectorizer)
+            self.client.schema.delete_class(document_class_name)
+            self.client.schema.delete_class(chunk_class_name)
+            schema_manager.init_schemas(self.client, vectorizer, False, True)
+
+        for embedding in schema_manager.EMBEDDINGS:
+            document_class_name = "Document_" + schema_manager.strip_non_letters(embedding)
+            chunk_class_name = "Chunk_" + schema_manager.strip_non_letters(embedding)
+            self.client.schema.delete_class(document_class_name)
+            self.client.schema.delete_class(chunk_class_name)
+            schema_manager.init_schemas(self.client, embedding, False, True)
+
     def reset_cache(self):
         # Check if all schemas exist for all possible vectorizers
         for vectorizer in schema_manager.VECTORIZERS:

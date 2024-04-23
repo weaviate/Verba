@@ -26,6 +26,9 @@ class SearchQueryPayload(BaseModel):
 class GetDocumentPayload(BaseModel):
     document_id: str
 
+class ResetPayload(BaseModel):
+    resetMode: str
+
 
 class LoadPayload(BaseModel):
     reader: str

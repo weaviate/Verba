@@ -13,8 +13,8 @@ import time
 
 from goldenverba import verba_manager
 from goldenverba.server.ConfigManager import ConfigManager
-from goldenverba.server.types import GetComponentPayload, ConfigPayload, SetComponentPayload, LoadPayload, QueryPayload, GeneratePayload, GetDocumentPayload, SearchQueryPayload, ImportPayload
-from goldenverba.server.util import get_config, set_config, setup_managers, create_reader_payload, create_chunker_payload, create_embedder_payload, create_generator_payload, create_retriever_payload
+from goldenverba.server.types import ResetPayload, ConfigPayload, QueryPayload, GeneratePayload, GetDocumentPayload, SearchQueryPayload, ImportPayload
+from goldenverba.server.util import get_config, set_config, setup_managers
 
 load_dotenv()
 
@@ -116,7 +116,6 @@ async def get_google_tag():
         }
     )
 
-
 @app.get("/api/get_production")
 async def get_production():
     return JSONResponse(
@@ -124,66 +123,6 @@ async def get_production():
             "production": production,
         }
     )
-
-
-# Get Readers, Chunkers, and Embedders
-@app.get("/api/get_components")
-async def get_components():
-    msg.info("Retrieving components")
-
-    data = {"readers": [], "chunker": [], "embedder": []}
-
-    for key in readers:
-        current_reader = readers[key]
-        current_reader_data = create_reader_payload(manager, key, current_reader)
-        data["readers"].append(current_reader_data)
-
-    for key in chunker:
-        current_chunker = chunker[key]
-        current_chunker_data = create_chunker_payload(manager, key, current_chunker)
-        data["chunker"].append(current_chunker_data)
-
-    for key in embedders:
-        current_embedder = embedders[key]
-        current_embedder_data = create_embedder_payload(manager, key, current_embedder)
-        data["embedder"].append(current_embedder_data)
-
-    try:
-        data["default_values"] = {
-            "last_reader": create_reader_payload(
-                manager, config_manager.get_reader(), readers[config_manager.get_reader()]
-            ),
-            "last_chunker": create_chunker_payload(
-                manager, config_manager.get_chunker(), chunker[config_manager.get_chunker()]
-            ),
-            "last_embedder": create_embedder_payload(
-                manager, config_manager.get_embedder(), embedders[config_manager.get_embedder()]
-            ),
-            "last_document_type": "Documentation",
-        }
-    except KeyError:
-        # Reset Config
-        msg.warn("Mismatched Config detected, resetting managers")
-        config_manager.default_config()
-        config_manager.save_config()
-        setup_managers(
-            manager, config_manager, readers, chunker, embedders, retrievers, generators
-        )
-        config_manager.save_config()
-        data["default_values"] = {
-            "last_reader": create_reader_payload(
-                config_manager.get_reader(), readers[config_manager.get_reader()]
-            ),
-            "last_chunker": create_chunker_payload(
-                config_manager.get_chunker(), chunker[config_manager.get_chunker()]
-            ),
-            "last_embedder": create_embedder_payload(
-                config_manager.get_embedder(), embedders[config_manager.get_embedder()]
-            ),
-            "last_document_type": "Documentation",
-        }
-
-    return JSONResponse(content=data)
 
 # Get Configuration
 @app.get("/api/config")
@@ -197,73 +136,6 @@ async def retrieve_config():
     except Exception as e:
         msg.warn(f"Could not retrieve configuration: {str(e)}")
         return JSONResponse(status_code=200, content={"data":{}, "error":f"Could not retrieve configuration: {str(e)}"})
-
-
-@app.post("/api/get_component")
-async def get_component(payload: GetComponentPayload):
-    msg.info(f"Retrieving {payload.component} components")
-
-    data = {"components": []}
-
-    if payload.component == "embedders":
-        data["selected_component"] = create_embedder_payload(
-            manager.embedder_manager.selected_embedder,
-            manager.embedder_manager.selected_embedder,
-        )
-
-        for key in embedders:
-            current_embedder = embedders[key]
-            current_embedder_data = create_embedder_payload(key, current_embedder)
-            data["components"].append(current_embedder_data)
-
-    elif payload.component == "retrievers":
-        data["selected_component"] = create_retriever_payload(
-            manager.retriever_manager.selected_retriever.name,
-            manager.retriever_manager.selected_retriever,
-        )
-
-        for key in retrievers:
-            current_retriever = retrievers[key]
-            current_retriever_data = create_retriever_payload(key, current_retriever)
-            data["components"].append(current_retriever_data)
-
-    elif payload.component == "generators":
-        data["selected_component"] = create_generator_payload(
-            manager.generator_manager.selected_generator.name,
-            manager.generator_manager.selected_generator,
-        )
-
-        for key in generators:
-            current_generator = generators[key]
-            current_generator_data = create_generator_payload(key, current_generator)
-            data["components"].append(current_generator_data)
-
-    return JSONResponse(content=data)
-
-
-@app.post("/api/set_component")
-async def set_component(payload: SetComponentPayload):
-    if production:
-        return JSONResponse(content={})
-
-    msg.info(f"Setting {payload.component} to {payload.selected_component}")
-
-    if payload.component == "embedders":
-        manager.embedder_manager.set_embedder(payload.selected_component)
-        config_manager.set_embedder(payload.selected_component)
-
-    elif payload.component == "retrievers":
-        manager.retriever_manager.set_retriever(payload.selected_component)
-        config_manager.set_retriever(payload.selected_component)
-
-    elif payload.component == "generators":
-        manager.generator_manager.set_generator(payload.selected_component)
-        config_manager.set_generator(payload.selected_component)
-
-    config_manager.save_config()
-
-    return JSONResponse(content={})
-
 
 # Get Status meta data
 @app.get("/api/get_status")
@@ -298,42 +170,25 @@ async def get_status():
         msg.fail(f"Status retrieval failed: {str(e)}")
         return JSONResponse(content=data)
 
-
 # Reset Verba
-@app.get("/api/reset")
-async def reset_verba():
+@app.post("/api/reset")
+async def reset_verba(payload: ResetPayload):
     if production:
         return JSONResponse(status_code=200, content={})
+    
+    if payload.resetMode == "VERBA":
+        manager.reset()
+    elif payload.resetMode == "DOCUMENTS":
+        manager.reset_documents()
+    elif payload.resetMode == "CACHE":
+        manager.reset_cache()
+    elif payload.resetMode == "SUGGESTIONS":
+        manager.reset_suggestion()
 
-    msg.info("Resetting verba")
-
-    manager.reset()
+    msg.info(f"Resetting Verba ({payload.resetMode})")
 
     return JSONResponse(status_code=200, content={})
 
-
-# Reset Verba
-@app.get("/api/reset_cache")
-async def reset_cache():
-    if production:
-        return JSONResponse(status_code=200, content={})
-    msg.info("Resetting cache")
-
-    manager.reset_cache()
-
-    return JSONResponse(status_code=200, content={})
-
-
-# Reset Verba suggestions
-@app.get("/api/reset_suggestion")
-async def reset_suggestion():
-    if production:
-        return JSONResponse(status_code=200, content={})
-    msg.info("Resetting suggestions")
-
-    manager.reset_suggestion()
-
-    return JSONResponse(status_code=200, content={})
 
 # Receive query and return chunks and query answer
 @app.post("/api/import")
@@ -357,8 +212,6 @@ async def import_data(payload: ImportPayload):
             }
         )
     
-
-
 @app.post("/api/set_config")
 async def update_config(payload: ConfigPayload):
 
@@ -370,80 +223,6 @@ async def update_config(payload: ConfigPayload):
             "status_msg": "Config Updated",
         }
     )
-
-# Receive query and return chunks and query answer
-@app.post("/api/load_data")
-async def load_data(payload: LoadPayload):
-    if production:
-        return JSONResponse(
-            content={
-                "status": "200",
-                "status_msg": "Can't add data when in production mode",
-            }
-        )
-
-    manager.reader_set_reader(payload.reader)
-    manager.chunker_set_chunker(payload.chunker)
-    manager.embedder_set_embedder(payload.embedder)
-
-    config_manager.set_reader(payload.reader)
-    config_manager.set_chunker(payload.chunker)
-    config_manager.set_embedder(payload.embedder)
-    config_manager.save_config()
-
-    # Set new default values based on user input
-    current_chunker = manager.chunker_get_chunker()[payload.chunker]
-    current_chunker.default_units = payload.chunkUnits
-    current_chunker.default_overlap = payload.chunkOverlap
-
-    msg.info(
-        f"Received Data to Import: READER({payload.reader}, Documents {len(payload.fileBytes)}, Type {payload.document_type}) CHUNKER ({payload.chunker}, UNITS {payload.chunkUnits}, OVERLAP {payload.chunkOverlap}), EMBEDDER ({payload.embedder})"
-    )
-
-    if payload.fileBytes or payload.filePath:
-        try:
-            documents = manager.import_data(
-                payload.fileBytes,
-                [],
-                [payload.filePath],
-                payload.fileNames,
-                payload.document_type,
-                payload.chunkUnits,
-                payload.chunkOverlap,
-            )
-
-            if documents is None:
-                return JSONResponse(
-                    content={
-                        "status": 200,
-                        "status_msg": "No documents imported",
-                    }
-                )
-
-            document_count = len(documents)
-            chunks_count = sum([len(document.chunks) for document in documents])
-
-            return JSONResponse(
-                content={
-                    "status": 200,
-                    "status_msg": f"Succesfully imported {document_count} documents and {chunks_count} chunks",
-                }
-            )
-        except Exception as e:
-            msg.fail(f"Loading data failed {str(e)}")
-            return JSONResponse(
-                content={
-                    "status": "400",
-                    "status_msg": str(e),
-                }
-            )
-    return JSONResponse(
-        content={
-            "status": "200",
-            "status_msg": "No documents received",
-        }
-    )
-
 
 # Receive query and return chunks and query answer
 @app.post("/api/query")

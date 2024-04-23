@@ -11,6 +11,8 @@ import StatusLabel from '../Chat/StatusLabel';
 import StatusCard from './StatusCard';
 import PulseLoader from "react-spinners/PulseLoader";
 
+import UserModalComponent from '../Navigation/UserModal';
+
 interface AdminConsoleComponentProps {
 
     type: string | null;
@@ -18,12 +20,41 @@ interface AdminConsoleComponentProps {
     schemas: SchemaStatus | null;
     isFetching: boolean
     settingConfig: SettingsConfiguration
+    reset_verba: (m: string) => void;
 }
 
 const AdminConsoleComponent: React.FC<AdminConsoleComponentProps> = ({
     type,
-    connected, isFetching, schemas, settingConfig
+    connected, isFetching, schemas, settingConfig, reset_verba
 }) => {
+
+    const openResetVerba = () => {
+        const modal = document.getElementById('reset_verba_modal');
+        if (modal instanceof HTMLDialogElement) {
+            modal.showModal();
+        }
+    }
+
+    const openResetDocuments = () => {
+        const modal = document.getElementById('reset_documents_modal');
+        if (modal instanceof HTMLDialogElement) {
+            modal.showModal();
+        }
+    }
+
+    const openResetCache = () => {
+        const modal = document.getElementById('reset_cache_modal');
+        if (modal instanceof HTMLDialogElement) {
+            modal.showModal();
+        }
+    }
+
+    const openResetSuggestions = () => {
+        const modal = document.getElementById('reset_suggestions_modal');
+        if (modal instanceof HTMLDialogElement) {
+            modal.showModal();
+        }
+    }
 
     return (
         <div className='flex flex-col gap-2' >
@@ -49,7 +80,7 @@ const AdminConsoleComponent: React.FC<AdminConsoleComponentProps> = ({
 
                 {connected === "Online" && (
                     <div className='gap-2 grid grid-cols-2'>
-                        <button className='btn bg-button-verba text-text-verba hover:bg-warning-verba flex gap-2'>
+                        <button onClick={openResetVerba} className='btn bg-button-verba text-text-verba hover:bg-warning-verba flex gap-2'>
                             <div className='hidden lg:flex'>
                                 <MdDelete />
                             </div>
@@ -57,7 +88,7 @@ const AdminConsoleComponent: React.FC<AdminConsoleComponentProps> = ({
                                 Reset Verba
                             </p>
                         </button>
-                        <button className='btn bg-button-verba text-text-verba hover:bg-warning-verba flex gap-2'>
+                        <button onClick={openResetDocuments} className='btn bg-button-verba text-text-verba hover:bg-warning-verba flex gap-2'>
                             <div className='hidden lg:flex'>
                                 <MdDelete />
                             </div>
@@ -65,7 +96,7 @@ const AdminConsoleComponent: React.FC<AdminConsoleComponentProps> = ({
                                 Reset Documents
                             </p>
                         </button>
-                        <button className='btn bg-button-verba text-text-verba hover:bg-warning-verba flex gap-2'>
+                        <button onClick={openResetCache} className='btn bg-button-verba text-text-verba hover:bg-warning-verba flex gap-2'>
                             <div className='hidden lg:flex'>
                                 <MdDelete />
                             </div>
@@ -73,7 +104,7 @@ const AdminConsoleComponent: React.FC<AdminConsoleComponentProps> = ({
                                 Reset Cache
                             </p>
                         </button>
-                        <button className='btn bg-button-verba text-text-verba hover:bg-warning-verba flex gap-2'>
+                        <button onClick={openResetSuggestions} className='btn bg-button-verba text-text-verba hover:bg-warning-verba flex gap-2'>
                             <div className='hidden lg:flex'>
                                 <MdDelete />
                             </div>
@@ -93,6 +124,13 @@ const AdminConsoleComponent: React.FC<AdminConsoleComponentProps> = ({
                 </div>
 
             </div>
+
+            <UserModalComponent modal_id='reset_verba_modal' title='Reset Verba' text={"Do you want to delete all data Verba data?"} triggerString='Reset' triggerValue="VERBA" triggerAccept={reset_verba} />
+            <UserModalComponent modal_id='reset_documents_modal' title='Reset Documents' text={"Do you want to delete all documents?"} triggerString='Reset' triggerValue="DOCUMENTS" triggerAccept={reset_verba} />
+            <UserModalComponent modal_id='reset_cache_modal' title='Reset Cache' text={"Do you want to delete all cached data?"} triggerString='Reset' triggerValue="CACHE" triggerAccept={reset_verba} />
+            <UserModalComponent modal_id='reset_suggestions_modal' title='Reset Suggestions' text={"Do you want to delete all autocompletion suggestions?"} triggerString='Reset' triggerValue="SUGGESTIONS" triggerAccept={reset_verba} />
+
+
         </div >
     );
 };

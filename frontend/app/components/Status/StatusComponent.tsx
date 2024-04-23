@@ -72,12 +72,80 @@ const StatusComponent: React.FC<StatusComponentComponentProps> = ({ APIHost, set
         }
     }, []);
 
+    const fetchStatus = async () => {
+
+        if (!APIHost) {
+            return
+        }
+
+        try {
+            setIsFetching(true)
+
+            const response = await fetch(APIHost + "/api/get_status", {
+                method: "GET",
+            });
+            const data: StatusPayload = await response.json();
+
+            if (data) {
+
+                if (data.error) {
+                    console.log(data.error)
+                }
+
+                setType(data.type)
+                setConnected("Online")
+                setLibraries(data.libraries)
+                setVariables(data.variables)
+                setSchemas(data.schemas)
+                setIsFetching(false)
+
+            } else {
+                console.warn("Status could not be retrieved")
+            }
+        } catch (error) {
+            console.error("Failed to fetch document:", error);
+            setConnected("Offline")
+            setType(null)
+            setLibraries(null)
+            setVariables(null)
+            setSchemas(null)
+            setIsFetching(false)
+        }
+    }
+
+    const reset_verba = async (mode: string) => {
+        try {
+
+
+            setType(null)
+            setLibraries(null)
+            setVariables(null)
+            setSchemas(null)
+            setIsFetching(true)
+
+            const response = await fetch(APIHost + "/api/reset", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ resetMode: mode, }),
+            });
+
+            if (response) {
+                fetchStatus()
+            }
+
+        } catch (error) {
+            console.error("Failed to delete document:", error);
+        }
+    }
+
 
     return (
         <div className="flex sm:flex-col md:flex-row justify-center items-start gap-3 ">
 
             <div className='w-full md:w-1/3'>
-                <AdminConsoleComponent settingConfig={settingConfig} type={type} isFetching={isFetching} connected={connected} schemas={schemas} />
+                <AdminConsoleComponent reset_verba={reset_verba} settingConfig={settingConfig} type={type} isFetching={isFetching} connected={connected} schemas={schemas} />
             </div>
 
             <div className='w-full md:w-1/3'>
