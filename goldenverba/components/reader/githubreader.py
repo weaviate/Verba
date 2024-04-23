@@ -2,8 +2,8 @@ import base64
 import json
 from datetime import datetime
 import time
-import io
 import requests
+import os
 
 from wasabi import msg
 
@@ -26,19 +26,12 @@ class GitHubReader(Reader):
     def load(
         self,
         fileData: list[FileData],
-        config: dict
     ) -> tuple[list[Document], list[str]]:
 
         start_time = time.time()  # Start timing
         documents = []
         logging = []
         logging.append(["INFO",f"Starting loading in {len(fileData)} files"])
-
-        for _config in self.config:
-            if _config in config and self.config[_config] != config[_config]:
-                msg.info(f"Updating BasicReader Config {_config} : {self.config[_config]} -> {config[_config]}")
-                logging.append(["INFO",f"Updating BasicReader Config {_config} : {self.config[_config]} -> {config[_config]}"])
-                self.config[_config] = config[_config]
 
         data = fileData[0]
         docs = self.fetch_docs(data.content)

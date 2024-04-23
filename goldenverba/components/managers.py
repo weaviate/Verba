@@ -41,25 +41,17 @@ class ReaderManager:
 
     def load(
         self,
-        fileData: list[FileData],
-        config: dict
+        fileData: list[FileData], logging: list[dict]
     ) -> tuple[list[Document], list[str]]:
-        """Ingest data into Weaviate
-        @parameter: fileData : list[FileData] - List of filename x bytes pairs
-        @parameter: document_type : str - Document type
-        @returns tuple[list[Document], list[str]] - A tuple of a list of documents and a list of strings displayed as logging on the frontend.
-        """
-        return self.readers[self.selected_reader].load(
-            bytes, fileData
-        )
+        logging.append({"type":"INFO", "message":f"Importing {len(fileData)} files with {self.selected_reader}"})
+        return self.readers[self.selected_reader].load(fileData, logging)
 
-    def set_reader(self, reader: str) -> bool:
+    def set_reader(self, reader: str):
         if reader in self.readers:
+            msg.info(f"Setting READER to {reader}")
             self.selected_reader = reader
-            return True
         else:
             msg.warn(f"Reader {reader} not found")
-            return False
 
     def get_readers(self) -> dict[str, Reader]:
         return self.readers
@@ -72,23 +64,19 @@ class ChunkerManager:
         self.selected_chunker: str = "TokenChunker"
 
     def chunk(
-        self, documents: list[Document], units: int, overlap: int
+        self, documents: list[Document], logging: list[dict]
     ) -> list[Document]:
-        """Chunk verba documents into chunks based on n and overlap.
-
-        @parameter: documents : list[Document] - List of Verba documents
-        @parameter: units : int - How many units per chunk (words, sentences, etc.)
-        @parameter: overlap : int - How much overlap between the chunks
-        @returns list[str] - List of documents that contain the chunks.
-        """
-        chunked_docs = self.selected_chunker[self.selected_chunker].chunk(documents, units, overlap)
-        msg.good("Chunking completed")
+        logging.append({"type":"INFO", "message":f"Starting Chunking with {self.selected_chunker}"})
+        chunked_docs, logging = self.chunker[self.selected_chunker].chunk(documents, logging)
         if self.check_chunks(chunked_docs):
-            return chunked_docs
+            msg.good(f"Chunking completed with {sum([len(document.chunks) for document in chunked_docs])} chunks")
+            logging.append({"type":"SUCCESS", "message":f"Chunking completed with {sum([len(document.chunks) for document in chunked_docs])} chunks"})
+            return chunked_docs, logging
         return []
 
     def set_chunker(self, chunker: str) -> bool:
         if chunker in self.chunker:
+            msg.info(f"Setting CHUNKER to {chunker}")
             self.selected_chunker = chunker
             return True
         else:
@@ -127,7 +115,7 @@ class EmbeddingManager:
         self.selected_embedder: str = "ADAEmbedder"
 
     def embed(
-        self, documents: list[Document], client: Client, batch_size: int = 100
+        self, documents: list[Document], client: Client, logging:list[dict], batch_size: int = 100
     ) -> bool:
         """Embed verba documents and its chunks to Weaviate
         @parameter: documents : list[Document] - List of Verba documents
@@ -135,10 +123,12 @@ class EmbeddingManager:
         @parameter: batch_size : int - Batch Size of Input
         @returns bool - Bool whether the embedding what successful.
         """
-        return self.selected_embedder[self.selected_embedder].embed(documents, client)
+        logging.append({"type":"INFO", "message":f"Starting Embedding with {self.selected_embedder}"})
+        return self.embedders[self.selected_embedder].embed(documents, client, logging)
 
     def set_embedder(self, embedder: str) -> bool:
         if embedder in self.embedders:
+            msg.info(f"Setting EMBEDDER to {embedder}")
             self.selected_embedder = embedder
             return True
         else:
@@ -177,6 +167,7 @@ class RetrieverManager:
 
     def set_retriever(self, retriever: str) -> bool:
         if retriever in self.retrievers:
+            msg.info(f"Setting RETRIEVER to {retriever}")
             self.selected_retriever = retriever
             return True
         else:
@@ -285,6 +276,7 @@ class GeneratorManager:
 
     def set_generator(self, generator: str) -> bool:
         if generator in self.generators:
+            msg.info(f"Setting GENERATOR to {generator}")
             self.selected_generator = generator
             return True
         else:

@@ -29,6 +29,7 @@ All notable changes to this project will be documented in this file.
     - Cleaned codebase, merged interfaces and managers to single files
     - Added clean endpoints for better code readability
     - Reworked on interfaces
+- Added better console and logging for ingestion
 - More Configuration
     - Enable/Disable Caching and Autocomplete Suggestions
 

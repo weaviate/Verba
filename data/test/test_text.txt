@@ -1,0 +1,1 @@
+This is a simple text file. You can use the BasicReader to import and embed .txt files into Verba and apply different RAG techniques on it.

@@ -13,6 +13,9 @@ interface DocumentSearchComponentProps {
     selectedDocument: DocumentChunk | null;
     setSelectedDocument: (c: DocumentChunk | null) => void;
     settingConfig: SettingsConfiguration;
+    documents: Document[] | null;
+    setDocuments: (d: Document[] | null) => void;
+    triggerReset: boolean
 }
 
 const DocumentSearchComponent: React.FC<DocumentSearchComponentProps> = ({
@@ -20,10 +23,12 @@ const DocumentSearchComponent: React.FC<DocumentSearchComponentProps> = ({
     selectedDocument,
     settingConfig,
     setSelectedDocument,
+    documents,
+    setDocuments,
+    triggerReset
 }) => {
 
     const [userInput, setUserInput] = useState("")
-    const [documents, setDocuments] = useState<Document[] | null>([])
     const [page, setPage] = useState(1)
 
     const pageSize = 100
@@ -108,6 +113,16 @@ const DocumentSearchComponent: React.FC<DocumentSearchComponentProps> = ({
         }
     }, [page, selectedType]);
 
+    useEffect(() => {
+        if (APIHost != null) {
+
+            fetchAllDocuments(userInput);
+
+        } else {
+            setDocuments(null)
+            setIsFetching(false)
+        }
+    }, [triggerReset]);
 
     const handleSearch = () => {
         fetchAllDocuments(userInput)

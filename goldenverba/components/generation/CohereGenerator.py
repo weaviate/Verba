@@ -72,7 +72,7 @@ class CohereGenerator(Generator):
         queries: list[str],
         context: list[str],
         conversation: dict = None,
-    ) -> Iterator[dict]:
+    ):
         """Generate a stream of response dicts based on a list of queries and list of contexts, and includes conversational context
         @parameter: queries : list[str] - List of queries
         @parameter: context : list[str] - List of contexts

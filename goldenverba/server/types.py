@@ -43,6 +43,10 @@ class ImportPayload(BaseModel):
     config: dict
 
 
+class ConfigPayload(BaseModel):
+    config: dict
+
+
 class GetComponentPayload(BaseModel):
     component: str
 

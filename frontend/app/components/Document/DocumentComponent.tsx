@@ -13,13 +13,18 @@ import { MdOutlineSimCardDownload } from "react-icons/md";
 import { HiMiniSparkles } from "react-icons/hi2";
 import { MdDelete } from "react-icons/md";
 
+import UserModalComponent from '../Navigation/UserModal';
+
 
 interface DocumentComponentProps {
     settingConfig: SettingsConfiguration;
     APIhost: string | null;
     selectedChunk: DocumentChunk | null
+    setSelectedChunk: (s: any | null) => void;
     selectedDocument: Document | null
     deletable: boolean;
+    setDocuments?: (d: Document[] | null) => void;
+    setTriggerReset?: (b: any) => void;
 }
 
 const DocumentComponent: React.FC<DocumentComponentProps> = ({
@@ -27,7 +32,8 @@ const DocumentComponent: React.FC<DocumentComponentProps> = ({
     selectedChunk,
     settingConfig,
     selectedDocument,
-    deletable
+    deletable,
+    setSelectedChunk, setDocuments, setTriggerReset
 }) => {
 
     const [currentDocument, setCurrentDocument] = useState<Document | null>(null)
@@ -39,50 +45,6 @@ const DocumentComponent: React.FC<DocumentComponentProps> = ({
 
     useEffect(() => {
         if (selectedChunk != null && APIhost != null) {
-            const fetchDocuments = async () => {
-                try {
-                    setIsFetching(true)
-
-                    const response = await fetch(APIhost + "/api/get_document", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({
-                            document_id: selectedChunk.doc_uuid,
-                        }),
-                    });
-                    const data: DocumentPayload = await response.json();
-
-                    if (data) {
-                        if (data.error !== "") {
-                            setCurrentDocument(null)
-                            console.error(data.error)
-                            setFormattedDocument(null)
-                            setIsFetching(false)
-                            setWholeDocument(false)
-                        } else {
-                            setCurrentDocument(data.document)
-                            setFormattedDocument(splitDocument(data.document.text, selectedChunk.text))
-                            setIsFetching(false)
-                            if (chunkRef.current) {
-                                chunkRef.current.scrollIntoView({ behavior: "smooth" });
-                            }
-                            if (selectedChunk.text !== "" && data.document.text.length > settingConfig.Chat.settings.max_document_size.value) {
-                                setWholeDocument(false)
-                            } else {
-                                setWholeDocument(true)
-                            }
-                        }
-                    }
-
-
-                } catch (error) {
-                    console.error("Failed to fetch document:", error);
-                    setIsFetching(false)
-                }
-            }
-
             fetchDocuments();
 
         } else {
@@ -90,18 +52,89 @@ const DocumentComponent: React.FC<DocumentComponentProps> = ({
         }
     }, [selectedChunk]);
 
+    const fetchDocuments = async () => {
+        if (selectedChunk != null && APIhost != null) {
+            try {
+                setIsFetching(true)
+
+                const response = await fetch(APIhost + "/api/get_document", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        document_id: selectedChunk.doc_uuid,
+                    }),
+                });
+                const data: DocumentPayload = await response.json();
+
+                if (data) {
+                    if (data.error !== "") {
+                        setCurrentDocument(null)
+                        console.error(data.error)
+                        setFormattedDocument(null)
+                        setIsFetching(false)
+                        setWholeDocument(false)
+                    } else {
+                        setCurrentDocument(data.document)
+                        setFormattedDocument(splitDocument(data.document.text, selectedChunk.text))
+                        setIsFetching(false)
+                        if (chunkRef.current) {
+                            chunkRef.current.scrollIntoView({ behavior: "smooth" });
+                        }
+                        if (selectedChunk.text !== "" && data.document.text.length > settingConfig.Chat.settings.max_document_size.value) {
+                            setWholeDocument(false)
+                        } else {
+                            setWholeDocument(true)
+                        }
+                    }
+                }
+
+
+            } catch (error) {
+                console.error("Failed to fetch document:", error);
+                setIsFetching(false)
+            }
+        }
+    }
+
     const handleSourceClick = () => {
         // Open a new tab with the specified URL
         window.open(currentDocument?.link, '_blank', 'noopener,noreferrer');
     };
 
-    const handleDeleteDocument = () => {
-        // Open a new tab with the specified URL
-        console.log("DELETE")
+    const handleDeleteDocument = async (uuid: string) => {
+        try {
+            console.log("DELETING " + uuid)
+            fetch(APIhost + "/api/delete_document", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ document_id: uuid, }),
+            });
+            setCurrentDocument(null)
+            setSelectedChunk(null)
+            if (setDocuments) {
+                setDocuments(null)
+            }
+            if (setTriggerReset) {
+                setTriggerReset((prev: boolean) => !prev)
+            }
+        } catch (error) {
+            console.error("Failed to delete document:", error);
+        }
     };
 
     const handleDocumentShow = () => {
         setWholeDocument(prev => !prev)
+    }
+
+    const openDeleteModal = () => {
+        const modal = document.getElementById('delete_document_modal');
+        if (modal instanceof HTMLDialogElement) {
+            modal.showModal();
+        }
     }
 
     if (currentDocument !== null && !isFetching) {
@@ -137,7 +170,7 @@ const DocumentComponent: React.FC<DocumentComponentProps> = ({
                         )}
                         {deletable && (
                             <div className='flex'>
-                                <button onClick={handleDeleteDocument} className='btn bg-warning-verba hover:button-hover-verba flex gap-2'>
+                                <button onClick={openDeleteModal} className='btn bg-warning-verba hover:button-hover-verba flex gap-2'>
                                     <MdDelete />
                                     <p className='sm:hidden md:flex text-xs'>
                                         Delete Document
@@ -241,6 +274,7 @@ const DocumentComponent: React.FC<DocumentComponentProps> = ({
                     </div>
                 )}
 
+                <UserModalComponent modal_id='delete_document_modal' title='Delete Document' text={"Do you want to delete " + currentDocument.name + "?"} triggerString='Delete' triggerValue={selectedChunk ? selectedChunk.doc_uuid : ""} triggerAccept={handleDeleteDocument} />
 
 
             </div >

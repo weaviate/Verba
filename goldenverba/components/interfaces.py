@@ -36,9 +36,35 @@ class VerbaComponent:
         self.config = {}
         self.type = ""
 
-    def get_meta(self) -> dict:
-        return {"name": self.name, "variables": self.requires_env, "library": self.requires_library , "description": self.description , "type": self.type, "config": {_c :  self.config[_c].dict() for _c in self.config} }
+    def get_meta(self, envs, libs) -> dict:
+        _metadata = {"name": self.name, "variables": self.requires_env, "library": self.requires_library , "description": self.description , "type": self.type, "config": {_c :  self.config[_c].model_dump() for _c in self.config}, "available": self.check_available(envs,libs) }
+        return _metadata
     
+    def set_config(self, new_config: dict):
+        for _k in new_config:
+            if _k in self.config:
+                if self.config[_k].type == "text":
+                    if self.config[_k].text != new_config[_k].get("text",""):
+                        self.config[_k].text = new_config[_k].get("text","")
+                        msg.info(f"Updating {self.name} config ({_k}) {self.config[_k].text} -> {new_config[_k].get('text','')}")
+                if self.config[_k].type == "number":
+                    if self.config[_k].value != new_config[_k].get("value",0):
+                        msg.info(f"Updating {self.name} config ({_k}) {self.config[_k].value} -> {new_config[_k].get('value',0)}")
+                        self.config[_k].value = new_config[_k].get("value",0)
+
+    def check_available(self, envs, libs) -> bool:
+        if self.requires_env:
+            for _env in self.requires_env:
+                if _env not in envs or not envs.get(_env,False):
+                    msg.info(f"({self.name}): {_env} missing in {envs}")
+                    return False
+        if self.requires_library:
+            for _lib in self.requires_library:
+                if _lib not in libs or not libs.get(_lib,False):
+                    msg.info(f"({self.name}): {_lib} missing in {libs}")
+                    return False
+        return True
+
 class Reader(VerbaComponent):
     """
     Interface for Verba Readers.
@@ -50,12 +76,11 @@ class Reader(VerbaComponent):
         self.config = {"document_type": InputText(type="text", text="Document", description="Choose a label for your documents for filtering")}
 
     def load(
-        fileData: list[FileData],
-        config: dict
+        self,
+        fileData: list[FileData], logging: list[dict]
     ) -> tuple[list[Document], list[str]]:
         """Ingest data into Weaviate
-        @parameter: fileData : list[FileData] - List of filename x bytes pairs
-        @parameter: document_type : str - Document type
+        @parameter: fileData : list[FileData] - List of filename and bytes pairs
         @returns tuple[list[Document], list[str]] - A tuple of a list of documents and a list of strings displayed as logging on the frontend.
         """
         raise NotImplementedError("load method must be implemented by a subclass.")
@@ -70,13 +95,11 @@ class Chunker(VerbaComponent):
         self.config = {"units": InputNumber(type="number", value=100, description="Choose the units per chunks"), "overlap": InputNumber(type="number", value=50, description="Choose the units for overlap between chunks")}
 
     def chunk(
-        self, documents: list[Document], units: int, overlap: int
+        self, documents: list[Document], logging: list[dict]
     ) -> list[Document]:
         """Chunk verba documents into chunks based on units and overlap.
 
         @parameter: documents : list[Document] - List of Verba documents
-        @parameter: units : int - How many units per chunk (words, sentences, etc.)
-        @parameter: overlap : int - How much overlap between the chunks
         @returns list[str] - List of documents that contain the chunks.
         """
         raise NotImplementedError("chunk method must be implemented by a subclass.")
@@ -90,7 +113,7 @@ class Embedder(VerbaComponent):
         super().__init__()
         self.vectorizer = ""
 
-    def embed(documents: list[Document], client: Client, batch_size: int = 100) -> bool:
+    def embed(documents: list[Document], client: Client, logging:list[dict], batch_size: int = 100) -> bool:
         """Embed verba documents and its chunks to Weaviate
         @parameter: documents : list[Document] - List of Verba documents
         @parameter: client : Client - Weaviate Client
@@ -103,6 +126,7 @@ class Embedder(VerbaComponent):
         self,
         documents: list[Document],
         client: Client,
+        logging: list[dict]
     ) -> bool:
         """Import verba documents and its chunks to Weaviate
         @parameter: documents : list[Document] - List of Verba documents
@@ -191,9 +215,12 @@ class Embedder(VerbaComponent):
                     "Document_" + strip_non_letters(self.vectorizer),
                     "Chunk_" + strip_non_letters(self.vectorizer),
                     len(document.chunks),
+                    logging
                 )
-            return True
+            logging.append({"type":"SUCCESS", "message":f"Embedding successful"})
+            return logging
         except Exception as e:
+            logging.append({"type":"ERROR", "message":f"Embedding not successful: {str(e)}"})
             raise Exception(e)
 
     def check_document_status(
@@ -204,6 +231,7 @@ class Embedder(VerbaComponent):
         doc_class_name: str,
         chunk_class_name: str,
         chunk_count: int,
+        logging: list[dict]
     ):
         """Verifies that imported documents and its chunks exist in the database, if not, remove everything that was added and rollback
         @parameter: client : Client - Weaviate Client

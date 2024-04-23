@@ -42,13 +42,13 @@ class MiniLMEmbedder(Embedder):
             self.model = self.model.to(self.device)
 
         except Exception as e:
-            msg.warn(str(e))
             pass
 
     def embed(
         self,
         documents: list[Document],
         client: Client,
+        logging: list[dict],
     ) -> bool:
         """Embed verba documents and its chunks to Weaviate
         @parameter: documents : list[Document] - List of Verba documents
@@ -62,7 +62,7 @@ class MiniLMEmbedder(Embedder):
             for chunk in document.chunks:
                 chunk.set_vector(self.vectorize_chunk(chunk.text))
 
-        return self.import_data(documents, client)
+        return self.import_data(documents, client, logging)
 
     def vectorize_chunk(self, chunk) -> list[float]:
         try:

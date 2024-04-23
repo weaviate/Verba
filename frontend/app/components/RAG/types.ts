@@ -5,6 +5,21 @@ export type RAGResponse = {
     error: string;
 };
 
+export type ImportResponse = {
+    logging: ConsoleMessage[];
+};
+
+export type ConsoleMessage = {
+    type: "INFO" | "WARNING" | "SUCCESS" | "ERROR";
+    message: string;
+};
+
+export type FileData = {
+    filename: string;
+    extension: string;
+    content: string;
+}
+
 export type RAGConfig = {
     [componentTitle: string]: RAGComponentClass;
 };
@@ -26,6 +41,7 @@ export type RAGComponentConfig = {
     selected: string;
     config: RAGSetting;
     type: string;
+    available: boolean
 }
 
 export type RAGSetting = {

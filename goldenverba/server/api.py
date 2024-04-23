@@ -13,8 +13,8 @@ import time
 
 from goldenverba import verba_manager
 from goldenverba.server.ConfigManager import ConfigManager
-from goldenverba.server.types import GetComponentPayload, SetComponentPayload, LoadPayload, QueryPayload, GeneratePayload, GetDocumentPayload, SearchQueryPayload, ImportPayload
-from goldenverba.server.util import setup_managers, create_reader_payload, create_chunker_payload, create_embedder_payload, create_generator_payload, create_retriever_payload
+from goldenverba.server.types import GetComponentPayload, ConfigPayload, SetComponentPayload, LoadPayload, QueryPayload, GeneratePayload, GetDocumentPayload, SearchQueryPayload, ImportPayload
+from goldenverba.server.util import get_config, set_config, setup_managers, create_reader_payload, create_chunker_payload, create_embedder_payload, create_generator_payload, create_retriever_payload
 
 load_dotenv()
 
@@ -187,33 +187,16 @@ async def get_components():
 
 # Get Configuration
 @app.get("/api/config")
-async def get_config():
+async def retrieve_config():
     msg.info("Retrieving configuration")
 
     try:
-        readers = manager.reader_manager.get_readers()
-        reader_config = {"components":{reader: readers[reader].get_meta() for reader in readers}, "selected": manager.reader_manager.selected_reader}
-
-        chunkers = manager.chunker_manager.get_chunkers()
-        chunkers_config = {"components":{chunker: chunkers[chunker].get_meta() for chunker in chunkers}, "selected": manager.chunker_manager.selected_chunker}
-
-        embedders = manager.embedder_manager.get_embedders()
-        embedder_config = {"components":{embedder: embedders[embedder].get_meta() for embedder in embedders}, "selected": manager.embedder_manager.selected_embedder}
-
-        retrievers = manager.retriever_manager.get_retrievers()
-        retrievers_config = {"components":{retriever: retrievers[retriever].get_meta() for retriever in retrievers}, "selected": manager.retriever_manager.selected_retriever}
-
-        generators = manager.generator_manager.get_generators()
-        generator_config = {"components":{generator: generators[generator].get_meta() for generator in generators}, "selected": manager.generator_manager.selected_generator}
-
-        config = {"Reader": reader_config, "Chunker":chunkers_config, "Embedder":embedder_config, "Retriever":retrievers_config, "Generator": generator_config}
-
+        config = get_config(manager)
         return JSONResponse(status_code=200, content={"data":config, "error":""})
 
     except Exception as e:
         msg.warn(f"Could not retrieve configuration: {str(e)}")
         return JSONResponse(status_code=200, content={"data":{}, "error":f"Could not retrieve configuration: {str(e)}"})
-
 
 
 @app.post("/api/get_component")
@@ -356,10 +339,35 @@ async def reset_suggestion():
 @app.post("/api/import")
 async def import_data(payload: ImportPayload):
 
+    try:
+        logging = []
+        set_config(manager, payload.config)
+        documents, logging = manager.import_data(payload.data, logging)
+
+        return JSONResponse(
+            content={
+                "logging": logging,
+            }
+        )
+    
+    except Exception as e:
+        return JSONResponse(
+            content={
+                "logging": [{"type":"ERROR","message":str(e)}],
+            }
+        )
+    
+
+
+@app.post("/api/set_config")
+async def update_config(payload: ConfigPayload):
+
+    set_config(manager, payload.config)
+
     return JSONResponse(
         content={
             "status": "200",
-            "status_msg": "No documents received",
+            "status_msg": "Config Updated",
         }
     )
 

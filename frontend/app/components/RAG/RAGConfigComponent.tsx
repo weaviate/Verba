@@ -12,19 +12,20 @@ import { RAGComponent, RAGConfig, RAGComponentClass } from './types';
 import { TextFieldSetting, NumberFieldSetting } from '../Settings/types';
 
 import TextFieldRAGComponent from './TextFieldRAGComponent';
+import NumberFieldRAGComponent from './NumberFieldRAGComponent';
 
 interface RAGConfigComponentProps {
     settingConfig: SettingsConfiguration;
     APIHost: string | null;
+    files: FileList | null;
     RAGConfig: RAGConfig;
     RAGConfigTitle: string;
     RAGComponents: RAGComponentClass
     setRAGConfig: (r_: any) => void;
+    setFiles: (f: FileList | null) => void;
 }
 
-const RAGConfigComponent: React.FC<RAGConfigComponentProps> = ({ APIHost, settingConfig, RAGConfig, RAGConfigTitle, RAGComponents, setRAGConfig }) => {
-
-    const [files, setFiles] = useState<FileList | null>(null)
+const RAGConfigComponent: React.FC<RAGConfigComponentProps> = ({ APIHost, files, settingConfig, RAGConfig, RAGConfigTitle, RAGComponents, setRAGConfig, setFiles }) => {
 
     const onSelectComponent = (_selected: string) => {
         setRAGConfig((prevConfig: any) => {
@@ -35,7 +36,6 @@ const RAGConfigComponent: React.FC<RAGConfigComponentProps> = ({ APIHost, settin
     };
 
     const handleUploadFiles = (event: React.ChangeEvent<HTMLInputElement>) => {
-        console.log("TRIGGERED")
         if (event.target.files && event.target.files[0]) {
             setFiles(event.target.files)
         }
@@ -51,7 +51,7 @@ const RAGConfigComponent: React.FC<RAGConfigComponentProps> = ({ APIHost, settin
             case 'text':
                 return <TextFieldRAGComponent title={title} RAGConfig={RAGConfig} TextFieldSetting={setting_type} RAGComponentTitle={RAGComponents.selected} RAGConfigTitle={RAGConfigTitle} setRAGConfig={setRAGConfig} />;
             case 'number':
-                return null;
+                return <NumberFieldRAGComponent title={title} RAGConfig={RAGConfig} NumberFieldSetting={setting_type} RAGComponentTitle={RAGComponents.selected} RAGConfigTitle={RAGConfigTitle} setRAGConfig={setRAGConfig} />;
             default:
                 return null;
         }
@@ -68,7 +68,7 @@ const RAGConfigComponent: React.FC<RAGConfigComponentProps> = ({ APIHost, settin
 
                 <div className='grid grid-cols-1 lg:grid-cols-2 gap-2'>
                     {RAGComponents && Object.entries(RAGComponents.components).map(([key, value]) => (
-                        <button onClick={() => { onSelectComponent(key) }} className={`btn border-none ${key === RAGComponents.selected ? ("bg-secondary-verba text-text-verba") : ("bg-button-verba text-text-alt-verba")} hover:bg-button-hover-verba `}>
+                        <button disabled={!value.available} onClick={() => { onSelectComponent(key) }} className={`btn border-none ${key === RAGComponents.selected ? ("bg-secondary-verba text-text-verba") : ("bg-button-verba text-text-alt-verba")} hover:bg-button-hover-verba `}>
                             <p>
                                 {key}
                             </p>

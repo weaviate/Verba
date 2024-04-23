@@ -166,6 +166,32 @@ const DarkModeCustomization: CustomizationSettings = {
     }
 }
 
+
+const GoogleHackathonCustomization: CustomizationSettings = {
+    title: "Customization",
+    description: "Customize the layout of your Verba by changing the title, subtitle, logo, and colors of the app.",
+    settings: {
+        title: { text: "Google Solve", type: "text", description: "Title of the Page" },
+        subtitle: { text: "Medical RAG", type: "text", description: "Subtitle of the Page" },
+        intro_message: { text: "Welcome to Google Solve! We ingested medical data into our RAG pipeline to improve access to healthcare. Try it out by asking questions related to diseases, symptoms and medical conditions.", type: "text", description: "Intro Message" },
+        placeholder_message: { text: "Ask a medical question", type: "text", description: "Input Placeholder" },
+        image: { src: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/1920px-Google_%22G%22_logo.svg.png?20230822192911", type: "image", description: "Logo of the Page" },
+        primary_color: { color: "#4C86F9", type: "color", description: "Primary Color" },
+        secondary_color: { color: "#49A84C", type: "color", description: "Secondary Color" },
+        warning_color: { color: "#E1442E", type: "color", description: "Accent Color" },
+        bg_color: { color: "#FFFFFF", type: "color", description: "Background Color" },
+        bg_alt_color: { color: "#F3F3F3", type: "color", description: "Alternative Background Color" },
+        text_color: { color: "#1C1C1C", type: "color", description: "Text Color" },
+        text_alt_color: { color: "#646464", type: "color", description: "Alternative Text Color" },
+        button_color: { color: "#E0E0E0", type: "color", description: "Button Color" },
+        button_hover_color: { color: "#CBCBCB", type: "color", description: "Button Hover Color" },
+        font: {
+            value: "Open_Sans", type: "select", options: AvailableFonts, description: "Text Font"
+        },
+        theme: "light",
+    }
+}
+
 const WeaviateCustomization: CustomizationSettings = {
     title: "Customization",
     description: "Customize the layout of your Verba by changing the title, subtitle, logo, and colors of the app.",
@@ -213,6 +239,10 @@ export const BaseSettings: Settings = {
     },
     Weaviate: {
         Customization: WeaviateCustomization,
+        Chat: BaseChat
+    },
+    GoogleHackathon: {
+        Customization: GoogleHackathonCustomization,
         Chat: BaseChat
     },
     Custom: {

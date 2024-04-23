@@ -64,9 +64,6 @@ export default function Home() {
               if (data.error) {
                 console.log(data.error)
               }
-
-              console.log(data.data)
-
               setRAGConfig(data.data)
 
             } else {
@@ -88,7 +85,7 @@ export default function Home() {
 
   return (
     <main className={`min-h-screen p-5 bg-bg-verba text-text-verba ${fontClassName}`} data-theme={baseSetting[settingTemplate].Customization.settings.theme}>
-      <Navbar title={baseSetting[settingTemplate].Customization.settings.title.text} subtitle={baseSetting[settingTemplate].Customization.settings.subtitle.text} imageSrc={baseSetting[settingTemplate].Customization.settings.image.src} version='v1.0.0' currentPage={currentPage} setCurrentPage={setCurrentPage} />
+      <Navbar APIHost={APIHost} title={baseSetting[settingTemplate].Customization.settings.title.text} subtitle={baseSetting[settingTemplate].Customization.settings.subtitle.text} imageSrc={baseSetting[settingTemplate].Customization.settings.image.src} version='v1.0.0' currentPage={currentPage} setCurrentPage={setCurrentPage} />
 
       {currentPage === "CHAT" && (
         <ChatComponent settingConfig={baseSetting[settingTemplate]} APIHost={APIHost} />

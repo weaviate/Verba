@@ -22,6 +22,7 @@ class CohereEmbedder(Embedder):
         self,
         documents: list[Document],
         client: Client,
+        logging: list[dict],
     ) -> bool:
         """Embed verba documents and its chunks to Weaviate
         @parameter: documents : list[Document] - List of Verba documents
@@ -29,4 +30,4 @@ class CohereEmbedder(Embedder):
         @parameter: batch_size : int - Batch Size of Input
         @returns bool - Bool whether the embedding what successful.
         """
-        return self.import_data(documents, client)
+        return self.import_data(documents, client, logging)

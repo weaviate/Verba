@@ -10,12 +10,13 @@ interface NavbarButtonProps {
   currentPage: string;
   setCurrentPage: (page: "CHAT" | "DOCUMENTS" | "STATUS" | "ADD" | "SETTINGS" | "RAG") => void;
   setPage: "CHAT" | "DOCUMENTS" | "STATUS" | "ADD" | "SETTINGS" | "RAG";
+  APIHost: string | null;
 }
 
-const NavbarButton: React.FC<NavbarButtonProps> = ({ Icon, iconSize, title, currentPage, setPage, setCurrentPage }) => {
+const NavbarButton: React.FC<NavbarButtonProps> = ({ Icon, iconSize, title, currentPage, setPage, setCurrentPage, APIHost }) => {
 
   return (
-    <button key={title} className={`btn md:btn-sm lg:btn-md flex flex-grow items-center justify-center border-none hover:bg-button-hover-verba ${currentPage === setPage ? ("bg-primary-verba text-text-verba") : "bg-button-verba text-text-alt-verba"}`} onClick={(e) => { setCurrentPage(setPage) }}>
+    <button disabled={APIHost === null} key={title} className={`btn md:btn-sm lg:btn-md flex flex-grow items-center justify-center border-none hover:bg-button-hover-verba ${currentPage === setPage ? ("bg-primary-verba text-text-verba") : "bg-button-verba text-text-alt-verba"}`} onClick={(e) => { setCurrentPage(setPage) }}>
       <Icon size={iconSize} />
       <p className="md:text-xs lg:text-sm sm:hidden md:flex">{title}</p>
     </button>

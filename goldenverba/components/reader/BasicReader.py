@@ -29,24 +29,15 @@ class BasicReader(Reader):
 
     def load(
         self,
-        fileData: list[FileData],
-        config: dict
+        fileData: list[FileData], logging: list[dict]
     ) -> tuple[list[Document], list[str]]:
 
         start_time = time.time()  # Start timing
         documents = []
-        logging = []
-        logging.append(["INFO",f"Starting loading in {len(fileData)} files"])
-
-        for _config in self.config:
-            if _config in config and self.config[_config] != config[_config]:
-                msg.info(f"Updating BasicReader Config {_config} : {self.config[_config]} -> {config[_config]}")
-                logging.append(["INFO",f"Updating BasicReader Config {_config} : {self.config[_config]} -> {config[_config]}"])
-                self.config[_config] = config[_config]
 
         for file in fileData:
             msg.info(f"Loading in {file.filename}")
-            logging.append(["INFO",f"Loading in {file.filename}"])
+            logging.append({"type":"INFO", "message":f"Importing {file.filename}"})
 
             decoded_bytes = base64.b64decode(file.content)
 
@@ -56,7 +47,7 @@ class BasicReader(Reader):
                     document = Document(
                         name=file.filename,
                         text=original_text,
-                        type=self.config["document_type"],
+                        type=self.config["document_type"].text,
                         timestamp=str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
                         reader=self.name,
                     )
@@ -64,7 +55,7 @@ class BasicReader(Reader):
 
                 except Exception as e:
                     msg.warn(f"Failed to load {file.filename} : {str(e)}")
-                    logging.append(["WARNING",f"Failed to load {file.filename} : {str(e)}"])
+                    logging.append({"type":"WARNING", "message":f"Failed to load {file.filename} : {str(e)}"})
 
             elif file.extension == "json":
                 try:
@@ -76,7 +67,7 @@ class BasicReader(Reader):
 
                 except Exception as e:
                     msg.warn(f"Failed to load {file.filename} : {str(e)}")
-                    logging.append(["WARNING",f"Failed to load {file.filename} : {str(e)}"])
+                    logging.append({"type":"WARNING", "message":f"Failed to load {file.filename} : {str(e)}"})
 
             elif file.extension == "pdf":
                 try:
@@ -91,23 +82,23 @@ class BasicReader(Reader):
                     document = Document(
                             name=file.filename,
                             text=full_text,
-                            type=self.config["document_type"],
+                            type=self.config["document_type"].text,
                             timestamp=str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
                             reader=self.name,
                         )
                     documents.append(document)
                 except Exception as e:
                     msg.warn(f"Failed to load {file.filename} : {str(e)}")
-                    logging.append(["WARNING",f"Failed to load {file.filename} : {str(e)}"])
+                    logging.append({"type":"WARNING", "message":f"Failed to load {file.filename} : {str(e)}"})
         
             else:
                 msg.warn(f"{file.filename} with extension {file.extension} not supported by BasicReader.")
-                logging.append(["WARNING",f"{file.filename} with extension {file.extension} not supported by BasicReader."])
+                logging.append({"type":"WARNING", "message":f"{file.filename} with extension {file.extension} not supported by BasicReader."})
 
 
         elapsed_time = round(time.time() - start_time , 2) # Calculate elapsed time
         msg.good(f"Loaded {len(documents)} documents in {elapsed_time}s")
-        logging.append(["SUCCESS",f"Loaded {len(documents)} documents in {elapsed_time}s"])
+        logging.append({"type":"SUCCESS", "message":f"Loaded {len(documents)} documents in {elapsed_time}s"})
 
         return documents, logging
 

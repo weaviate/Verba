@@ -20,6 +20,7 @@ interface NavbarProps {
   subtitle: string;
   version: string;
   currentPage: string;
+  APIHost: string | null;
   setCurrentPage: (page: "CHAT" | "DOCUMENTS" | "STATUS" | "ADD" | "SETTINGS" | "RAG") => void;
 }
 
@@ -30,7 +31,7 @@ const formatGitHubNumber = (num: number): string => {
   return num.toString();
 }
 
-const Navbar: React.FC<NavbarProps> = ({ imageSrc, title, subtitle, version, currentPage, setCurrentPage }) => {
+const Navbar: React.FC<NavbarProps> = ({ imageSrc, title, subtitle, APIHost, version, currentPage, setCurrentPage }) => {
 
   const [gitHubStars, setGitHubStars] = useState("0")
   const icon_size = 18
@@ -80,13 +81,13 @@ const Navbar: React.FC<NavbarProps> = ({ imageSrc, title, subtitle, version, cur
         {/* Pages */}
         <div className="lg:flex hidden lg:flex-row items-center lg:gap-3 justify-between">
           <div className="hidden sm:block sm:h-[3vh] lg:h-[5vh] bg-text-alt-verba w-px mx-1"></div>
-          <NavbarButton Icon={IoChatbubbleSharp} iconSize={icon_size} title='Chat' currentPage={currentPage} setCurrentPage={setCurrentPage} setPage='CHAT' />
-          <NavbarButton Icon={IoDocumentSharp} iconSize={icon_size} title='Documents' currentPage={currentPage} setCurrentPage={setCurrentPage} setPage='DOCUMENTS' />
-          <NavbarButton Icon={HiOutlineStatusOnline} iconSize={icon_size} title='Overview' currentPage={currentPage} setCurrentPage={setCurrentPage} setPage='STATUS' />
+          <NavbarButton APIHost={APIHost} Icon={IoChatbubbleSharp} iconSize={icon_size} title='Chat' currentPage={currentPage} setCurrentPage={setCurrentPage} setPage='CHAT' />
+          <NavbarButton APIHost={APIHost} Icon={IoDocumentSharp} iconSize={icon_size} title='Documents' currentPage={currentPage} setCurrentPage={setCurrentPage} setPage='DOCUMENTS' />
+          <NavbarButton APIHost={APIHost} Icon={HiOutlineStatusOnline} iconSize={icon_size} title='Overview' currentPage={currentPage} setCurrentPage={setCurrentPage} setPage='STATUS' />
           <div className="hidden sm:block sm:h-[3vh] lg:h-[5vh] bg-text-alt-verba w-px mx-1"></div>
-          <NavbarButton Icon={IoMdAddCircle} iconSize={icon_size} title='Add Documents' currentPage={currentPage} setCurrentPage={setCurrentPage} setPage='ADD' />
-          <NavbarButton Icon={IoBuildSharp} iconSize={icon_size} title='RAG' currentPage={currentPage} setCurrentPage={setCurrentPage} setPage='RAG' />
-          <NavbarButton Icon={IoSettingsSharp} iconSize={icon_size} title='Settings' currentPage={currentPage} setCurrentPage={setCurrentPage} setPage='SETTINGS' />
+          <NavbarButton APIHost={APIHost} Icon={IoMdAddCircle} iconSize={icon_size} title='Add Documents' currentPage={currentPage} setCurrentPage={setCurrentPage} setPage='ADD' />
+          <NavbarButton APIHost={APIHost} Icon={IoBuildSharp} iconSize={icon_size} title='RAG' currentPage={currentPage} setCurrentPage={setCurrentPage} setPage='RAG' />
+          <NavbarButton APIHost={APIHost} Icon={IoSettingsSharp} iconSize={icon_size} title='Settings' currentPage={currentPage} setCurrentPage={setCurrentPage} setPage='SETTINGS' />
           <div className="hidden sm:block sm:h-[3vh] lg:h-[5vh] bg-text-alt-verba w-px mx-1"></div>
 
           <button className={`md:hidden btn md:btn-sm lg:btn-md lg:flex items-center justify-center border-none bg-secondary-verba hover:bg-button-hover-verba`} onClick={handleGitHubClick}>
