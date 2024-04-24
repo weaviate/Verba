@@ -32,6 +32,8 @@ All notable changes to this project will be documented in this file.
 - Added better console and logging for ingestion
 - More Configuration
     - Enable/Disable Caching and Autocomplete Suggestions
+    - Improved verba_config.json
+- Ability to enable/disable caching + autosuggestions
 
 ### Changed
 - Changed to AppRouter framework

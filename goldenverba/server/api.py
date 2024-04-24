@@ -12,7 +12,15 @@ from wasabi import msg  # type: ignore[import]
 import time
 
 from goldenverba import verba_manager
-from goldenverba.server.types import ResetPayload, ConfigPayload, QueryPayload, GeneratePayload, GetDocumentPayload, SearchQueryPayload, ImportPayload
+from goldenverba.server.types import (
+    ResetPayload,
+    ConfigPayload,
+    QueryPayload,
+    GeneratePayload,
+    GetDocumentPayload,
+    SearchQueryPayload,
+    ImportPayload,
+)
 from goldenverba.server.util import get_config, set_config, setup_managers
 
 load_dotenv()
@@ -64,6 +72,7 @@ app.mount("/static", StaticFiles(directory=BASE_DIR / "frontend/out"), name="app
 async def serve_frontend():
     return FileResponse(os.path.join(BASE_DIR, "frontend/out/index.html"))
 
+
 # Define health check endpoint
 @app.get("/api/health")
 async def health_check():
@@ -90,6 +99,7 @@ async def health_check():
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
         )
 
+
 # Define health check endpoint
 @app.get("/api/get_google_tag")
 async def get_google_tag():
@@ -104,6 +114,7 @@ async def get_google_tag():
         }
     )
 
+
 @app.get("/api/get_production")
 async def get_production():
     return JSONResponse(
@@ -111,6 +122,7 @@ async def get_production():
             "production": production,
         }
     )
+
 
 # Get Status meta data
 @app.get("/api/get_status")
@@ -120,17 +132,29 @@ async def get_status():
     try:
 
         schemas = manager.get_schemas()
-        sorted_schemas = dict(sorted(schemas.items(), key=lambda item: item[1], reverse=True))
+        sorted_schemas = dict(
+            sorted(schemas.items(), key=lambda item: item[1], reverse=True)
+        )
 
-        sorted_libraries = dict(sorted(manager.installed_libraries.items(), key=lambda item: (not item[1], item[0])))
-        sorted_variables = dict(sorted(manager.environment_variables.items(), key=lambda item: (not item[1], item[0])))
+        sorted_libraries = dict(
+            sorted(
+                manager.installed_libraries.items(),
+                key=lambda item: (not item[1], item[0]),
+            )
+        )
+        sorted_variables = dict(
+            sorted(
+                manager.environment_variables.items(),
+                key=lambda item: (not item[1], item[0]),
+            )
+        )
 
         data = {
             "type": manager.weaviate_type,
             "libraries": sorted_libraries,
             "variables": sorted_variables,
             "schemas": sorted_schemas,
-            "error": ""
+            "error": "",
         }
 
         return JSONResponse(content=data)
@@ -140,17 +164,18 @@ async def get_status():
             "libraries": {},
             "variables": {},
             "schemas": {},
-            "error": f"Status retrieval failed: {str(e)}"
+            "error": f"Status retrieval failed: {str(e)}",
         }
         msg.fail(f"Status retrieval failed: {str(e)}")
         return JSONResponse(content=data)
+
 
 # Reset Verba
 @app.post("/api/reset")
 async def reset_verba(payload: ResetPayload):
     if production:
         return JSONResponse(status_code=200, content={})
-    
+
     if payload.resetMode == "VERBA":
         manager.reset()
     elif payload.resetMode == "DOCUMENTS":
@@ -164,6 +189,7 @@ async def reset_verba(payload: ResetPayload):
 
     return JSONResponse(status_code=200, content={})
 
+
 # Get Configuration
 @app.get("/api/config")
 async def retrieve_config():
@@ -171,11 +197,18 @@ async def retrieve_config():
 
     try:
         config = get_config(manager)
-        return JSONResponse(status_code=200, content={"data":config, "error":""})
+        return JSONResponse(status_code=200, content={"data": config, "error": ""})
 
     except Exception as e:
         msg.warn(f"Could not retrieve configuration: {str(e)}")
-        return JSONResponse(status_code=200, content={"data":{}, "error":f"Could not retrieve configuration: {str(e)}"})
+        return JSONResponse(
+            status_code=200,
+            content={
+                "data": {},
+                "error": f"Could not retrieve configuration: {str(e)}",
+            },
+        )
+
 
 # Receive query and return chunks and query answer
 @app.post("/api/import")
@@ -191,14 +224,15 @@ async def import_data(payload: ImportPayload):
                 "logging": logging,
             }
         )
-    
+
     except Exception as e:
         return JSONResponse(
             content={
-                "logging": [{"type":"ERROR","message":str(e)}],
+                "logging": [{"type": "ERROR", "message": str(e)}],
             }
         )
-    
+
+
 @app.post("/api/set_config")
 async def update_config(payload: ConfigPayload):
 
@@ -210,6 +244,7 @@ async def update_config(payload: ConfigPayload):
             "status_msg": "Config Updated",
         }
     )
+
 
 # Receive query and return chunks and query answer
 @app.post("/api/query")
@@ -234,7 +269,7 @@ async def query(payload: QueryPayload):
             for chunk in chunks
         ]
 
-        elapsed_time = round(time.time() - start_time , 2) # Calculate elapsed time
+        elapsed_time = round(time.time() - start_time, 2)  # Calculate elapsed time
         msg.good(f"Succesfully processed query: {payload.query} in {elapsed_time}s")
 
         if len(chunks) == 0:
@@ -243,7 +278,7 @@ async def query(payload: QueryPayload):
                     "chunks": [],
                     "took": 0,
                     "context": "",
-                    "error": "Chunks could be retrieved"
+                    "error": "Chunks could be retrieved",
                 }
             )
 
@@ -252,7 +287,7 @@ async def query(payload: QueryPayload):
                 "error": "",
                 "chunks": retrieved_chunks,
                 "context": context,
-                "took": elapsed_time
+                "took": elapsed_time,
             }
         )
 
@@ -265,6 +300,7 @@ async def query(payload: QueryPayload):
                 "documents": [],
             }
         )
+
 
 # Receive query and return chunks and query answer
 @app.post("/api/generate")
@@ -291,6 +327,7 @@ async def generate(payload: GeneratePayload):
                 "system": f"Something went wrong! {str(e)}",
             }
         )
+
 
 @app.websocket("/ws/generate_stream")
 async def websocket_generate_stream(websocket: WebSocket):
@@ -321,6 +358,7 @@ async def websocket_generate_stream(websocket: WebSocket):
             )
         msg.good("Succesfully streamed answer")
 
+
 # Retrieve auto complete suggestions based on user input
 @app.post("/api/suggestions")
 async def suggestions(payload: QueryPayload):
@@ -339,6 +377,7 @@ async def suggestions(payload: QueryPayload):
             }
         )
 
+
 # Retrieve specific document based on UUID
 @app.post("/api/get_document")
 async def get_document(payload: GetDocumentPayload):
@@ -347,16 +386,16 @@ async def get_document(payload: GetDocumentPayload):
 
     try:
         document = manager.retrieve_document(payload.document_id)
-        document_properties = document.get("properties",{})
+        document_properties = document.get("properties", {})
         document_obj = {
-            "class":document.get("class","No Class"),
-            "id":document.get("id",payload.document_id),
-            "chunks":document_properties.get("chunk_count", 0),
-            "link":document_properties.get("doc_link", ""),
-            "name":document_properties.get("doc_name", "No name"),
-            "type":document_properties.get("doc_type", "No type"),
-            "text":document_properties.get("text", "No text"),
-            "timestamp":document_properties.get("timestamp", ""),
+            "class": document.get("class", "No Class"),
+            "id": document.get("id", payload.document_id),
+            "chunks": document_properties.get("chunk_count", 0),
+            "link": document_properties.get("doc_link", ""),
+            "name": document_properties.get("doc_name", "No name"),
+            "type": document_properties.get("doc_type", "No type"),
+            "text": document_properties.get("text", "No text"),
+            "timestamp": document_properties.get("timestamp", ""),
         }
 
         msg.good(f"Succesfully retrieved document: {payload.document_id}")
@@ -375,6 +414,7 @@ async def get_document(payload: GetDocumentPayload):
             }
         )
 
+
 ## Retrieve all documents imported to Weaviate
 @app.post("/api/get_all_documents")
 async def get_all_documents(payload: SearchQueryPayload):
@@ -384,39 +424,47 @@ async def get_all_documents(payload: SearchQueryPayload):
 
     try:
         if payload.query == "":
-            documents = manager.retrieve_all_documents(payload.doc_type, payload.page, payload.pageSize)
+            documents = manager.retrieve_all_documents(
+                payload.doc_type, payload.page, payload.pageSize
+            )
         else:
-            documents = manager.search_documents(payload.query, payload.doc_type, payload.page, payload.pageSize)
+            documents = manager.search_documents(
+                payload.query, payload.doc_type, payload.page, payload.pageSize
+            )
 
         if not documents:
-             return JSONResponse(
-            content={
-                "documents": [],
-                "doc_types": [],
-                "current_embedder": manager.embedder_manager.selected_embedder,
-                "error": f"No Results found!",
-                "took": 0
-            }
-        )
-            
+            return JSONResponse(
+                content={
+                    "documents": [],
+                    "doc_types": [],
+                    "current_embedder": manager.embedder_manager.selected_embedder,
+                    "error": f"No Results found!",
+                    "took": 0,
+                }
+            )
+
         documents_obj = []
         for document in documents:
 
             _additional = document["_additional"]
 
-            documents_obj.append({
-            "class":"No Class",
-            "uuid":_additional.get("id","none"),
-            "chunks":document.get("chunk_count", 0),
-            "link":document.get("doc_link", ""),
-            "name":document.get("doc_name", "No name"),
-            "type":document.get("doc_type", "No type"),
-            "text":document.get("text", "No text"),
-            "timestamp":document.get("timestamp", ""),
-        })
-            
-        elapsed_time = round(time.time() - start_time , 2) # Calculate elapsed time
-        msg.good(f"Succesfully retrieved document: {len(documents)} documents in {elapsed_time}s")
+            documents_obj.append(
+                {
+                    "class": "No Class",
+                    "uuid": _additional.get("id", "none"),
+                    "chunks": document.get("chunk_count", 0),
+                    "link": document.get("doc_link", ""),
+                    "name": document.get("doc_name", "No name"),
+                    "type": document.get("doc_type", "No type"),
+                    "text": document.get("text", "No text"),
+                    "timestamp": document.get("timestamp", ""),
+                }
+            )
+
+        elapsed_time = round(time.time() - start_time, 2)  # Calculate elapsed time
+        msg.good(
+            f"Succesfully retrieved document: {len(documents)} documents in {elapsed_time}s"
+        )
 
         doc_types = manager.retrieve_all_document_types()
 
@@ -426,7 +474,7 @@ async def get_all_documents(payload: SearchQueryPayload):
                 "doc_types": list(doc_types),
                 "current_embedder": manager.embedder_manager.selected_embedder,
                 "error": "",
-                "took": elapsed_time
+                "took": elapsed_time,
             }
         )
     except Exception as e:
@@ -437,9 +485,10 @@ async def get_all_documents(payload: SearchQueryPayload):
                 "doc_types": [],
                 "current_embedder": manager.embedder_manager.selected_embedder,
                 "error": f"All Document retrieval failed: {str(e)}",
-                "took": 0
+                "took": 0,
             }
         )
+
 
 # Retrieve specific document based on UUID
 @app.post("/api/delete_document")
