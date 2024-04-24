@@ -27,18 +27,7 @@ else:
     production = False
 
 manager = verba_manager.VerbaManager()
-config_manager = ConfigManager()
-
-readers = manager.reader_get_readers()
-chunker = manager.chunker_get_chunker()
-embedders = manager.embedder_get_embedder()
-retrievers = manager.retriever_get_retriever()
-generators = manager.generator_get_generator()
-
-setup_managers(
-    manager, config_manager, readers, chunker, embedders, retrievers, generators
-)
-config_manager.save_config()
+setup_managers(manager)
 
 # FastAPI App
 app = FastAPI()
@@ -78,7 +67,7 @@ async def serve_frontend():
 
 # Define health check endpoint
 @app.get("/api/health")
-async def root():
+async def health_check():
     try:
         if manager.client.is_ready():
             return JSONResponse(
@@ -189,7 +178,6 @@ async def reset_verba(payload: ResetPayload):
 
     return JSONResponse(status_code=200, content={})
 
-
 # Receive query and return chunks and query answer
 @app.post("/api/import")
 async def import_data(payload: ImportPayload):
@@ -279,7 +267,6 @@ async def query(payload: QueryPayload):
             }
         )
 
-
 # Receive query and return chunks and query answer
 @app.post("/api/generate")
 async def generate(payload: GeneratePayload):
@@ -305,7 +292,6 @@ async def generate(payload: GeneratePayload):
                 "system": f"Something went wrong! {str(e)}",
             }
         )
-
 
 @app.websocket("/ws/generate_stream")
 async def websocket_generate_stream(websocket: WebSocket):
@@ -336,7 +322,6 @@ async def websocket_generate_stream(websocket: WebSocket):
             )
         msg.good("Succesfully streamed answer")
 
-
 # Retrieve auto complete suggestions based on user input
 @app.post("/api/suggestions")
 async def suggestions(payload: QueryPayload):
@@ -354,7 +339,6 @@ async def suggestions(payload: QueryPayload):
                 "suggestions": [],
             }
         )
-
 
 # Retrieve specific document based on UUID
 @app.post("/api/get_document")
@@ -391,7 +375,6 @@ async def get_document(payload: GetDocumentPayload):
                 "document": None,
             }
         )
-
 
 ## Retrieve all documents imported to Weaviate
 @app.post("/api/get_all_documents")
@@ -458,7 +441,6 @@ async def get_all_documents(payload: SearchQueryPayload):
                 "took": 0
             }
         )
-
 
 # Retrieve specific document based on UUID
 @app.post("/api/delete_document")
