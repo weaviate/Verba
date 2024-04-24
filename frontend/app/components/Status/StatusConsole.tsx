@@ -37,7 +37,7 @@ const StatusConsoleComponent: React.FC<StatusConsoleComponentProps> = ({
 
                 <div className='flex flex-col gap-2'>
                     {status && Object.entries(status).map(([key, value]) => (
-                        <StatusCard title={key} value={null} checked={value} />
+                        <StatusCard key={"Status_" + key} title={key} value={null} checked={value} />
                     ))}
 
                 </div>

@@ -1,4 +1,3 @@
-from goldenverba.components.interfaces import Reader, Chunker, Embedder, Retriever, Generator
 from goldenverba.verba_manager import VerbaManager
 
 import json

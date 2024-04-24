@@ -129,7 +129,7 @@ const RAGComponent: React.FC<RAGComponentProps> = ({ APIHost, settingConfig, RAG
         <div className="flex sm:flex-col md:flex-row justify-between gap-3 ">
             {currentRAGSettings && Object.entries(currentRAGSettings).map(([key, value]) => (
                 showComponents.includes(key) && (
-                    <div className='w-full md:w-1/4'>
+                    <div key={"RAGButton_" + key} className='w-full md:w-1/4'>
                         <RAGConfigComponent key={key} files={files} setFiles={setFiles} settingConfig={settingConfig} APIHost={APIHost} RAGConfig={currentRAGSettings} RAGConfigTitle={key} RAGComponents={value} setRAGConfig={setCurrentRAGSettings} />
                     </div>
                 )
@@ -164,8 +164,8 @@ const RAGComponent: React.FC<RAGComponentProps> = ({ APIHost, settingConfig, RAG
                                 <p className='text-lg'>Console</p>
                             </div>
                             <div className='flex flex-col gap-2'>
-                                {consoleLog && consoleLog.map((msg) => (
-                                    <div>
+                                {consoleLog && consoleLog.map((msg, index) => (
+                                    <div key={"ConsoleMessage " + index}>
                                         {
                                             msg.type === "INFO" && (
                                                 <div className='flex text-text-verba text-sm gap-2'>

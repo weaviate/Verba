@@ -64,7 +64,7 @@ const RAGConfigComponent: React.FC<RAGConfigComponentProps> = ({ APIHost, files,
 
                 <div className='grid grid-cols-1 lg:grid-cols-2 gap-2'>
                     {RAGComponents && Object.entries(RAGComponents.components).map(([key, value]) => (
-                        <button disabled={!value.available} onClick={() => { onSelectComponent(key) }} className={`btn border-none ${key === RAGComponents.selected ? ("bg-secondary-verba text-text-verba") : ("bg-button-verba text-text-alt-verba")} hover:bg-button-hover-verba `}>
+                        <button key={"Component_" + key} disabled={!value.available} onClick={() => { onSelectComponent(key) }} className={`btn border-none ${key === RAGComponents.selected ? ("bg-secondary-verba text-text-verba") : ("bg-button-verba text-text-alt-verba")} hover:bg-button-hover-verba `}>
                             <p>
                                 {key}
                             </p>
