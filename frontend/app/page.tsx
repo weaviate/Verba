@@ -88,11 +88,11 @@ export default function Home() {
       <Navbar APIHost={APIHost} title={baseSetting[settingTemplate].Customization.settings.title.text} subtitle={baseSetting[settingTemplate].Customization.settings.subtitle.text} imageSrc={baseSetting[settingTemplate].Customization.settings.image.src} version='v1.0.0' currentPage={currentPage} setCurrentPage={setCurrentPage} />
 
       {currentPage === "CHAT" && (
-        <ChatComponent settingConfig={baseSetting[settingTemplate]} APIHost={APIHost} />
+        <ChatComponent settingConfig={baseSetting[settingTemplate]} APIHost={APIHost} RAGConfig={RAGConfig} setCurrentPage={setCurrentPage} />
       )}
 
       {currentPage === "DOCUMENTS" && (
-        <DocumentViewerComponent settingConfig={baseSetting[settingTemplate]} APIHost={APIHost} />
+        <DocumentViewerComponent RAGConfig={RAGConfig} setCurrentPage={setCurrentPage} settingConfig={baseSetting[settingTemplate]} APIHost={APIHost} />
       )}
 
       {currentPage === "STATUS" && (

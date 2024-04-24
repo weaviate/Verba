@@ -7,12 +7,16 @@ import { DocumentChunk, Document } from '../Document/types';
 import DocumentComponent from '../Document/DocumentComponent';
 import DocumentSearchComponent from './DocumentSearchComponent';
 
+import { RAGConfig } from '../RAG/types';
+
 interface DocumentViewerComponentProps {
     settingConfig: SettingsConfiguration;
     APIHost: string | null;
+    setCurrentPage: (p: any) => void;
+    RAGConfig: RAGConfig | null;
 }
 
-const DocumentViewerComponent: React.FC<DocumentViewerComponentProps> = ({ APIHost, settingConfig }) => {
+const DocumentViewerComponent: React.FC<DocumentViewerComponentProps> = ({ APIHost, settingConfig, setCurrentPage, RAGConfig }) => {
 
     const [documents, setDocuments] = useState<Document[] | null>([])
     const [documentTime, setDocumentTime] = useState(0);
@@ -23,7 +27,7 @@ const DocumentViewerComponent: React.FC<DocumentViewerComponentProps> = ({ APIHo
         <div className="flex sm:flex-col md:flex-row justify-center items-start gap-3 ">
             {/* Chat Interface */}
             <div className='sm:w-full md:w-2/4'>
-                <DocumentSearchComponent triggerReset={triggerReset} documents={documents} setDocuments={setDocuments} APIHost={APIHost} setSelectedDocument={setSelectedDocument} settingConfig={settingConfig} selectedDocument={selectedDocument} />
+                <DocumentSearchComponent RAGConfig={RAGConfig} setCurrentPage={setCurrentPage} triggerReset={triggerReset} documents={documents} setDocuments={setDocuments} APIHost={APIHost} setSelectedDocument={setSelectedDocument} settingConfig={settingConfig} selectedDocument={selectedDocument} />
             </div>
 
             <div className='sm:w-full md:w-2/4'>

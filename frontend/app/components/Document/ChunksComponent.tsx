@@ -5,18 +5,28 @@ import CountUp from 'react-countup';
 
 import StatusLabel from '../Chat/StatusLabel';
 
+import { RAGConfig } from '../RAG/types';
+import ComponentStatus from '../Status/ComponentStatus';
+
+import { FaSearch } from "react-icons/fa";
+import { FaDatabase } from "react-icons/fa";
+
 interface ChunksComponentComponentProps {
     chunks: DocumentChunk[]
     selectedChunk: DocumentChunk | null
     chunkTime: number;
     setSelectedChunk: (c: DocumentChunk | null) => void;
+    setCurrentPage: (p: any) => void;
+    RAGConfig: RAGConfig | null;
 }
 
 const ChunksComponent: React.FC<ChunksComponentComponentProps> = ({
     chunks,
     selectedChunk,
     chunkTime,
-    setSelectedChunk
+    setSelectedChunk,
+    setCurrentPage,
+    RAGConfig
 }) => {
 
     useEffect(() => {
@@ -33,8 +43,12 @@ const ChunksComponent: React.FC<ChunksComponentComponentProps> = ({
             <div className="flex flex-col bg-bg-alt-verba rounded-lg shadow-lg p-5 text-text-verba gap-3 md:h-[17vh] lg:h-[65vh] overflow-auto">
                 <div className='flex lg:flex-col md:flex-row gap-5'>
                     <div className='flex md:flex-row lg:flex-col gap-2 justify-center items-center'>
-                        <StatusLabel status={true} true_text='WindowRetriever' false_text='No Caching' />
-                        <StatusLabel status={false} true_text='Caching' false_text='OpenAIEmbedder' />
+                        {RAGConfig && (
+                            <div className='flex flex-col gap-2 items-center w-full'>
+                                <ComponentStatus component_name={RAGConfig ? RAGConfig["Embedder"].selected : ""} Icon={FaDatabase} changeTo={"RAG"} changePage={setCurrentPage} />
+                                <ComponentStatus component_name={RAGConfig ? RAGConfig["Retriever"].selected : ""} Icon={FaSearch} changeTo={"RAG"} changePage={setCurrentPage} />
+                            </div>
+                        )}
                     </div>
                     {chunks.length > 0 && (
                         <div className='sm:hidden md:flex items-center justify-center'>

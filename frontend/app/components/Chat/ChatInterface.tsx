@@ -8,21 +8,30 @@ import { getWebSocketApiHost } from "./util"
 import ChatMessage from './ChatMessage';
 import { SettingsConfiguration } from "../Settings/types"
 import { IoIosRefresh } from "react-icons/io";
+import { AiFillRobot } from "react-icons/ai";
 
 import StatusLabel from './StatusLabel';
+
+import ComponentStatus from '../Status/ComponentStatus';
+
+import { RAGConfig } from '../RAG/types';
 
 interface ChatInterfaceComponentProps {
     settingConfig: SettingsConfiguration;
     APIHost: string | null;
     setChunks: (c: DocumentChunk[]) => void
     setChunkTime: (t: number) => void
+    setCurrentPage: (p: any) => void;
+    RAGConfig: RAGConfig | null;
 }
 
 const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
     APIHost,
     settingConfig,
     setChunks,
-    setChunkTime
+    setChunkTime,
+    setCurrentPage,
+    RAGConfig
 }) => {
 
     const [previewText, setPreviewText] = useState("");
@@ -348,9 +357,13 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
             {/*Chat Messages*/}
             <div className="flex flex-col bg-bg-alt-verba rounded-lg shadow-lg p-5 text-text-verba gap-5 h-[55vh] overflow-auto">
                 <div className='flex gap-2 items-center'>
-                    <StatusLabel status={APIHost !== null && socket !== null && socket.readyState !== WebSocket.CLOSED} true_text='Online' false_text='Connecting...' />
-                    <StatusLabel status={true} true_text='GPT-4' false_text='Connecting...' />
+                    {RAGConfig && (
+                        <div className='flex gap-2 items-center'>
+                            <ComponentStatus component_name={RAGConfig ? RAGConfig["Generator"].selected : ""} Icon={AiFillRobot} changeTo={"RAG"} changePage={setCurrentPage} />
+                        </div>
+                    )}
                     <div className="hidden sm:block sm:h-[3vh] lg:h-[2vh] bg-text-alt-verba w-px mx-1"></div>
+                    <StatusLabel status={APIHost !== null && socket !== null && socket.readyState !== WebSocket.CLOSED} true_text='Online' false_text='Connecting...' />
                     <StatusLabel status={settingConfig.Chat.settings.caching.checked} true_text='Caching' false_text='No Caching' />
                     <StatusLabel status={settingConfig.Chat.settings.suggestion.checked} true_text='Suggestions' false_text='No Suggestions' />
                 </div>

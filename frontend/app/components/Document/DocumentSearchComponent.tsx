@@ -8,6 +8,11 @@ import { IoIosRefresh } from "react-icons/io";
 
 import StatusLabel from '../Chat/StatusLabel';
 
+import { FaDatabase } from "react-icons/fa";
+
+import { RAGConfig } from '../RAG/types';
+import ComponentStatus from '../Status/ComponentStatus';
+
 interface DocumentSearchComponentProps {
     APIHost: string | null;
     selectedDocument: DocumentChunk | null;
@@ -16,6 +21,8 @@ interface DocumentSearchComponentProps {
     documents: Document[] | null;
     setDocuments: (d: Document[] | null) => void;
     triggerReset: boolean
+    setCurrentPage: (p: any) => void;
+    RAGConfig: RAGConfig | null;
 }
 
 const DocumentSearchComponent: React.FC<DocumentSearchComponentProps> = ({
@@ -25,7 +32,9 @@ const DocumentSearchComponent: React.FC<DocumentSearchComponentProps> = ({
     setSelectedDocument,
     documents,
     setDocuments,
-    triggerReset
+    triggerReset,
+    setCurrentPage,
+    RAGConfig
 }) => {
 
     const [userInput, setUserInput] = useState("")
@@ -150,23 +159,21 @@ const DocumentSearchComponent: React.FC<DocumentSearchComponentProps> = ({
             <div className="flex flex-col bg-bg-alt-verba rounded-lg shadow-lg p-5 text-text-verba md:gap-5 min-h-[15vh] md:min-h-[9.3vh]">
                 {/*Search Bar*/}
                 <form
-                    className='flex md:justify-between w-full items-center justify-center gap-2 md:gap-3'
+                    className='flex md:justify-between w-full items-center justify-between gap-2 md:gap-3'
                     onSubmit={handleSearch}
                 >
-                    <div className='flex md:flex-row flex-col gap-2 md:gap-5 sm:w-full'>
-                        <div>
-                            <StatusLabel status={true} true_text='ADAEmbedder' false_text='No Caching' />
-                        </div>
-                        <textarea rows={1} cols={10} onKeyDown={handleKeyDown} value={userInput} onChange={(e) => { setUserInput(e.target.value) }} className=" bg-bg-alt-verba textarea textarea-xs p-2 text-sm md:text-base w-full" placeholder={`Search for documents`}></textarea>
+                    <textarea rows={1} cols={10} onKeyDown={handleKeyDown} value={userInput} onChange={(e) => { setUserInput(e.target.value) }} className=" bg-bg-alt-verba textarea textarea-xs p-2 text-sm md:text-base w-2/3" placeholder={`Search for documents`}></textarea>
+                    <div>
+                        <ComponentStatus component_name={RAGConfig ? RAGConfig["Embedder"].selected : ""} Icon={FaDatabase} changeTo={"RAG"} changePage={setCurrentPage} />
                     </div>
-                    <div className='flex md:flex-row flex-col gap-2 md:gap-5'>
-                        <button type='button' onClick={handleSearch} className='btn btn-circle border-none shadow-none bg-bg-alt-verba hover:bg-secondary-verba'>
-                            <FaSearch size={18} />
-                        </button>
-                        <button type='button' onClick={clearSearch} className='btn btn-circle border-none shadow-none bg-bg-alt-verba hover:bg-secondary-verba'>
-                            <IoIosRefresh size={18} />
-                        </button>
-                    </div>
+
+                    <button type='button' onClick={handleSearch} className='btn btn-circle border-none shadow-none bg-bg-alt-verba hover:bg-secondary-verba'>
+                        <FaSearch size={18} />
+                    </button>
+                    <button type='button' onClick={clearSearch} className='btn btn-circle border-none shadow-none bg-bg-alt-verba hover:bg-secondary-verba'>
+                        <IoIosRefresh size={18} />
+                    </button>
+
                 </form>
 
             </div >
