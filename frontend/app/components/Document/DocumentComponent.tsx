@@ -140,7 +140,7 @@ const DocumentComponent: React.FC<DocumentComponentProps> = ({
     if (currentDocument !== null && !isFetching) {
 
         return (
-            <div className="flex flex-col bg-bg-alt-verba rounded-lg shadow-lg p-5 text-text-verba gap-5 sm:h-[47vh] lg:h-[65vh] overflow-auto">
+            <div className="flex flex-col bg-bg-alt-verba rounded-lg shadow-lg p-5 text-text-verba gap-5 sm:h-[53.5vh] lg:h-[65vh] overflow-auto">
                 {/*Title*/}
                 <div className='flex justify-between'>
                     <div className='flex flex-col'>
@@ -150,9 +150,9 @@ const DocumentComponent: React.FC<DocumentComponentProps> = ({
                     <div className='flex gap-2'>
                         {formattedDocument && formattedDocument.substring !== "" && (
                             <div className='flex'>
-                                <button onClick={handleDocumentShow} className='btn bg-button-verba hover:button-hover-verba flex gap-2'>
+                                <button onClick={handleDocumentShow} className='btn border-none text-text-verba bg-button-verba hover:bg-button-hover-verba flex gap-2'>
                                     <MdOutlineSimCardDownload />
-                                    <p className='sm:hidden md:flex text-xs'>
+                                    <p className='sm:hidden md:flex text-xs text-text-verba'>
                                         {showWholeDocument ? ("Show Only Context") : ("Show Whole Document")}
                                     </p>
                                 </button>
@@ -160,9 +160,9 @@ const DocumentComponent: React.FC<DocumentComponentProps> = ({
                         )}
                         {currentDocument.link !== "" && (
                             <div className='flex'>
-                                <button onClick={handleSourceClick} className='btn bg-button-verba hover:button-hover-verba flex gap-2'>
+                                <button onClick={handleSourceClick} className='btn border-none text-text-verba bg-button-verba hover:bg-button-hover-verba flex gap-2'>
                                     <FaExternalLinkAlt />
-                                    <p className='sm:hidden md:flex text-xs'>
+                                    <p className='sm:hidden md:flex text-xs text-text-verba'>
                                         Go To Source
                                     </p>
                                 </button>
@@ -170,9 +170,9 @@ const DocumentComponent: React.FC<DocumentComponentProps> = ({
                         )}
                         {deletable && (
                             <div className='flex'>
-                                <button onClick={openDeleteModal} className='btn bg-warning-verba hover:button-hover-verba flex gap-2'>
+                                <button onClick={openDeleteModal} className='btn border-none text-text-verba bg-warning-verba hover:bg-button-hover-verba flex gap-2'>
                                     <MdDelete />
-                                    <p className='sm:hidden md:flex text-xs'>
+                                    <p className='sm:hidden md:flex text-xs text-text-verba'>
                                         Delete Document
                                     </p>
                                 </button>

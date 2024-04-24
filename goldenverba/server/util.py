@@ -12,7 +12,14 @@ def setup_managers(manager):
     config = load_config(manager)
     set_config(manager, config)
     
-def get_config(manager: VerbaManager) -> dict:
+def get_config(manager: VerbaManager, filename: str = "verba_config.json") -> dict:
+
+    config = {}
+    if os.path.exists(filename):
+        with open(filename, "r") as file:
+            config = json.load(file)
+
+    setting_config = config.get("SETTING",{})
 
     available_environments = manager.environment_variables
     available_libraries = manager.installed_libraries
@@ -32,11 +39,12 @@ def get_config(manager: VerbaManager) -> dict:
     generators = manager.generator_manager.get_generators()
     generator_config = {"components":{generator: generators[generator].get_meta(available_environments,available_libraries) for generator in generators}, "selected": manager.generator_manager.selected_generator}
 
-    return {"Reader": reader_config, "Chunker":chunkers_config, "Embedder":embedder_config, "Retriever":retrievers_config, "Generator": generator_config}
+    return {"RAG": {"Reader": reader_config, "Chunker":chunkers_config, "Embedder":embedder_config, "Retriever":retrievers_config, "Generator": generator_config}, "SETTING":setting_config} 
 
-def set_config(manager: VerbaManager, config: dict):
+def set_config(manager: VerbaManager, combined_config: dict):
 
-    save_config(config)
+    save_config(combined_config)
+    config = combined_config.get("RAG", {})
 
     # Set Selected
     manager.reader_manager.set_reader(config.get("Reader",{}).get("selected",""))

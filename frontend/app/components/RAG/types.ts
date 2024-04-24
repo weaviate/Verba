@@ -1,7 +1,7 @@
-import { TextFieldSetting, NumberFieldSetting } from "../Settings/types";
+import { TextFieldSetting, NumberFieldSetting, SettingsPayload } from "../Settings/types";
 
 export type RAGResponse = {
-    data: RAGConfig;
+    data: { "RAG": RAGConfig, "SETTING": SettingsPayload }
     error: string;
 };
 

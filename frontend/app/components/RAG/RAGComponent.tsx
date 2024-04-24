@@ -8,6 +8,7 @@ import { FaFileImport } from "react-icons/fa";
 import { MdCancel } from "react-icons/md";
 
 import PulseLoader from "react-spinners/PulseLoader";
+import { Settings } from '../Settings/types';
 
 import { processFiles } from './util';
 
@@ -18,43 +19,17 @@ interface RAGComponentProps {
     setRAGConfig: (r_: RAGConfig | null) => void;
     showComponents: string[]
     buttonTitle: string;
+    settingTemplate: string
+    baseSetting: Settings
 }
 
-const RAGComponent: React.FC<RAGComponentProps> = ({ APIHost, settingConfig, RAGConfig, setRAGConfig, showComponents, buttonTitle }) => {
+const RAGComponent: React.FC<RAGComponentProps> = ({ APIHost, settingConfig, RAGConfig, setRAGConfig, showComponents, buttonTitle, baseSetting, settingTemplate }) => {
 
     const [currentRAGSettings, setCurrentRAGSettings] = useState<RAGConfig>(JSON.parse(JSON.stringify(RAGConfig)))
     const [files, setFiles] = useState<FileList | null>(null)
     const [isFetching, setIsFetching] = useState(false)
 
     const [consoleLog, setConsoleLog] = useState<ConsoleMessage[]>([])
-
-    useEffect(() => {
-        const fetchHost = async () => {
-            try {
-                if (APIHost && !RAGConfig) {
-                    const response = await fetch(APIHost + "/api/config", {
-                        method: "GET",
-                    });
-                    const data: RAGResponse = await response.json();
-                    if (data) {
-                        if (data.error) {
-                            console.log(data.error)
-                        }
-                        console.log(data.data)
-
-                        setRAGConfig(data.data)
-
-                    } else {
-                        console.warn("Configuration could not be retrieved")
-                    }
-                }
-            } catch (error) {
-                console.error('Error detecting host:', error);
-                setRAGConfig(null); // Optionally handle the error by setting the state to an empty string or a specific error message
-            }
-        };
-        fetchHost();
-    }, [APIHost]);
 
     const saveSettings = () => {
         setRAGConfig(currentRAGSettings)
@@ -78,7 +53,7 @@ const RAGComponent: React.FC<RAGComponentProps> = ({ APIHost, settingConfig, RAG
             const fileData = await processFiles(files);
             setFiles(null)
             if (fileData) {
-                const payload = { config: currentRAGSettings, data: fileData }
+                const payload = { config: { "RAG": currentRAGSettings, "SETTING": { "selectedTheme": settingTemplate, "themes": baseSetting } }, data: fileData }
 
                 const response = await fetch(APIHost + "/api/import", {
                     method: "POST",
@@ -113,7 +88,7 @@ const RAGComponent: React.FC<RAGComponentProps> = ({ APIHost, settingConfig, RAG
 
         try {
 
-            const payload = { config: currentRAGSettings }
+            const payload = { config: { "RAG": currentRAGSettings, "SETTING": { "selectedTheme": settingTemplate, "themes": baseSetting } } }
 
             const response = await fetch(APIHost + "/api/set_config", {
                 method: "POST",

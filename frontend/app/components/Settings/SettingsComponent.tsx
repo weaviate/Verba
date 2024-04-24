@@ -33,17 +33,7 @@ const SettingsComponent: React.FC<SettingsComponentProps> = ({ settingTemplate, 
 
     const [availableTemplate, setAvailableTemplate] = useState<string[]>(Object.keys(BaseSettings))
 
-
     useEffect(() => {
-        document.documentElement.style.setProperty("--primary-verba", baseSetting[settingTemplate].Customization.settings.primary_color.color);
-        document.documentElement.style.setProperty("--secondary-verba", baseSetting[settingTemplate].Customization.settings.secondary_color.color);
-        document.documentElement.style.setProperty("--warning-verba", baseSetting[settingTemplate].Customization.settings.warning_color.color);
-        document.documentElement.style.setProperty("--bg-verba", baseSetting[settingTemplate].Customization.settings.bg_color.color);
-        document.documentElement.style.setProperty("--bg-alt-verba", baseSetting[settingTemplate].Customization.settings.bg_alt_color.color);
-        document.documentElement.style.setProperty("--text-verba", baseSetting[settingTemplate].Customization.settings.text_color.color);
-        document.documentElement.style.setProperty("--text-alt-verba", baseSetting[settingTemplate].Customization.settings.text_alt_color.color);
-        document.documentElement.style.setProperty("--button-verba", baseSetting[settingTemplate].Customization.settings.button_color.color);
-        document.documentElement.style.setProperty("--button-hover-verba", baseSetting[settingTemplate].Customization.settings.button_hover_color.color);
         setAvailableTemplate(Object.keys(BaseSettings))
         setCurrentSettingsConfig(JSON.parse(JSON.stringify(baseSetting[settingTemplate])))
     }, [baseSetting, settingTemplate]);

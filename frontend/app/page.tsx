@@ -64,7 +64,14 @@ export default function Home() {
               if (data.error) {
                 console.log(data.error)
               }
-              setRAGConfig(data.data)
+
+              if (data.data.RAG) {
+                setRAGConfig(data.data.RAG)
+              }
+              if (data.data.SETTING.themes) {
+                setBaseSetting(data.data.SETTING.themes)
+                setSettingTemplate(data.data.SETTING.selectedTheme)
+              }
 
             } else {
               console.warn("Configuration could not be retrieved")
@@ -83,6 +90,38 @@ export default function Home() {
     fetchHost();
   }, []);
 
+  const importConfig = async () => {
+    try {
+      const payload = { config: { "RAG": RAGConfig, "SETTING": { "selectedTheme": settingTemplate, "themes": baseSetting } } }
+
+      const response = await fetch(APIHost + "/api/set_config", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      })
+    } catch (error) {
+      console.error("Failed to update config:", error);
+    }
+  }
+
+  useEffect(() => {
+    importConfig()
+  }, [baseSetting, settingTemplate]);
+
+  useEffect(() => {
+    document.documentElement.style.setProperty("--primary-verba", baseSetting[settingTemplate].Customization.settings.primary_color.color);
+    document.documentElement.style.setProperty("--secondary-verba", baseSetting[settingTemplate].Customization.settings.secondary_color.color);
+    document.documentElement.style.setProperty("--warning-verba", baseSetting[settingTemplate].Customization.settings.warning_color.color);
+    document.documentElement.style.setProperty("--bg-verba", baseSetting[settingTemplate].Customization.settings.bg_color.color);
+    document.documentElement.style.setProperty("--bg-alt-verba", baseSetting[settingTemplate].Customization.settings.bg_alt_color.color);
+    document.documentElement.style.setProperty("--text-verba", baseSetting[settingTemplate].Customization.settings.text_color.color);
+    document.documentElement.style.setProperty("--text-alt-verba", baseSetting[settingTemplate].Customization.settings.text_alt_color.color);
+    document.documentElement.style.setProperty("--button-verba", baseSetting[settingTemplate].Customization.settings.button_color.color);
+    document.documentElement.style.setProperty("--button-hover-verba", baseSetting[settingTemplate].Customization.settings.button_hover_color.color);
+  }, [baseSetting, settingTemplate]);
+
   return (
     <main className={`min-h-screen p-5 bg-bg-verba text-text-verba ${fontClassName}`} data-theme={baseSetting[settingTemplate].Customization.settings.theme}>
       <Navbar APIHost={APIHost} title={baseSetting[settingTemplate].Customization.settings.title.text} subtitle={baseSetting[settingTemplate].Customization.settings.subtitle.text} imageSrc={baseSetting[settingTemplate].Customization.settings.image.src} version='v1.0.0' currentPage={currentPage} setCurrentPage={setCurrentPage} />
@@ -100,11 +139,11 @@ export default function Home() {
       )}
 
       {currentPage === "ADD" && (
-        <RAGComponent buttonTitle="Import" settingConfig={baseSetting[settingTemplate]} APIHost={APIHost} RAGConfig={RAGConfig} setRAGConfig={setRAGConfig} showComponents={["Reader", "Chunker", "Embedder"]} />
+        <RAGComponent baseSetting={baseSetting} settingTemplate={settingTemplate} buttonTitle="Import" settingConfig={baseSetting[settingTemplate]} APIHost={APIHost} RAGConfig={RAGConfig} setRAGConfig={setRAGConfig} showComponents={["Reader", "Chunker", "Embedder"]} />
       )}
 
       {currentPage === "RAG" && (
-        <RAGComponent buttonTitle="Save" settingConfig={baseSetting[settingTemplate]} APIHost={APIHost} RAGConfig={RAGConfig} setRAGConfig={setRAGConfig} showComponents={["Embedder", "Retriever", "Generator"]} />
+        <RAGComponent baseSetting={baseSetting} settingTemplate={settingTemplate} buttonTitle="Save" settingConfig={baseSetting[settingTemplate]} APIHost={APIHost} RAGConfig={RAGConfig} setRAGConfig={setRAGConfig} showComponents={["Embedder", "Retriever", "Generator"]} />
       )}
 
       {currentPage === "SETTINGS" && (

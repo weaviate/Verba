@@ -13,8 +13,10 @@ interface ComponentStatusProps {
 const ComponentStatus: React.FC<ComponentStatusProps> = ({ component_name, Icon, changeTo, changePage }) => {
 
     return (
-        <button onClick={() => changePage(changeTo)} className={`btn btn-sm w-full border-none p-2 rounded-lg text-text-verba text-sm bg-button-verba hover:bg-primary-verba }`}>
-            <Icon size={15} />
+        <button onClick={() => changePage(changeTo)} className={`btn btn-sm lg:w-full border-none p-2 rounded-lg text-text-verba text-sm bg-button-verba hover:bg-primary-verba }`}>
+            <div className='hidden md:flex'>
+                <Icon size={15} />
+            </div>
             <p className={`text-xs "text-text-verba`}>
                 {component_name}
             </p>

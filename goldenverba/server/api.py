@@ -12,7 +12,6 @@ from wasabi import msg  # type: ignore[import]
 import time
 
 from goldenverba import verba_manager
-from goldenverba.server.ConfigManager import ConfigManager
 from goldenverba.server.types import ResetPayload, ConfigPayload, QueryPayload, GeneratePayload, GetDocumentPayload, SearchQueryPayload, ImportPayload
 from goldenverba.server.util import get_config, set_config, setup_managers
 
@@ -113,19 +112,6 @@ async def get_production():
         }
     )
 
-# Get Configuration
-@app.get("/api/config")
-async def retrieve_config():
-    msg.info("Retrieving configuration")
-
-    try:
-        config = get_config(manager)
-        return JSONResponse(status_code=200, content={"data":config, "error":""})
-
-    except Exception as e:
-        msg.warn(f"Could not retrieve configuration: {str(e)}")
-        return JSONResponse(status_code=200, content={"data":{}, "error":f"Could not retrieve configuration: {str(e)}"})
-
 # Get Status meta data
 @app.get("/api/get_status")
 async def get_status():
@@ -177,6 +163,19 @@ async def reset_verba(payload: ResetPayload):
     msg.info(f"Resetting Verba ({payload.resetMode})")
 
     return JSONResponse(status_code=200, content={})
+
+# Get Configuration
+@app.get("/api/config")
+async def retrieve_config():
+    msg.info("Retrieving configuration")
+
+    try:
+        config = get_config(manager)
+        return JSONResponse(status_code=200, content={"data":config, "error":""})
+
+    except Exception as e:
+        msg.warn(f"Could not retrieve configuration: {str(e)}")
+        return JSONResponse(status_code=200, content={"data":{}, "error":f"Could not retrieve configuration: {str(e)}"})
 
 # Receive query and return chunks and query answer
 @app.post("/api/import")

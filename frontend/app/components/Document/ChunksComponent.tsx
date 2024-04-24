@@ -41,10 +41,10 @@ const ChunksComponent: React.FC<ChunksComponentComponentProps> = ({
         <div className='flex flex-col gap-2' >
             {/*Chunks*/}
             <div className="flex flex-col bg-bg-alt-verba rounded-lg shadow-lg p-5 text-text-verba gap-3 md:h-[17vh] lg:h-[65vh] overflow-auto">
-                <div className='flex lg:flex-col md:flex-row gap-5'>
-                    <div className='flex md:flex-row lg:flex-col gap-2 justify-center items-center'>
+                <div className='flex md:flex-col gap-5'>
+                    <div className='flex md:flex-row lg:flex-col gap-2 justify-center md:justify-start items-center'>
                         {RAGConfig && (
-                            <div className='flex flex-col gap-2 items-center w-full'>
+                            <div className='flex flex-row lg:flex-col gap-2 items-center lg:w-full'>
                                 <ComponentStatus component_name={RAGConfig ? RAGConfig["Embedder"].selected : ""} Icon={FaDatabase} changeTo={"RAG"} changePage={setCurrentPage} />
                                 <ComponentStatus component_name={RAGConfig ? RAGConfig["Retriever"].selected : ""} Icon={FaSearch} changeTo={"RAG"} changePage={setCurrentPage} />
                             </div>

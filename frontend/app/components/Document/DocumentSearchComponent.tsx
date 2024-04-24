@@ -159,20 +159,22 @@ const DocumentSearchComponent: React.FC<DocumentSearchComponentProps> = ({
             <div className="flex flex-col bg-bg-alt-verba rounded-lg shadow-lg p-5 text-text-verba md:gap-5 min-h-[15vh] md:min-h-[9.3vh]">
                 {/*Search Bar*/}
                 <form
-                    className='flex md:justify-between w-full items-center justify-between gap-2 md:gap-3'
+                    className='flex flex-col lg:flex-row lg:justify-between w-full items-center justify-between gap-2 lg:gap-3'
                     onSubmit={handleSearch}
                 >
-                    <textarea rows={1} cols={10} onKeyDown={handleKeyDown} value={userInput} onChange={(e) => { setUserInput(e.target.value) }} className=" bg-bg-alt-verba textarea textarea-xs p-2 text-sm md:text-base w-2/3" placeholder={`Search for documents`}></textarea>
-                    <div>
+                    <textarea rows={1} cols={10} onKeyDown={handleKeyDown} value={userInput} onChange={(e) => { setUserInput(e.target.value) }} className=" bg-bg-alt-verba textarea textarea-xs p-2 text-sm md:text-base w-full lg:w-2/3" placeholder={`Search for documents`}></textarea>
+
+                    <div className='flex justify-center items-center gap-2 w-full'>
                         <ComponentStatus component_name={RAGConfig ? RAGConfig["Embedder"].selected : ""} Icon={FaDatabase} changeTo={"RAG"} changePage={setCurrentPage} />
+                        <button type='button' onClick={handleSearch} className='btn btn-sm md:btn-md btn-circle border-none shadow-none bg-bg-alt-verba hover:bg-secondary-verba'>
+                            <FaSearch size={18} />
+                        </button>
+                        <button type='button' onClick={clearSearch} className='btn btn-sm md:btn-md btn-circle border-none shadow-none bg-bg-alt-verba hover:bg-secondary-verba'>
+                            <IoIosRefresh size={18} />
+                        </button>
                     </div>
 
-                    <button type='button' onClick={handleSearch} className='btn btn-circle border-none shadow-none bg-bg-alt-verba hover:bg-secondary-verba'>
-                        <FaSearch size={18} />
-                    </button>
-                    <button type='button' onClick={clearSearch} className='btn btn-circle border-none shadow-none bg-bg-alt-verba hover:bg-secondary-verba'>
-                        <IoIosRefresh size={18} />
-                    </button>
+
 
                 </form>
 

@@ -24,7 +24,7 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ APIHost, settingConfig, s
     const [selectedChunk, setSelectedChunk] = useState<DocumentChunk | null>(null)
 
     return (
-        <div className="flex sm:flex-col md:flex-row justify-between items-start gap-3 ">
+        <div className="flex sm:flex-col md:flex-row justify-between items-start md:gap-3 ">
 
             {/* Chat Interface */}
             <div className='sm:w-full md:w-1/2 lg:w-2/6'>

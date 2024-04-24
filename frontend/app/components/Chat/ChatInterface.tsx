@@ -355,15 +355,15 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
     return (
         <div className='flex flex-col gap-2' >
             {/*Chat Messages*/}
-            <div className="flex flex-col bg-bg-alt-verba rounded-lg shadow-lg p-5 text-text-verba gap-5 h-[55vh] overflow-auto">
-                <div className='flex gap-2 items-center'>
+            <div className="flex flex-col bg-bg-alt-verba rounded-lg shadow-lg p-2 md:p-5 text-text-verba gap-5 h-[55vh] overflow-auto">
+                <div className='flex gap-1 md:gap-2 items-center'>
                     {RAGConfig && (
                         <div className='flex gap-2 items-center'>
                             <ComponentStatus component_name={RAGConfig ? RAGConfig["Generator"].selected : ""} Icon={AiFillRobot} changeTo={"RAG"} changePage={setCurrentPage} />
                         </div>
                     )}
-                    <div className="hidden sm:block sm:h-[3vh] lg:h-[2vh] bg-text-alt-verba w-px mx-1"></div>
-                    <StatusLabel status={APIHost !== null && socket !== null && socket.readyState !== WebSocket.CLOSED} true_text='Online' false_text='Connecting...' />
+                    <div className="hidden sm:block md:h-[3vh] lg:h-[2vh] bg-text-alt-verba w-px mx-0 md:mx-1"></div>
+                    <StatusLabel status={APIHost !== null && socket !== null && socket.readyState === WebSocket.OPEN} true_text='Online' false_text='Connecting...' />
                     <StatusLabel status={settingConfig.Chat.settings.caching.checked} true_text='Caching' false_text='No Caching' />
                     <StatusLabel status={settingConfig.Chat.settings.suggestion.checked} true_text='Suggestions' false_text='No Suggestions' />
                 </div>
