@@ -1,9 +1,9 @@
 'use client'
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { SettingsConfiguration } from "../Settings/types"
 import RAGConfigComponent from './RAGConfigComponent';
-import { RAGConfig, ConsoleMessage, RAGResponse, ImportResponse } from './types';
+import { RAGConfig, ConsoleMessage, ImportResponse } from './types';
 import { FaFileImport } from "react-icons/fa";
 import { MdCancel } from "react-icons/md";
 

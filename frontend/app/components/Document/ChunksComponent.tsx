@@ -1,9 +1,7 @@
 'use client'
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { DocumentChunk } from '../Document/types';
 import CountUp from 'react-countup';
-
-import StatusLabel from '../Chat/StatusLabel';
 
 import { RAGConfig } from '../RAG/types';
 import ComponentStatus from '../Status/ComponentStatus';

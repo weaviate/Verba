@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { SettingsConfiguration, TextFieldSetting } from "./types"
 
 interface TextFieldComponentProps {

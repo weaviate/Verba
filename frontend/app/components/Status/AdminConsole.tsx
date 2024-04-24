@@ -1,10 +1,8 @@
 'use client'
-import React, { useState, useEffect, useRef } from 'react';
-import { DocumentChunk } from '../Document/types';
-import CountUp from 'react-countup';
+import React from 'react';
 import { SettingsConfiguration } from '../Settings/types';
 
-import { StatusPayload, Status, SchemaStatus } from './types';
+import { SchemaStatus } from './types';
 import { MdDelete } from "react-icons/md";
 
 import StatusLabel from '../Chat/StatusLabel';

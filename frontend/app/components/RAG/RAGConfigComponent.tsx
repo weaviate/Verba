@@ -1,13 +1,9 @@
 'use client'
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { SettingsConfiguration } from "../Settings/types"
 
-import AdminConsoleComponent from '../Status/AdminConsole';
-import StatusConsoleComponent from '../Status/StatusConsole';
-
-import { StatusPayload, Status, SchemaStatus } from '../Status/types';
-import { RAGComponent, RAGConfig, RAGComponentClass } from './types';
+import { RAGConfig, RAGComponentClass } from './types';
 
 import { TextFieldSetting, NumberFieldSetting } from '../Settings/types';
 

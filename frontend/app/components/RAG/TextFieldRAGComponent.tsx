@@ -1,9 +1,9 @@
 'use client'
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 
 import { TextFieldSetting } from '../Settings/types';
-import { RAGConfig, RAGComponent } from './types';
+import { RAGConfig } from './types';
 
 interface TextFieldComponentProps {
     title: string;

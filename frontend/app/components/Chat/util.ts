@@ -1,5 +1,3 @@
-import { Segment } from "./types";
-
 export const getWebSocketApiHost = () => {
     if (process.env.NODE_ENV === 'development') {
         return 'ws://localhost:8000/ws/generate_stream';

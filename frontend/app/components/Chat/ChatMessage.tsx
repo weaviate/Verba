@@ -1,11 +1,10 @@
 'use client'
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Message } from './types';
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark, oneLight } from "react-syntax-highlighter/dist/cjs/styles/prism";
-import { FaCopy } from 'react-icons/fa';
 import { SettingsConfiguration } from "../Settings/types"
 
 interface ChatMessageProps {
