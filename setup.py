@@ -51,10 +51,9 @@ setup(
             "transformers",
             "torch",
             "huggingface_hub",
-            "accelerate",
+            "accelerate==0.29.2",
         ],
         "google": [
-            "accelerate==0.29.2",
             "vertexai==1.46.0",
         ]
     },

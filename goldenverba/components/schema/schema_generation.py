@@ -43,13 +43,12 @@ def verify_vectorizer(
     # adding specific config for Google
     if vectorizer == "text2vec-palm":
         project = os.getenv("GOOGLE_CLOUD_PROJECT")
-        if project is None:
-            raise Exception("GOOGLE_CLOUD_PROJECT is not set")
-        vectorizer_config = {
-            "text2vec-palm": {
-                "projectId": project,
+        if project is not None:
+            vectorizer_config = {
+                "text2vec-palm": {
+                    "projectId": project,
+                }
             }
-        }
 
     # Verify Vectorizer
     if vectorizer in VECTORIZERS:
