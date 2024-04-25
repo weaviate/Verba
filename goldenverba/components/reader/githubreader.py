@@ -31,14 +31,14 @@ class GitHubReader(Reader):
         start_time = time.time()  # Start timing
         documents = []
         logging = []
-        logging.append(["INFO",f"Starting loading in {len(fileData)} files"])
+        logging.append(["INFO", f"Starting loading in {len(fileData)} files"])
 
         data = fileData[0]
         docs = self.fetch_docs(data.content)
 
         for _file in docs:
             try:
-                logging.append(["INFO",f"Downloading in {_file}"])
+                logging.append(["INFO", f"Downloading in {_file}"])
                 content, link, _path = self.download_file(data.content, _file)
                 if ".json" in _file:
                     json_obj = json.loads(str(content))
@@ -54,9 +54,7 @@ class GitHubReader(Reader):
                         name=_file,
                         link=link,
                         path=_path,
-                        timestamp=str(
-                            datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                        ),
+                        timestamp=str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
                         reader=self.name,
                     )
 
@@ -66,11 +64,11 @@ class GitHubReader(Reader):
                 msg.warn(f"Couldn't load, skipping {_file}: {str(e)}")
                 continue
 
-        elapsed_time = round(time.time() - start_time , 2) # Calculate elapsed time
+        elapsed_time = round(time.time() - start_time, 2)  # Calculate elapsed time
         msg.good(f"Loaded {len(documents)} documents in {elapsed_time}s")
-        logging.append(["SUCCESS",f"Loaded {len(documents)} documents in {elapsed_time}s"])
-
-
+        logging.append(
+            ["SUCCESS", f"Loaded {len(documents)} documents in {elapsed_time}s"]
+        )
 
     def fetch_docs(self, path: str) -> list:
         """Fetch filenames from Github

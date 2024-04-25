@@ -159,7 +159,7 @@ class GeminiGenerator(Generator):
                 role="user",
                 parts=[
                     Part.from_text(
-                        f"Please answer this query: '{query}' with this provided context: {user_context}"
+                        f"{user_context} Please answer this query: '{query}' with this provided context. Only use the context if it is necessary to answer the question."
                     )
                 ],
             )
@@ -193,6 +193,12 @@ class GeminiGenerator(Generator):
             if message.role == "system":
                 message.role = "model"
 
+        for message in messages:
+            print(message.role)
+        if messages[0].role == "model":
+            messages = messages[1:]
+        for message in messages:
+            print(message.role)
         for message in messages:
             if message.role == current_role:
                 new_messages[-1] = message
