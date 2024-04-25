@@ -28,7 +28,7 @@ const ChunksComponent: React.FC<ChunksComponentComponentProps> = ({
 }) => {
 
     useEffect(() => {
-        if (chunks.length > 0) {
+        if (chunks && chunks.length > 0) {
             setSelectedChunk(chunks[0])
         } else {
             setSelectedChunk(null)

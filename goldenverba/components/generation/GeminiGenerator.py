@@ -116,10 +116,17 @@ class GeminiGenerator(Generator):
                 while True:
                     chunk = await iter.__anext__()
                     if len(chunk.candidates) > 0:
-                        yield {
-                            "message": chunk.candidates[0].content.parts[0].text,
-                            "finish_reason": chunk.candidates[0].finish_reason,
-                        }
+                        if len(chunk.candidates[0].content.parts) > 0:
+                            yield {
+                                "message": chunk.candidates[0].content.parts[0].text,
+                                "finish_reason": chunk.candidates[0].finish_reason,
+                            }
+                        else:
+                            yield {
+                                "message": " < Canceled due SAFETY REASONS >",
+                                "finish_reason": "",
+                            }
+
             except StopAsyncIteration:
                 yield {
                     "message": "",
