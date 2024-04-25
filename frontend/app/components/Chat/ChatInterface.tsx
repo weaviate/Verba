@@ -213,11 +213,16 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
     };
 
     const getChunksFromLocalStorage = (key: string) => {
-        if (typeof window !== 'undefined') {
-            const saved = localStorage.getItem(key);
-            if (saved && JSON.parse(saved).length > 0) {
-                return JSON.parse(saved);
+        try {
+            if (typeof window !== 'undefined') {
+                const saved = localStorage.getItem(key);
+                if (saved && JSON.parse(saved).length > 0) {
+                    return JSON.parse(saved);
+                }
             }
+        } catch (e) {
+            console.error("Failed to load chunks from local storage:", e);
+            return []; // Exit early if data isn't valid JSON
         }
         return []; // Return a default value or null if not found
     };
