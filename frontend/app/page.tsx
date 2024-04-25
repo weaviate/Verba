@@ -91,6 +91,11 @@ export default function Home() {
   }, []);
 
   const importConfig = async () => {
+
+    if (!APIHost) {
+      return
+    }
+
     try {
       const payload = { config: { "RAG": RAGConfig, "SETTING": { "selectedTheme": settingTemplate, "themes": baseSetting } } }
 
