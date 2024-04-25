@@ -1,11 +1,21 @@
-# Verba 
-## 🐕 The Golden RAGtriever
+# Sana Maxima
+## Healing powered by AI
 
-Welcome to Verba: The Golden RAGtriever, an open-source application designed to offer an end-to-end, streamlined, and user-friendly interface for Retrieval-Augmented Generation (RAG) out of the box. In just a few easy steps, explore your datasets and extract insights with ease, either locally or through LLM providers such as OpenAI, Cohere, and HuggingFace.
+Welcome to Sana Maxima, our project for the Google Solve Hackathon 2024, in Amsterdam. It's based on Verba an open-source application designed to offer an end-to-end, streamlined, and user-friendly interface for Retrieval-Augmented Generation (RAG) out of the box. In just a few easy steps, explore your datasets and extract insights with ease, either locally or through LLM providers such as Google.
+
+![Architecture Image](https://github.com/weaviate/Verba/blob/dev/img/hackathon_architecture.png)
+
+Use the `README` below to setup Verba and ingest medical data.
+
+You can find the data used in our demo in `data/google_hackathon`, we provide three synthetic generated patient notes and one research paper on Methotrexate.
 
 ```
-pip install goldenverba
+git clone https://github.com/weaviate/Verba.git
+git checkout google-solve-hackathon
+pip install '.[google]'
 ```
+
+Depending on what components (LLM, etc.) you want to use, you need to specify different environment variables. You'll find all the information for setting up Google Gemini model [here](#google-gemini)
 
 [![Weaviate](https://img.shields.io/static/v1?label=powered%20by&message=Weaviate%20%E2%9D%A4&color=green&style=flat-square)](https://weaviate.io/) 
 [![PyPi downloads](https://static.pepy.tech/personalized-badge/goldenverba?period=total&units=international_system&left_color=grey&right_color=orange&left_text=pip%20downloads)](https://pypi.org/project/goldenverba/) [![Docker support](https://img.shields.io/badge/Docker_support-%E2%9C%93-4c1?style=flat-square&logo=docker&logoColor=white)](https://docs.docker.com/get-started/) [![Demo](https://img.shields.io/badge/Check%20out%20the%20demo!-yellow?&style=flat-square&logo=react&logoColor=white)](https://verba.weaviate.io/)
