@@ -3,7 +3,7 @@
 
 Welcome to Sana Maxima, our project for the Google Solve Hackathon 2024, in Amsterdam. It's based on Verba an open-source application designed to offer an end-to-end, streamlined, and user-friendly interface for Retrieval-Augmented Generation (RAG) out of the box. In just a few easy steps, explore your datasets and extract insights with ease, either locally or through LLM providers such as Google.
 
-![Architecture Image](https://github.com/weaviate/Verba/blob/dev/img/hackathon_architecture.png)
+![Architecture Image](https://github.com/weaviate/Verba/blob/google-solve-hackathon/img/hackathon_architecture.png)
 
 Use the `README` below to setup Verba and ingest medical data.
 
