@@ -53,5 +53,9 @@ setup(
             "huggingface_hub",
             "accelerate",
         ],
+        "google": [
+            "accelerate==0.29.2",
+            "vertexai==1.46.0",
+        ]
     },
 )

@@ -147,7 +147,13 @@ The default package is perfect for getting started quickly and includes support 
 pip install goldenverba
 ```
 
-> This will set you up with all you need to integrate Verba with these services without additional configuration.
+## Google Version (EXPERIMENTAL)
+To use the GoogleEmbedder and GeminiGenerator you need to install the Google Package with `vertexai`. Make sure to include all necessary environment variables in the `.env` file and `secret.json`
+
+```
+pip install goldenverba[google]
+```
+
 
 ## HuggingFace Version
 For those looking to leverage models from the HuggingFace ecosystem, including `SentenceTransformer` and `LLama2`, the HuggingFace version is the ideal choice. This package is optimized for GPU usage to accommodate the high performance demands of these models:
@@ -299,6 +305,28 @@ Verba supports Cohere Models, to use them, you need to specify the `COHERE_API_K
 
 ```
 COHERE_API_KEY=YOUR-COHERE-KEY
+```
+
+## Google Embeddings
+
+For the Google Embeddings, Verba is using Vertex AI Studio inside Google Cloud. You can find instructions for obtaining a key [here](https://cloud.google.com/iam/docs/create-short-lived-credentials-direct). If you have the `gcloud` CLI installed, you can run the following command: `gcloud auth print-access-token`. **At the moment, this acccess token must be renewed every hour.**
+
+You also need to set the `GOOGLE_CLOUD_PROJECT` environment variable to the name of your project.
+
+```
+GOOGLE_API_KEY=YOUR-GOOGLE-KEY
+GOOGLE_CLOUD_PROJECT=YOUR-CLOUD-PROJECT-KEY
+```
+
+## Google Gemini
+
+To use Google Gemini, you need a service account key, which is a JSON file. To obtain this, go to "project settings" in your Google Cloud console, then to "service accounts". Create a new service account, then create a new key. Download this key and place it in the route of Verba. Name it `gemini_secrets.json` to have it excluded from git automatically. Set the environment variable `GOOGLE_APPLICATION_CREDENTIALS` to the location of this file, e.g. `gemini_secrets.json`.
+
+You also need to set the `GOOGLE_CLOUD_PROJECT` environment variable to the name of your project.
+
+```
+GOOGLE_APPLICATION_CREDENTIALS=LOCATION-OF-YOUR-KEY
+GOOGLE_CLOUD_PROJECT=YOUR-CLOUD-PROJECT-KEY
 ```
 
 ## HuggingFace
