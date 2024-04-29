@@ -47,46 +47,49 @@ export default function Home() {
 
   const [APIHost, setAPIHost] = useState<string | null>(null)
 
-  useEffect(() => {
-    const fetchHost = async () => {
-      try {
-        const host = await detectHost();
-        setAPIHost(host);
-        if (host === "" || host === "http://localhost:8000") {
-          try {
-            const response = await fetch(host + "/api/config", {
-              method: "GET",
-            });
-            const data: RAGResponse = await response.json();
+  const fetchHost = async () => {
+    try {
+      const host = await detectHost();
+      setAPIHost(host);
+      if (host === "" || host === "http://localhost:8000") {
+        try {
+          const response = await fetch(host + "/api/config", {
+            method: "GET",
+          });
+          const data: RAGResponse = await response.json();
 
-            if (data) {
+          if (data) {
 
-              if (data.error) {
-                console.log(data.error)
-              }
-
-              if (data.data.RAG) {
-                setRAGConfig(data.data.RAG)
-              }
-              if (data.data.SETTING.themes) {
-                setBaseSetting(data.data.SETTING.themes)
-                setSettingTemplate(data.data.SETTING.selectedTheme)
-              }
-
-            } else {
-              console.warn("Configuration could not be retrieved")
+            if (data.error) {
+              console.log(data.error)
             }
-          } catch (error) {
-            console.error("Failed to fetch configuration:", error);
-            setRAGConfig(null)
-          }
-        }
-      } catch (error) {
-        console.error('Error detecting host:', error);
-        setAPIHost(null); // Optionally handle the error by setting the state to an empty string or a specific error message
-      }
-    };
 
+            if (data.data.RAG) {
+              setRAGConfig(data.data.RAG)
+            }
+            if (data.data.SETTING.themes) {
+              setBaseSetting(data.data.SETTING.themes)
+              setSettingTemplate(data.data.SETTING.selectedTheme)
+            } else {
+              setBaseSetting(BaseSettings)
+              setSettingTemplate("Default")
+            }
+
+          } else {
+            console.warn("Configuration could not be retrieved")
+          }
+        } catch (error) {
+          console.error("Failed to fetch configuration:", error);
+          setRAGConfig(null)
+        }
+      }
+    } catch (error) {
+      console.error('Error detecting host:', error);
+      setAPIHost(null); // Optionally handle the error by setting the state to an empty string or a specific error message
+    }
+  };
+
+  useEffect(() => {
     fetchHost();
   }, []);
 
@@ -140,7 +143,7 @@ export default function Home() {
       )}
 
       {currentPage === "STATUS" && (
-        <StatusComponent settingConfig={baseSetting[settingTemplate]} APIHost={APIHost} />
+        <StatusComponent fetchHost={fetchHost} settingConfig={baseSetting[settingTemplate]} APIHost={APIHost} />
       )}
 
       {currentPage === "ADD" && (

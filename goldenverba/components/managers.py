@@ -7,7 +7,7 @@ from goldenverba.components.types import FileData
 from goldenverba.components.interfaces import Reader, Chunker, Embedder, Retriever, Generator
 
 from goldenverba.components.reader.BasicReader import BasicReader
-from goldenverba.components.reader.GitHubReader import GitHubReader
+from goldenverba.components.reader.GitReader import GitHubReader
 from goldenverba.components.reader.Unstructured import UnstructuredReader
 
 from goldenverba.components.chunking.TokenChunker import TokenChunker

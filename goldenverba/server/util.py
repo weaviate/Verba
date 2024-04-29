@@ -100,3 +100,7 @@ def load_config(manager, filename: str = "verba_config.json"):
     else:
         return get_config(manager)
 
+def reset_config(filename: str = "verba_config.json"):
+    if os.path.exists(filename):
+        os.remove(filename)
+        msg.good("Config cleared and reset.")

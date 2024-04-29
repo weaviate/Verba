@@ -20,7 +20,6 @@ const ColorFieldComponent: React.FC<ColorFieldComponentProps> = ({ title, ColorS
         setSettingsConfig((prevConfig: any) => {
             // Creating a deep copy of prevConfig to avoid mutating the original state directly
             const newConfig = JSON.parse(JSON.stringify(prevConfig));
-            setColor(e)
 
             // Updating the copied state
             newConfig[setting].settings[title].color = e;
@@ -29,8 +28,6 @@ const ColorFieldComponent: React.FC<ColorFieldComponentProps> = ({ title, ColorS
             return newConfig;
         });
     };
-
-    const [color, setColor] = useState(ColorSetting.color);
 
     return (
         <div key={title} className='flex flex-col justify-center gap-1'>
@@ -46,11 +43,11 @@ const ColorFieldComponent: React.FC<ColorFieldComponentProps> = ({ title, ColorS
                             type="text"
                             className="grow"
                             placeholder={title}
-                            value={color}
-                            onChange={(e) => { setColor(e.target.value); handleChange(e.target.value) }}
+                            value={(settingsConfig[setting].settings as any)[title].color}
+                            onChange={(e) => { handleChange(e.target.value) }}
                         />
                     </label>
-                    <HexColorPicker color={color} onChange={(newColor: string) => { handleChange(newColor) }} />
+                    <HexColorPicker color={(settingsConfig[setting].settings as any)[title].color} onChange={(newColor: string) => { handleChange(newColor) }} />
                 </div>
             </div>
 

@@ -54,6 +54,13 @@ const AdminConsoleComponent: React.FC<AdminConsoleComponentProps> = ({
         }
     }
 
+    const openConfigSuggestions = () => {
+        const modal = document.getElementById('reset_config_modal');
+        if (modal instanceof HTMLDialogElement) {
+            modal.showModal();
+        }
+    }
+
     return (
         <div className='flex flex-col gap-2' >
             <div className="flex flex-col bg-bg-alt-verba rounded-lg shadow-lg p-5 text-text-verba gap-6 h-[65vh] overflow-auto">
@@ -110,6 +117,14 @@ const AdminConsoleComponent: React.FC<AdminConsoleComponentProps> = ({
                                 Reset Suggestion
                             </p>
                         </button>
+                        <button onClick={openConfigSuggestions} className='btn bg-button-verba text-text-verba hover:bg-warning-verba flex gap-2'>
+                            <div className='hidden lg:flex'>
+                                <MdDelete />
+                            </div>
+                            <p className='flex text-xs'>
+                                Reset Config
+                            </p>
+                        </button>
                     </div>
                 )}
 
@@ -127,7 +142,7 @@ const AdminConsoleComponent: React.FC<AdminConsoleComponentProps> = ({
             <UserModalComponent modal_id='reset_documents_modal' title='Reset Documents' text={"Do you want to delete all documents?"} triggerString='Reset' triggerValue="DOCUMENTS" triggerAccept={reset_verba} />
             <UserModalComponent modal_id='reset_cache_modal' title='Reset Cache' text={"Do you want to delete all cached data?"} triggerString='Reset' triggerValue="CACHE" triggerAccept={reset_verba} />
             <UserModalComponent modal_id='reset_suggestions_modal' title='Reset Suggestions' text={"Do you want to delete all autocompletion suggestions?"} triggerString='Reset' triggerValue="SUGGESTIONS" triggerAccept={reset_verba} />
-
+            <UserModalComponent modal_id='reset_config_modal' title='Reset Configuration' text={"Do you want to reset your Verba configuration?"} triggerString='Reset' triggerValue="CONFIG" triggerAccept={reset_verba} />
 
         </div >
     );

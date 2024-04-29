@@ -10,10 +10,11 @@ import { StatusPayload, Status, SchemaStatus } from './types';
 
 interface StatusComponentComponentProps {
     settingConfig: SettingsConfiguration;
+    fetchHost: () => void;
     APIHost: string | null;
 }
 
-const StatusComponent: React.FC<StatusComponentComponentProps> = ({ APIHost, settingConfig }) => {
+const StatusComponent: React.FC<StatusComponentComponentProps> = ({ APIHost, settingConfig, fetchHost }) => {
 
     const [type, setType] = useState<string | null>(null);
     const [connected, setConnected] = useState<"Online" | "Offline">("Offline");
@@ -132,7 +133,8 @@ const StatusComponent: React.FC<StatusComponentComponentProps> = ({ APIHost, set
             });
 
             if (response) {
-                fetchStatus()
+                await fetchHost()
+                await fetchStatus()
             }
 
         } catch (error) {

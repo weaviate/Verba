@@ -54,8 +54,7 @@ const SettingsComponent: React.FC<SettingsComponentProps> = ({ settingTemplate, 
     }
 
     const revertChanges = () => {
-        setCurrentSettingsConfig(BaseSettings[settingTemplate])
-        setBaseSetting(BaseSettings)
+        setCurrentSettingsConfig(JSON.parse(JSON.stringify(baseSetting[settingTemplate])))
     }
 
     const renderSettingComponent = (title: any, setting_type: TextFieldSetting | ImageFieldSetting | CheckboxSetting | ColorSetting | SelectSetting | NumberFieldSetting) => {

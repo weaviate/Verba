@@ -56,13 +56,15 @@ const ChunksComponent: React.FC<ChunksComponentComponentProps> = ({
                         </div>
                     )}
                 </div>
-                <div className='flex md:flex-row lg:flex-col gap-2'>
+                <div className='flex sm:flex-row lg:flex-col gap-2'>
                     {chunks && chunks.map((chunk, index) => (
-                        <button key={chunk.doc_name + index} onClick={() => setSelectedChunk(chunk)} className={`btn md:btn-md lg:btn-lg sm:w-1/3 lg:w-full flex justify-start gap-4 ${selectedChunk?.chunk_id === chunk.chunk_id && selectedChunk.doc_uuid === chunk.doc_uuid ? ("bg-secondary-verba") : ("bg-button-verba")} hover:button-hover-verba`}>
-                            <div className={`sm:hidden md:flex md:text-sm text-base w-1/6`}>
-                                <CountUp end={Math.round(chunk.score * 100)} />
+                        <button key={chunk.doc_name + index} onClick={() => setSelectedChunk(chunk)} className={`btn md:btn-base lg:btn-lg sm:w-2/3 md:w-1/3 lg:w-full flex justify-start items-center gap-5 ${selectedChunk?.chunk_id === chunk.chunk_id && selectedChunk.doc_uuid === chunk.doc_uuid ? ("bg-secondary-verba") : ("bg-button-verba")} hover:button-hover-verba`}>
+                            <div className="tooltip text-xs z-50" data-tip={`Score: ${Math.round(chunk.score * 100)}`}>
+                                <button className={`btn btn-xs text-xs btn-circle lg:btn-sm bg-bg-alt-verba hover:bg-primary-verba flex md:text-sm lg:text-base`}>
+                                    <CountUp end={index + 1} className='text-sm' />
+                                </button>
                             </div>
-                            <div className='flex flex-col items-start truncate md:w-4/6'>
+                            <div className='flex flex-col items-start truncate sm:w-1/2'>
                                 <p className="text-xs lg:text-sm text-text-verba">{chunk.doc_name}</p>
                                 <p className="text-xs text-text-alt-verba">{chunk.doc_type}</p>
                             </div>
