@@ -34,6 +34,7 @@ All notable changes to this project will be documented in this file.
     - Enable/Disable Caching and Autocomplete Suggestions
     - Improved verba_config.json
 - Ability to enable/disable caching + autosuggestions
+- Add Google Gemini as new Embedder and Generator
 
 ### Changed
 - Changed to AppRouter framework

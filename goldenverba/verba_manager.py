@@ -155,6 +155,15 @@ class VerbaManager:
         if cohere_key != "":
             additional_header["X-Cohere-Api-Key"] = cohere_key
 
+        # Check Google Key
+        google_key = os.environ.get("GOOGLE_API_KEY", "")
+        self.environment_variables["GOOGLE_API_KEY"] = False
+        if google_key != "":
+            additional_header["X-Palm-Api-Key"] = google_key
+            self.environment_variables["GOOGLE_API_KEY"] = True
+
+        google_project = os.environ.get("GOOGLE_CLOUD_PROJECT", "")
+
         # Check Verba URL ENV
         weaviate_url = os.environ.get("WEAVIATE_URL_VERBA", "")
         if weaviate_url != "":
@@ -190,7 +199,12 @@ class VerbaManager:
             self.weaviate_type = "Weaviate Embedded"
             client = weaviate.Client(
                 additional_headers=additional_header,
-                embedded_options=EmbeddedOptions(),
+                 embedded_options=EmbeddedOptions(
+                    additional_env_vars={
+                        "ENABLE_MODULES": "text2vec-palm,text2vec-openai,generative-openai,qna-openai,text2vec-cohere,text2vec-palm",
+                        "GOOGLE_CLOUD_PROJECT": google_project,
+                    }
+                ),
             )
 
         if client is not None:
@@ -235,6 +249,13 @@ class VerbaManager:
             self.installed_libraries["openai"] = True
         except Exception:
             self.installed_libraries["openai"] = False
+
+        try:
+            import vertexai
+
+            self.installed_libraries["google-cloud-aiplatform"] = True
+        except Exception:
+            self.installed_libraries["google-cloud-aiplatform"] = False
 
         try:
             import cohere
@@ -330,6 +351,18 @@ class VerbaManager:
             self.environment_variables["OPENAI_API_VERSION"] = True
         else:
             self.environment_variables["OPENAI_API_VERSION"] = False
+
+        # GOOGLE_CLOUD_PROJECT
+        if os.environ.get("GOOGLE_CLOUD_PROJECT", "") != "":
+            self.environment_variables["GOOGLE_CLOUD_PROJECT"] = True
+        else:
+            self.environment_variables["GOOGLE_CLOUD_PROJECT"] = False
+
+        # GOOGLE_APPLICATION_CREDENTIALS
+        if os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "") != "":
+            self.environment_variables["GOOGLE_APPLICATION_CREDENTIALS"] = True
+        else:
+            self.environment_variables["GOOGLE_APPLICATION_CREDENTIALS"] = False
 
         # Azure openai ressource name, mandatory when using Azure, should be XXX when endpoint is https://XXX.openai.azure.com
         if os.environ.get("AZURE_OPENAI_RESOURCE_NAME", "") != "":
@@ -568,14 +601,14 @@ class VerbaManager:
         semantic_result = None
         if self.enable_caching:
             semantic_query = (
-                self.embedder_manager.selected_embedder.conversation_to_query(
+                self.embedder_manager.embedders[self.embedder_manager.selected_embedder].conversation_to_query(
                     queries, conversation
                 )
             )
             (
                 semantic_result,
                 distance,
-            ) = self.embedder_manager.selected_embedder.retrieve_semantic_cache(
+            ) = self.embedder_manager.embedders[self.embedder_manager.selected_embedder].retrieve_semantic_cache(
                 self.client, semantic_query
             )
 
@@ -588,11 +621,11 @@ class VerbaManager:
             }
 
         else:
-            full_text = await self.generator_manager.selected_generator.generate(
+            full_text = await self.generator_manager.generators[self.generator_manager.selected_generator].generate(
                 queries, contexts, conversation
             )
             if self.enable_caching:
-                self.embedder_manager.selected_embedder.add_to_semantic_cache(
+                self.embedder_manager.embedders[self.embedder_manager.selected_embedder].add_to_semantic_cache(
                     self.client, semantic_query, full_text
                 )
                 self.set_suggestions(" ".join(queries))

@@ -196,7 +196,11 @@ class Embedder(VerbaComponent):
 
                             # Check if vector already exists
                             if chunk.vector is None:
-                                client.batch.add_data_object(properties, class_name)
+                                try:
+                                    client.batch.add_data_object(properties, class_name)
+                                    msg.info("Added chunk to Weaviate")
+                                except Exception as e:
+                                    msg.fail(f"Error adding chunk to Weaviate: {e}")
                             else:
                                 client.batch.add_data_object(
                                     properties, class_name, vector=chunk.vector

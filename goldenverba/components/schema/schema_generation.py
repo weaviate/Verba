@@ -6,7 +6,7 @@ from weaviate import Client
 
 load_dotenv()
 
-VECTORIZERS = {"text2vec-openai", "text2vec-cohere"}  # Needs to match with Weaviate modules
+VECTORIZERS = {"text2vec-openai", "text2vec-cohere", "text2vec-palm",}  # Needs to match with Weaviate modules
 EMBEDDINGS = {"MiniLM"}  # Custom Vectors
 
 
@@ -27,19 +27,28 @@ def verify_vectorizer(
         skip_properties = []
     modified_schema = schema.copy()
 
-    #adding specific config for Azure OpenAI
+    # adding specific config for Azure OpenAI
     vectorizer_config = None
-    if os.getenv("OPENAI_API_TYPE") == "azure" and vectorizer=="text2vec-openai":
+    if os.getenv("OPENAI_API_TYPE") == "azure" and vectorizer == "text2vec-openai":
         resourceName = os.getenv("AZURE_OPENAI_RESOURCE_NAME")
         model = os.getenv("AZURE_OPENAI_EMBEDDING_MODEL")
         if resourceName is None or model is None:
-            raise Exception("AZURE_OPENAI_RESOURCE_NAME and AZURE_OPENAI_EMBEDDING_MODEL should be set when OPENAI_API_TYPE is azure. Resource name is XXX in http://XXX.openai.azure.com")
-        vectorizer_config = { 
-            "text2vec-openai": {
-                    "deploymentId": model,
-                    "resourceName": resourceName
-            }
+            raise Exception(
+                "AZURE_OPENAI_RESOURCE_NAME and AZURE_OPENAI_EMBEDDING_MODEL should be set when OPENAI_API_TYPE is azure. Resource name is XXX in http://XXX.openai.azure.com"
+            )
+        vectorizer_config = {
+            "text2vec-openai": {"deploymentId": model, "resourceName": resourceName}
         }
+
+    # adding specific config for Google
+    if vectorizer == "text2vec-palm":
+        project = os.getenv("GOOGLE_CLOUD_PROJECT")
+        if project is not None:
+            vectorizer_config = {
+                "text2vec-palm": {
+                    "projectId": project,
+                }
+            }
 
     # Verify Vectorizer
     if vectorizer in VECTORIZERS:

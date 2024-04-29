@@ -84,6 +84,11 @@ const RAGComponent: React.FC<RAGComponentProps> = ({ APIHost, settingConfig, RAG
     }
 
     const importConfig = async () => {
+
+        if (!APIHost) {
+            return
+        }
+
         setIsFetching(true)
 
         try {

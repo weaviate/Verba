@@ -15,10 +15,12 @@ from goldenverba.components.chunking.TokenChunker import TokenChunker
 from goldenverba.components.embedding.ADAEmbedder import ADAEmbedder
 from goldenverba.components.embedding.CohereEmbedder import CohereEmbedder
 from goldenverba.components.embedding.MiniLMEmbedder import MiniLMEmbedder
+from goldenverba.components.embedding.GoogleEmbedder import GoogleEmbedder
 
 from goldenverba.components.retriever.SimpleRetriever import SimpleRetriever
 from goldenverba.components.retriever.WindowRetriever import WindowRetriever
 
+from goldenverba.components.generation.GeminiGenerator import GeminiGenerator
 from goldenverba.components.generation.CohereGenerator import CohereGenerator
 from goldenverba.components.generation.GPT3Generator import GPT3Generator
 from goldenverba.components.generation.GPT4Generator import GPT4Generator
@@ -108,6 +110,7 @@ class ChunkerManager:
 class EmbeddingManager:
     def __init__(self):
         self.embedders: dict[str, Embedder] = {
+            "GoogleEmbedder": GoogleEmbedder(),
             "MiniLMEmbedder": MiniLMEmbedder(),
             "ADAEmbedder": ADAEmbedder(),
             "CohereEmbedder": CohereEmbedder(),
@@ -180,6 +183,7 @@ class RetrieverManager:
 class GeneratorManager:
     def __init__(self):
         self.generators: dict[str, Generator] = {
+            "GeminiGenerator": GeminiGenerator(),
             "GPT4Generator": GPT4Generator(),
             "GPT3Generator": GPT3Generator(),
             "CohereGenerator": CohereGenerator(),

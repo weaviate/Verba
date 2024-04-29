@@ -28,7 +28,7 @@ const ChunksComponent: React.FC<ChunksComponentComponentProps> = ({
 }) => {
 
     useEffect(() => {
-        if (chunks.length > 0) {
+        if (chunks && chunks.length > 0) {
             setSelectedChunk(chunks[0])
         } else {
             setSelectedChunk(null)
@@ -48,7 +48,7 @@ const ChunksComponent: React.FC<ChunksComponentComponentProps> = ({
                             </div>
                         )}
                     </div>
-                    {chunks.length > 0 && (
+                    {chunks && chunks.length > 0 && (
                         <div className='sm:hidden md:flex items-center justify-center'>
                             <p className='items-center justify-center text-text-alt-verba text-xs'>
                                 {chunks.length} chunks retrieved in {chunkTime} seconds.
@@ -57,7 +57,7 @@ const ChunksComponent: React.FC<ChunksComponentComponentProps> = ({
                     )}
                 </div>
                 <div className='flex md:flex-row lg:flex-col gap-2'>
-                    {chunks.map((chunk, index) => (
+                    {chunks && chunks.map((chunk, index) => (
                         <button key={chunk.doc_name + index} onClick={() => setSelectedChunk(chunk)} className={`btn md:btn-md lg:btn-lg sm:w-1/3 lg:w-full flex justify-start gap-4 ${selectedChunk?.chunk_id === chunk.chunk_id && selectedChunk.doc_uuid === chunk.doc_uuid ? ("bg-secondary-verba") : ("bg-button-verba")} hover:button-hover-verba`}>
                             <div className={`sm:hidden md:flex md:text-sm text-base w-1/6`}>
                                 <CountUp end={Math.round(chunk.score * 100)} />
