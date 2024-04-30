@@ -21,6 +21,7 @@ interface NavbarProps {
   version: string;
   currentPage: string;
   APIHost: string | null;
+  production: boolean;
   setCurrentPage: (page: "CHAT" | "DOCUMENTS" | "STATUS" | "ADD" | "SETTINGS" | "RAG") => void;
 }
 
@@ -31,7 +32,7 @@ const formatGitHubNumber = (num: number): string => {
   return num.toString();
 }
 
-const Navbar: React.FC<NavbarProps> = ({ imageSrc, title, subtitle, APIHost, version, currentPage, setCurrentPage }) => {
+const Navbar: React.FC<NavbarProps> = ({ imageSrc, title, subtitle, APIHost, version, currentPage, setCurrentPage, production }) => {
 
   const [gitHubStars, setGitHubStars] = useState("0")
   const icon_size = 18
@@ -80,16 +81,15 @@ const Navbar: React.FC<NavbarProps> = ({ imageSrc, title, subtitle, APIHost, ver
 
         {/* Pages */}
         <div className="lg:flex hidden lg:flex-row items-center lg:gap-3 justify-between">
-          <div className="hidden sm:block sm:h-[3vh] lg:h-[5vh] bg-text-alt-verba w-px mx-1"></div>
-          <NavbarButton APIHost={APIHost} Icon={IoChatbubbleSharp} iconSize={icon_size} title='Chat' currentPage={currentPage} setCurrentPage={setCurrentPage} setPage='CHAT' />
-          <NavbarButton APIHost={APIHost} Icon={IoDocumentSharp} iconSize={icon_size} title='Documents' currentPage={currentPage} setCurrentPage={setCurrentPage} setPage='DOCUMENTS' />
-          <NavbarButton APIHost={APIHost} Icon={HiOutlineStatusOnline} iconSize={icon_size} title='Overview' currentPage={currentPage} setCurrentPage={setCurrentPage} setPage='STATUS' />
-          <div className="hidden sm:block sm:h-[3vh] lg:h-[5vh] bg-text-alt-verba w-px mx-1"></div>
-          <NavbarButton APIHost={APIHost} Icon={IoMdAddCircle} iconSize={icon_size} title='Add Documents' currentPage={currentPage} setCurrentPage={setCurrentPage} setPage='ADD' />
-          <NavbarButton APIHost={APIHost} Icon={IoBuildSharp} iconSize={icon_size} title='RAG' currentPage={currentPage} setCurrentPage={setCurrentPage} setPage='RAG' />
-          <NavbarButton APIHost={APIHost} Icon={IoSettingsSharp} iconSize={icon_size} title='Settings' currentPage={currentPage} setCurrentPage={setCurrentPage} setPage='SETTINGS' />
-          <div className="hidden sm:block sm:h-[3vh] lg:h-[5vh] bg-text-alt-verba w-px mx-1"></div>
-
+          <div className={` ${production ? ("h-[0vh]") : ("sm:h-[3vh] lg:h-[5vh] mx-1")} hidden sm:block bg-text-alt-verba w-px`}></div>
+          <NavbarButton hide={false} APIHost={APIHost} Icon={IoChatbubbleSharp} iconSize={icon_size} title='Chat' currentPage={currentPage} setCurrentPage={setCurrentPage} setPage='CHAT' />
+          <NavbarButton hide={false} APIHost={APIHost} Icon={IoDocumentSharp} iconSize={icon_size} title='Documents' currentPage={currentPage} setCurrentPage={setCurrentPage} setPage='DOCUMENTS' />
+          <NavbarButton hide={production} APIHost={APIHost} Icon={HiOutlineStatusOnline} iconSize={icon_size} title='Overview' currentPage={currentPage} setCurrentPage={setCurrentPage} setPage='STATUS' />
+          <div className={` ${production ? ("h-[0vh]") : ("sm:h-[3vh] lg:h-[5vh] mx-1")} hidden sm:block bg-text-alt-verba w-px`}></div>
+          <NavbarButton hide={production} APIHost={APIHost} Icon={IoMdAddCircle} iconSize={icon_size} title='Add Documents' currentPage={currentPage} setCurrentPage={setCurrentPage} setPage='ADD' />
+          <NavbarButton hide={production} APIHost={APIHost} Icon={IoBuildSharp} iconSize={icon_size} title='RAG' currentPage={currentPage} setCurrentPage={setCurrentPage} setPage='RAG' />
+          <NavbarButton hide={production} APIHost={APIHost} Icon={IoSettingsSharp} iconSize={icon_size} title='Settings' currentPage={currentPage} setCurrentPage={setCurrentPage} setPage='SETTINGS' />
+          <div className={`sm:h-[3vh] lg:h-[5vh] mx-1 hidden sm:block bg-text-alt-verba w-px`}></div>
           <button className={`md:hidden btn md:btn-sm lg:btn-md lg:flex items-center justify-center border-none bg-secondary-verba hover:bg-button-hover-verba`} onClick={handleGitHubClick}>
             <FaGithub size={icon_size} className='text-text-verba' />
             <p className="text-xs sm:hidden md:flex text-text-verba ">{gitHubStars}</p>
@@ -97,29 +97,29 @@ const Navbar: React.FC<NavbarProps> = ({ imageSrc, title, subtitle, APIHost, ver
           <p className="hidden lg:flex text-xs text-text-alt-verba">{version}</p>
         </div>
 
-      </div>
-
-      {/* Menu */}
-      <div className="flex flex-row items-center sm:gap-1 lg:gap-5 justify-between">
-        <div className='lg:hidden sm:flex md:ml-4 sm:mr-8'>
-          <ul className="menu md:menu-md sm:menu-sm sm:menu-horizontal bg-base-200 rounded-box bg-bg-alt-verba z-50">
-            <li>
-              <details>
-                <summary><LuMenu size={20} /></summary>
-                <ul className='bg-bg-alt-verba'>
-                  <li onClick={(e) => { setCurrentPage("CHAT") }}><a>Chat</a></li>
-                  <li onClick={(e) => { setCurrentPage("DOCUMENTS") }}><a>Documents</a></li>
-                  <li onClick={(e) => { setCurrentPage("STATUS") }}><a>Status</a></li>
-                  <li onClick={(e) => { setCurrentPage("ADD") }}><a>Add Documents</a></li>
-                  <li onClick={(e) => { setCurrentPage("RAG") }}><a>RAG</a></li>
-                  <li onClick={(e) => { setCurrentPage("SETTINGS") }}><a>Settings</a></li>
-                  <li onClick={handleGitHubClick}><a>GitHub</a></li>
-                  <li className='items-center justify-center text-xs text-text-alt-verba mt-2'>{version}</li>
-                </ul>
-              </details>
-            </li>
-          </ul>
+        {/* Menu */}
+        <div className="flex flex-row items-center sm:gap-1 lg:gap-5 justify-between">
+          <div className='lg:hidden sm:flex md:ml-4 sm:mr-8'>
+            <ul className="menu md:menu-md sm:menu-sm sm:menu-horizontal bg-base-200 rounded-box bg-bg-alt-verba z-50">
+              <li>
+                <details>
+                  <summary><LuMenu size={20} /></summary>
+                  <ul className='bg-bg-alt-verba'>
+                    <li onClick={(e) => { setCurrentPage("CHAT") }}><a>Chat</a></li>
+                    <li onClick={(e) => { setCurrentPage("DOCUMENTS") }}><a>Documents</a></li>
+                    <li onClick={(e) => { setCurrentPage("STATUS") }}><a>Status</a></li>
+                    <li onClick={(e) => { setCurrentPage("ADD") }}><a>Add Documents</a></li>
+                    <li onClick={(e) => { setCurrentPage("RAG") }}><a>RAG</a></li>
+                    <li onClick={(e) => { setCurrentPage("SETTINGS") }}><a>Settings</a></li>
+                    <li onClick={handleGitHubClick}><a>GitHub</a></li>
+                    <li className='items-center justify-center text-xs text-text-alt-verba mt-2'>{version}</li>
+                  </ul>
+                </details>
+              </li>
+            </ul>
+          </div>
         </div>
+
       </div>
 
     </div>

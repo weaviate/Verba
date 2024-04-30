@@ -16,6 +16,7 @@ interface ChunksComponentComponentProps {
     setSelectedChunk: (c: DocumentChunk | null) => void;
     setCurrentPage: (p: any) => void;
     RAGConfig: RAGConfig | null;
+    production: boolean;
 }
 
 const ChunksComponent: React.FC<ChunksComponentComponentProps> = ({
@@ -24,7 +25,8 @@ const ChunksComponent: React.FC<ChunksComponentComponentProps> = ({
     chunkTime,
     setSelectedChunk,
     setCurrentPage,
-    RAGConfig
+    RAGConfig,
+    production
 }) => {
 
     useEffect(() => {
@@ -43,8 +45,8 @@ const ChunksComponent: React.FC<ChunksComponentComponentProps> = ({
                     <div className='flex md:flex-row lg:flex-col gap-2 justify-center md:justify-start items-center'>
                         {RAGConfig && (
                             <div className='flex flex-row lg:flex-col gap-2 items-center lg:w-full'>
-                                <ComponentStatus component_name={RAGConfig ? RAGConfig["Embedder"].selected : ""} Icon={FaDatabase} changeTo={"RAG"} changePage={setCurrentPage} />
-                                <ComponentStatus component_name={RAGConfig ? RAGConfig["Retriever"].selected : ""} Icon={FaSearch} changeTo={"RAG"} changePage={setCurrentPage} />
+                                <ComponentStatus disable={production} component_name={RAGConfig ? RAGConfig["Embedder"].selected : ""} Icon={FaDatabase} changeTo={"RAG"} changePage={setCurrentPage} />
+                                <ComponentStatus disable={production} component_name={RAGConfig ? RAGConfig["Retriever"].selected : ""} Icon={FaSearch} changeTo={"RAG"} changePage={setCurrentPage} />
                             </div>
                         )}
                     </div>

@@ -23,6 +23,7 @@ interface ChatInterfaceComponentProps {
     setChunkTime: (t: number) => void
     setCurrentPage: (p: any) => void;
     RAGConfig: RAGConfig | null;
+    production: boolean;
 }
 
 const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
@@ -31,6 +32,7 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
     setChunks,
     setChunkTime,
     setCurrentPage,
+    production,
     RAGConfig
 }) => {
 
@@ -364,7 +366,7 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
                 <div className='flex gap-1 md:gap-2 items-center'>
                     {RAGConfig && (
                         <div className='flex gap-2 items-center'>
-                            <ComponentStatus component_name={RAGConfig ? RAGConfig["Generator"].selected : ""} Icon={AiFillRobot} changeTo={"RAG"} changePage={setCurrentPage} />
+                            <ComponentStatus disable={production} component_name={RAGConfig ? RAGConfig["Generator"].selected : ""} Icon={AiFillRobot} changeTo={"RAG"} changePage={setCurrentPage} />
                         </div>
                     )}
                     <div className="hidden sm:block md:h-[3vh] lg:h-[2vh] bg-text-alt-verba w-px mx-0 md:mx-1"></div>

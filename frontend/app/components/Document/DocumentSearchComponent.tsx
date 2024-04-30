@@ -21,6 +21,7 @@ interface DocumentSearchComponentProps {
     triggerReset: boolean
     setCurrentPage: (p: any) => void;
     RAGConfig: RAGConfig | null;
+    production: boolean;
 }
 
 const DocumentSearchComponent: React.FC<DocumentSearchComponentProps> = ({
@@ -32,7 +33,8 @@ const DocumentSearchComponent: React.FC<DocumentSearchComponentProps> = ({
     setDocuments,
     triggerReset,
     setCurrentPage,
-    RAGConfig
+    RAGConfig,
+    production
 }) => {
 
     const [userInput, setUserInput] = useState("")
@@ -164,7 +166,7 @@ const DocumentSearchComponent: React.FC<DocumentSearchComponentProps> = ({
 
                     <div className='flex justify-between items-center gap-2 lg:w-3/5'>
                         <div className='flex w-full'>
-                            <ComponentStatus component_name={RAGConfig ? RAGConfig["Embedder"].selected : ""} Icon={FaDatabase} changeTo={"RAG"} changePage={setCurrentPage} />
+                            <ComponentStatus disable={production} component_name={RAGConfig ? RAGConfig["Embedder"].selected : ""} Icon={FaDatabase} changeTo={"RAG"} changePage={setCurrentPage} />
                         </div>
                         <button type='button' onClick={handleSearch} className='btn btn-sm md:btn-md btn-circle border-none shadow-none bg-bg-alt-verba hover:bg-secondary-verba'>
                             <FaSearch size={18} />

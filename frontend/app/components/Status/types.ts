@@ -7,6 +7,12 @@ export type StatusPayload = {
 
 };
 
+export type HealthPayload = {
+    message: string
+    production: boolean
+    gtag: string
+};
+
 export type Status = {
     [key: string]: boolean
 };

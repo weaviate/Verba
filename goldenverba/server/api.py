@@ -27,6 +27,7 @@ load_dotenv()
 
 # Check if runs in production
 production_key = os.environ.get("VERBA_PRODUCTION", "")
+tag = os.environ.get("VERBA_GOOGLE_TAG", "")
 if production_key == "True":
     msg.info("API runs in Production Mode")
     production = True
@@ -81,12 +82,16 @@ async def health_check():
             return JSONResponse(
                 content={
                     "message": "Alive!",
+                    "production": production,
+                    "gtag": tag
                 }
             )
         else:
             return JSONResponse(
                 content={
                     "message": "Database not ready!",
+                    "production": production,
+                    "gtag": tag
                 },
                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             )
@@ -95,34 +100,11 @@ async def health_check():
         return JSONResponse(
             content={
                 "message": f"Healthcheck failed with {str(e)}",
+                "production": production,
+                "gtag": tag
             },
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
         )
-
-
-# Define health check endpoint
-@app.get("/api/get_google_tag")
-async def get_google_tag():
-    tag = os.environ.get("VERBA_GOOGLE_TAG", "")
-
-    if tag:
-        msg.good("Google Tag available!")
-
-    return JSONResponse(
-        content={
-            "tag": tag,
-        }
-    )
-
-
-@app.get("/api/get_production")
-async def get_production():
-    return JSONResponse(
-        content={
-            "production": production,
-        }
-    )
-
 
 # Get Status meta data
 @app.get("/api/get_status")
@@ -216,6 +198,13 @@ async def retrieve_config():
 @app.post("/api/import")
 async def import_data(payload: ImportPayload):
 
+    if production:
+        return JSONResponse(
+            content={
+                "logging": [{"type": "ERROR", "message": "Can't import when in production mode"}],
+            }
+        )
+
     try:
         logging = []
         set_config(manager, payload.config)
@@ -237,6 +226,14 @@ async def import_data(payload: ImportPayload):
 
 @app.post("/api/set_config")
 async def update_config(payload: ConfigPayload):
+
+    if production:
+        return JSONResponse(
+            content={
+            "status": "200",
+            "status_msg": "Config can't be Updated in Production Mode",
+            }
+        )
 
     set_config(manager, payload.config)
 
@@ -496,6 +493,7 @@ async def get_all_documents(payload: SearchQueryPayload):
 @app.post("/api/delete_document")
 async def delete_document(payload: GetDocumentPayload):
     if production:
+        msg.warn("Can't delete documents when in Production Mode")
         return JSONResponse(status_code=200, content={})
 
     msg.info(f"Document ID received: {payload.document_id}")

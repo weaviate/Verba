@@ -14,9 +14,10 @@ interface DocumentViewerComponentProps {
     APIHost: string | null;
     setCurrentPage: (p: any) => void;
     RAGConfig: RAGConfig | null;
+    production: boolean;
 }
 
-const DocumentViewerComponent: React.FC<DocumentViewerComponentProps> = ({ APIHost, settingConfig, setCurrentPage, RAGConfig }) => {
+const DocumentViewerComponent: React.FC<DocumentViewerComponentProps> = ({ APIHost, settingConfig, setCurrentPage, RAGConfig, production }) => {
 
     const [documents, setDocuments] = useState<Document[] | null>([])
     const [documentTime, setDocumentTime] = useState(0);
@@ -27,11 +28,11 @@ const DocumentViewerComponent: React.FC<DocumentViewerComponentProps> = ({ APIHo
         <div className="flex sm:flex-col md:flex-row justify-center items-start gap-3 ">
             {/* Chat Interface */}
             <div className='sm:w-full md:w-2/4'>
-                <DocumentSearchComponent RAGConfig={RAGConfig} setCurrentPage={setCurrentPage} triggerReset={triggerReset} documents={documents} setDocuments={setDocuments} APIHost={APIHost} setSelectedDocument={setSelectedDocument} settingConfig={settingConfig} selectedDocument={selectedDocument} />
+                <DocumentSearchComponent production={production} RAGConfig={RAGConfig} setCurrentPage={setCurrentPage} triggerReset={triggerReset} documents={documents} setDocuments={setDocuments} APIHost={APIHost} setSelectedDocument={setSelectedDocument} settingConfig={settingConfig} selectedDocument={selectedDocument} />
             </div>
 
             <div className='sm:w-full md:w-2/4'>
-                <DocumentComponent setTriggerReset={setTriggerReset} deletable={true} setDocuments={setDocuments} setSelectedChunk={setSelectedDocument} selectedChunk={selectedDocument} APIhost={APIHost} settingConfig={settingConfig} selectedDocument={null} />
+                <DocumentComponent production={production} setTriggerReset={setTriggerReset} deletable={true} setDocuments={setDocuments} setSelectedChunk={setSelectedDocument} selectedChunk={selectedDocument} APIhost={APIHost} settingConfig={settingConfig} selectedDocument={null} />
             </div>
 
         </div >

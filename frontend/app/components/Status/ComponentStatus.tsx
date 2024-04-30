@@ -8,12 +8,13 @@ interface ComponentStatusProps {
     Icon: typeof FaStar;
     changeTo: string;
     changePage: (p: string) => void;
+    disable: boolean
 }
 
-const ComponentStatus: React.FC<ComponentStatusProps> = ({ component_name, Icon, changeTo, changePage }) => {
+const ComponentStatus: React.FC<ComponentStatusProps> = ({ component_name, Icon, changeTo, changePage, disable }) => {
 
     return (
-        <button onClick={() => changePage(changeTo)} className={`btn btn-sm w-full border-none p-2 rounded-lg text-text-verba text-sm bg-button-verba hover:bg-primary-verba }`}>
+        <button disabled={disable} onClick={() => changePage(changeTo)} className={`btn btn-sm w-full border-none p-2 rounded-lg text-text-verba text-sm bg-button-verba hover:bg-primary-verba }`}>
             <div className='hidden md:flex'>
                 <Icon size={15} />
             </div>

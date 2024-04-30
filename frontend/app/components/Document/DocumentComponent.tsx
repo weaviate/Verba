@@ -25,6 +25,7 @@ interface DocumentComponentProps {
     deletable: boolean;
     setDocuments?: (d: Document[] | null) => void;
     setTriggerReset?: (b: any) => void;
+    production: boolean
 }
 
 const DocumentComponent: React.FC<DocumentComponentProps> = ({
@@ -33,7 +34,7 @@ const DocumentComponent: React.FC<DocumentComponentProps> = ({
     settingConfig,
     selectedDocument,
     deletable,
-    setSelectedChunk, setDocuments, setTriggerReset
+    setSelectedChunk, setDocuments, setTriggerReset, production
 }) => {
 
     const [currentDocument, setCurrentDocument] = useState<Document | null>(null)
@@ -168,7 +169,7 @@ const DocumentComponent: React.FC<DocumentComponentProps> = ({
                                 </button>
                             </div>
                         )}
-                        {deletable && (
+                        {deletable && !production && (
                             <div className='flex'>
                                 <button onClick={openDeleteModal} className='btn border-none text-text-verba bg-warning-verba hover:bg-button-hover-verba flex gap-2'>
                                     <MdDelete />
@@ -288,7 +289,7 @@ const DocumentComponent: React.FC<DocumentComponentProps> = ({
                         <div className="flex items-center justify-center pl-4 mb-4 gap-3">
                             <PulseLoader color={settingConfig.Customization.settings.text_color.color} loading={true} size={10} speedMultiplier={0.75} />
                             <p>
-                                Loading Document
+                                Loading Document...
                             </p>
                         </div>
                     )}

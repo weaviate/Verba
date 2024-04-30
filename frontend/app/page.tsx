@@ -11,6 +11,8 @@ import { Settings, BaseSettings } from "./components/Settings/types"
 import { Inter, Plus_Jakarta_Sans, Open_Sans, PT_Mono } from "next/font/google";
 import RAGComponent from './components/RAG/RAGComponent';
 
+import { HealthPayload } from './components/Status/types';
+
 import { RAGConfig, RAGResponse } from './components/RAG/types';
 
 import { detectHost } from "./api"
@@ -35,6 +37,9 @@ export default function Home() {
   // Page States
   const [currentPage, setCurrentPage] = useState<"CHAT" | "DOCUMENTS" | "STATUS" | "ADD" | "SETTINGS" | "RAG">("CHAT")
 
+  const [production, setProduction] = useState(false);
+  const [gtag, setGtag] = useState("")
+
   // Settings
   const [settingTemplate, setSettingTemplate] = useState("Default")
   const [baseSetting, setBaseSetting] = useState<Settings>(BaseSettings)
@@ -53,6 +58,18 @@ export default function Home() {
       setAPIHost(host);
       if (host === "" || host === "http://localhost:8000") {
         try {
+
+          const health_response = await fetch(host + "/api/health", {
+            method: "GET",
+          });
+
+          const health_data: HealthPayload = await health_response.json();
+
+          if (health_data) {
+            setProduction(health_data.production)
+            setGtag(health_data.gtag)
+          }
+
           const response = await fetch(host + "/api/config", {
             method: "GET",
           });
@@ -132,29 +149,29 @@ export default function Home() {
 
   return (
     <main className={`min-h-screen p-5 bg-bg-verba text-text-verba ${fontClassName}`} data-theme={baseSetting[settingTemplate].Customization.settings.theme}>
-      <Navbar APIHost={APIHost} title={baseSetting[settingTemplate].Customization.settings.title.text} subtitle={baseSetting[settingTemplate].Customization.settings.subtitle.text} imageSrc={baseSetting[settingTemplate].Customization.settings.image.src} version='v1.0.0' currentPage={currentPage} setCurrentPage={setCurrentPage} />
+      <Navbar APIHost={APIHost} production={production} title={baseSetting[settingTemplate].Customization.settings.title.text} subtitle={baseSetting[settingTemplate].Customization.settings.subtitle.text} imageSrc={baseSetting[settingTemplate].Customization.settings.image.src} version='v1.0.0' currentPage={currentPage} setCurrentPage={setCurrentPage} />
 
       {currentPage === "CHAT" && (
-        <ChatComponent settingConfig={baseSetting[settingTemplate]} APIHost={APIHost} RAGConfig={RAGConfig} setCurrentPage={setCurrentPage} />
+        <ChatComponent production={production} settingConfig={baseSetting[settingTemplate]} APIHost={APIHost} RAGConfig={RAGConfig} setCurrentPage={setCurrentPage} />
       )}
 
       {currentPage === "DOCUMENTS" && (
-        <DocumentViewerComponent RAGConfig={RAGConfig} setCurrentPage={setCurrentPage} settingConfig={baseSetting[settingTemplate]} APIHost={APIHost} />
+        <DocumentViewerComponent RAGConfig={RAGConfig} production={production} setCurrentPage={setCurrentPage} settingConfig={baseSetting[settingTemplate]} APIHost={APIHost} />
       )}
 
-      {currentPage === "STATUS" && (
+      {currentPage === "STATUS" && !production && (
         <StatusComponent fetchHost={fetchHost} settingConfig={baseSetting[settingTemplate]} APIHost={APIHost} />
       )}
 
-      {currentPage === "ADD" && (
+      {currentPage === "ADD" && !production && (
         <RAGComponent baseSetting={baseSetting} settingTemplate={settingTemplate} buttonTitle="Import" settingConfig={baseSetting[settingTemplate]} APIHost={APIHost} RAGConfig={RAGConfig} setRAGConfig={setRAGConfig} showComponents={["Reader", "Chunker", "Embedder"]} />
       )}
 
-      {currentPage === "RAG" && (
+      {currentPage === "RAG" && !production && (
         <RAGComponent baseSetting={baseSetting} settingTemplate={settingTemplate} buttonTitle="Save" settingConfig={baseSetting[settingTemplate]} APIHost={APIHost} RAGConfig={RAGConfig} setRAGConfig={setRAGConfig} showComponents={["Embedder", "Retriever", "Generator"]} />
       )}
 
-      {currentPage === "SETTINGS" && (
+      {currentPage === "SETTINGS" && !production && (
         <SettingsComponent settingTemplate={settingTemplate} setSettingTemplate={setSettingTemplate} baseSetting={baseSetting} setBaseSetting={setBaseSetting} />
       )}
 
