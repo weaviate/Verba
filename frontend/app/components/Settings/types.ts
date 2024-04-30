@@ -35,6 +35,8 @@ export interface CustomizationSettings extends MetaInformation {
         text_alt_color: ColorSetting;
         button_color: ColorSetting;
         button_hover_color: ColorSetting;
+        bg_console: ColorSetting;
+        text_console: ColorSetting;
         font: SelectSetting;
         theme: "light" | "dark"
     }
@@ -114,6 +116,8 @@ const BaseCustomization: CustomizationSettings = {
         text_alt_color: { color: "#8E8E8E", type: "color", description: "Alternative Text Color" },
         button_color: { color: "#EFEFEF", type: "color", description: "Button Color" },
         button_hover_color: { color: "#DCDCDC", type: "color", description: "Button Hover Color" },
+        bg_console: { color: "#3F3E40", type: "color", description: "Console Background" },
+        text_console: { color: "#FFFFFF", type: "color", description: "Console Text" },
         font: BaseFonts,
         theme: "light",
     }
@@ -137,6 +141,8 @@ const CustomCustomization: CustomizationSettings = {
         text_alt_color: { color: "#8E8E8E", type: "color", description: "Alternative Text Color" },
         button_color: { color: "#EFEFEF", type: "color", description: "Button Color" },
         button_hover_color: { color: "#DCDCDC", type: "color", description: "Button Hover Color" },
+        bg_console: { color: "#3F3E40", type: "color", description: "Console Background" },
+        text_console: { color: "#FFFFFF", type: "color", description: "Console Text" },
         font: BaseFonts,
         theme: "light",
     }
@@ -160,6 +166,8 @@ const DarkModeCustomization: CustomizationSettings = {
         text_alt_color: { color: "#999999", type: "color", description: "Alternative Text Color" },
         button_color: { color: "#3C3C3C", type: "color", description: "Button Color" },
         button_hover_color: { color: "#2C2C2C", type: "color", description: "Button Hover Color" },
+        bg_console: { color: "#2F2929", type: "color", description: "Console Background" },
+        text_console: { color: "#FFFFFF", type: "color", description: "Console Text" },
         font: {
             value: "Open_Sans", type: "select", options: AvailableFonts, description: "Text Font"
         },
@@ -186,6 +194,8 @@ const GoogleHackathonCustomization: CustomizationSettings = {
         text_alt_color: { color: "#818181", type: "color", description: "Alternative Text Color" },
         button_color: { color: "#E4E4E4", type: "color", description: "Button Color" },
         button_hover_color: { color: "#CCCCCC", type: "color", description: "Button Hover Color" },
+        bg_console: { color: "#3F3E40", type: "color", description: "Console Background" },
+        text_console: { color: "#FFFFFF", type: "color", description: "Console Text" },
         font: {
             value: "Open_Sans", type: "select", options: AvailableFonts, description: "Text Font"
         },
@@ -211,6 +221,8 @@ const WeaviateCustomization: CustomizationSettings = {
         text_alt_color: { color: "#8196A6", type: "color", description: "Alternative Text Color" },
         button_color: { color: "#E6E3E3", type: "color", description: "Button Color" },
         button_hover_color: { color: "#FFFFFF", type: "color", description: "Button Hover Color" },
+        bg_console: { color: "#3F3E40", type: "color", description: "Console Background" },
+        text_console: { color: "#FFFFFF", type: "color", description: "Console Text" },
         font: {
             value: "Inter", type: "select", options: AvailableFonts, description: "Text Font"
         },

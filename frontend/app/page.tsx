@@ -147,6 +147,8 @@ export default function Home() {
     document.documentElement.style.setProperty("--text-alt-verba", baseSetting[settingTemplate].Customization.settings.text_alt_color.color);
     document.documentElement.style.setProperty("--button-verba", baseSetting[settingTemplate].Customization.settings.button_color.color);
     document.documentElement.style.setProperty("--button-hover-verba", baseSetting[settingTemplate].Customization.settings.button_hover_color.color);
+    document.documentElement.style.setProperty("--bg-console-verba", baseSetting[settingTemplate].Customization.settings.bg_console.color);
+    document.documentElement.style.setProperty("--text-console-verba", baseSetting[settingTemplate].Customization.settings.text_console.color);
   }, [baseSetting, settingTemplate]);
 
   return (

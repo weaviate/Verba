@@ -60,7 +60,9 @@ const config: Config = {
         "secondary-verba": "var(--secondary-verba, #90FFA8)",
         "warning-verba": "var(--warning-verba, #FF8399)",
         "text-verba": "var(--text-verba, #161616)",
-        "text-alt-verba": "var(--text-alt-verba, #8E8E8E)"
+        "text-alt-verba": "var(--text-alt-verba, #8E8E8E)",
+        "bg-console-verba": "var(--bg-console-verba, #3F3E40)",
+        "text-console-verba": "var(--text-console-verba, #FFFFFF)"
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
