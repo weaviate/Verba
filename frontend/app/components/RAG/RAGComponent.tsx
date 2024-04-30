@@ -164,49 +164,10 @@ const RAGComponent: React.FC<RAGComponentProps> = ({ APIHost, settingConfig, RAG
                         </button>
                     </div>
                     {buttonTitle === "Import" && (
-                        <div className='flex flex-col bg-bg-alt-verba rounded-lg shadow-lg p-5 text-text-verba gap-5 h-[58.5vh] overflow-auto w-full'>
-                            <div className='flex flex-col'>
-                                <p className='text-lg'>Console</p>
-                            </div>
-                            <div className='flex flex-col gap-2'>
-                                {consoleLog && consoleLog.map((msg, index) => (
-                                    <div key={"ConsoleMessage " + index}>
-                                        {
-                                            msg.type === "INFO" && (
-                                                <div className='flex text-text-verba text-sm gap-2'>
-                                                    <p className='flex font-bold'>{msg.type}</p>
-                                                    <p className='flex font-mono'>{msg.message}</p>
-                                                </div>
-                                            )
-                                        }
-                                        {
-                                            msg.type === "SUCCESS" && (
-                                                <div className='flex text-sm gap-2'>
-                                                    <p className='flex font-bold text-secondary-verba '>{msg.type}</p>
-                                                    <p className='flex font-mono text-text-verba'>{msg.message}</p>
-                                                </div>
-                                            )
-                                        }
-                                        {
-                                            msg.type === "ERROR" && (
-                                                <div className='flex text-sm gap-2'>
-                                                    <p className='flex text-warning-verba font-bold'>{msg.type}</p>
-                                                    <p className='flex text-text-verba font-mono'>{msg.message}</p>
-                                                </div>
-                                            )
-                                        }
-                                        {
-                                            msg.type === "WARNING" && (
-                                                <div className='flex text-sm gap-2'>
-                                                    <p className='flex text-primary-verba font-bold'>{msg.type}</p>
-                                                    <p className='flex text-text-verba font-mono'>{msg.message}</p>
-                                                </div>
-                                            )
-                                        }
-                                    </div>
-
-                                ))}
-                            </div>
+                        <div className='mockup-code h-[58vh] overflow-auto w-full'>
+                            {consoleLog && consoleLog.map((msg, index) => (
+                                <pre data-prefix={index} className={`text-sm ${msg.type === 'WARNING' ? 'text-primary-verba' : msg.type === 'SUCCESS' ? 'text-secondary-verba' : msg.type === 'ERROR' ? 'text-warning-verba' : ''}`}><code>({msg.type}) {msg.message}</code></pre>
+                            ))}
                         </div>
                     )}
                 </div>

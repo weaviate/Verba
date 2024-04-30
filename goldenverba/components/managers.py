@@ -26,6 +26,8 @@ from goldenverba.components.generation.GPT3Generator import GPT3Generator
 from goldenverba.components.generation.GPT4Generator import GPT4Generator
 from goldenverba.components.generation.Llama2Generator import Llama2Generator
 
+import time
+
 
 
 try:
@@ -69,10 +71,12 @@ class ChunkerManager:
         self, documents: list[Document], logging: list[dict]
     ) -> list[Document]:
         logging.append({"type":"INFO", "message":f"Starting Chunking with {self.selected_chunker}"})
+        start_time = time.time()  # Start timing
         chunked_docs, logging = self.chunker[self.selected_chunker].chunk(documents, logging)
         if self.check_chunks(chunked_docs):
-            msg.good(f"Chunking completed with {sum([len(document.chunks) for document in chunked_docs])} chunks")
-            logging.append({"type":"SUCCESS", "message":f"Chunking completed with {sum([len(document.chunks) for document in chunked_docs])} chunks"})
+            elapsed_time = round(time.time() - start_time, 2)  # Calculate elapsed time
+            msg.good(f"Chunking completed with {sum([len(document.chunks) for document in chunked_docs])} chunks in {elapsed_time}s")
+            logging.append({"type":"SUCCESS", "message":f"Chunking completed with {sum([len(document.chunks) for document in chunked_docs])} chunks in {elapsed_time}s"})
             return chunked_docs, logging
         return []
 
@@ -126,8 +130,13 @@ class EmbeddingManager:
         @parameter: batch_size : int - Batch Size of Input
         @returns bool - Bool whether the embedding what successful.
         """
+        start_time = time.time()  # Start timing
         logging.append({"type":"INFO", "message":f"Starting Embedding with {self.selected_embedder}"})
-        return self.embedders[self.selected_embedder].embed(documents, client, logging)
+        successful_embedding = self.embedders[self.selected_embedder].embed(documents, client, logging)
+        elapsed_time = round(time.time() - start_time, 2)  # Calculate elapsed time
+        msg.good(f"Embedding completed with {len(documents)} Documents and {sum([len(document.chunks) for document in documents])} chunks in {elapsed_time}s")
+        logging.append({"type":"SUCCESS", "message":f"Embedding completed with {len(documents)} Documents and {sum([len(document.chunks) for document in documents])} chunks in {elapsed_time}s"})
+        return successful_embedding
 
     def set_embedder(self, embedder: str) -> bool:
         if embedder in self.embedders:

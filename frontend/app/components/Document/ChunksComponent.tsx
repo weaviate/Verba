@@ -59,7 +59,7 @@ const ChunksComponent: React.FC<ChunksComponentComponentProps> = ({
                 <div className='flex sm:flex-row lg:flex-col gap-2'>
                     {chunks && chunks.map((chunk, index) => (
                         <button key={chunk.doc_name + index} onClick={() => setSelectedChunk(chunk)} className={`btn md:btn-base lg:btn-lg sm:w-2/3 md:w-1/3 lg:w-full flex justify-start items-center gap-5 ${selectedChunk?.chunk_id === chunk.chunk_id && selectedChunk.doc_uuid === chunk.doc_uuid ? ("bg-secondary-verba") : ("bg-button-verba")} hover:button-hover-verba`}>
-                            <div className="tooltip text-xs z-50" data-tip={`Score: ${Math.round(chunk.score * 100)}`}>
+                            <div className="tooltip text-xs" data-tip={`Score: ${Math.round(chunk.score * 100)}`}>
                                 <button className={`btn btn-xs text-xs btn-circle lg:btn-sm bg-bg-alt-verba hover:bg-primary-verba flex md:text-sm lg:text-base`}>
                                     <CountUp end={index + 1} className='text-sm' />
                                 </button>

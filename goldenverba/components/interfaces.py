@@ -219,7 +219,6 @@ class Embedder(VerbaComponent):
                     len(document.chunks),
                     logging
                 )
-            logging.append({"type":"SUCCESS", "message":f"Embedding successful"})
             return logging
         except Exception as e:
             logging.append({"type":"ERROR", "message":f"Embedding not successful: {str(e)}"})
