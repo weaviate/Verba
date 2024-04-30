@@ -29,10 +29,9 @@ class BasicReader(Reader):
 
     def load(
         self,
-        fileData: list[FileData], logging: list[dict]
+        fileData: list[FileData], textValues: list[str], logging: list[dict]
     ) -> tuple[list[Document], list[str]]:
 
-        start_time = time.time()  # Start timing
         documents = []
 
         for file in fileData:
@@ -94,11 +93,6 @@ class BasicReader(Reader):
             else:
                 msg.warn(f"{file.filename} with extension {file.extension} not supported by BasicReader.")
                 logging.append({"type":"WARNING", "message":f"{file.filename} with extension {file.extension} not supported by BasicReader."})
-
-
-        elapsed_time = round(time.time() - start_time , 2) # Calculate elapsed time
-        msg.good(f"Loaded {len(documents)} documents in {elapsed_time}s")
-        logging.append({"type":"SUCCESS", "message":f"Loaded {len(documents)} documents in {elapsed_time}s"})
 
         return documents, logging
 

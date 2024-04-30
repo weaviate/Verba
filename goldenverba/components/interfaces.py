@@ -70,15 +70,16 @@ class Reader(VerbaComponent):
 
     def __init__(self):
         super().__init__()
-        self.type = "UPLOAD" # "LINK"
+        self.type = "UPLOAD" # "TEXT"
         self.config = {"document_type": InputText(type="text", text="Document", description="Choose a label for your documents for filtering")}
 
     def load(
         self,
-        fileData: list[FileData], logging: list[dict]
+        fileData: list[FileData], textValues: list[str], logging: list[dict]
     ) -> tuple[list[Document], list[str]]:
         """Ingest data into Weaviate
         @parameter: fileData : list[FileData] - List of filename and bytes pairs
+        @parameter: textValues : list[str] - List of strings, e.g. URLs etc
         @returns tuple[list[Document], list[str]] - A tuple of a list of documents and a list of strings displayed as logging on the frontend.
         """
         raise NotImplementedError("load method must be implemented by a subclass.")

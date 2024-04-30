@@ -198,17 +198,19 @@ async def retrieve_config():
 @app.post("/api/import")
 async def import_data(payload: ImportPayload):
 
+    logging = []
+
     if production:
+        logging.append({"type": "ERROR", "message": "Can't import when in production mode"})
         return JSONResponse(
             content={
-                "logging": [{"type": "ERROR", "message": "Can't import when in production mode"}],
+                "logging": logging,
             }
         )
 
     try:
-        logging = []
         set_config(manager, payload.config)
-        documents, logging = manager.import_data(payload.data, logging)
+        documents, logging = manager.import_data(payload.data, payload.textValues, logging)
 
         return JSONResponse(
             content={
@@ -217,9 +219,10 @@ async def import_data(payload: ImportPayload):
         )
 
     except Exception as e:
+        logging.append({"type": "ERROR", "message": str(e)})
         return JSONResponse(
             content={
-                "logging": [{"type": "ERROR", "message": str(e)}],
+                "logging": logging,
             }
         )
 

@@ -43,6 +43,7 @@ class LoadPayload(BaseModel):
 
 class ImportPayload(BaseModel):
     data: list[FileData]
+    textValues: list[str]
     config: dict
 
 

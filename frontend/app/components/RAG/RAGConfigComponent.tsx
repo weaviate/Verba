@@ -1,14 +1,17 @@
 'use client'
 
-import React from 'react';
+import React, { useState } from 'react';
 import { SettingsConfiguration } from "../Settings/types"
 
 import { RAGConfig, RAGComponentClass } from './types';
 
 import { TextFieldSetting, NumberFieldSetting } from '../Settings/types';
 
+import { FaCheck } from "react-icons/fa";
+
 import TextFieldRAGComponent from './TextFieldRAGComponent';
 import NumberFieldRAGComponent from './NumberFieldRAGComponent';
+import { text } from 'stream/consumers';
 
 interface RAGConfigComponentProps {
     settingConfig: SettingsConfiguration;
@@ -19,9 +22,13 @@ interface RAGConfigComponentProps {
     RAGComponents: RAGComponentClass
     setRAGConfig: (r_: any) => void;
     setFiles: (f: FileList | null) => void;
+    setTextValues: (t: string[]) => void;
+    textValues: string[];
 }
 
-const RAGConfigComponent: React.FC<RAGConfigComponentProps> = ({ APIHost, files, settingConfig, RAGConfig, RAGConfigTitle, RAGComponents, setRAGConfig, setFiles }) => {
+const RAGConfigComponent: React.FC<RAGConfigComponentProps> = ({ APIHost, files, settingConfig, textValues, RAGConfig, RAGConfigTitle, RAGComponents, setRAGConfig, setFiles, setTextValues }) => {
+
+    const [currentText, setCurrentText] = useState(textValues ? textValues[0] : "")
 
     const onSelectComponent = (_selected: string) => {
         setRAGConfig((prevConfig: any) => {
@@ -109,6 +116,32 @@ const RAGConfigComponent: React.FC<RAGConfigComponentProps> = ({ APIHost, files,
                                 </div>
                             </div>
                         )}
+                    </div>
+                )}
+
+                {RAGComponents.components[RAGComponents.selected].type === "URL" && (
+                    <div className='flex flex-col gap-1'>
+                        <div className='flex items-center justify-center'>
+                            {(textValues.length > 0 && currentText !== textValues[0]) || (currentText != "" && textValues.length <= 0) ? (<p>
+                                *Enter URL
+                            </p>) : (<p>
+                                Enter URL
+                            </p>)}
+                        </div>
+                        <div className='flex flex-row gap-2 w-full items-center justify-center'>
+                            <div className='flex flex-col items-center justify-center gap-1 w-full'>
+                                <label className="input input-bordered flex items-center w-full bg-bg-verba">
+                                    <input
+                                        type="text"
+                                        className="grow"
+                                        value={currentText}
+                                        onChange={(e) => { setCurrentText(e.target.value) }} />
+                                </label>
+                            </div>
+                            <button onClick={() => { setTextValues([currentText]) }} className='btn bg-bg-verba border-none hover:bg-secondary-verba'>
+                                <FaCheck />
+                            </button>
+                        </div>
                     </div>
                 )}
 

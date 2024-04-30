@@ -59,10 +59,10 @@ class VerbaManager:
             schema_manager.init_schemas(self.client, embedding, False, True)
 
     def import_data(
-        self, fileData: list[FileData], logging: list[dict]
+        self, fileData: list[FileData], textValues: list[str], logging: list[dict]
     ) -> list[Document]:
 
-        loaded_documents, logging = self.reader_manager.load(fileData, logging)
+        loaded_documents, logging = self.reader_manager.load(fileData,textValues,logging)
 
         filtered_documents = []
 

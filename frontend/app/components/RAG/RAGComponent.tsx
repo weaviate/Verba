@@ -27,6 +27,7 @@ const RAGComponent: React.FC<RAGComponentProps> = ({ APIHost, settingConfig, RAG
 
     const [currentRAGSettings, setCurrentRAGSettings] = useState<RAGConfig>(JSON.parse(JSON.stringify(RAGConfig)))
     const [files, setFiles] = useState<FileList | null>(null)
+    const [textValues, setTextValues] = useState<string[]>([])
     const [isFetching, setIsFetching] = useState(false)
 
     const [consoleLog, setConsoleLog] = useState<ConsoleMessage[]>([])
@@ -43,17 +44,17 @@ const RAGComponent: React.FC<RAGComponentProps> = ({ APIHost, settingConfig, RAG
     const importData = async () => {
         setIsFetching(true)
 
-        if (!files) {
+        if (!files && textValues.length <= 0) {
             setIsFetching(false)
             return
         }
 
         try {
-            addToConsole("INFO", "Starting Import")
-            const fileData = await processFiles(files);
+            addToConsole("INFO", "Importing...")
+            const fileData = files ? await processFiles(files) : [];
             setFiles(null)
             if (fileData) {
-                const payload = { config: { "RAG": currentRAGSettings, "SETTING": { "selectedTheme": settingTemplate, "themes": baseSetting } }, data: fileData }
+                const payload = { config: { "RAG": currentRAGSettings, "SETTING": { "selectedTheme": settingTemplate, "themes": baseSetting } }, data: fileData, textValues: textValues }
 
                 const response = await fetch(APIHost + "/api/import", {
                     method: "POST",
@@ -122,6 +123,8 @@ const RAGComponent: React.FC<RAGComponentProps> = ({ APIHost, settingConfig, RAG
     const resetSettings = () => {
         setCurrentRAGSettings(JSON.parse(JSON.stringify(RAGConfig)))
         setConsoleLog([])
+        setTextValues([])
+        setFiles(null)
     }
 
     const addToConsole = (t: "INFO" | "WARNING" | "SUCCESS" | "ERROR", m: string) => {
@@ -135,7 +138,7 @@ const RAGComponent: React.FC<RAGComponentProps> = ({ APIHost, settingConfig, RAG
             {currentRAGSettings && Object.entries(currentRAGSettings).map(([key, value]) => (
                 showComponents.includes(key) && (
                     <div key={"RAGButton_" + key} className='w-full md:w-1/4'>
-                        <RAGConfigComponent key={key} files={files} setFiles={setFiles} settingConfig={settingConfig} APIHost={APIHost} RAGConfig={currentRAGSettings} RAGConfigTitle={key} RAGComponents={value} setRAGConfig={setCurrentRAGSettings} />
+                        <RAGConfigComponent textValues={textValues} setTextValues={setTextValues} key={key} files={files} setFiles={setFiles} settingConfig={settingConfig} APIHost={APIHost} RAGConfig={currentRAGSettings} RAGConfigTitle={key} RAGComponents={value} setRAGConfig={setCurrentRAGSettings} />
                     </div>
                 )
             ))}

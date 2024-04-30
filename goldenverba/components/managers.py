@@ -45,10 +45,24 @@ class ReaderManager:
 
     def load(
         self,
-        fileData: list[FileData], logging: list[dict]
+        fileData: list[FileData], textValues: list[str], logging: list[dict]
     ) -> tuple[list[Document], list[str]]:
-        logging.append({"type":"INFO", "message":f"Importing {len(fileData)} files with {self.selected_reader}"})
-        return self.readers[self.selected_reader].load(fileData, logging)
+        
+        start_time = time.time()  # Start timing
+
+        if len(fileData) > 0:
+            logging.append({"type":"INFO", "message":f"Importing {len(fileData)} files with {self.selected_reader}"})
+        else:
+            logging.append({"type":"INFO", "message":f"Importing {textValues} with {self.selected_reader}"})
+
+        documents, logging = self.readers[self.selected_reader].load(fileData, textValues, logging)
+
+        elapsed_time = round(time.time() - start_time , 2) # Calculate elapsed time
+
+        msg.good(f"Loaded {len(documents)} documents in {elapsed_time}s")
+        logging.append({"type":"SUCCESS", "message":f"Loaded {len(documents)} documents in {elapsed_time}s"})
+
+        return documents, logging
 
     def set_reader(self, reader: str):
         if reader in self.readers:

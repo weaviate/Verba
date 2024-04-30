@@ -148,7 +148,7 @@ const DocumentComponent: React.FC<DocumentComponentProps> = ({
                         <p className='sm:text-sm md:text-lg font-semibold'>{currentDocument.name}</p>
                         <p className='sm:text-xs md:text-sm text-text-alt-verba'>{currentDocument.type}</p>
                     </div>
-                    <div className='flex gap-2'>
+                    <div className='flex gap-3'>
                         {formattedDocument && formattedDocument.substring !== "" && (
                             <div className='flex'>
                                 <button onClick={handleDocumentShow} className='btn border-none text-text-verba bg-button-verba hover:bg-button-hover-verba flex gap-2'>

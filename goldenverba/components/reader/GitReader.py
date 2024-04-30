@@ -1,9 +1,9 @@
 import base64
 import json
 from datetime import datetime
-import time
 import requests
 import os
+import re
 
 from wasabi import msg
 
@@ -20,26 +20,35 @@ class GitHubReader(Reader):
     def __init__(self):
         super().__init__()
         self.name = "GitHubReader"
+        self.type = "URL" 
         self.requires_env = ["GITHUB_TOKEN"]
         self.description = "Retrieves all text files (.txt, .md, .mdx, .json) from a GitHub Repository and imports them into Verba. Use this format {owner}/{repo}/{branch}/{folder}"
 
     def load(
         self,
-        fileData: list[FileData],
+        fileData: list[FileData], textValues: list[str], logging: list[dict]
     ) -> tuple[list[Document], list[str]]:
+        
+        if(len(textValues) <= 0):
+            logging.append({"type":"ERROR", "message":f"No GitHub Link detected"})
+            return [], logging
+        elif textValues[0] == "":
+            logging.append({"type":"ERROR", "message":f"Empty GitHub URL"})
+            return [], logging
 
-        start_time = time.time()  # Start timing
+        github_link = textValues[0]
+
+        if not self.is_valid_github_path(github_link):
+            logging.append({"type":"ERROR", "message":f"GitHub URL {github_link} not matching pattern: owner/repo/branch/folder"})
+            return [], logging
+
         documents = []
-        logging = []
-        logging.append(["INFO", f"Starting loading in {len(fileData)} files"])
-
-        data = fileData[0]
-        docs = self.fetch_docs(data.content)
+        docs, logging = self.fetch_docs(github_link, logging)
 
         for _file in docs:
             try:
-                logging.append(["INFO", f"Downloading in {_file}"])
-                content, link, _path = self.download_file(data.content, _file)
+                logging.append({"type":"INFO", "message":f"Downloading {_file}"})
+                content, link, _path = self.download_file(github_link, _file)
                 if ".json" in _file:
                     json_obj = json.loads(str(content))
                     try:
@@ -47,10 +56,10 @@ class GitHubReader(Reader):
                     except Exception as e:
                         raise Exception(f"Loading JSON failed {e}")
 
-                else:
+                elif ".txt" in _file or ".md" in _file or ".mdx" in _file:
                     document = Document(
                         text=content,
-                        type=self.config["document_type"],
+                        type=self.config["document_type"].text,
                         name=_file,
                         link=link,
                         path=_path,
@@ -62,15 +71,12 @@ class GitHubReader(Reader):
 
             except Exception as e:
                 msg.warn(f"Couldn't load, skipping {_file}: {str(e)}")
+                logging.append({"type":"WARNING", "message":f"Couldn't load, skipping {_file}: {str(e)}"})
                 continue
 
-        elapsed_time = round(time.time() - start_time, 2)  # Calculate elapsed time
-        msg.good(f"Loaded {len(documents)} documents in {elapsed_time}s")
-        logging.append(
-            ["SUCCESS", f"Loaded {len(documents)} documents in {elapsed_time}s"]
-        )
+        return documents, logging
 
-    def fetch_docs(self, path: str) -> list:
+    def fetch_docs(self, path: str, logging) -> list:
         """Fetch filenames from Github
         @parameter path : str - Path to a GitHub repository
         @returns list - List of document names.
@@ -103,7 +109,8 @@ class GitHubReader(Reader):
         msg.info(
             f"Fetched {len(files)} filenames from {url} (checking folder {folder_path})"
         )
-        return files
+        logging.append({"type":"SUCCESS", "message":f"Fetched {len(files)} filenames from {url} (checking folder {folder_path})"})
+        return files, logging
 
     def download_file(self, path: str, file_path: str) -> str:
         """Download files from Github based on filename
@@ -130,3 +137,14 @@ class GitHubReader(Reader):
         content = base64.b64decode(content_b64).decode("utf-8")
         msg.info(f"Downloaded {url}")
         return (content, link, path)
+
+    def is_valid_github_path(self, path):
+        # Regex pattern to match {owner}/{repo}/{branch}/{folder}
+        # {folder} is optional and can include subfolders
+        pattern = r'^([^/]+)/([^/]+)/([^/]+)(/[^/]*)*$'
+        
+        # Match the pattern with the provided path
+        match = re.match(pattern, path)
+        
+        # Return True if the pattern matches, False otherwise
+        return bool(match)
