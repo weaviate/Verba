@@ -17,6 +17,8 @@ import { RAGConfig, RAGResponse } from './components/RAG/types';
 
 import { detectHost } from "./api"
 
+import { GoogleAnalytics } from '@next/third-parties/google'
+
 // Fonts
 const inter = Inter({ subsets: ["latin"] });
 const plus_jakarta_sans = Plus_Jakarta_Sans({ subsets: ["latin"] });
@@ -149,6 +151,11 @@ export default function Home() {
 
   return (
     <main className={`min-h-screen p-5 bg-bg-verba text-text-verba ${fontClassName}`} data-theme={baseSetting[settingTemplate].Customization.settings.theme}>
+
+      {gtag !== "" && (
+        <GoogleAnalytics gaId={gtag} />
+      )}
+
       <Navbar APIHost={APIHost} production={production} title={baseSetting[settingTemplate].Customization.settings.title.text} subtitle={baseSetting[settingTemplate].Customization.settings.subtitle.text} imageSrc={baseSetting[settingTemplate].Customization.settings.image.src} version='v1.0.0' currentPage={currentPage} setCurrentPage={setCurrentPage} />
 
       {currentPage === "CHAT" && (
