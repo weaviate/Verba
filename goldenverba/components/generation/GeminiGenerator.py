@@ -21,7 +21,7 @@ class GeminiGenerator(Generator):
         super().__init__()
         self.name = "GeminiGenerator"
         self.description = "Generator using Google's Gemini 1.5 Pro model"
-        self.requires_library = ["google-cloud-aiplatform"]
+        self.requires_library = ["vertexai"]
         self.requires_env = [
             "GOOGLE_APPLICATION_CREDENTIALS",
             "GOOGLE_CLOUD_PROJECT",

@@ -253,9 +253,9 @@ class VerbaManager:
         try:
             import vertexai
 
-            self.installed_libraries["google-cloud-aiplatform"] = True
+            self.installed_libraries["vertexai"] = True
         except Exception:
-            self.installed_libraries["google-cloud-aiplatform"] = False
+            self.installed_libraries["vertexai"] = False
 
         try:
             import cohere

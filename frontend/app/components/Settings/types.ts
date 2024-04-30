@@ -44,6 +44,7 @@ export interface ChatSettings extends MetaInformation {
     settings: {
         caching: CheckboxSetting;
         suggestion: CheckboxSetting;
+        info_button: CheckboxSetting,
         max_document_size: NumberFieldSetting;
     }
 }
@@ -223,6 +224,7 @@ const BaseChat: ChatSettings = {
     settings: {
         caching: { checked: true, type: "check", description: "Enable Caching" },
         suggestion: { checked: true, type: "check", description: "Enable Autocompletion" },
+        info_button: { checked: true, type: "check", description: "Enable Help Information" },
         max_document_size: { value: 10000, type: "number", description: "Max characters to show Documents" },
     }
 
