@@ -299,6 +299,18 @@ class VerbaManager:
         """
         Checks which environment variables are installed and fills out the self.environment_variables dictionary for the frontend to access.
         """
+
+        # Ollama URL
+        if os.environ.get("OLLAMA_URL", "") != "":
+            self.environment_variables["OLLAMA_URL"] = True
+        else:
+            self.environment_variables["OLLAMA_URL"] = False
+
+        if os.environ.get("OLLAMA_MODEL", "") != "":
+            self.environment_variables["OLLAMA_MODEL"] = True
+        else:
+            self.environment_variables["OLLAMA_MODEL"] = False
+
         # OpenAI API Key
         if os.environ.get("OPENAI_API_KEY", "") != "":
             self.environment_variables["OPENAI_API_KEY"] = True
@@ -316,12 +328,6 @@ class VerbaManager:
         else:
             self.environment_variables["COHERE_API_KEY"] = False
 
-        # HuggingFace Key
-        if os.environ.get("HF_TOKEN", "") != "":
-            self.environment_variables["HF_TOKEN"] = True
-        else:
-            self.environment_variables["HF_TOKEN"] = False
-
         # Github Token Key
         if os.environ.get("GITHUB_TOKEN", "") != "":
             self.environment_variables["GITHUB_TOKEN"] = True
@@ -333,12 +339,6 @@ class VerbaManager:
             self.environment_variables["UNSTRUCTURED_API_KEY"] = True
         else:
             self.environment_variables["UNSTRUCTURED_API_KEY"] = False
-
-        # LLAMA2-7B-CHAT-HF
-        if os.environ.get("LLAMA2-7B-CHAT-HF", "") == "True":
-            self.environment_variables["LLAMA2-7B-CHAT-HF"] = True
-        else:
-            self.environment_variables["LLAMA2-7B-CHAT-HF"] = False
 
         # OpenAI API Type, should be set to "azure" if using Azure OpenAI
         if os.environ.get("OPENAI_API_TYPE", "") != "":
@@ -670,7 +670,7 @@ class VerbaManager:
                 ].add_to_semantic_cache(self.client, semantic_query, full_text)
 
     def reset(self):
-        self.client.schema.delete_class("Suggestion")
+        self.client.schema.delete_class("VERBA_Suggestion")
         # Check if all schemas exist for all possible vectorizers
         for vectorizer in schema_manager.VECTORIZERS:
             schema_manager.reset_schemas(self.client, vectorizer)
@@ -717,7 +717,7 @@ class VerbaManager:
             schema_manager.init_schemas(self.client, embedding, False, True)
 
     def reset_suggestion(self):
-        self.client.schema.delete_class("Suggestion")
+        self.client.schema.delete_class("VERBA_Suggestion")
         schema_manager.init_suggestion(self.client, "", False, True)
 
     def check_if_document_exits(self, document: Document) -> bool:

@@ -37,6 +37,7 @@ All notable changes to this project will be documented in this file.
 - Add Google Gemini as new Embedder and Generator
 - Added .CSV support (all file types available in Unstructured IO)
 - More test data
+- Add Ollama as Generator and Embedding Component
 
 ### Changed
 - Changed to AppRouter framework

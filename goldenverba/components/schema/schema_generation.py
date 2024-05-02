@@ -88,9 +88,9 @@ def reset_schemas(
     client: Client = None,
     vectorizer: str = None,
 ):
-    doc_name = "Document_" + strip_non_letters(vectorizer)
-    chunk_name = "Chunk_" + strip_non_letters(vectorizer)
-    cache_name = "Cache_" + strip_non_letters(vectorizer)
+    doc_name = "VERBA_Document_" + strip_non_letters(vectorizer)
+    chunk_name = "VERBA_Chunk_" + strip_non_letters(vectorizer)
+    cache_name = "VERBA_Cache_" + strip_non_letters(vectorizer)
 
     client.schema.delete_class(doc_name)
     client.schema.delete_class(chunk_name)

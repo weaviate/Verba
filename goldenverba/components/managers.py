@@ -23,7 +23,7 @@ from goldenverba.components.generation.GeminiGenerator import GeminiGenerator
 from goldenverba.components.generation.CohereGenerator import CohereGenerator
 from goldenverba.components.generation.GPT3Generator import GPT3Generator
 from goldenverba.components.generation.GPT4Generator import GPT4Generator
-from goldenverba.components.generation.Llama2Generator import Llama2Generator
+from goldenverba.components.generation.OllamaGenerator import OllamaGenerator
 
 import time
 
@@ -208,8 +208,8 @@ class GeneratorManager:
             "GeminiGenerator": GeminiGenerator(),
             "GPT4Generator": GPT4Generator(),
             "GPT3Generator": GPT3Generator(),
+            "OllamaGenerator": OllamaGenerator(),
             "CohereGenerator": CohereGenerator(),
-            "Llama2Generator": Llama2Generator(),
         }
         self.selected_generator: str = "GPT3Generator"
 

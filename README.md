@@ -299,6 +299,19 @@ OPENAI_MODEL="gpt-4"
 WAIT_TIME_BETWEEN_INGESTION_QUERIES_MS="100"
 ```
 
+## Ollama
+
+Verba supports Ollama models. Download and Install Ollama on your device (https://ollama.com/download). Make sure to install your preferred LLM and set the two environment variables:
+
+```
+OLLAMA_URL=<URL to your running Ollama instance>
+OLLAMA_MODEL=<Model you want to use>
+```
+
+Tested with `llama3` and `mistral`
+
+> Make sure Ollama Server runs in the background when using
+
 ## Cohere
 
 Verba supports Cohere Models, to use them, you need to specify the `COHERE_API_KEY` environment variable. You can get it from [Cohere](https://dashboard.cohere.com/)
@@ -327,22 +340,6 @@ You also need to set the `GOOGLE_CLOUD_PROJECT` environment variable to the name
 ```
 GOOGLE_APPLICATION_CREDENTIALS=LOCATION-OF-YOUR-KEY
 GOOGLE_CLOUD_PROJECT=YOUR-CLOUD-PROJECT-KEY
-```
-
-## HuggingFace
-
-Verba supports HuggingFace models, such as SentenceTransformers and Llama2. To use them you need the `HF_TOKEN` environment variable. You can get it from [HuggingFace](https://huggingface.co/)
-
-```
-HF_TOKEN=YOUR-HUGGINGFACE-TOKEN
-```
-
-### Llama2 
-
-To use the Llama2 model from Meta, you first need to request access to it. Read more about accessing the [Llama model here](https://huggingface.co/blog/llama2). To enable the LLama2 model for Verba use:
-
-```
-LLAMA2-7B-CHAT-HF=True
 ```
 
 ## Unstructured
