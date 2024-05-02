@@ -17,7 +17,6 @@ from goldenverba.components.embedding.CohereEmbedder import CohereEmbedder
 from goldenverba.components.embedding.MiniLMEmbedder import MiniLMEmbedder
 from goldenverba.components.embedding.GoogleEmbedder import GoogleEmbedder
 
-from goldenverba.components.retriever.SimpleRetriever import SimpleRetriever
 from goldenverba.components.retriever.WindowRetriever import WindowRetriever
 
 from goldenverba.components.generation.GeminiGenerator import GeminiGenerator
@@ -169,7 +168,6 @@ class RetrieverManager:
     def __init__(self):
         self.retrievers: dict[str, Retriever] = {
             "WindowRetriever": WindowRetriever(),
-            "SimpleRetriever": SimpleRetriever(),
         }
         self.selected_retriever: str = "WindowRetriever"
 

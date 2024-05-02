@@ -80,9 +80,7 @@ def add_suffix(schema: dict, vectorizer: str) -> tuple[dict, str]:
     """
     modified_schema = schema.copy()
     # Verify Vectorizer and add suffix
-    modified_schema["classes"][0]["class"] = (
-        modified_schema["classes"][0]["class"] + "_" + strip_non_letters(vectorizer)
-    )
+    modified_schema["classes"][0]["class"] = ("VERBA_"+modified_schema["classes"][0]["class"] + "_" + strip_non_letters(vectorizer))
     return modified_schema, modified_schema["classes"][0]["class"]
 
 
@@ -327,7 +325,7 @@ def init_suggestion(
     SCHEMA_SUGGESTION = {
         "classes": [
             {
-                "class": "Suggestion",
+                "class": "VERBA_Suggestion",
                 "description": "List of possible prompts",
                 "properties": [
                     {
@@ -341,7 +339,7 @@ def init_suggestion(
     }
 
     suggestion_schema = SCHEMA_SUGGESTION
-    suggestion_name = "Suggestion"
+    suggestion_name = "VERBA_Suggestion"
 
     if client.schema.exists(suggestion_name):
         if check:

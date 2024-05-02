@@ -169,7 +169,7 @@ const RAGComponent: React.FC<RAGComponentProps> = ({ APIHost, settingConfig, RAG
                     {buttonTitle === "Import" && consoleLog.length > 0 && (
                         <div className='bg-bg-console-verba h-[58vh] overflow-auto w-full p-5 flex flex-col gap-1 rounded-lg'>
                             {consoleLog && consoleLog.map((msg, index) => (
-                                <pre className={`text-xs font-mono ${msg.type === 'INFO' ? 'text-text-console-verba' : msg.type === 'WARNING' ? 'text-primary-verba' : msg.type === 'SUCCESS' ? 'text-secondary-verba' : msg.type === 'ERROR' ? 'text-warning-verba' : ''}`}><code>({msg.type}) {msg.message}</code></pre>
+                                <pre key={"console_message_" + index} className={`text-xs font-mono ${msg.type === 'INFO' ? 'text-text-console-verba' : msg.type === 'WARNING' ? 'text-primary-verba' : msg.type === 'SUCCESS' ? 'text-secondary-verba' : msg.type === 'ERROR' ? 'text-warning-verba' : ''}`}><code>({msg.type}) {msg.message}</code></pre>
                             ))}
                         </div>
                     )}

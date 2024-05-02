@@ -171,7 +171,7 @@ class Embedder(VerbaComponent):
                         "timestamp": str(document.timestamp),
                     }
 
-                    class_name = "Document_" + strip_non_letters(self.vectorizer)
+                    class_name = "VERBA_Document_" + strip_non_letters(self.vectorizer)
                     uuid = client.batch.add_data_object(properties, class_name)
 
                     for chunk in document.chunks:
@@ -193,7 +193,7 @@ class Embedder(VerbaComponent):
                                 "doc_type": chunk.doc_type,
                                 "chunk_id": chunk.chunk_id,
                             }
-                            class_name = "Chunk_" + strip_non_letters(self.vectorizer)
+                            class_name = "VERBA_Chunk_" + strip_non_letters(self.vectorizer)
 
                             # Check if vector already exists
                             if chunk.vector is None:
@@ -214,8 +214,8 @@ class Embedder(VerbaComponent):
                     client,
                     uuid,
                     document.name,
-                    "Document_" + strip_non_letters(self.vectorizer),
-                    "Chunk_" + strip_non_letters(self.vectorizer),
+                    "VERBA_Document_" + strip_non_letters(self.vectorizer),
+                    "VERBA_Chunk_" + strip_non_letters(self.vectorizer),
                     len(document.chunks),
                     logging
                 )
@@ -298,8 +298,8 @@ class Embedder(VerbaComponent):
         msg.warn(f"Deleted document {doc_name} and its chunks")
 
     def remove_document_by_id(self, client: Client, doc_id: str):
-        doc_class_name = "Document_" + strip_non_letters(self.vectorizer)
-        chunk_class_name = "Chunk_" + strip_non_letters(self.vectorizer)
+        doc_class_name = "VERBA_Document_" + strip_non_letters(self.vectorizer)
+        chunk_class_name = "VERBA_Chunk_" + strip_non_letters(self.vectorizer)
 
         client.data_object.delete(uuid=doc_id, class_name=doc_class_name)
 
@@ -311,20 +311,20 @@ class Embedder(VerbaComponent):
         msg.warn(f"Deleted document {doc_id} and its chunks")
 
     def get_document_class(self) -> str:
-        return "Document_" + strip_non_letters(self.vectorizer)
+        return "VERBA_Document_" + strip_non_letters(self.vectorizer)
 
     def get_chunk_class(self) -> str:
-        return "Chunk_" + strip_non_letters(self.vectorizer)
+        return "VERBA_Chunk_" + strip_non_letters(self.vectorizer)
 
     def get_cache_class(self) -> str:
-        return "Cache_" + strip_non_letters(self.vectorizer)
+        return "VERBA_Cache_" + strip_non_letters(self.vectorizer)
 
     def search_documents(self, client: Client, query: str, doc_type: str, page:int, pageSize: int) -> list:
         """Search for documents from Weaviate
         @parameter query_string : str - Search query
         @returns list - Document list.
         """
-        doc_class_name = "Document_" + strip_non_letters(self.vectorizer)
+        doc_class_name = "VERBA_Document_" + strip_non_letters(self.vectorizer)
         offset = pageSize * (page - 1)
 
         if doc_type == "" or doc_type is None:
