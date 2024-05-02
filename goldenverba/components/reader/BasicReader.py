@@ -1,7 +1,6 @@
 import base64
 import json
 from datetime import datetime
-import time
 import io
 
 from wasabi import msg

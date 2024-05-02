@@ -35,10 +35,17 @@ All notable changes to this project will be documented in this file.
     - Improved verba_config.json
 - Ability to enable/disable caching + autosuggestions
 - Add Google Gemini as new Embedder and Generator
+- Added .CSV support (all file types available in Unstructured IO)
+- More test data
 
 ### Changed
 - Changed to AppRouter framework
 - Changed frontend project structure
+- Changed backend project structure
+- Removed Llama Generator Component
+
+### Fixed
+- Using Accelerator Library
 
 ## [0.4.0] - 11.04.2024
 

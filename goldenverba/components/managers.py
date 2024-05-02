@@ -8,7 +8,7 @@ from goldenverba.components.interfaces import Reader, Chunker, Embedder, Retriev
 
 from goldenverba.components.reader.BasicReader import BasicReader
 from goldenverba.components.reader.GitReader import GitHubReader
-from goldenverba.components.reader.Unstructured import UnstructuredReader
+from goldenverba.components.reader.UnstructuredAPI import UnstructuredReader
 
 from goldenverba.components.chunking.TokenChunker import TokenChunker
 
@@ -40,6 +40,7 @@ class ReaderManager:
         self.readers: dict[str, Reader] = {
             "BasicReader": BasicReader(),
             "GitHubReader": GitHubReader(),
+            "UnstructuredAPI": UnstructuredReader(),
         }
         self.selected_reader: str = "BasicReader"
 

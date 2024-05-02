@@ -114,6 +114,12 @@ const StatusComponent: React.FC<StatusComponentComponentProps> = ({ APIHost, set
         }
     }
 
+    const removeMessagesFromLocalStorage = (key: string) => {
+        if (typeof window !== 'undefined') {
+            localStorage.removeItem(key);
+        }
+    };
+
     const reset_verba = async (mode: string) => {
         try {
 
@@ -123,6 +129,8 @@ const StatusComponent: React.FC<StatusComponentComponentProps> = ({ APIHost, set
             setVariables(null)
             setSchemas(null)
             setIsFetching(true)
+            removeMessagesFromLocalStorage("VERBA_CONVERSATION")
+            removeMessagesFromLocalStorage("VERBA_CHUNKS")
 
             const response = await fetch(APIHost + "/api/reset", {
                 method: "POST",
