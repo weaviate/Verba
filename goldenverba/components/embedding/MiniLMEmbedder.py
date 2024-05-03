@@ -1,6 +1,9 @@
 from tqdm import tqdm
+import torch
 from wasabi import msg
 from weaviate import Client
+from transformers import AutoModel, AutoTokenizer
+from accelerate import Accelerator
 
 from goldenverba.components.interfaces import Embedder
 from goldenverba.components.document import Document
@@ -20,26 +23,19 @@ class MiniLMEmbedder(Embedder):
         self.model = None
         self.tokenizer = None
         try:
-            import torch
-            from transformers import AutoModel, AutoTokenizer
+            accelerator = Accelerator()
 
-            def get_device():
-                if torch.cuda.is_available():
-                    return torch.device("cuda")
-                elif torch.backends.mps.is_available():
-                    return torch.device("mps")
-                else:
-                    return torch.device("cpu")
-
-            self.device = get_device()
+            self.device = accelerator.device
 
             self.model = AutoModel.from_pretrained(
                 "sentence-transformers/all-MiniLM-L6-v2", device_map=self.device
             )
+            
+            self.model = accelerator.prepare(self.model)
+            
             self.tokenizer = AutoTokenizer.from_pretrained(
                 "sentence-transformers/all-MiniLM-L6-v2", device_map=self.device
             )
-            self.model = self.model.to(self.device)
 
         except Exception as e:
             pass
@@ -66,8 +62,6 @@ class MiniLMEmbedder(Embedder):
 
     def vectorize_chunk(self, chunk) -> list[float]:
         try:
-            import torch
-
             text = chunk
             tokens = self.tokenizer.tokenize(text)
 
