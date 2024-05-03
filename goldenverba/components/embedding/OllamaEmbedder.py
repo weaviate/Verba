@@ -35,7 +35,7 @@ class OllamaEmbedder(Embedder):
         for document in tqdm(
             documents, total=len(documents), desc="Vectorizing document chunks"
         ):
-            for chunk in document.chunks:
+            for chunk in tqdm(document.chunks, total=len(document.chunks), desc="Vectorizing Chunks"):
                 chunk.set_vector(self.vectorize_chunk(chunk.text))
 
         return self.import_data(documents, client, logging)

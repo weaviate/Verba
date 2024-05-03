@@ -418,7 +418,7 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
                         <IoMdSend size={18} />
                     </button>
                     <div className="tooltip text-text-verba" data-tip="Reset Conversation">
-                        <button type='button' onClick={() => { removeMessagesFromLocalStorage("VERBA_CONVERSATION"); removeChunksFromLocalStorage("VERBA_CHUNKS"); setChunks([]); setMessages([]); setUserInput(""); setSuggestions([]) }} className='btn btn-circle border-none shadow-none bg-bg-alt-verba hover:bg-secondary-verba'>
+                        <button type='button' onClick={() => { removeMessagesFromLocalStorage("VERBA_CONVERSATION"); removeChunksFromLocalStorage("VERBA_CHUNKS"); setChunks([]); setMessages([{ type: "system", content: settingConfig.Customization.settings.intro_message.text }]); setUserInput(""); setSuggestions([]) }} className='btn btn-circle border-none shadow-none bg-bg-alt-verba hover:bg-secondary-verba'>
                             <IoIosRefresh size={18} />
                         </button>
                     </div>

@@ -270,13 +270,6 @@ class VerbaManager:
             self.installed_libraries["vertexai"] = False
 
         try:
-            import cohere
-
-            self.installed_libraries["cohere"] = True
-        except Exception:
-            self.installed_libraries["cohere"] = False
-
-        try:
             import transformers
 
             self.installed_libraries["transformers"] = True

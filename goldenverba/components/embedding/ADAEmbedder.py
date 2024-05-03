@@ -13,7 +13,6 @@ class ADAEmbedder(Embedder):
         super().__init__()
         self.name = "ADAEmbedder"
         self.requires_env = ["OPENAI_API_KEY"]
-        self.requires_library = ["openai"]
         self.description = "Embeds and retrieves objects using OpenAI's ADA model"
         self.vectorizer = "text2vec-openai"
 
