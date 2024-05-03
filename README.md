@@ -308,9 +308,9 @@ OLLAMA_URL=<URL to your running Ollama instance>
 OLLAMA_MODEL=<Model you want to use>
 ```
 
-Tested with `llama3` and `mistral`
+Tested with `llama3`, `llama3:70b` and `mistral`. The bigger models generally perform better, small models tend more to hallucinate or not directly answer the query.
 
-> Make sure Ollama Server runs in the background when using
+> Make sure Ollama Server runs in the background when using and that you don't have any documents imported when changing the model because model may have a different vector dimension which can cause errors.
 
 ## Cohere
 

@@ -98,7 +98,7 @@ const RAGConfigComponent: React.FC<RAGConfigComponentProps> = ({ APIHost, files,
                         <div className='flex flex-col gap-2 items-center'>
                             <div className='flex'>
                                 <button onClick={() => document.getElementById(RAGConfigTitle + RAGComponents.selected + "_upload")?.click()} className="btn border-none bg-button-verba hover:bg-secondary-verba text-text-verba">Add Files</button>
-                                <input id={RAGConfigTitle + RAGComponents.selected + "_upload"} type="file" onChange={handleUploadFiles} className="hidden" multiple />
+                                <input id={RAGConfigTitle + RAGComponents.selected + "_upload"} type="file" value={files ? undefined : ''} onChange={handleUploadFiles} className="hidden" multiple />
                             </div>
                             {files && (
                                 <div className='flex'>

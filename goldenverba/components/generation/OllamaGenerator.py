@@ -43,7 +43,7 @@ class OllamaGenerator(Generator):
         if conversation is None:
             conversation = {}
         messages = self.prepare_messages(queries, context, conversation)
-        
+
         try:
             data = {
                 "model": model,
@@ -100,7 +100,7 @@ class OllamaGenerator(Generator):
         messages.append(
             {
                 "role": "user",
-                "content": f"Please answer this query: '{query}' with this provided context: {user_context}",
+                "content": f"With this provided context: '{user_context}' Please answer this query: '{query}'",
             }
         )
 

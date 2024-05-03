@@ -16,6 +16,7 @@ from goldenverba.components.embedding.ADAEmbedder import ADAEmbedder
 from goldenverba.components.embedding.CohereEmbedder import CohereEmbedder
 from goldenverba.components.embedding.MiniLMEmbedder import MiniLMEmbedder
 from goldenverba.components.embedding.GoogleEmbedder import GoogleEmbedder
+from goldenverba.components.embedding.OllamaEmbedder import OllamaEmbedder
 
 from goldenverba.components.retriever.WindowRetriever import WindowRetriever
 
@@ -132,6 +133,7 @@ class EmbeddingManager:
             "MiniLMEmbedder": MiniLMEmbedder(),
             "ADAEmbedder": ADAEmbedder(),
             "CohereEmbedder": CohereEmbedder(),
+            "OllamaEmbedder": OllamaEmbedder(),
         }
         self.selected_embedder: str = "ADAEmbedder"
 
