@@ -18,10 +18,7 @@ class ADAEmbedder(Embedder):
         self.vectorizer = "text2vec-openai"
 
     def embed(
-        self,
-        documents: list[Document],
-        client: Client,
-        logging: list[dict]
+        self, documents: list[Document], client: Client, logging: list[dict]
     ) -> bool:
         """Embed verba documents and its chunks to Weaviate
         @parameter: documents : list[Document] - List of Verba documents

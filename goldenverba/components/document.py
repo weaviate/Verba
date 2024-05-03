@@ -1,5 +1,6 @@
 from goldenverba.components.chunk import Chunk
 
+
 class Document:
     def __init__(
         self,

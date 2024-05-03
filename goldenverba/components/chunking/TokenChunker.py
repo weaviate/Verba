@@ -23,10 +23,8 @@ class TokenChunker(Chunker):
         self.description = "Chunks documents by word tokens. Choose between the chunk size and their overlap."
         self.encoding = tiktoken.encoding_for_model("gpt-3.5-turbo")
 
-    def chunk(
-        self, documents: list[Document], logging: list[dict]
-    ) -> list[Document]:
-        
+    def chunk(self, documents: list[Document], logging: list[dict]) -> list[Document]:
+
         for document in tqdm(
             documents, total=len(documents), desc="Chunking documents"
         ):
@@ -36,7 +34,10 @@ class TokenChunker(Chunker):
 
             encoded_tokens = self.encoding.encode(document.text, disallowed_special=())
 
-            if self.config["units"].value > len(encoded_tokens) or self.config["units"].value < 1:
+            if (
+                self.config["units"].value > len(encoded_tokens)
+                or self.config["units"].value < 1
+            ):
                 doc_chunk = Chunk(
                     text=document.text,
                     doc_name=document.name,
@@ -48,9 +49,14 @@ class TokenChunker(Chunker):
                 msg.warn(
                     f"Overlap value is greater than unit (Units {self.config['units'].value}/ Overlap {self.config['overlap'].value})"
                 )
-                logging.append({"type":"ERROR", "message":f"Overlap value is greater than unit (Units {self.config['units'].value}/ Overlap {self.config['overlap'].value})"})
-                self.config["overlap"].value = self.config["units"].value-1
-            
+                logging.append(
+                    {
+                        "type": "ERROR",
+                        "message": f"Overlap value is greater than unit (Units {self.config['units'].value}/ Overlap {self.config['overlap'].value})",
+                    }
+                )
+                self.config["overlap"].value = self.config["units"].value - 1
+
             i = 0
             split_id_counter = 0
             while i < len(encoded_tokens):
@@ -74,6 +80,8 @@ class TokenChunker(Chunker):
                 if end_i == len(encoded_tokens):
                     break
 
-                i += self.config["units"].value - self.config["overlap"].value  # Step forward, considering overlap
+                i += (
+                    self.config["units"].value - self.config["overlap"].value
+                )  # Step forward, considering overlap
 
         return documents, logging

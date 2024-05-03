@@ -3,7 +3,7 @@ import ssl
 from typing import Optional
 
 import weaviate
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 from wasabi import msg
 from weaviate import Client
 from weaviate.embedded import EmbeddedOptions
@@ -30,7 +30,10 @@ from goldenverba.components.managers import (
     GeneratorManager,
 )
 
-load_dotenv()
+environment_file = find_dotenv()
+if environment_file != "":
+
+    load_dotenv()
 
 
 class VerbaManager:
@@ -62,7 +65,9 @@ class VerbaManager:
         self, fileData: list[FileData], textValues: list[str], logging: list[dict]
     ) -> list[Document]:
 
-        loaded_documents, logging = self.reader_manager.load(fileData,textValues,logging)
+        loaded_documents, logging = self.reader_manager.load(
+            fileData, textValues, logging
+        )
 
         filtered_documents = []
 
@@ -195,15 +200,22 @@ class VerbaManager:
             else:
                 ssl._create_default_https_context = _create_unverified_https_context
 
+            if google_project != "":
+                additional_env_vars = {
+                    "ENABLE_MODULES": "text2vec-openai,generative-openai,qna-openai,text2vec-cohere,text2vec-palm",
+                    "GOOGLE_CLOUD_PROJECT": google_project,
+                }
+            else:
+                additional_env_vars = {
+                    "ENABLE_MODULES": "text2vec-openai,generative-openai,qna-openai,text2vec-cohere",
+                }
+
             msg.info("Using Weaviate Embedded")
             self.weaviate_type = "Weaviate Embedded"
             client = weaviate.Client(
                 additional_headers=additional_header,
-                 embedded_options=EmbeddedOptions(
-                    additional_env_vars={
-                        "ENABLE_MODULES": "text2vec-palm,text2vec-openai,generative-openai,qna-openai,text2vec-cohere,text2vec-palm",
-                        "GOOGLE_CLOUD_PROJECT": google_project,
-                    }
+                embedded_options=EmbeddedOptions(
+                    additional_env_vars=additional_env_vars
                 ),
             )
 
@@ -265,21 +277,18 @@ class VerbaManager:
             self.installed_libraries["cohere"] = False
 
         try:
-            import huggingface_hub 
-            from huggingface_hub import login
-
-            login(token=os.environ.get("HF_TOKEN", ""), add_to_git_credential=True)
-
-            self.installed_libraries["huggingface_hub"] = True
-        except Exception:
-            self.installed_libraries["huggingface_hub"] = False
-
-        try:
             import transformers
 
             self.installed_libraries["transformers"] = True
         except Exception:
             self.installed_libraries["transformers"] = False
+
+        try:
+            import accelerate
+
+            self.installed_libraries["accelerate"] = True
+        except Exception:
+            self.installed_libraries["accelerate"] = False
 
         try:
             import torch
@@ -401,17 +410,20 @@ class VerbaManager:
 
         schemas = {}
 
-        for _class in schema_info["classes"]:
-            results = (
-                self.client.query.aggregate(_class["class"]).with_meta_count().do()
-            )
-            schemas[_class["class"]] = (
-                results.get("data", {})
-                .get("Aggregate", {})
-                .get(_class["class"], [{}])[0]
-                .get("meta", {})
-                .get("count", 0)
-            )
+        try:
+            for _class in schema_info["classes"]:
+                results = (
+                    self.client.query.aggregate(_class["class"]).with_meta_count().do()
+                )
+                schemas[_class["class"]] = (
+                    results.get("data", {})
+                    .get("Aggregate", {})
+                    .get(_class["class"], [{}])[0]
+                    .get("meta", {})
+                    .get("count", 0)
+                )
+        except Exception as e:
+            msg.error(f"Couldn't retrieve information about Collections, if you're using Weaviate Embedded, try to reset `~/.local/share/weaviate` ({str(e)})")
 
         return schemas
 
@@ -470,7 +482,10 @@ class VerbaManager:
             "data" in check_results
             and len(check_results["data"]["Get"]["VERBA_Suggestion"]) > 0
         ):
-            if query == check_results["data"]["Get"]["VERBA_Suggestion"][0]["suggestion"]:
+            if (
+                query
+                == check_results["data"]["Get"]["VERBA_Suggestion"][0]["suggestion"]
+            ):
                 return
 
         with self.client.batch as batch:
@@ -600,17 +615,15 @@ class VerbaManager:
     ):
         semantic_result = None
         if self.enable_caching:
-            semantic_query = (
-                self.embedder_manager.embedders[self.embedder_manager.selected_embedder].conversation_to_query(
-                    queries, conversation
-                )
-            )
+            semantic_query = self.embedder_manager.embedders[
+                self.embedder_manager.selected_embedder
+            ].conversation_to_query(queries, conversation)
             (
                 semantic_result,
                 distance,
-            ) = self.embedder_manager.embedders[self.embedder_manager.selected_embedder].retrieve_semantic_cache(
-                self.client, semantic_query
-            )
+            ) = self.embedder_manager.embedders[
+                self.embedder_manager.selected_embedder
+            ].retrieve_semantic_cache(self.client, semantic_query)
 
         if semantic_result is not None:
             return {
@@ -621,13 +634,13 @@ class VerbaManager:
             }
 
         else:
-            full_text = await self.generator_manager.generators[self.generator_manager.selected_generator].generate(
-                queries, contexts, conversation
-            )
+            full_text = await self.generator_manager.generators[
+                self.generator_manager.selected_generator
+            ].generate(queries, contexts, conversation)
             if self.enable_caching:
-                self.embedder_manager.embedders[self.embedder_manager.selected_embedder].add_to_semantic_cache(
-                    self.client, semantic_query, full_text
-                )
+                self.embedder_manager.embedders[
+                    self.embedder_manager.selected_embedder
+                ].add_to_semantic_cache(self.client, semantic_query, full_text)
                 self.set_suggestions(" ".join(queries))
             return full_text
 
@@ -690,7 +703,9 @@ class VerbaManager:
             document_class_name = "VERBA_Document_" + schema_manager.strip_non_letters(
                 vectorizer
             )
-            chunk_class_name = "VERBA_Chunk_" + schema_manager.strip_non_letters(vectorizer)
+            chunk_class_name = "VERBA_Chunk_" + schema_manager.strip_non_letters(
+                vectorizer
+            )
             self.client.schema.delete_class(document_class_name)
             self.client.schema.delete_class(chunk_class_name)
             schema_manager.init_schemas(self.client, vectorizer, False, True)
@@ -699,7 +714,9 @@ class VerbaManager:
             document_class_name = "VERBA_Document_" + schema_manager.strip_non_letters(
                 embedding
             )
-            chunk_class_name = "VERBA_Chunk_" + schema_manager.strip_non_letters(embedding)
+            chunk_class_name = "VERBA_Chunk_" + schema_manager.strip_non_letters(
+                embedding
+            )
             self.client.schema.delete_class(document_class_name)
             self.client.schema.delete_class(chunk_class_name)
             schema_manager.init_schemas(self.client, embedding, False, True)

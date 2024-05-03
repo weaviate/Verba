@@ -13,7 +13,7 @@ class OllamaGenerator(Generator):
         super().__init__()
         self.name = "OllamaGenerator"
         self.description = "Generator using a local running Ollama Model"
-        self.requires_env = ["OLLAMA_URL","OLLAMA_MODEL"]
+        self.requires_env = ["OLLAMA_URL", "OLLAMA_MODEL"]
         self.streamable = True
         self.context_window = 3000
 
@@ -34,9 +34,9 @@ class OllamaGenerator(Generator):
         model = os.environ.get("OLLAMA_MODEL", "")
         if url == "":
             yield {
-                    "message": "Missing Ollama URL",
-                    "finish_reason": "stop",
-                }
+                "message": "Missing Ollama URL",
+                "finish_reason": "stop",
+            }
 
         url += "/api/chat"
 
@@ -45,17 +45,18 @@ class OllamaGenerator(Generator):
         messages = self.prepare_messages(queries, context, conversation)
 
         try:
-            data = {
-                "model": model,
-                "messages": messages
-            }
+            data = {"model": model, "messages": messages}
             async with aiohttp.ClientSession() as session:
                 async with session.post(url, json=data) as response:
                     async for line in response.content:
                         if line.strip():  # Ensure line is not just whitespace
-                            json_data = json.loads(line.decode('utf-8'))  # Decode bytes to string then to JSON
+                            json_data = json.loads(
+                                line.decode("utf-8")
+                            )  # Decode bytes to string then to JSON
                             message = json_data.get("message", {}).get("content", "")
-                            finish_reason = "stop" if json_data.get("done", False) else ""
+                            finish_reason = (
+                                "stop" if json_data.get("done", False) else ""
+                            )
 
                             yield {
                                 "message": message,

@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from goldenverba.components.types import FileData
 
+
 class QueryPayload(BaseModel):
     query: str
 
@@ -26,6 +27,7 @@ class SearchQueryPayload(BaseModel):
 class GetDocumentPayload(BaseModel):
     document_id: str
 
+
 class ResetPayload(BaseModel):
     resetMode: str
 
@@ -40,6 +42,7 @@ class LoadPayload(BaseModel):
     document_type: str
     chunkUnits: int
     chunkOverlap: int
+
 
 class ImportPayload(BaseModel):
     data: list[FileData]

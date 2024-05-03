@@ -1,9 +1,12 @@
 from tqdm import tqdm
-import torch
-from wasabi import msg
 from weaviate import Client
-from transformers import AutoModel, AutoTokenizer
-from accelerate import Accelerator
+
+try:
+    import torch
+    from accelerate import Accelerator
+    from transformers import AutoModel, AutoTokenizer
+except:
+    pass
 
 from goldenverba.components.interfaces import Embedder
 from goldenverba.components.document import Document
@@ -17,7 +20,7 @@ class MiniLMEmbedder(Embedder):
     def __init__(self):
         super().__init__()
         self.name = "MiniLMEmbedder"
-        self.requires_library = ["torch", "transformers"]
+        self.requires_library = ["torch", "transformers", "accelerate"]
         self.description = "Embeds and retrieves objects using SentenceTransformer's all-MiniLM-L6-v2 model"
         self.vectorizer = "MiniLM"
         self.model = None
@@ -30,9 +33,9 @@ class MiniLMEmbedder(Embedder):
             self.model = AutoModel.from_pretrained(
                 "sentence-transformers/all-MiniLM-L6-v2", device_map=self.device
             )
-            
+
             self.model = accelerator.prepare(self.model)
-            
+
             self.tokenizer = AutoTokenizer.from_pretrained(
                 "sentence-transformers/all-MiniLM-L6-v2", device_map=self.device
             )

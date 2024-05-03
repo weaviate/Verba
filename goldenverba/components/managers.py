@@ -4,7 +4,13 @@ from weaviate import Client
 from goldenverba.components.document import Document
 from goldenverba.components.chunk import Chunk
 from goldenverba.components.types import FileData
-from goldenverba.components.interfaces import Reader, Chunker, Embedder, Retriever, Generator
+from goldenverba.components.interfaces import (
+    Reader,
+    Chunker,
+    Embedder,
+    Retriever,
+    Generator,
+)
 
 from goldenverba.components.reader.BasicReader import BasicReader
 from goldenverba.components.reader.GitReader import GitHubReader
@@ -29,11 +35,11 @@ from goldenverba.components.generation.OllamaGenerator import OllamaGenerator
 import time
 
 
-
 try:
     import tiktoken
 except Exception:
     msg.warn("tiktoken not installed, your base installation might be corrupted.")
+
 
 class ReaderManager:
     def __init__(self):
@@ -45,23 +51,39 @@ class ReaderManager:
         self.selected_reader: str = "BasicReader"
 
     def load(
-        self,
-        fileData: list[FileData], textValues: list[str], logging: list[dict]
+        self, fileData: list[FileData], textValues: list[str], logging: list[dict]
     ) -> tuple[list[Document], list[str]]:
-        
+
         start_time = time.time()  # Start timing
 
         if len(fileData) > 0:
-            logging.append({"type":"INFO", "message":f"Importing {len(fileData)} files with {self.selected_reader}"})
+            logging.append(
+                {
+                    "type": "INFO",
+                    "message": f"Importing {len(fileData)} files with {self.selected_reader}",
+                }
+            )
         else:
-            logging.append({"type":"INFO", "message":f"Importing {textValues} with {self.selected_reader}"})
+            logging.append(
+                {
+                    "type": "INFO",
+                    "message": f"Importing {textValues} with {self.selected_reader}",
+                }
+            )
 
-        documents, logging = self.readers[self.selected_reader].load(fileData, textValues, logging)
+        documents, logging = self.readers[self.selected_reader].load(
+            fileData, textValues, logging
+        )
 
-        elapsed_time = round(time.time() - start_time , 2) # Calculate elapsed time
+        elapsed_time = round(time.time() - start_time, 2)  # Calculate elapsed time
 
         msg.good(f"Loaded {len(documents)} documents in {elapsed_time}s")
-        logging.append({"type":"SUCCESS", "message":f"Loaded {len(documents)} documents in {elapsed_time}s"})
+        logging.append(
+            {
+                "type": "SUCCESS",
+                "message": f"Loaded {len(documents)} documents in {elapsed_time}s",
+            }
+        )
 
         return documents, logging
 
@@ -74,7 +96,8 @@ class ReaderManager:
 
     def get_readers(self) -> dict[str, Reader]:
         return self.readers
-    
+
+
 class ChunkerManager:
     def __init__(self):
         self.chunker: dict[str, Chunker] = {
@@ -82,16 +105,28 @@ class ChunkerManager:
         }
         self.selected_chunker: str = "TokenChunker"
 
-    def chunk(
-        self, documents: list[Document], logging: list[dict]
-    ) -> list[Document]:
-        logging.append({"type":"INFO", "message":f"Starting Chunking with {self.selected_chunker}"})
+    def chunk(self, documents: list[Document], logging: list[dict]) -> list[Document]:
+        logging.append(
+            {
+                "type": "INFO",
+                "message": f"Starting Chunking with {self.selected_chunker}",
+            }
+        )
         start_time = time.time()  # Start timing
-        chunked_docs, logging = self.chunker[self.selected_chunker].chunk(documents, logging)
+        chunked_docs, logging = self.chunker[self.selected_chunker].chunk(
+            documents, logging
+        )
         if self.check_chunks(chunked_docs):
             elapsed_time = round(time.time() - start_time, 2)  # Calculate elapsed time
-            msg.good(f"Chunking completed with {sum([len(document.chunks) for document in chunked_docs])} chunks in {elapsed_time}s")
-            logging.append({"type":"SUCCESS", "message":f"Chunking completed with {sum([len(document.chunks) for document in chunked_docs])} chunks in {elapsed_time}s"})
+            msg.good(
+                f"Chunking completed with {sum([len(document.chunks) for document in chunked_docs])} chunks in {elapsed_time}s"
+            )
+            logging.append(
+                {
+                    "type": "SUCCESS",
+                    "message": f"Chunking completed with {sum([len(document.chunks) for document in chunked_docs])} chunks in {elapsed_time}s",
+                }
+            )
             return chunked_docs, logging
         return []
 
@@ -126,6 +161,7 @@ class ChunkerManager:
 
         return True
 
+
 class EmbeddingManager:
     def __init__(self):
         self.embedders: dict[str, Embedder] = {
@@ -138,7 +174,11 @@ class EmbeddingManager:
         self.selected_embedder: str = "ADAEmbedder"
 
     def embed(
-        self, documents: list[Document], client: Client, logging:list[dict], batch_size: int = 100
+        self,
+        documents: list[Document],
+        client: Client,
+        logging: list[dict],
+        batch_size: int = 100,
     ) -> bool:
         """Embed verba documents and its chunks to Weaviate
         @parameter: documents : list[Document] - List of Verba documents
@@ -147,11 +187,25 @@ class EmbeddingManager:
         @returns bool - Bool whether the embedding what successful.
         """
         start_time = time.time()  # Start timing
-        logging.append({"type":"INFO", "message":f"Starting Embedding with {self.selected_embedder}"})
-        successful_embedding = self.embedders[self.selected_embedder].embed(documents, client, logging)
+        logging.append(
+            {
+                "type": "INFO",
+                "message": f"Starting Embedding with {self.selected_embedder}",
+            }
+        )
+        successful_embedding = self.embedders[self.selected_embedder].embed(
+            documents, client, logging
+        )
         elapsed_time = round(time.time() - start_time, 2)  # Calculate elapsed time
-        msg.good(f"Embedding completed with {len(documents)} Documents and {sum([len(document.chunks) for document in documents])} chunks in {elapsed_time}s")
-        logging.append({"type":"SUCCESS", "message":f"Embedding completed with {len(documents)} Documents and {sum([len(document.chunks) for document in documents])} chunks in {elapsed_time}s"})
+        msg.good(
+            f"Embedding completed with {len(documents)} Documents and {sum([len(document.chunks) for document in documents])} chunks in {elapsed_time}s"
+        )
+        logging.append(
+            {
+                "type": "SUCCESS",
+                "message": f"Embedding completed with {len(documents)} Documents and {sum([len(document.chunks) for document in documents])} chunks in {elapsed_time}s",
+            }
+        )
         return successful_embedding
 
     def set_embedder(self, embedder: str) -> bool:
@@ -165,6 +219,7 @@ class EmbeddingManager:
 
     def get_embedders(self) -> dict[str, Embedder]:
         return self.embedders
+
 
 class RetrieverManager:
     def __init__(self):
@@ -186,7 +241,9 @@ class RetrieverManager:
         @parameter: embedder : Embedder - Current selected Embedder
         @returns list[Chunk] - List of retrieved chunks.
         """
-        chunks, context = self.retrievers[self.selected_retriever].retrieve(queries, client, embedder)
+        chunks, context = self.retrievers[self.selected_retriever].retrieve(
+            queries, client, embedder
+        )
         managed_context = self.retrievers[self.selected_retriever].cutoff_text(
             context, generator.context_window
         )
@@ -204,6 +261,7 @@ class RetrieverManager:
     def get_retrievers(self) -> dict[str, Retriever]:
         return self.retrievers
 
+
 class GeneratorManager:
     def __init__(self):
         self.generators: dict[str, Generator] = {
@@ -211,7 +269,7 @@ class GeneratorManager:
             "GPT4Generator": GPT4Generator(),
             "GPT3Generator": GPT3Generator(),
             "OllamaGenerator": OllamaGenerator(),
-            "CohereGenerator": CohereGenerator(),
+            "Command R+": CohereGenerator(),
         }
         self.selected_generator: str = "GPT3Generator"
 
@@ -233,7 +291,8 @@ class GeneratorManager:
             queries,
             context,
             self.truncate_conversation_items(
-                conversation, int(self.generators[self.selected_generator].context_window * 0.375)
+                conversation,
+                int(self.generators[self.selected_generator].context_window * 0.375),
             ),
         )
 
@@ -255,7 +314,8 @@ class GeneratorManager:
             queries,
             context,
             self.truncate_conversation_items(
-                conversation, int(self.generators[self.selected_generator].context_window * 0.375)
+                conversation,
+                int(self.generators[self.selected_generator].context_window * 0.375),
             ),
         ):
             yield result

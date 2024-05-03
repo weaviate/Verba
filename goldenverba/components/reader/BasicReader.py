@@ -17,7 +17,7 @@ except Exception:
 
 class BasicReader(Reader):
     """
-    The BasicReader reads .txt, .md, .mdx, .json and .pdf files. 
+    The BasicReader reads .txt, .md, .mdx, .json and .pdf files.
     """
 
     def __init__(self):
@@ -27,19 +27,18 @@ class BasicReader(Reader):
         self.requires_library = ["pypdf"]
 
     def load(
-        self,
-        fileData: list[FileData], textValues: list[str], logging: list[dict]
+        self, fileData: list[FileData], textValues: list[str], logging: list[dict]
     ) -> tuple[list[Document], list[str]]:
 
         documents = []
 
         for file in fileData:
             msg.info(f"Loading in {file.filename}")
-            logging.append({"type":"INFO", "message":f"Importing {file.filename}"})
+            logging.append({"type": "INFO", "message": f"Importing {file.filename}"})
 
             decoded_bytes = base64.b64decode(file.content)
 
-            if file.extension in ["txt","md","mdx"]:
+            if file.extension in ["txt", "md", "mdx"]:
                 try:
                     original_text = decoded_bytes.decode("utf-8")
                     document = Document(
@@ -53,7 +52,12 @@ class BasicReader(Reader):
 
                 except Exception as e:
                     msg.warn(f"Failed to load {file.filename} : {str(e)}")
-                    logging.append({"type":"WARNING", "message":f"Failed to load {file.filename} : {str(e)}"})
+                    logging.append(
+                        {
+                            "type": "WARNING",
+                            "message": f"Failed to load {file.filename} : {str(e)}",
+                        }
+                    )
 
             elif file.extension == "json":
                 try:
@@ -65,7 +69,12 @@ class BasicReader(Reader):
 
                 except Exception as e:
                     msg.warn(f"Failed to load {file.filename} : {str(e)}")
-                    logging.append({"type":"WARNING", "message":f"Failed to load {file.filename} : {str(e)}"})
+                    logging.append(
+                        {
+                            "type": "WARNING",
+                            "message": f"Failed to load {file.filename} : {str(e)}",
+                        }
+                    )
 
             elif file.extension == "pdf":
                 try:
@@ -78,21 +87,31 @@ class BasicReader(Reader):
                         full_text += page.extract_text() + "\n\n"
 
                     document = Document(
-                            name=file.filename,
-                            text=full_text,
-                            type=self.config["document_type"].text,
-                            timestamp=str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
-                            reader=self.name,
-                        )
+                        name=file.filename,
+                        text=full_text,
+                        type=self.config["document_type"].text,
+                        timestamp=str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
+                        reader=self.name,
+                    )
                     documents.append(document)
                 except Exception as e:
                     msg.warn(f"Failed to load {file.filename} : {str(e)}")
-                    logging.append({"type":"WARNING", "message":f"Failed to load {file.filename} : {str(e)}"})
-        
+                    logging.append(
+                        {
+                            "type": "WARNING",
+                            "message": f"Failed to load {file.filename} : {str(e)}",
+                        }
+                    )
+
             else:
-                msg.warn(f"{file.filename} with extension {file.extension} not supported by BasicReader.")
-                logging.append({"type":"WARNING", "message":f"{file.filename} with extension {file.extension} not supported by BasicReader."})
+                msg.warn(
+                    f"{file.filename} with extension {file.extension} not supported by BasicReader."
+                )
+                logging.append(
+                    {
+                        "type": "WARNING",
+                        "message": f"{file.filename} with extension {file.extension} not supported by BasicReader.",
+                    }
+                )
 
         return documents, logging
-
-   

@@ -173,11 +173,11 @@ export default function Home() {
       )}
 
       {currentPage === "ADD" && !production && (
-        <RAGComponent baseSetting={baseSetting} settingTemplate={settingTemplate} buttonTitle="Import" settingConfig={baseSetting[settingTemplate]} APIHost={APIHost} RAGConfig={RAGConfig} setRAGConfig={setRAGConfig} showComponents={["Reader", "Chunker", "Embedder"]} />
+        <RAGComponent baseSetting={baseSetting} settingTemplate={settingTemplate} buttonTitle="Import" settingConfig={baseSetting[settingTemplate]} APIHost={APIHost} RAGConfig={RAGConfig} setRAGConfig={setRAGConfig} setCurrentPage={setCurrentPage} showComponents={["Reader", "Chunker", "Embedder"]} />
       )}
 
       {currentPage === "RAG" && !production && (
-        <RAGComponent baseSetting={baseSetting} settingTemplate={settingTemplate} buttonTitle="Save" settingConfig={baseSetting[settingTemplate]} APIHost={APIHost} RAGConfig={RAGConfig} setRAGConfig={setRAGConfig} showComponents={["Embedder", "Retriever", "Generator"]} />
+        <RAGComponent baseSetting={baseSetting} settingTemplate={settingTemplate} buttonTitle="Save" settingConfig={baseSetting[settingTemplate]} APIHost={APIHost} RAGConfig={RAGConfig} setRAGConfig={setRAGConfig} setCurrentPage={setCurrentPage} showComponents={["Embedder", "Retriever", "Generator"]} />
       )}
 
       {currentPage === "SETTINGS" && !production && (

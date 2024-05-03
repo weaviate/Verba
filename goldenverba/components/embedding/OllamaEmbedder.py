@@ -14,7 +14,7 @@ class OllamaEmbedder(Embedder):
     def __init__(self):
         super().__init__()
         self.name = "OllamaEmbedder"
-        self.requires_env = ["OLLAMA_URL","OLLAMA_MODEL"]
+        self.requires_env = ["OLLAMA_URL", "OLLAMA_MODEL"]
         self.description = "Embeds and retrieves objects using Ollama and the model specified in the environment variable"
         self.vectorizer = "OLLAMA"
         self.url = os.environ.get("OLLAMA_URL", "")
@@ -44,13 +44,10 @@ class OllamaEmbedder(Embedder):
         try:
             embeddings = []
             embedding_url = self.url + "/api/embeddings"
-            data = {
-                "model": self.model,
-                "prompt": chunk
-            }
+            data = {"model": self.model, "prompt": chunk}
             response = requests.post(embedding_url, json=data)
             json_data = json.loads(response.text)
-            embeddings = json_data.get("embedding",[])
+            embeddings = json_data.get("embedding", [])
             return embeddings
 
         except Exception:

@@ -6,8 +6,15 @@ from weaviate import Client
 
 load_dotenv()
 
-VECTORIZERS = {"text2vec-openai", "text2vec-cohere", "text2vec-palm",}  # Needs to match with Weaviate modules
-EMBEDDINGS = {"MiniLM","OLLAMA"}  # Custom Vectors
+VECTORIZERS = {
+    "text2vec-openai",
+    "text2vec-cohere",
+}  # Needs to match with Weaviate modules
+EMBEDDINGS = {"MiniLM", "OLLAMA"}  # Custom Vectors
+
+google_project = os.getenv("GOOGLE_CLOUD_PROJECT")
+if google_project != None:
+    VECTORIZERS.add("text2vec-palm")
 
 
 def strip_non_letters(s: str):
@@ -42,11 +49,10 @@ def verify_vectorizer(
 
     # adding specific config for Google
     if vectorizer == "text2vec-palm":
-        project = os.getenv("GOOGLE_CLOUD_PROJECT")
-        if project is not None:
+        if google_project is not None:
             vectorizer_config = {
                 "text2vec-palm": {
-                    "projectId": project,
+                    "projectId": google_project,
                 }
             }
 
@@ -80,7 +86,12 @@ def add_suffix(schema: dict, vectorizer: str) -> tuple[dict, str]:
     """
     modified_schema = schema.copy()
     # Verify Vectorizer and add suffix
-    modified_schema["classes"][0]["class"] = ("VERBA_"+modified_schema["classes"][0]["class"] + "_" + strip_non_letters(vectorizer))
+    modified_schema["classes"][0]["class"] = (
+        "VERBA_"
+        + modified_schema["classes"][0]["class"]
+        + "_"
+        + strip_non_letters(vectorizer)
+    )
     return modified_schema, modified_schema["classes"][0]["class"]
 
 

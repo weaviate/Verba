@@ -21,7 +21,7 @@ from goldenverba.server.types import (
     SearchQueryPayload,
     ImportPayload,
 )
-from goldenverba.server.util import get_config, set_config, setup_managers,reset_config
+from goldenverba.server.util import get_config, set_config, setup_managers, reset_config
 
 load_dotenv()
 
@@ -80,18 +80,14 @@ async def health_check():
     try:
         if manager.client.is_ready():
             return JSONResponse(
-                content={
-                    "message": "Alive!",
-                    "production": production,
-                    "gtag": tag
-                }
+                content={"message": "Alive!", "production": production, "gtag": tag}
             )
         else:
             return JSONResponse(
                 content={
                     "message": "Database not ready!",
                     "production": production,
-                    "gtag": tag
+                    "gtag": tag,
                 },
                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             )
@@ -101,10 +97,11 @@ async def health_check():
             content={
                 "message": f"Healthcheck failed with {str(e)}",
                 "production": production,
-                "gtag": tag
+                "gtag": tag,
             },
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
         )
+
 
 # Get Status meta data
 @app.get("/api/get_status")
@@ -112,7 +109,6 @@ async def get_status():
     msg.info("Retrieving status")
 
     try:
-
         schemas = manager.get_schemas()
         sorted_schemas = dict(
             sorted(schemas.items(), key=lambda item: item[1], reverse=True)
@@ -201,7 +197,9 @@ async def import_data(payload: ImportPayload):
     logging = []
 
     if production:
-        logging.append({"type": "ERROR", "message": "Can't import when in production mode"})
+        logging.append(
+            {"type": "ERROR", "message": "Can't import when in production mode"}
+        )
         return JSONResponse(
             content={
                 "logging": logging,
@@ -210,7 +208,9 @@ async def import_data(payload: ImportPayload):
 
     try:
         set_config(manager, payload.config)
-        documents, logging = manager.import_data(payload.data, payload.textValues, logging)
+        documents, logging = manager.import_data(
+            payload.data, payload.textValues, logging
+        )
 
         return JSONResponse(
             content={
@@ -233,8 +233,8 @@ async def update_config(payload: ConfigPayload):
     if production:
         return JSONResponse(
             content={
-            "status": "200",
-            "status_msg": "Config can't be Updated in Production Mode",
+                "status": "200",
+                "status_msg": "Config can't be Updated in Production Mode",
             }
         )
 

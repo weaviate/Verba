@@ -4,6 +4,7 @@ from weaviate.gql.get import HybridFusion
 from goldenverba.components.chunk import Chunk
 from goldenverba.components.interfaces import Embedder, Retriever
 
+
 class WindowRetriever(Retriever):
     """
     WindowRetriever that retrieves chunks and their surrounding context depending on the window size.

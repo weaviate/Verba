@@ -21,9 +21,10 @@ interface RAGComponentProps {
     buttonTitle: string;
     settingTemplate: string
     baseSetting: Settings
+    setCurrentPage: (p: any) => void;
 }
 
-const RAGComponent: React.FC<RAGComponentProps> = ({ APIHost, settingConfig, RAGConfig, setRAGConfig, showComponents, buttonTitle, baseSetting, settingTemplate }) => {
+const RAGComponent: React.FC<RAGComponentProps> = ({ APIHost, setCurrentPage, settingConfig, RAGConfig, setRAGConfig, showComponents, buttonTitle, baseSetting, settingTemplate }) => {
 
     const [currentRAGSettings, setCurrentRAGSettings] = useState<RAGConfig>(JSON.parse(JSON.stringify(RAGConfig)))
     const [files, setFiles] = useState<FileList | null>(null)
@@ -38,6 +39,7 @@ const RAGComponent: React.FC<RAGComponentProps> = ({ APIHost, settingConfig, RAG
             importData()
         } else {
             importConfig()
+            setCurrentPage("CHAT")
         }
     }
 

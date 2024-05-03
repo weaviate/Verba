@@ -20,26 +20,30 @@ class GitHubReader(Reader):
     def __init__(self):
         super().__init__()
         self.name = "GitHubReader"
-        self.type = "URL" 
+        self.type = "URL"
         self.requires_env = ["GITHUB_TOKEN"]
         self.description = "Retrieves all text files (.txt, .md, .mdx, .json) from a GitHub Repository and imports them into Verba. Use this format {owner}/{repo}/{branch}/{folder}"
 
     def load(
-        self,
-        fileData: list[FileData], textValues: list[str], logging: list[dict]
+        self, fileData: list[FileData], textValues: list[str], logging: list[dict]
     ) -> tuple[list[Document], list[str]]:
-        
-        if(len(textValues) <= 0):
-            logging.append({"type":"ERROR", "message":f"No GitHub Link detected"})
+
+        if len(textValues) <= 0:
+            logging.append({"type": "ERROR", "message": f"No GitHub Link detected"})
             return [], logging
         elif textValues[0] == "":
-            logging.append({"type":"ERROR", "message":f"Empty GitHub URL"})
+            logging.append({"type": "ERROR", "message": f"Empty GitHub URL"})
             return [], logging
 
         github_link = textValues[0]
 
         if not self.is_valid_github_path(github_link):
-            logging.append({"type":"ERROR", "message":f"GitHub URL {github_link} not matching pattern: owner/repo/branch/folder"})
+            logging.append(
+                {
+                    "type": "ERROR",
+                    "message": f"GitHub URL {github_link} not matching pattern: owner/repo/branch/folder",
+                }
+            )
             return [], logging
 
         documents = []
@@ -47,7 +51,7 @@ class GitHubReader(Reader):
 
         for _file in docs:
             try:
-                logging.append({"type":"INFO", "message":f"Downloading {_file}"})
+                logging.append({"type": "INFO", "message": f"Downloading {_file}"})
                 content, link, _path = self.download_file(github_link, _file)
                 if ".json" in _file:
                     json_obj = json.loads(str(content))
@@ -71,7 +75,12 @@ class GitHubReader(Reader):
 
             except Exception as e:
                 msg.warn(f"Couldn't load, skipping {_file}: {str(e)}")
-                logging.append({"type":"WARNING", "message":f"Couldn't load, skipping {_file}: {str(e)}"})
+                logging.append(
+                    {
+                        "type": "WARNING",
+                        "message": f"Couldn't load, skipping {_file}: {str(e)}",
+                    }
+                )
                 continue
 
         return documents, logging
@@ -109,7 +118,12 @@ class GitHubReader(Reader):
         msg.info(
             f"Fetched {len(files)} filenames from {url} (checking folder {folder_path})"
         )
-        logging.append({"type":"SUCCESS", "message":f"Fetched {len(files)} filenames from {url} (checking folder {folder_path})"})
+        logging.append(
+            {
+                "type": "SUCCESS",
+                "message": f"Fetched {len(files)} filenames from {url} (checking folder {folder_path})",
+            }
+        )
         return files, logging
 
     def download_file(self, path: str, file_path: str) -> str:
@@ -141,10 +155,10 @@ class GitHubReader(Reader):
     def is_valid_github_path(self, path):
         # Regex pattern to match {owner}/{repo}/{branch}/{folder}
         # {folder} is optional and can include subfolders
-        pattern = r'^([^/]+)/([^/]+)/([^/]+)(/[^/]*)*$'
-        
+        pattern = r"^([^/]+)/([^/]+)/([^/]+)(/[^/]*)*$"
+
         # Match the pattern with the provided path
         match = re.match(pattern, path)
-        
+
         # Return True if the pattern matches, False otherwise
         return bool(match)
