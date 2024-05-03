@@ -38,6 +38,7 @@ All notable changes to this project will be documented in this file.
 - Added .CSV support (all file types available in Unstructured IO)
 - More test data
 - Add Ollama as Generator and Embedding Component
+- Add Support for Cohere R+
 
 ### Changed
 - Changed to AppRouter framework
