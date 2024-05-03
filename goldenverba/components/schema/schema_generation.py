@@ -6,8 +6,8 @@ from weaviate import Client
 
 load_dotenv()
 
-VECTORIZERS = {"text2vec-openai", "text2vec-cohere"}  # Needs to match with Weaviate modules
-EMBEDDINGS = {"MiniLM"}  # Custom Vectors
+VECTORIZERS = {"text2vec-openai", "text2vec-cohere", "text2vec-palm",}  # Needs to match with Weaviate modules
+EMBEDDINGS = {"MiniLM","OLLAMA"}  # Custom Vectors
 
 
 def strip_non_letters(s: str):
@@ -27,19 +27,28 @@ def verify_vectorizer(
         skip_properties = []
     modified_schema = schema.copy()
 
-    #adding specific config for Azure OpenAI
+    # adding specific config for Azure OpenAI
     vectorizer_config = None
-    if os.getenv("OPENAI_API_TYPE") == "azure" and vectorizer=="text2vec-openai":
+    if os.getenv("OPENAI_API_TYPE") == "azure" and vectorizer == "text2vec-openai":
         resourceName = os.getenv("AZURE_OPENAI_RESOURCE_NAME")
         model = os.getenv("AZURE_OPENAI_EMBEDDING_MODEL")
         if resourceName is None or model is None:
-            raise Exception("AZURE_OPENAI_RESOURCE_NAME and AZURE_OPENAI_EMBEDDING_MODEL should be set when OPENAI_API_TYPE is azure. Resource name is XXX in http://XXX.openai.azure.com")
-        vectorizer_config = { 
-            "text2vec-openai": {
-                    "deploymentId": model,
-                    "resourceName": resourceName
-            }
+            raise Exception(
+                "AZURE_OPENAI_RESOURCE_NAME and AZURE_OPENAI_EMBEDDING_MODEL should be set when OPENAI_API_TYPE is azure. Resource name is XXX in http://XXX.openai.azure.com"
+            )
+        vectorizer_config = {
+            "text2vec-openai": {"deploymentId": model, "resourceName": resourceName}
         }
+
+    # adding specific config for Google
+    if vectorizer == "text2vec-palm":
+        project = os.getenv("GOOGLE_CLOUD_PROJECT")
+        if project is not None:
+            vectorizer_config = {
+                "text2vec-palm": {
+                    "projectId": project,
+                }
+            }
 
     # Verify Vectorizer
     if vectorizer in VECTORIZERS:
@@ -71,9 +80,7 @@ def add_suffix(schema: dict, vectorizer: str) -> tuple[dict, str]:
     """
     modified_schema = schema.copy()
     # Verify Vectorizer and add suffix
-    modified_schema["classes"][0]["class"] = (
-        modified_schema["classes"][0]["class"] + "_" + strip_non_letters(vectorizer)
-    )
+    modified_schema["classes"][0]["class"] = ("VERBA_"+modified_schema["classes"][0]["class"] + "_" + strip_non_letters(vectorizer))
     return modified_schema, modified_schema["classes"][0]["class"]
 
 
@@ -81,9 +88,9 @@ def reset_schemas(
     client: Client = None,
     vectorizer: str = None,
 ):
-    doc_name = "Document_" + strip_non_letters(vectorizer)
-    chunk_name = "Chunk_" + strip_non_letters(vectorizer)
-    cache_name = "Cache_" + strip_non_letters(vectorizer)
+    doc_name = "VERBA_Document_" + strip_non_letters(vectorizer)
+    chunk_name = "VERBA_Chunk_" + strip_non_letters(vectorizer)
+    cache_name = "VERBA_Cache_" + strip_non_letters(vectorizer)
 
     client.schema.delete_class(doc_name)
     client.schema.delete_class(chunk_name)
@@ -318,7 +325,7 @@ def init_suggestion(
     SCHEMA_SUGGESTION = {
         "classes": [
             {
-                "class": "Suggestion",
+                "class": "VERBA_Suggestion",
                 "description": "List of possible prompts",
                 "properties": [
                     {
@@ -332,7 +339,7 @@ def init_suggestion(
     }
 
     suggestion_schema = SCHEMA_SUGGESTION
-    suggestion_name = "Suggestion"
+    suggestion_name = "VERBA_Suggestion"
 
     if client.schema.exists(suggestion_name):
         if check:

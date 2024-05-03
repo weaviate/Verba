@@ -37,7 +37,7 @@ setup(
         "cohere==4.33",
         "accelerate==0.29.2",
         "requests",
-        "pypdf2",
+        "pypdf==4.2.0",
     ],
     extras_require={
         "dev": ["pytest", "wheel", "twine", "black>=23.7.0", "setuptools"],
@@ -45,7 +45,11 @@ setup(
             "sentence-transformers",
             "transformers",
             "torch",
-            "huggingface_hub"
+            "huggingface_hub",
+            "accelerate==0.29.2",
         ],
+        "google": [
+            "vertexai==1.46.0",
+        ]
     },
 )

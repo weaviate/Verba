@@ -1,4 +1,6 @@
 import type { Config } from "tailwindcss";
+const colors = require('tailwindcss/colors')
+
 
 const config: Config = {
   purge: {
@@ -31,13 +33,37 @@ const config: Config = {
   theme: {
     screens: {
       sm: '100px',
-      md: '1024px',
-      lg: '1480px',
+      md: '800px',
+      lg: '1330px',
       full: '1700px',
-      xl: '2000px',
-      '2xl': '1536px',
+    },
+    colors: {
+      transparent: 'transparent',
+      current: 'currentColor',
+      black: colors.black,
+      white: colors.white,
+      gray: colors.gray,
+      emerald: colors.emerald,
+      indigo: colors.indigo,
+      green: colors.green,
+      blue: colors.blue,
+      yellow: colors.yellow,
+      red: colors.red
     },
     extend: {
+      colors: {
+        "bg-verba": "var(--bg-verba, #FEF7F7)",
+        "bg-alt-verba": "var(--bg-alt-verba, #FFFFFF)",
+        "button-verba": "var(--button-verba, #EFEFEF)",
+        "button-hover-verba": "var(--button-hover-verba, #DCDCDC)",
+        "primary-verba": "var(--primary-verba, #FDFF91)",
+        "secondary-verba": "var(--secondary-verba, #90FFA8)",
+        "warning-verba": "var(--warning-verba, #FF8399)",
+        "text-verba": "var(--text-verba, #161616)",
+        "text-alt-verba": "var(--text-alt-verba, #8E8E8E)",
+        "bg-console-verba": "var(--bg-console-verba, #3F3E40)",
+        "text-console-verba": "var(--text-console-verba, #FFFFFF)"
+      },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic":
@@ -45,6 +71,10 @@ const config: Config = {
       },
     },
   },
-  plugins: [],
+  plugins: [require("daisyui"), require('@tailwindcss/typography')],
+
+  daisyui: {
+    themes: ["light", "dark"],
+  },
 };
 export default config;

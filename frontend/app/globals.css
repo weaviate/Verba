@@ -261,10 +261,6 @@
   transition: opacity 0.3s ease-in-out;
 }
 
-button:hover .fade-in-out {
-  opacity: 1;
-}
-
-.hide {
-  opacity: 0;
+.react-colorful {
+  height: 100px;
 }

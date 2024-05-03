@@ -147,7 +147,13 @@ The default package is perfect for getting started quickly and includes support 
 pip install goldenverba
 ```
 
-> This will set you up with all you need to integrate Verba with these services without additional configuration.
+## Google Version (EXPERIMENTAL)
+To use the GoogleEmbedder and GeminiGenerator you need to install the Google Package with `vertexai`. Make sure to include all necessary environment variables in the `.env` file and `secret.json`
+
+```
+pip install goldenverba[google]
+```
+
 
 ## HuggingFace Version
 For those looking to leverage models from the HuggingFace ecosystem, including `SentenceTransformer` and `LLama2`, the HuggingFace version is the ideal choice. This package is optimized for GPU usage to accommodate the high performance demands of these models:
@@ -293,6 +299,19 @@ OPENAI_MODEL="gpt-4"
 WAIT_TIME_BETWEEN_INGESTION_QUERIES_MS="100"
 ```
 
+## Ollama
+
+Verba supports Ollama models. Download and Install Ollama on your device (https://ollama.com/download). Make sure to install your preferred LLM and set the two environment variables:
+
+```
+OLLAMA_URL=<URL to your running Ollama instance>
+OLLAMA_MODEL=<Model you want to use>
+```
+
+Tested with `llama3`, `llama3:70b` and `mistral`. The bigger models generally perform better, small models tend more to hallucinate or not directly answer the query.
+
+> Make sure Ollama Server runs in the background when using and that you don't have any documents imported when changing the model because model may have a different vector dimension which can cause errors.
+
 ## Cohere
 
 Verba supports Cohere Models, to use them, you need to specify the `COHERE_API_KEY` environment variable. You can get it from [Cohere](https://dashboard.cohere.com/)
@@ -301,30 +320,37 @@ Verba supports Cohere Models, to use them, you need to specify the `COHERE_API_K
 COHERE_API_KEY=YOUR-COHERE-KEY
 ```
 
-## HuggingFace
+## Google Embeddings
 
-Verba supports HuggingFace models, such as SentenceTransformers and Llama2. To use them you need the `HF_TOKEN` environment variable. You can get it from [HuggingFace](https://huggingface.co/)
+For the Google Embeddings, Verba is using Vertex AI Studio inside Google Cloud. You can find instructions for obtaining a key [here](https://cloud.google.com/iam/docs/create-short-lived-credentials-direct). If you have the `gcloud` CLI installed, you can run the following command: `gcloud auth print-access-token`. **At the moment, this acccess token must be renewed every hour.**
 
-```
-HF_TOKEN=YOUR-HUGGINGFACE-TOKEN
-```
-
-### Llama2 
-
-To use the Llama2 model from Meta, you first need to request access to it. Read more about accessing the [Llama model here](https://huggingface.co/blog/llama2). To enable the LLama2 model for Verba use:
+You also need to set the `GOOGLE_CLOUD_PROJECT` environment variable to the name of your project.
 
 ```
-LLAMA2-7B-CHAT-HF=True
+GOOGLE_API_KEY=YOUR-GOOGLE-KEY
+GOOGLE_CLOUD_PROJECT=YOUR-CLOUD-PROJECT-KEY
+```
+
+## Google Gemini
+
+To use Google Gemini, you need a service account key, which is a JSON file. To obtain this, go to "project settings" in your Google Cloud console, then to "service accounts". Create a new service account, then create a new key. Download this key and place it in the route of Verba. Name it `gemini_secrets.json` to have it excluded from git automatically. Set the environment variable `GOOGLE_APPLICATION_CREDENTIALS` to the location of this file, e.g. `gemini_secrets.json`.
+
+You also need to set the `GOOGLE_CLOUD_PROJECT` environment variable to the name of your project.
+
+```
+GOOGLE_APPLICATION_CREDENTIALS=LOCATION-OF-YOUR-KEY
+GOOGLE_CLOUD_PROJECT=YOUR-CLOUD-PROJECT-KEY
 ```
 
 ## Unstructured
-Verba supports importing documents through Unstructured (e.g .pdf). To use them you need the `UNSTRUCTURED_API_KEY` environment variable. You can get it from [Unstructured](https://unstructured.io/)
+Verba supports importing documents through Unstructured IO (e.g plain text, .pdf, .csv, and more). To use them you need the `UNSTRUCTURED_API_KEY` and `UNSTRUCTURED_API_URL` environment variable. You can get it from [Unstructured](https://unstructured.io/)
 
 ```
 UNSTRUCTURED_API_KEY=YOUR-UNSTRUCTURED-KEY
 UNSTRUCTURED_API_URL=YOUR-SELF-HOSTED-INSTANCE # If you are self hosting, in the form of `http://localhost:8000/general/v0/general`
 ```
 
+> UNSTRUCTURED_API_URL is set to `https://api.unstructured.io/general/v0/general` by default
 
 
 ## Github

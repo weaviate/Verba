@@ -5,8 +5,8 @@ from weaviate import Client
 from transformers import AutoModel, AutoTokenizer
 from accelerate import Accelerator
 
-from goldenverba.components.embedding.interface import Embedder
-from goldenverba.components.reader.document import Document
+from goldenverba.components.interfaces import Embedder
+from goldenverba.components.document import Document
 
 
 class MiniLMEmbedder(Embedder):
@@ -38,13 +38,13 @@ class MiniLMEmbedder(Embedder):
             )
 
         except Exception as e:
-            msg.warn(str(e))
             pass
 
     def embed(
         self,
         documents: list[Document],
         client: Client,
+        logging: list[dict],
     ) -> bool:
         """Embed verba documents and its chunks to Weaviate
         @parameter: documents : list[Document] - List of Verba documents
@@ -58,7 +58,7 @@ class MiniLMEmbedder(Embedder):
             for chunk in document.chunks:
                 chunk.set_vector(self.vectorize_chunk(chunk.text))
 
-        return self.import_data(documents, client)
+        return self.import_data(documents, client, logging)
 
     def vectorize_chunk(self, chunk) -> list[float]:
         try:

@@ -4,7 +4,7 @@ from collections.abc import Iterator
 
 from dotenv import load_dotenv
 
-from goldenverba.components.generation.interface import Generator
+from goldenverba.components.interfaces import Generator
 
 load_dotenv()
 
@@ -79,7 +79,7 @@ class GPT4Generator(Generator):
         queries: list[str],
         context: list[str],
         conversation: dict = None,
-    ) -> Iterator[dict]:
+    ):
         """Generate a stream of response dicts based on a list of queries and list of contexts, and includes conversational context
         @parameter: queries : list[str] - List of queries
         @parameter: context : list[str] - List of contexts
