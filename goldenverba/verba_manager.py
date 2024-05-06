@@ -1,11 +1,9 @@
 import os
 import ssl
-from typing import Optional
 
 import weaviate
 from dotenv import load_dotenv, find_dotenv
 from wasabi import msg
-from weaviate import Client
 from weaviate.embedded import EmbeddedOptions
 
 import goldenverba.components.schema.schema_generation as schema_manager
@@ -30,11 +28,7 @@ from goldenverba.components.managers import (
     GeneratorManager,
 )
 
-environment_file = find_dotenv()
-if environment_file != "":
-
-    load_dotenv()
-
+load_dotenv()
 
 class VerbaManager:
     """Manages all Verba Components."""

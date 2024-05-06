@@ -1,9 +1,5 @@
-import asyncio
 import os
-from collections.abc import Iterator
-
 from dotenv import load_dotenv
-
 from goldenverba.components.interfaces import Generator
 
 load_dotenv()

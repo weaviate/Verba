@@ -73,6 +73,7 @@ app.mount("/static", StaticFiles(directory=BASE_DIR / "frontend/out"), name="app
 async def serve_frontend():
     return FileResponse(os.path.join(BASE_DIR, "frontend/out/index.html"))
 
+### GET
 
 # Define health check endpoint
 @app.get("/api/health")
@@ -102,12 +103,9 @@ async def health_check():
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
         )
 
-
 # Get Status meta data
 @app.get("/api/get_status")
 async def get_status():
-    msg.info("Retrieving status")
-
     try:
         schemas = manager.get_schemas()
         sorted_schemas = dict(
@@ -135,6 +133,7 @@ async def get_status():
             "error": "",
         }
 
+        msg.info("Status Retrieved")
         return JSONResponse(content=data)
     except Exception as e:
         data = {
@@ -147,6 +146,56 @@ async def get_status():
         msg.fail(f"Status retrieval failed: {str(e)}")
         return JSONResponse(content=data)
 
+# Get Configuration
+@app.get("/api/config")
+async def retrieve_config():
+    try:
+        config = get_config(manager)
+        msg.info("Config Retrieved")
+        return JSONResponse(status_code=200, content={"data": config, "error": ""})
+
+    except Exception as e:
+        msg.warn(f"Could not retrieve configuration: {str(e)}")
+        return JSONResponse(
+            status_code=500,
+            content={
+                "data": {},
+                "error": f"Could not retrieve configuration: {str(e)}",
+            },
+        )
+
+### WEBSOCKETS
+
+@app.websocket("/ws/generate_stream")
+async def websocket_generate_stream(websocket: WebSocket):
+    await websocket.accept()
+    while True:  # Start a loop to keep the connection alive.
+        try:
+            data = await websocket.receive_text()
+            # Parse and validate the JSON string using Pydantic model
+            payload = GeneratePayload.model_validate_json(data)
+            msg.good(f"Received generate stream call for {payload.query}")
+            full_text = ""
+            async for chunk in manager.generate_stream_answer(
+                [payload.query], [payload.context], payload.conversation
+            ):
+                full_text += chunk["message"]
+                if chunk["finish_reason"] == "stop":
+                    chunk["full_text"] = full_text
+                await websocket.send_json(chunk)
+
+        except WebSocketDisconnect:
+            msg.warn("WebSocket connection closed by client.")
+            break  # Break out of the loop when the client disconnects
+
+        except Exception as e:
+            msg.fail(f"WebSocket Error: {str(e)}")
+            await websocket.send_json(
+                {"message": e, "finish_reason": "stop", "full_text": str(e)}
+            )
+        msg.good("Succesfully streamed answer")
+
+### POST
 
 # Reset Verba
 @app.post("/api/reset")
@@ -154,41 +203,24 @@ async def reset_verba(payload: ResetPayload):
     if production:
         return JSONResponse(status_code=200, content={})
 
-    if payload.resetMode == "VERBA":
-        manager.reset()
-    elif payload.resetMode == "DOCUMENTS":
-        manager.reset_documents()
-    elif payload.resetMode == "CACHE":
-        manager.reset_cache()
-    elif payload.resetMode == "SUGGESTIONS":
-        manager.reset_suggestion()
-    elif payload.resetMode == "CONFIG":
-        reset_config()
-
-    msg.info(f"Resetting Verba ({payload.resetMode})")
-
-    return JSONResponse(status_code=200, content={})
-
-
-# Get Configuration
-@app.get("/api/config")
-async def retrieve_config():
-    msg.info("Retrieving configuration")
-
     try:
-        config = get_config(manager)
-        return JSONResponse(status_code=200, content={"data": config, "error": ""})
+        if payload.resetMode == "VERBA":
+            manager.reset()
+        elif payload.resetMode == "DOCUMENTS":
+            manager.reset_documents()
+        elif payload.resetMode == "CACHE":
+            manager.reset_cache()
+        elif payload.resetMode == "SUGGESTIONS":
+            manager.reset_suggestion()
+        elif payload.resetMode == "CONFIG":
+            reset_config()
+
+        msg.info(f"Resetting Verba ({payload.resetMode})")
 
     except Exception as e:
-        msg.warn(f"Could not retrieve configuration: {str(e)}")
-        return JSONResponse(
-            status_code=200,
-            content={
-                "data": {},
-                "error": f"Could not retrieve configuration: {str(e)}",
-            },
-        )
+        msg.warn(f"Failed to reset Verba {str(e)}")
 
+    return JSONResponse(status_code=200, content={})
 
 # Receive query and return chunks and query answer
 @app.post("/api/import")
@@ -226,7 +258,6 @@ async def import_data(payload: ImportPayload):
             }
         )
 
-
 @app.post("/api/set_config")
 async def update_config(payload: ConfigPayload):
 
@@ -234,11 +265,14 @@ async def update_config(payload: ConfigPayload):
         return JSONResponse(
             content={
                 "status": "200",
-                "status_msg": "Config can't be Updated in Production Mode",
+                "status_msg": "Config can't be updated in Production Mode",
             }
         )
 
-    set_config(manager, payload.config)
+    try:
+        set_config(manager, payload.config)
+    except Exception as e:
+        msg.warn(f"Failed to set new Config {str(e)}")
 
     return JSONResponse(
         content={
@@ -246,7 +280,6 @@ async def update_config(payload: ConfigPayload):
             "status_msg": "Config Updated",
         }
     )
-
 
 # Receive query and return chunks and query answer
 @app.post("/api/query")
@@ -277,7 +310,7 @@ async def query(payload: QueryPayload):
                     "chunks": [],
                     "took": 0,
                     "context": "",
-                    "error": "Chunks could be retrieved",
+                    "error": "No Chunks Available",
                 }
             )
 
@@ -291,72 +324,15 @@ async def query(payload: QueryPayload):
         )
 
     except Exception as e:
-        msg.fail(f"Query failed: {str(e)}")
+        msg.warn(f"Query failed: {str(e)}")
         return JSONResponse(
             content={
-                "error": f"Something went wrong! {str(e)}",
-                "context": "",
-                "documents": [],
+                    "chunks": [],
+                    "took": 0,
+                    "context": "",
+                    "error": f"Something went wrong: {str(e)}",
             }
         )
-
-
-# Receive query and return chunks and query answer
-@app.post("/api/generate")
-async def generate(payload: GeneratePayload):
-    msg.good(f"Received generate call for: {payload.query}")
-    try:
-        answer = await manager.generate_answer(
-            [payload.query], [payload.context], payload.conversation
-        )
-
-        msg.good(f"Succesfully generated answer: {payload.query}")
-
-        return JSONResponse(
-            content={
-                "system": answer,
-            }
-        )
-
-    except Exception as e:
-        raise
-        msg.fail(f"Answer Generation failed: {str(e)}")
-        return JSONResponse(
-            content={
-                "system": f"Something went wrong! {str(e)}",
-            }
-        )
-
-
-@app.websocket("/ws/generate_stream")
-async def websocket_generate_stream(websocket: WebSocket):
-    await websocket.accept()
-    while True:  # Start a loop to keep the connection alive.
-        try:
-            data = await websocket.receive_text()
-            # Parse and validate the JSON string using Pydantic model
-            payload = GeneratePayload.model_validate_json(data)
-            msg.good(f"Received generate stream call for {payload.query}")
-            full_text = ""
-            async for chunk in manager.generate_stream_answer(
-                [payload.query], [payload.context], payload.conversation
-            ):
-                full_text += chunk["message"]
-                if chunk["finish_reason"] == "stop":
-                    chunk["full_text"] = full_text
-                await websocket.send_json(chunk)
-
-        except WebSocketDisconnect:
-            msg.warn("WebSocket connection closed by client.")
-            break  # Break out of the loop when the client disconnects
-
-        except Exception as e:
-            msg.fail(f"WebSocket Error: {e}")
-            await websocket.send_json(
-                {"message": e, "finish_reason": "stop", "full_text": e}
-            )
-        msg.good("Succesfully streamed answer")
-
 
 # Retrieve auto complete suggestions based on user input
 @app.post("/api/suggestions")
@@ -375,7 +351,6 @@ async def suggestions(payload: QueryPayload):
                 "suggestions": [],
             }
         )
-
 
 # Retrieve specific document based on UUID
 @app.post("/api/get_document")
@@ -413,8 +388,7 @@ async def get_document(payload: GetDocumentPayload):
             }
         )
 
-
-## Retrieve all documents imported to Weaviate
+## Retrieve and search documents imported to Weaviate
 @app.post("/api/get_all_documents")
 async def get_all_documents(payload: SearchQueryPayload):
     # TODO Standarize Document Creation
@@ -488,8 +462,7 @@ async def get_all_documents(payload: SearchQueryPayload):
             }
         )
 
-
-# Retrieve specific document based on UUID
+# Delete specific document based on UUID
 @app.post("/api/delete_document")
 async def delete_document(payload: GetDocumentPayload):
     if production:

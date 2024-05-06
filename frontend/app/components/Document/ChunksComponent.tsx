@@ -9,7 +9,7 @@ import ComponentStatus from "../Status/ComponentStatus";
 import { FaSearch } from "react-icons/fa";
 import { FaDatabase } from "react-icons/fa";
 
-import { GrDocumentText } from "react-icons/gr";
+import { IoSparkles } from "react-icons/io5";
 
 import UserModalComponent from "../Navigation/UserModal";
 
@@ -92,16 +92,19 @@ const ChunksComponent: React.FC<ChunksComponentComponentProps> = ({
               <button
                 key={chunk.doc_name + index}
                 onClick={() => setSelectedChunk(chunk)}
-                className={`btn md:btn-base lg:btn-lg sm:w-2/3 md:w-1/3 lg:w-full flex justify-start items-center gap-5 ${selectedChunk?.chunk_id === chunk.chunk_id && selectedChunk.doc_uuid === chunk.doc_uuid ? "bg-secondary-verba" : "bg-button-verba"} hover:button-hover-verba`}
+                className={`btn md:btn-base bg-button-verba hover:bg-button-hover-verba border-none lg:btn-lg sm:w-2/3 md:w-1/3 lg:w-full flex justify-start items-center gap-5 ${selectedChunk?.chunk_id === chunk.chunk_id && selectedChunk.doc_uuid === chunk.doc_uuid ? "bg-secondary-verba" : "bg-button-verba"} hover:button-hover-verba`}
               >
                 <div
                   className="tooltip text-xs"
                   data-tip={`Score: ${Math.round(chunk.score * 100)}`}
                 >
                   <button
-                    className={`btn btn-xs text-xs btn-circle lg:btn-sm bg-bg-alt-verba hover:bg-primary-verba flex md:text-sm lg:text-base`}
+                    className={`btn btn-xs border-none text-xs btn-circle lg:btn-sm bg-bg-alt-verba hover:bg-primary-verba flex md:text-sm lg:text-base`}
                   >
-                    <CountUp end={index + 1} className="text-sm" />
+                    <CountUp
+                      end={index + 1}
+                      className="text-sm text-text-verba"
+                    />
                   </button>
                 </div>
                 <div className="flex flex-col items-start truncate sm:w-1/2">
@@ -117,9 +120,9 @@ const ChunksComponent: React.FC<ChunksComponentComponentProps> = ({
           {context !== "" && (
             <button
               onClick={openContextModal}
-              className="btn flex gap-2 w-full border-none bg-button-verba hover:bg-button-hover-verba"
+              className="btn flex gap-2 w-full border-none bg-button-verba text-text-verba hover:bg-button-hover-verba"
             >
-              <GrDocumentText />
+              <IoSparkles className="text-text-verba" />
               <p className="text-text-verba text-xs">See Context</p>
             </button>
           )}

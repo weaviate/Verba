@@ -25,5 +25,5 @@ export const detectHost = async (): Promise<string> => {
     return "";
   }
 
-  throw new Error("Both health checks failed");
+  throw new Error("Both health checks failed, please check the Verba Server");
 };

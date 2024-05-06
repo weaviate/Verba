@@ -3,6 +3,7 @@
 import React from "react";
 import { Message } from "./types";
 import ReactMarkdown from "react-markdown";
+import { FaDatabase } from "react-icons/fa";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import {
   oneDark,
@@ -26,8 +27,9 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
       className={`flex items-end gap-2 ${message.type === "user" ? "justify-end" : "justify-start"}`}
     >
       <div
-        className={`flex flex-col p-4 rounded-xl animate-press-in shadow-md sm:text-sm md:text-base ${message.type === "user" ? "bg-primary-verba" : "bg-bg-verba"}`}
+        className={`flex flex-col items-start p-4 rounded-xl animate-press-in shadow-md sm:text-sm md:text-base ${message.type === "user" ? "bg-primary-verba" : "bg-bg-verba"}`}
       >
+        {message.cached && <FaDatabase size={12} className="text-text-verba" />}
         {message.type === "system" ? (
           <ReactMarkdown
             className="prose md:prose-base sm:prose-sm p-3 prose-pre:bg-bg-alt-verba"

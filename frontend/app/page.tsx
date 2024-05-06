@@ -51,6 +51,8 @@ export default function Home() {
           if (health_data) {
             setProduction(health_data.production);
             setGtag(health_data.gtag);
+          } else {
+            console.warn("Could not retrieve health data");
           }
 
           const response = await fetch(host + "/api/config", {
@@ -60,7 +62,7 @@ export default function Home() {
 
           if (data) {
             if (data.error) {
-              console.log(data.error);
+              console.error(data.error);
             }
 
             if (data.data.RAG) {

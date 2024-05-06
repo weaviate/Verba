@@ -12,7 +12,7 @@ class WindowRetriever(Retriever):
 
     def __init__(self):
         super().__init__()
-        self.description = "WindowRetriever uses Hybrid Search to retrieve relevant chunks and adds their surrounding context"
+        self.description = "Retrieve relevant chunks and their surrounding context using Semantic and Keyword Search (Hybrid)"
         self.name = "WindowRetriever"
 
     def retrieve(

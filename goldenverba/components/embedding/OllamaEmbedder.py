@@ -1,5 +1,4 @@
 from tqdm import tqdm
-from wasabi import msg
 from weaviate import Client
 import os
 import requests

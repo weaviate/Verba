@@ -98,7 +98,7 @@ const AdminConsoleComponent: React.FC<AdminConsoleComponentProps> = ({
           <div className="gap-2 grid grid-cols-2">
             <button
               onClick={openResetVerba}
-              className="btn bg-button-verba text-text-verba hover:bg-warning-verba flex gap-2"
+              className="btn bg-button-verba text-text-verba border-none hover:bg-warning-verba flex gap-2"
             >
               <div className="hidden lg:flex">
                 <MdDelete />
@@ -107,7 +107,7 @@ const AdminConsoleComponent: React.FC<AdminConsoleComponentProps> = ({
             </button>
             <button
               onClick={openResetDocuments}
-              className="btn bg-button-verba text-text-verba hover:bg-warning-verba flex gap-2"
+              className="btn bg-button-verba text-text-verba border-none hover:bg-warning-verba flex gap-2"
             >
               <div className="hidden lg:flex">
                 <MdDelete />
@@ -116,7 +116,7 @@ const AdminConsoleComponent: React.FC<AdminConsoleComponentProps> = ({
             </button>
             <button
               onClick={openResetCache}
-              className="btn bg-button-verba text-text-verba hover:bg-warning-verba flex gap-2"
+              className="btn bg-button-verba text-text-verba border-none hover:bg-warning-verba flex gap-2"
             >
               <div className="hidden lg:flex">
                 <MdDelete />
@@ -125,7 +125,7 @@ const AdminConsoleComponent: React.FC<AdminConsoleComponentProps> = ({
             </button>
             <button
               onClick={openResetSuggestions}
-              className="btn bg-button-verba text-text-verba hover:bg-warning-verba flex gap-2"
+              className="btn bg-button-verba text-text-verba border-none hover:bg-warning-verba flex gap-2"
             >
               <div className="hidden lg:flex">
                 <MdDelete />
@@ -134,7 +134,7 @@ const AdminConsoleComponent: React.FC<AdminConsoleComponentProps> = ({
             </button>
             <button
               onClick={openConfigSuggestions}
-              className="btn bg-button-verba text-text-verba hover:bg-warning-verba flex gap-2"
+              className="btn bg-button-verba text-text-verba border-none hover:bg-warning-verba flex gap-2"
             >
               <div className="hidden lg:flex">
                 <MdDelete />

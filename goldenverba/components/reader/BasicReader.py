@@ -23,7 +23,7 @@ class BasicReader(Reader):
     def __init__(self):
         super().__init__()
         self.name = "BasicReader"
-        self.description = "Use this light-weight reader for normal text, PDF, markdown, and json files."
+        self.description = "Imports plain text, pdf, markdown, and json files."
         self.requires_library = ["pypdf"]
 
     def load(

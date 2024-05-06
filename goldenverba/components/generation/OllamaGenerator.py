@@ -1,8 +1,6 @@
 import os
 
-from wasabi import msg
 import json
-import requests
 import aiohttp
 
 from goldenverba.components.interfaces import Generator
@@ -12,7 +10,7 @@ class OllamaGenerator(Generator):
     def __init__(self):
         super().__init__()
         self.name = "OllamaGenerator"
-        self.description = "Generator using a local running Ollama Model"
+        self.description = "Generator using a local running Ollama Model specified in the ` OLLAMA_MODEL` variable"
         self.requires_env = ["OLLAMA_URL", "OLLAMA_MODEL"]
         self.streamable = True
         self.context_window = 10000

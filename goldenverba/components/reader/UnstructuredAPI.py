@@ -1,8 +1,6 @@
 import base64
-import glob
 import os
 from datetime import datetime
-from pathlib import Path
 import io
 
 import requests

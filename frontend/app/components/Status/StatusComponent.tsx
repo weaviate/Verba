@@ -28,40 +28,6 @@ const StatusComponent: React.FC<StatusComponentComponentProps> = ({
 
   useEffect(() => {
     if (APIHost != null) {
-      const fetchStatus = async () => {
-        try {
-          setIsFetching(true);
-
-          const response = await fetch(APIHost + "/api/get_status", {
-            method: "GET",
-          });
-          const data: StatusPayload = await response.json();
-
-          if (data) {
-            if (data.error) {
-              console.log(data.error);
-            }
-
-            setType(data.type);
-            setConnected("Online");
-            setLibraries(data.libraries);
-            setVariables(data.variables);
-            setSchemas(data.schemas);
-            setIsFetching(false);
-          } else {
-            console.warn("Status could not be retrieved");
-          }
-        } catch (error) {
-          console.error("Failed to fetch document:", error);
-          setConnected("Offline");
-          setType(null);
-          setLibraries(null);
-          setVariables(null);
-          setSchemas(null);
-          setIsFetching(false);
-        }
-      };
-
       fetchStatus();
     } else {
       console.warn("Missing API Host for retrieving status");
@@ -127,6 +93,7 @@ const StatusComponent: React.FC<StatusComponentComponentProps> = ({
       setIsFetching(true);
       removeMessagesFromLocalStorage("VERBA_CONVERSATION");
       removeMessagesFromLocalStorage("VERBA_CHUNKS");
+      removeMessagesFromLocalStorage("VERBA_CONTEXT");
 
       const response = await fetch(APIHost + "/api/reset", {
         method: "POST",
