@@ -24,6 +24,7 @@ interface ChatComponentProps {
 const ChatComponent: React.FC<ChatComponentProps> = ({ APIHost, settingConfig, setCurrentPage, RAGConfig, production }) => {
 
     const [chunks, setChunks] = useState<DocumentChunk[]>([])
+    const [context, setContext] = useState("")
     const [chunkTime, setChunkTime] = useState(0);
     const [selectedChunk, setSelectedChunk] = useState<DocumentChunk | null>(null)
 
@@ -33,14 +34,14 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ APIHost, settingConfig, s
             {/* Chat Interface */}
             <div className='sm:w-full md:w-1/2 lg:w-2/6 flex flex-col gap-2'>
                 <InfoComponent settingConfig={settingConfig} tooltip_text={chat_interface_info} display_text='Chat Interface' />
-                <ChatInterfaceComponent production={production} RAGConfig={RAGConfig} settingConfig={settingConfig} APIHost={APIHost} setChunks={setChunks} setChunkTime={setChunkTime} setCurrentPage={setCurrentPage} />
+                <ChatInterfaceComponent setContext={setContext} production={production} RAGConfig={RAGConfig} settingConfig={settingConfig} APIHost={APIHost} setChunks={setChunks} setChunkTime={setChunkTime} setCurrentPage={setCurrentPage} />
             </div>
 
             <div className='flex lg:flex-row sm:flex-col justify-between items-start sm:w-full md:w-1/2 lg:w-4/6 gap-3'>
                 {/* Chunk Selection */}
                 <div className='sm:w-full lg:w-1/4 flex flex-col gap-2'>
                     <InfoComponent settingConfig={settingConfig} tooltip_text={chunk_interface_info} display_text='Relevant Context' />
-                    <ChunksComponent production={production} chunks={chunks} RAGConfig={RAGConfig} selectedChunk={selectedChunk} setSelectedChunk={setSelectedChunk} chunkTime={chunkTime} setCurrentPage={setCurrentPage} />
+                    <ChunksComponent context={context} production={production} chunks={chunks} RAGConfig={RAGConfig} selectedChunk={selectedChunk} setSelectedChunk={setSelectedChunk} chunkTime={chunkTime} setCurrentPage={setCurrentPage} />
                 </div>
 
                 {/* Document Viewer */}

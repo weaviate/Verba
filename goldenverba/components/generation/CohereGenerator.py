@@ -17,7 +17,7 @@ class CohereGenerator(Generator):
         self.requires_env = ["COHERE_API_KEY"]
         self.streamable = True
         self.model = "command-r-plus"
-        self.context_window = 3000
+        self.context_window = 10000
         self.url = "https://api.cohere.ai/v1/chat"
 
     async def generate_stream(

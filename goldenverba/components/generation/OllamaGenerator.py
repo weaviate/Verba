@@ -15,7 +15,7 @@ class OllamaGenerator(Generator):
         self.description = "Generator using a local running Ollama Model"
         self.requires_env = ["OLLAMA_URL", "OLLAMA_MODEL"]
         self.streamable = True
-        self.context_window = 3000
+        self.context_window = 10000
 
     async def generate_stream(
         self,
@@ -43,6 +43,9 @@ class OllamaGenerator(Generator):
         if conversation is None:
             conversation = {}
         messages = self.prepare_messages(queries, context, conversation)
+
+        print(messages)
+        print(queries)
 
         try:
             data = {"model": model, "messages": messages}

@@ -15,7 +15,7 @@ class OllamaEmbedder(Embedder):
         super().__init__()
         self.name = "OllamaEmbedder"
         self.requires_env = ["OLLAMA_URL", "OLLAMA_MODEL"]
-        self.description = "Embeds and retrieves objects using Ollama and the model specified in the environment variable"
+        self.description = "Embeds and retrieves objects using Ollama and the model specified in the environment variable 'OLLAMA_MODEL'"
         self.vectorizer = "OLLAMA"
         self.url = os.environ.get("OLLAMA_URL", "")
         self.model = os.environ.get("OLLAMA_MODEL", "")
@@ -36,7 +36,7 @@ class OllamaEmbedder(Embedder):
             documents, total=len(documents), desc="Vectorizing document chunks"
         ):
             for chunk in tqdm(document.chunks, total=len(document.chunks), desc="Vectorizing Chunks"):
-                chunk.set_vector(self.vectorize_chunk(chunk.text))
+                chunk.set_vector(self.vectorize_chunk(document.name + " : " + chunk.text))
 
         return self.import_data(documents, client, logging)
 

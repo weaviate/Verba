@@ -22,6 +22,7 @@ interface ChatInterfaceComponentProps {
     setChunks: (c: DocumentChunk[]) => void
     setChunkTime: (t: number) => void
     setCurrentPage: (p: any) => void;
+    setContext: (c: string) => void;
     RAGConfig: RAGConfig | null;
     production: boolean;
 }
@@ -32,6 +33,7 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
     setChunks,
     setChunkTime,
     setCurrentPage,
+    setContext,
     production,
     RAGConfig
 }) => {
@@ -91,6 +93,7 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
 
         setMessages(getMessagesFromLocalStorage("VERBA_CONVERSATION"))
         setChunks(getChunksFromLocalStorage("VERBA_CHUNKS"))
+        setContext(getContextFromLocalStorage("VERBA_CONTEXT"))
 
         const socketHost = getWebSocketApiHost()
         const localSocket = new WebSocket(socketHost);
@@ -192,6 +195,12 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
         }
     };
 
+    const saveContextToLocalStorage = (key: string, value: string) => {
+        if (typeof window !== 'undefined') { // Check if window is defined
+            localStorage.setItem(key, value);
+        }
+    };
+
     const getMessagesFromLocalStorage = (key: string) => {
         if (typeof window !== 'undefined') {
             const saved = localStorage.getItem(key);
@@ -227,6 +236,21 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
             return []; // Exit early if data isn't valid JSON
         }
         return []; // Return a default value or null if not found
+    };
+
+    const getContextFromLocalStorage = (key: string) => {
+        try {
+            if (typeof window !== 'undefined') {
+                const saved = localStorage.getItem(key);
+                if (saved) {
+                    return saved
+                }
+            }
+        } catch (e) {
+            console.error("Failed to load context from local storage:", e);
+            return ""; // Exit early if data isn't valid JSON
+        }
+        return ""; // Return a default value or null if not found
     };
 
     const removeChunksFromLocalStorage = (key: string) => {
@@ -292,6 +316,8 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
 
                     if (data.context) {
                         streamResponses(sendInput, data.context)
+                        setContext(data.context)
+                        saveContextToLocalStorage("VERBA_CONTEXT", data.context)
                         setFetchingStatus("RESPONSE")
                     }
                 } else {
@@ -418,7 +444,7 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
                         <IoMdSend size={18} />
                     </button>
                     <div className="tooltip text-text-verba" data-tip="Reset Conversation">
-                        <button type='button' onClick={() => { removeMessagesFromLocalStorage("VERBA_CONVERSATION"); removeChunksFromLocalStorage("VERBA_CHUNKS"); setChunks([]); setMessages([{ type: "system", content: settingConfig.Customization.settings.intro_message.text }]); setUserInput(""); setSuggestions([]) }} className='btn btn-circle border-none shadow-none bg-bg-alt-verba hover:bg-secondary-verba'>
+                        <button type='button' onClick={() => { removeMessagesFromLocalStorage("VERBA_CONVERSATION"); removeChunksFromLocalStorage("VERBA_CHUNKS"); setChunks([]); setMessages([{ type: "system", content: settingConfig.Customization.settings.intro_message.text }]); setUserInput(""); setSuggestions([]); setContext("") }} className='btn btn-circle border-none shadow-none bg-bg-alt-verba hover:bg-secondary-verba'>
                             <IoIosRefresh size={18} />
                         </button>
                     </div>

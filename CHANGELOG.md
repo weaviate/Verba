@@ -39,6 +39,8 @@ All notable changes to this project will be documented in this file.
 - More test data
 - Add Ollama as Generator and Embedding Component
 - Add Support for Cohere R+
+- Improved WindowRetriever Context Generation
+- Show RAW Context in Frontend + Save in LocalStorage
 
 ### Changed
 - Changed to AppRouter framework

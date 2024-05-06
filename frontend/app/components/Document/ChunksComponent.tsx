@@ -9,12 +9,17 @@ import ComponentStatus from '../Status/ComponentStatus';
 import { FaSearch } from "react-icons/fa";
 import { FaDatabase } from "react-icons/fa";
 
+import { GrDocumentText } from "react-icons/gr";
+
+import UserModalComponent from '../Navigation/UserModal';
+
 interface ChunksComponentComponentProps {
     chunks: DocumentChunk[]
     selectedChunk: DocumentChunk | null
     chunkTime: number;
     setSelectedChunk: (c: DocumentChunk | null) => void;
     setCurrentPage: (p: any) => void;
+    context: string;
     RAGConfig: RAGConfig | null;
     production: boolean;
 }
@@ -23,6 +28,7 @@ const ChunksComponent: React.FC<ChunksComponentComponentProps> = ({
     chunks,
     selectedChunk,
     chunkTime,
+    context,
     setSelectedChunk,
     setCurrentPage,
     RAGConfig,
@@ -36,6 +42,13 @@ const ChunksComponent: React.FC<ChunksComponentComponentProps> = ({
             setSelectedChunk(null)
         }
     }, [chunks]);
+
+    const openContextModal = () => {
+        const modal = document.getElementById('context_modal');
+        if (modal instanceof HTMLDialogElement) {
+            modal.showModal();
+        }
+    }
 
     return (
         <div className='flex flex-col gap-2' >
@@ -72,8 +85,17 @@ const ChunksComponent: React.FC<ChunksComponentComponentProps> = ({
                             </div>
                         </button>
                     ))}
+                    {context !== "" && (
+                        <button onClick={openContextModal} className='btn flex gap-2 w-full border-none bg-button-verba hover:bg-button-hover-verba'>
+                            <GrDocumentText />
+                            <p className='text-text-verba text-xs'>
+                                See Context
+                            </p>
+                        </button>
+                    )}
                 </div>
             </div>
+            <UserModalComponent modal_id='context_modal' title='Context Used' text={context} />
         </div >
     );
 };

@@ -256,9 +256,6 @@ async def query(payload: QueryPayload):
     try:
         chunks, context = manager.retrieve_chunks([payload.query])
 
-        # Sort chunks based on score in descending order
-        chunks = sorted(chunks, key=lambda x: x.score, reverse=True)
-
         retrieved_chunks = [
             {
                 "text": chunk.text,
