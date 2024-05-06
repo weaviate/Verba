@@ -33,7 +33,7 @@ pip install goldenverba
 
 ## What Is Verba?
 
-Verba is a fully-customizable personal assistant for querying and interacting with your data, **either locally or deployed via cloud**. Resolve questions around your documents, cross-reference multiple data points or gain insights from existing knowledge bases. Verba combines state-of-the-art RAG techniques with Weaviate's context-aware database. Choose between different RAG frameworks, data types, chunking & retrieving techniques, LLM providers based on your individual use-case.
+Verba is a fully-customizable personal assistant for querying and interacting with your data, **either locally or deployed via cloud**. Resolve questions around your documents, cross-reference multiple data points or gain insights from existing knowledge bases. Verba combines state-of-the-art RAG techniques with Weaviate's context-aware database. Choose between different RAG frameworks, data types, chunking & retrieving techniques, and LLM providers based on your individual use-case.
 
 ## Feature Lists
 
@@ -143,7 +143,7 @@ Another robust local alternative is deploying Weaviate using Docker. For more de
 
 ## Ollama
 
-Verba supports Ollama models. Download and Install Ollama on your device (https://ollama.com/download). Make sure to install your preferred LLM using `ollama run <model>` and set the two environment variables:
+Verba supports Ollama models. Download and Install Ollama on your device (https://ollama.com/download). Make sure to install your preferred LLM using `ollama run <model>`.
 
 Tested with `llama3`, `llama3:70b` and `mistral`. The bigger models generally perform better, but need more computational power.
 
@@ -165,7 +165,7 @@ pip install `.[google]`
 
 ### Google Embeddings
 
-For the Google Embeddings, Verba is using Vertex AI Studio inside Google Cloud. You can find instructions for obtaining a key [here](https://cloud.google.com/iam/docs/create-short-lived-credentials-direct). If you have the `gcloud` CLI installed, you can run the following command: `gcloud auth print-access-token`. **At the moment, this acccess token must be renewed every hour.**
+For the Google Embeddings, Verba is using Vertex AI Studio inside Google Cloud. You can find instructions for obtaining a key [here](https://cloud.google.com/iam/docs/create-short-lived-credentials-direct). If you have the `gcloud` CLI installed, you can run the following command: `gcloud auth print-access-token`. **At the moment, this access token must be renewed every hour.**
 
 You also need to set the `GOOGLE_CLOUD_PROJECT` environment variable to the name of your project.
 
@@ -327,7 +327,7 @@ git clone https://github.com/weaviate/Verba.git
 2. **Adjust the docker-compose file**
    You can use the `docker-compose.yml` to add required environment variables under the `verba` service and can also adjust the Weaviate Docker settings to enable Authentification or change other settings of your database instance. You can read more about the Weaviate configuration in our [docker-compose documentation](https://weaviate.io/developers/weaviate/installation/docker-compose)
 
-> Please make sure to only add environment variables that you really need. If have no authentifcation enabled in your Weaviate Cluster, make sure to not include the `WEAVIATE_API_KEY_VERBA` enviroment variable
+> Please make sure to only add environment variables that you really need. If you have no authentifcation enabled in your Weaviate Cluster, make sure to not include the `WEAVIATE_API_KEY_VERBA` enviroment variable
 
 2. **Deploy using Docker**
    With Docker installed and the Verba repository cloned, navigate to the directory containing the Docker Compose file in your terminal or command prompt. Run the following command to start the Verba application in detached mode, which allows it to run in the background:
@@ -365,7 +365,7 @@ RUN pip install -e '.'
 
 Once you have access to Verba, you can use the `Overview Page` to validate if all environments and libraries were correctly set and installed. You can use the Admin Console, to see all data stored in the Weaviate Collections and reset certain parts of Verba.
 
-![Demo of Verba](https://github.com/weaviate/Verba/blob/1.0.0/img/verba_status.gif)
+![Demo of Verba](https://github.com/weaviate/Verba/blob/1.0.0/img/verba_status.png)
 
 ### Import Your Data
 
