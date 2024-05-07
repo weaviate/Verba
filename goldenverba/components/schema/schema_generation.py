@@ -28,7 +28,7 @@ def verify_vectorizer(
     modified_schema = schema.copy()
 
     #adding specific config for Azure OpenAI
-    vectorizer_config = None
+    vectorizer_config = {}
     if os.getenv("OPENAI_API_TYPE") == "azure" and vectorizer=="text2vec-openai":
         resourceName = os.getenv("AZURE_OPENAI_RESOURCE_NAME")
         model = os.getenv("AZURE_OPENAI_EMBEDDING_MODEL")
@@ -41,10 +41,22 @@ def verify_vectorizer(
             }
         }
 
+    base_url = os.getenv("OPENAI_BASE_URL", "")
+    if vectorizer == "text2vec-openai" and base_url:
+        vectorizer_config = {
+            "text2vec-openai": {
+                "baseURL": base_url,
+            }
+        }
+
+    embedding_model = os.getenv("OPENAI_EMBEDDING_MODEL", "")
+    if vectorizer == "text2vec-openai" and embedding_model:
+        moduleConfig[vectorizer]["model"] = embedding_model
+
     # Verify Vectorizer
     if vectorizer in VECTORIZERS:
         modified_schema["classes"][0]["vectorizer"] = vectorizer
-        if vectorizer_config is not None:
+        if vectorizer_config != {}:
             modified_schema["classes"][0]["moduleConfig"] = vectorizer_config
         for property in modified_schema["classes"][0]["properties"]:
             if property["name"] in skip_properties:
