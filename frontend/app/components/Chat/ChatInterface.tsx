@@ -537,6 +537,7 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
               onClick={() => {
                 removeMessagesFromLocalStorage("VERBA_CONVERSATION");
                 removeChunksFromLocalStorage("VERBA_CHUNKS");
+                removeChunksFromLocalStorage("VERBA_CONTEXT");
                 setChunks([]);
                 setMessages([
                   {
