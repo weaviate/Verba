@@ -13,6 +13,7 @@ import { RAGConfig, RAGResponse } from "./components/RAG/types";
 import { detectHost } from "./api";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { fonts, FontKey } from "./info";
+import PulseLoader from "react-spinners/PulseLoader";
 
 export default function Home() {
   // Page States
@@ -25,11 +26,13 @@ export default function Home() {
 
   // Settings
   const [settingTemplate, setSettingTemplate] = useState("Default");
-  const [baseSetting, setBaseSetting] = useState<Settings>(BaseSettings);
+  const [baseSetting, setBaseSetting] = useState<Settings | null>(null);
 
-  const fontKey = baseSetting[settingTemplate].Customization.settings.font
-    .value as FontKey; // Safely cast if you're sure, or use a check
-  const fontClassName = fonts[fontKey]?.className || "";
+  const fontKey = baseSetting
+    ? (baseSetting[settingTemplate].Customization.settings.font
+        .value as FontKey)
+    : null; // Safely cast if you're sure, or use a check
+  const fontClassName = fontKey ? fonts[fontKey]?.className || "" : "";
 
   // RAG Config
   const [RAGConfig, setRAGConfig] = useState<RAGConfig | null>(null);
@@ -94,7 +97,7 @@ export default function Home() {
   }, []);
 
   const importConfig = async () => {
-    if (!APIHost) {
+    if (!APIHost || !baseSetting) {
       return;
     }
 
@@ -123,143 +126,163 @@ export default function Home() {
   }, [baseSetting, settingTemplate]);
 
   useEffect(() => {
-    document.documentElement.style.setProperty(
-      "--primary-verba",
-      baseSetting[settingTemplate].Customization.settings.primary_color.color
-    );
-    document.documentElement.style.setProperty(
-      "--secondary-verba",
-      baseSetting[settingTemplate].Customization.settings.secondary_color.color
-    );
-    document.documentElement.style.setProperty(
-      "--warning-verba",
-      baseSetting[settingTemplate].Customization.settings.warning_color.color
-    );
-    document.documentElement.style.setProperty(
-      "--bg-verba",
-      baseSetting[settingTemplate].Customization.settings.bg_color.color
-    );
-    document.documentElement.style.setProperty(
-      "--bg-alt-verba",
-      baseSetting[settingTemplate].Customization.settings.bg_alt_color.color
-    );
-    document.documentElement.style.setProperty(
-      "--text-verba",
-      baseSetting[settingTemplate].Customization.settings.text_color.color
-    );
-    document.documentElement.style.setProperty(
-      "--text-alt-verba",
-      baseSetting[settingTemplate].Customization.settings.text_alt_color.color
-    );
-    document.documentElement.style.setProperty(
-      "--button-verba",
-      baseSetting[settingTemplate].Customization.settings.button_color.color
-    );
-    document.documentElement.style.setProperty(
-      "--button-hover-verba",
-      baseSetting[settingTemplate].Customization.settings.button_hover_color
-        .color
-    );
-    document.documentElement.style.setProperty(
-      "--bg-console-verba",
-      baseSetting[settingTemplate].Customization.settings.bg_console.color
-    );
-    document.documentElement.style.setProperty(
-      "--text-console-verba",
-      baseSetting[settingTemplate].Customization.settings.text_console.color
-    );
+    if (baseSetting) {
+      document.documentElement.style.setProperty(
+        "--primary-verba",
+        baseSetting[settingTemplate].Customization.settings.primary_color.color
+      );
+      document.documentElement.style.setProperty(
+        "--secondary-verba",
+        baseSetting[settingTemplate].Customization.settings.secondary_color
+          .color
+      );
+      document.documentElement.style.setProperty(
+        "--warning-verba",
+        baseSetting[settingTemplate].Customization.settings.warning_color.color
+      );
+      document.documentElement.style.setProperty(
+        "--bg-verba",
+        baseSetting[settingTemplate].Customization.settings.bg_color.color
+      );
+      document.documentElement.style.setProperty(
+        "--bg-alt-verba",
+        baseSetting[settingTemplate].Customization.settings.bg_alt_color.color
+      );
+      document.documentElement.style.setProperty(
+        "--text-verba",
+        baseSetting[settingTemplate].Customization.settings.text_color.color
+      );
+      document.documentElement.style.setProperty(
+        "--text-alt-verba",
+        baseSetting[settingTemplate].Customization.settings.text_alt_color.color
+      );
+      document.documentElement.style.setProperty(
+        "--button-verba",
+        baseSetting[settingTemplate].Customization.settings.button_color.color
+      );
+      document.documentElement.style.setProperty(
+        "--button-hover-verba",
+        baseSetting[settingTemplate].Customization.settings.button_hover_color
+          .color
+      );
+      document.documentElement.style.setProperty(
+        "--bg-console-verba",
+        baseSetting[settingTemplate].Customization.settings.bg_console.color
+      );
+      document.documentElement.style.setProperty(
+        "--text-console-verba",
+        baseSetting[settingTemplate].Customization.settings.text_console.color
+      );
+    }
   }, [baseSetting, settingTemplate]);
 
   return (
     <main
       className={`min-h-screen p-5 bg-bg-verba text-text-verba ${fontClassName}`}
-      data-theme={baseSetting[settingTemplate].Customization.settings.theme}
+      data-theme={
+        baseSetting
+          ? baseSetting[settingTemplate].Customization.settings.theme
+          : "light"
+      }
     >
       {gtag !== "" && <GoogleAnalytics gaId={gtag} />}
 
-      <Navbar
-        APIHost={APIHost}
-        production={production}
-        title={baseSetting[settingTemplate].Customization.settings.title.text}
-        subtitle={
-          baseSetting[settingTemplate].Customization.settings.subtitle.text
-        }
-        imageSrc={baseSetting[settingTemplate].Customization.settings.image.src}
-        version="v1.0.0"
-        currentPage={currentPage}
-        setCurrentPage={setCurrentPage}
-      />
+      {baseSetting ? (
+        <div>
+          <Navbar
+            APIHost={APIHost}
+            production={production}
+            title={
+              baseSetting[settingTemplate].Customization.settings.title.text
+            }
+            subtitle={
+              baseSetting[settingTemplate].Customization.settings.subtitle.text
+            }
+            imageSrc={
+              baseSetting[settingTemplate].Customization.settings.image.src
+            }
+            version="v1.0.0"
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+          />
 
-      {currentPage === "CHAT" && (
-        <ChatComponent
-          production={production}
-          settingConfig={baseSetting[settingTemplate]}
-          APIHost={APIHost}
-          RAGConfig={RAGConfig}
-          setCurrentPage={setCurrentPage}
-        />
+          {currentPage === "CHAT" && (
+            <ChatComponent
+              production={production}
+              settingConfig={baseSetting[settingTemplate]}
+              APIHost={APIHost}
+              RAGConfig={RAGConfig}
+              setCurrentPage={setCurrentPage}
+            />
+          )}
+
+          {currentPage === "DOCUMENTS" && (
+            <DocumentViewerComponent
+              RAGConfig={RAGConfig}
+              production={production}
+              setCurrentPage={setCurrentPage}
+              settingConfig={baseSetting[settingTemplate]}
+              APIHost={APIHost}
+            />
+          )}
+
+          {currentPage === "STATUS" && !production && (
+            <StatusComponent
+              fetchHost={fetchHost}
+              settingConfig={baseSetting[settingTemplate]}
+              APIHost={APIHost}
+            />
+          )}
+
+          {currentPage === "ADD" && !production && (
+            <RAGComponent
+              baseSetting={baseSetting}
+              settingTemplate={settingTemplate}
+              buttonTitle="Import"
+              settingConfig={baseSetting[settingTemplate]}
+              APIHost={APIHost}
+              RAGConfig={RAGConfig}
+              setRAGConfig={setRAGConfig}
+              setCurrentPage={setCurrentPage}
+              showComponents={["Reader", "Chunker", "Embedder"]}
+            />
+          )}
+
+          {currentPage === "RAG" && !production && (
+            <RAGComponent
+              baseSetting={baseSetting}
+              settingTemplate={settingTemplate}
+              buttonTitle="Save"
+              settingConfig={baseSetting[settingTemplate]}
+              APIHost={APIHost}
+              RAGConfig={RAGConfig}
+              setRAGConfig={setRAGConfig}
+              setCurrentPage={setCurrentPage}
+              showComponents={["Embedder", "Retriever", "Generator"]}
+            />
+          )}
+
+          {currentPage === "SETTINGS" && !production && (
+            <SettingsComponent
+              settingTemplate={settingTemplate}
+              setSettingTemplate={setSettingTemplate}
+              baseSetting={baseSetting}
+              setBaseSetting={setBaseSetting}
+            />
+          )}
+
+          <footer className="footer footer-center p-4 mt-8 bg-bg-verba text-text-alt-verba">
+            <aside>
+              <p>Build with ♥ and Weaviate © 2024</p>
+            </aside>
+          </footer>
+        </div>
+      ) : (
+        <div className="flex items-center justify-center h-screen gap-2">
+          <PulseLoader loading={true} size={12} speedMultiplier={0.75} />
+          <p>Loading Verba</p>
+        </div>
       )}
-
-      {currentPage === "DOCUMENTS" && (
-        <DocumentViewerComponent
-          RAGConfig={RAGConfig}
-          production={production}
-          setCurrentPage={setCurrentPage}
-          settingConfig={baseSetting[settingTemplate]}
-          APIHost={APIHost}
-        />
-      )}
-
-      {currentPage === "STATUS" && !production && (
-        <StatusComponent
-          fetchHost={fetchHost}
-          settingConfig={baseSetting[settingTemplate]}
-          APIHost={APIHost}
-        />
-      )}
-
-      {currentPage === "ADD" && !production && (
-        <RAGComponent
-          baseSetting={baseSetting}
-          settingTemplate={settingTemplate}
-          buttonTitle="Import"
-          settingConfig={baseSetting[settingTemplate]}
-          APIHost={APIHost}
-          RAGConfig={RAGConfig}
-          setRAGConfig={setRAGConfig}
-          setCurrentPage={setCurrentPage}
-          showComponents={["Reader", "Chunker", "Embedder"]}
-        />
-      )}
-
-      {currentPage === "RAG" && !production && (
-        <RAGComponent
-          baseSetting={baseSetting}
-          settingTemplate={settingTemplate}
-          buttonTitle="Save"
-          settingConfig={baseSetting[settingTemplate]}
-          APIHost={APIHost}
-          RAGConfig={RAGConfig}
-          setRAGConfig={setRAGConfig}
-          setCurrentPage={setCurrentPage}
-          showComponents={["Embedder", "Retriever", "Generator"]}
-        />
-      )}
-
-      {currentPage === "SETTINGS" && !production && (
-        <SettingsComponent
-          settingTemplate={settingTemplate}
-          setSettingTemplate={setSettingTemplate}
-          baseSetting={baseSetting}
-          setBaseSetting={setBaseSetting}
-        />
-      )}
-
-      <footer className="footer footer-center p-4 mt-8 bg-bg-verba text-text-alt-verba">
-        <aside>
-          <p>Build with ♥ and Weaviate © 2024</p>
-        </aside>
-      </footer>
     </main>
   );
 }
