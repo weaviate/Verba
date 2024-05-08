@@ -43,6 +43,9 @@ def verify_vectorizer(
 
     base_url = os.getenv("OPENAI_BASE_URL", "")
     if vectorizer == "text2vec-openai" and base_url:
+        # check if base_url ends with v1 and strip it since Weaviate automatically adds v1
+        if base_url.endswith("v1"):
+            base_url = base_url[:-2]
         if vectorizer_config == {}:
             vectorizer_config = {
                 "text2vec-openai": {
