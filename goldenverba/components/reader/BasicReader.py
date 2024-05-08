@@ -63,18 +63,25 @@ class BasicReader(Reader):
                 try:
                     decoded_bytes = base64.b64decode(file.content)
                     original_text = decoded_bytes.decode("utf-8")
-                    json_obj = json.loads(original_text)
-                    document = Document.from_json(json_obj)
-                    documents.append(document)
+                    json_list = json.loads(original_text)  # This is now expected to be a list
+
+                    for json_obj in json_list:  # Loop through each item in the list
+                        try:
+                            document = Document.from_json(json_obj)
+                            documents.append(document)
+                        except Exception as e:
+                            msg.warn(f"Failed to process an item in {file.filename} : {str(e)}")
+                            logging.append({
+                                "type": "WARNING",
+                                "message": f"Failed to process an item in {file.filename} : {str(e)}",
+                            })
 
                 except Exception as e:
                     msg.warn(f"Failed to load {file.filename} : {str(e)}")
-                    logging.append(
-                        {
-                            "type": "WARNING",
-                            "message": f"Failed to load {file.filename} : {str(e)}",
-                        }
-                    )
+                    logging.append({
+                        "type": "WARNING",
+                        "message": f"Failed to load {file.filename} : {str(e)}",
+                    })
 
             elif file.extension == "pdf":
                 try:

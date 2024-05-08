@@ -74,17 +74,17 @@ class Document:
         return doc_dict
 
     @staticmethod
-    def from_json(doc_dict: dict):
+    def from_json(doc_dict: list):
         """Convert a JSON string to a Document object."""
         document = Document(
-            text=doc_dict.get("text", ""),
-            type=doc_dict.get("type", ""),
-            name=doc_dict.get("name", ""),
-            path=doc_dict.get("path", ""),
-            link=doc_dict.get("link", ""),
-            timestamp=doc_dict.get("timestamp", ""),
-            reader=doc_dict.get("reader", ""),
-            meta=doc_dict.get("meta", {}),
+            text=doc_dict['Article_Text'],
+            type=doc_dict['Category'],
+            name=doc_dict['Category'],
+            path="",
+            link="",
+            timestamp="",
+            reader="Basic",
+            meta=['Tags'],
         )
         # Assuming Chunk has a from_dict method
         document.chunks = [
