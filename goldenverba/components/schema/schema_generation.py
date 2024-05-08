@@ -125,6 +125,7 @@ def init_schemas(
         init_documents(client, vectorizer, force, check)
         init_cache(client, vectorizer, force, check)
         init_suggestion(client, vectorizer, force, check)
+        init_config(client, vectorizer, force, check)
         return True
     except Exception as e:
         msg.fail(f"Schema initialization failed {str(e)}")
@@ -372,3 +373,47 @@ def init_suggestion(
         msg.good(f"{suggestion_name} schema created")
 
     return suggestion_schema
+
+def init_config(
+    client: Client, vectorizer: str = None, force: bool = False, check: bool = False
+) -> dict:
+    """Initializes the Configuration schema"""
+    SCHEMA_CONFIG = {
+        "classes": [
+            {
+                "class": "VERBA_Config",
+                "description": "Configuration JSON",
+                "properties": [
+                    {
+                        "name": "config",
+                        "dataType": ["text"],
+                        "description": "JSON String Config",
+                    },
+                ],
+            }
+        ]
+    }
+
+    config_schema = SCHEMA_CONFIG
+    config_name = "VERBA_Config"
+
+    if client.schema.exists(config_name):
+        if check:
+            return config_schema
+        if not force:
+            user_input = input(
+                f"{config_name} class already exists, do you want to delete it? (y/n): "
+            )
+        else:
+            user_input = "y"
+        if user_input.strip().lower() == "y":
+            client.schema.delete_class(config_name)
+            client.schema.create(config_schema)
+            msg.good(f"{config_name} schema created")
+        else:
+            msg.warn(f"Skipped deleting {config_name} schema, nothing changed")
+    else:
+        client.schema.create(config_schema)
+        msg.good(f"{config_name} schema created")
+
+    return config_schema

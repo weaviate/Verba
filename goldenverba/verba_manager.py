@@ -402,13 +402,14 @@ class VerbaManager:
                 results = (
                     self.client.query.aggregate(_class["class"]).with_meta_count().do()
                 )
-                schemas[_class["class"]] = (
-                    results.get("data", {})
-                    .get("Aggregate", {})
-                    .get(_class["class"], [{}])[0]
-                    .get("meta", {})
-                    .get("count", 0)
-                )
+                if "VERBA" in _class["class"]:
+                    schemas[_class["class"]] = (
+                        results.get("data", {})
+                        .get("Aggregate", {})
+                        .get(_class["class"], [{}])[0]
+                        .get("meta", {})
+                        .get("count", 0)
+                    )
         except Exception as e:
             msg.error(f"Couldn't retrieve information about Collections, if you're using Weaviate Embedded, try to reset `~/.local/share/weaviate` ({str(e)})")
 
@@ -723,6 +724,10 @@ class VerbaManager:
     def reset_suggestion(self):
         self.client.schema.delete_class("VERBA_Suggestion")
         schema_manager.init_suggestion(self.client, "", False, True)
+
+    def reset_config(self):
+        self.client.schema.delete_class("VERBA_Config")
+        schema_manager.init_config(self.client, "", False, True)
 
     def check_if_document_exits(self, document: Document) -> bool:
         """Return a document by it's ID (UUID format) from Weaviate

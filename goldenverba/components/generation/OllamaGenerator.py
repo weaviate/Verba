@@ -42,9 +42,6 @@ class OllamaGenerator(Generator):
             conversation = {}
         messages = self.prepare_messages(queries, context, conversation)
 
-        print(messages)
-        print(queries)
-
         try:
             data = {"model": model, "messages": messages}
             async with aiohttp.ClientSession() as session:

@@ -363,7 +363,7 @@ RUN pip install -e '.'
 
 ### Overview Page
 
-Once you have access to Verba, you can use the `Overview Page` to validate if all environments and libraries were correctly set and installed. You can use the Admin Console, to see all data stored in the Weaviate Collections and reset certain parts of Verba.
+Once you have access to Verba, you can use the `Overview Page` to validate if all environments and libraries were correctly set and installed. You can use the Admin Console, to see all data stored in the Weaviate Collections and reset certain parts of Verba (e.g. Documents, Cache, Configuration, etc.)
 
 ![Demo of Verba](https://github.com/weaviate/Verba/blob/1.0.0/img/verba_status.png)
 

@@ -5,6 +5,8 @@ import os
 
 from wasabi import msg  # type: ignore[import]
 
+config_uuid = "e0adcc12-9bad-4588-8a1e-bab0af6ed485"
+
 
 def setup_managers(manager):
     msg.info("Setting up components")
@@ -12,12 +14,21 @@ def setup_managers(manager):
     set_config(manager, config)
 
 
-def get_config(manager: VerbaManager, filename: str = "verba_config.json") -> dict:
+def get_config(manager: VerbaManager) -> dict:
 
     config = {}
-    if os.path.exists(filename):
-        with open(filename, "r") as file:
-            config = json.load(file)
+
+    exists = manager.client.data_object.exists(
+    config_uuid,
+    class_name="VERBA_Config",
+    )
+
+    if exists:
+        document = manager.client.data_object.get_by_id(
+                config_uuid,
+                class_name="VERBA_Config",
+        )
+        config = json.loads(document["properties"]["config"])
 
     setting_config = config.get("SETTING", {})
 
@@ -93,7 +104,7 @@ def get_config(manager: VerbaManager, filename: str = "verba_config.json") -> di
 
 def set_config(manager: VerbaManager, combined_config: dict):
 
-    save_config(combined_config)
+    save_config(manager, combined_config)
     config = combined_config.get("RAG", {})
 
     selected_theme = combined_config.get("SETTING", {}).get("selectedTheme", "")
@@ -175,25 +186,42 @@ def set_config(manager: VerbaManager, combined_config: dict):
             )
 
 
-def save_config(config: dict, filename: str = "verba_config.json"):
+def save_config(manager: VerbaManager, config: dict):
     """Save config to file."""
-    with open(filename, "w") as file:
-        msg.good("Saved Config")
-        json.dump(config, file, indent=4)
+
+    exists = manager.client.data_object.exists(
+    config_uuid,
+    class_name="VERBA_Config",
+    )
+
+    if exists:
+        manager.client.data_object.delete(uuid=config_uuid, class_name="VERBA_Config")
+
+    with manager.client.batch as batch:
+        batch.batch_size = 1
+        properties = {
+            "config": json.dumps(config),
+        }
+        manager.client.batch.add_data_object(properties, "VERBA_Config", uuid=config_uuid)
+        msg.good("Config Saved in Weaviate")
 
 
-def load_config(manager, filename: str = "verba_config.json"):
+def load_config(manager):
     """Save config to file."""
-    msg.good("Saved Config")
-    if os.path.exists(filename):
-        with open(filename, "r") as file:
-            config = json.load(file)
-            return config
-    else:
-        return get_config(manager)
+    
+    exists = manager.client.data_object.exists(
+    config_uuid,
+    class_name="VERBA_Config",
+    )
 
+    if exists:
+        document = manager.client.data_object.get_by_id(
+                config_uuid,
+                class_name="VERBA_Config",
+        )
 
-def reset_config(filename: str = "verba_config.json"):
-    if os.path.exists(filename):
-        os.remove(filename)
-        msg.good("Config cleared and reset.")
+        config = json.loads(document["properties"]["config"])
+        msg.info("Retrieve Config From Weaviate")
+        return config
+
+    return get_config(manager)

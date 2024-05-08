@@ -21,7 +21,7 @@ from goldenverba.server.types import (
     SearchQueryPayload,
     ImportPayload,
 )
-from goldenverba.server.util import get_config, set_config, setup_managers, reset_config
+from goldenverba.server.util import get_config, set_config, setup_managers
 
 load_dotenv()
 
@@ -213,7 +213,7 @@ async def reset_verba(payload: ResetPayload):
         elif payload.resetMode == "SUGGESTIONS":
             manager.reset_suggestion()
         elif payload.resetMode == "CONFIG":
-            reset_config()
+            manager.reset_config()
 
         msg.info(f"Resetting Verba ({payload.resetMode})")
 
