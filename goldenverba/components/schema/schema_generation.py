@@ -43,15 +43,14 @@ def verify_vectorizer(
 
     base_url = os.getenv("OPENAI_BASE_URL", "")
     if vectorizer == "text2vec-openai" and base_url:
-        vectorizer_config = {
-            "text2vec-openai": {
-                "baseURL": base_url,
+        if vectorizer_config == {}:
+            vectorizer_config = {
+                "text2vec-openai": {
+                    "baseURL": base_url,
+                }
             }
-        }
-
-    embedding_model = os.getenv("OPENAI_EMBEDDING_MODEL", "")
-    if vectorizer == "text2vec-openai" and embedding_model:
-        moduleConfig[vectorizer]["model"] = embedding_model
+        else:
+            vectorizer_config["text2vec-openai"]["baseURL"] = base_url
 
     # Verify Vectorizer
     if vectorizer in VECTORIZERS:
