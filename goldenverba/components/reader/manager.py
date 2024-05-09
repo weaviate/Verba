@@ -2,6 +2,7 @@ from wasabi import msg
 
 from goldenverba.components.reader.document import Document
 from goldenverba.components.reader.githubreader import GithubReader
+from goldenverba.components.reader.gitlabreader import GitLabReader
 from goldenverba.components.reader.interface import Reader
 from goldenverba.components.reader.pdfreader import PDFReader
 from goldenverba.components.reader.simplereader import SimpleReader
@@ -14,6 +15,7 @@ class ReaderManager:
             "SimpleReader": SimpleReader(),
             "PDFReader": PDFReader(),
             "GithubReader": GithubReader(),
+            "GitLabReader": GitLabReader(),
             "UnstructuredPDF": UnstructuredPDF(),
         }
         self.selected_reader: Reader = self.readers["SimpleReader"]

@@ -345,6 +345,12 @@ class VerbaManager:
         else:
             self.environment_variables["GITHUB_TOKEN"] = False
 
+        # GitLab Token Key
+        if os.environ.get("GITLAB_TOKEN", "") != "":
+            self.environment_variables["GITLAB_TOKEN"] = True
+        else:
+            self.environment_variables["GITLAB_TOKEN"] = False
+
         # Unstructured Token Key
         if os.environ.get("UNSTRUCTURED_API_KEY", "") != "":
             self.environment_variables["UNSTRUCTURED_API_KEY"] = True
