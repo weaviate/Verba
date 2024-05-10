@@ -416,7 +416,9 @@ With Verba configured, you're ready to import your data and start exploring. Fol
 5. **Pick an Embedder**
    - `Embedders` are crucial for integrating your data into Weaviate. Select one based on your preference:
      - `AdaEmbedder`: Utilizes OpenAI's ADA model for embedding.
-     - `MiniLMEmbedder`: Employs Sentence Transformers for embedding.
+     - `MiniLMEmbedder`: Employs Sentence Transformers with [all-MiniLM-L6-v2](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2) for embedding.
+     - `AllMPNetEmbedder`: Employs Sentence Transformers with [all-mpnet-base-v2](https://huggingface.co/sentence-transformers/all-mpnet-base-v2) for embedding.
+     - `MixedbreadEmbedder`: Employs Sentence Transformers with [mixedbread-ai/mxbai-embed-large-v1](https://huggingface.co/mixedbread-ai/mxbai-embed-large-v1) for embedding.
      - `CohereEmbedder`: Uses Cohere for embedding.
 
 6. **Commence Data Ingestion**

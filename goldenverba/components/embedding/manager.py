@@ -5,6 +5,8 @@ from goldenverba.components.embedding.ADAEmbedder import ADAEmbedder
 from goldenverba.components.embedding.CohereEmbedder import CohereEmbedder
 from goldenverba.components.embedding.interface import Embedder
 from goldenverba.components.embedding.MiniLMEmbedder import MiniLMEmbedder
+from goldenverba.components.embedding.AllMPNetEmbedder import AllMPNetEmbedder
+from goldenverba.components.embedding.MixedbreadEmbedder import MixedbreadEmbedder
 from goldenverba.components.reader.document import Document
 
 
@@ -12,6 +14,8 @@ class EmbeddingManager:
     def __init__(self):
         self.embedders: dict[str, Embedder] = {
             "MiniLMEmbedder": MiniLMEmbedder(),
+            "AllMPNetEmbedder": AllMPNetEmbedder(),
+            "MixedbreadEmbedder": MixedbreadEmbedder(),
             "ADAEmbedder": ADAEmbedder(),
             "CohereEmbedder": CohereEmbedder(),
         }
