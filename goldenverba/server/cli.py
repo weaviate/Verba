@@ -20,11 +20,16 @@ def cli():
     default="0.0.0.0",
     help="FastAPI Host",
 )
-def start(port, host):
+@click.option(
+    "--prod/--no-prod",
+    default=False,
+    help="Run in production mode.",
+)
+def start(port, host, prod):
     """
     Run the FastAPI application.
     """
-    uvicorn.run("goldenverba.server.api:app", host=host, port=port, reload=True)
+    uvicorn.run("goldenverba.server.api:app", host=host, port=port, reload=(not prod))
 
 if __name__ == "__main__":
     cli()

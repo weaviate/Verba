@@ -202,34 +202,46 @@ const Navbar: React.FC<NavbarProps> = ({
                     >
                       <a>Documents</a>
                     </li>
-                    <li
-                      onClick={(e) => {
-                        setCurrentPage("STATUS");
-                      }}
-                    >
-                      <a>Status</a>
-                    </li>
-                    <li
-                      onClick={(e) => {
-                        setCurrentPage("ADD");
-                      }}
-                    >
-                      <a>Add Documents</a>
-                    </li>
-                    <li
-                      onClick={(e) => {
-                        setCurrentPage("RAG");
-                      }}
-                    >
-                      <a>RAG</a>
-                    </li>
-                    <li
-                      onClick={(e) => {
-                        setCurrentPage("SETTINGS");
-                      }}
-                    >
-                      <a>Settings</a>
-                    </li>
+                    {!production && (
+                      <li
+                        onClick={(e) => {
+                          setCurrentPage("STATUS");
+                        }}
+                      >
+                        <a>Status</a>
+                      </li>
+                    )}
+
+                    {!production && (
+                      <li
+                        onClick={(e) => {
+                          setCurrentPage("ADD");
+                        }}
+                      >
+                        <a>Add Documents</a>
+                      </li>
+                    )}
+
+                    {!production && (
+                      <li
+                        onClick={(e) => {
+                          setCurrentPage("RAG");
+                        }}
+                      >
+                        <a>RAG</a>
+                      </li>
+                    )}
+
+                    {!production && (
+                      <li
+                        onClick={(e) => {
+                          setCurrentPage("SETTINGS");
+                        }}
+                      >
+                        <a>Settings</a>
+                      </li>
+                    )}
+
                     <li onClick={handleGitHubClick}>
                       <a>GitHub</a>
                     </li>

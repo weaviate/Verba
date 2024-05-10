@@ -33,7 +33,7 @@ setup(
         "uvicorn[standard]==0.29.0",
         "click==8.1.7",
         "asyncio==3.4.3",
-        "tiktoken==0.5.1",
+        "tiktoken==0.6.0",
         "requests==2.31.0",
         "pypdf==4.2.0",
     ],
