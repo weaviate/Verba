@@ -13,11 +13,11 @@ class GPT4Generator(Generator):
     def __init__(self):
         super().__init__()
         self.name = "GPT4Generator"
-        self.description = "Generator using OpenAI's GPT-4-1106-preview model"
+        self.description = "Generator using OpenAI's gpt-4-turbo model"
         self.requires_library = ["openai"]
         self.requires_env = ["OPENAI_API_KEY"]
         self.streamable = True
-        self.model_name = os.getenv("OPENAI_MODEL", "gpt-4-1106-preview")
+        self.model_name = os.getenv("OPENAI_MODEL", "gpt-4-turbo")
         self.context_window = 10000
 
     async def generate_stream(
