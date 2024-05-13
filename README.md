@@ -29,6 +29,7 @@ pip install goldenverba
 - [Quickstart: Deploy with Docker](#quickstart-deploy-with-docker)
 - [💾 Verba Walkthrough](#️verba-walkthrough)
 - [💖 Open Source Contribution](#open-source-contribution)
+- [🚩 Known Issues](#known-issues)
 - [❔FAQ](#faq)
 
 ## What Is Verba?
@@ -386,6 +387,11 @@ Your contributions are always welcome! Feel free to contribute ideas, feedback, 
 ### Project Architecture
 
 You can learn more about Verba's architecture and implementation in its [technical documentation](./TECHNICAL.md) and [frontend documentation](./FRONTEND.md). It's recommended to have a look at them before making any contributions.
+
+## Known Issues
+
+- **Weaviate Embeeded** currently not working on Windows yet
+  - Will be fixed in future versions, until then please use the Docker or WCS Deployment
 
 ## FAQ
 
