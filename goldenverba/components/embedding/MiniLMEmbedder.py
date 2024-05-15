@@ -1,9 +1,15 @@
 from tqdm import tqdm
-from wasabi import msg
 from weaviate import Client
 
-from goldenverba.components.embedding.interface import Embedder
-from goldenverba.components.reader.document import Document
+try:
+    import torch
+    from accelerate import Accelerator
+    from transformers import AutoModel, AutoTokenizer
+except:
+    pass
+
+from goldenverba.components.interfaces import Embedder
+from goldenverba.components.document import Document
 
 
 class MiniLMEmbedder(Embedder):
@@ -14,41 +20,34 @@ class MiniLMEmbedder(Embedder):
     def __init__(self):
         super().__init__()
         self.name = "MiniLMEmbedder"
-        self.requires_library = ["torch", "transformers"]
+        self.requires_library = ["torch", "transformers", "accelerate"]
         self.description = "Embeds and retrieves objects using SentenceTransformer's all-MiniLM-L6-v2 model"
         self.vectorizer = "MiniLM"
         self.model = None
         self.tokenizer = None
         try:
-            import torch
-            from transformers import AutoModel, AutoTokenizer
+            accelerator = Accelerator()
 
-            def get_device():
-                if torch.cuda.is_available():
-                    return torch.device("cuda")
-                elif torch.backends.mps.is_available():
-                    return torch.device("mps")
-                else:
-                    return torch.device("cpu")
-
-            self.device = get_device()
+            self.device = accelerator.device
 
             self.model = AutoModel.from_pretrained(
                 "sentence-transformers/all-MiniLM-L6-v2", device_map=self.device
             )
+
+            self.model = accelerator.prepare(self.model)
+
             self.tokenizer = AutoTokenizer.from_pretrained(
                 "sentence-transformers/all-MiniLM-L6-v2", device_map=self.device
             )
-            self.model = self.model.to(self.device)
 
         except Exception as e:
-            msg.warn(str(e))
             pass
 
     def embed(
         self,
         documents: list[Document],
         client: Client,
+        logging: list[dict],
     ) -> bool:
         """Embed verba documents and its chunks to Weaviate
         @parameter: documents : list[Document] - List of Verba documents
@@ -59,15 +58,13 @@ class MiniLMEmbedder(Embedder):
         for document in tqdm(
             documents, total=len(documents), desc="Vectorizing document chunks"
         ):
-            for chunk in document.chunks:
-                chunk.set_vector(self.vectorize_chunk(chunk.text))
+            for chunk in tqdm(document.chunks, total=len(document.chunks), desc="Vectorizing Chunks"):
+                chunk.set_vector(self.vectorize_chunk(document.name + " : " + chunk.text))
 
-        return self.import_data(documents, client)
+        return self.import_data(documents, client, logging)
 
     def vectorize_chunk(self, chunk) -> list[float]:
         try:
-            import torch
-
             text = chunk
             tokens = self.tokenizer.tokenize(text)
 

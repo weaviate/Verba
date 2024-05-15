@@ -1,30 +1,34 @@
 import os
 import ssl
-from typing import Optional
 
 import weaviate
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 from wasabi import msg
-from weaviate import Client
 from weaviate.embedded import EmbeddedOptions
 
 import goldenverba.components.schema.schema_generation as schema_manager
-from goldenverba.components.chunking.chunk import Chunk
-from goldenverba.components.chunking.interface import Chunker
-from goldenverba.components.chunking.manager import ChunkerManager
-from goldenverba.components.component import VerbaComponent
-from goldenverba.components.embedding.interface import Embedder
-from goldenverba.components.embedding.manager import EmbeddingManager
-from goldenverba.components.generation.interface import Generator
-from goldenverba.components.generation.manager import GeneratorManager
-from goldenverba.components.reader.document import Document
-from goldenverba.components.reader.interface import Reader
-from goldenverba.components.reader.manager import ReaderManager
-from goldenverba.components.retriever.interface import Retriever
-from goldenverba.components.retriever.manager import RetrieverManager
+
+from goldenverba.components.chunk import Chunk
+from goldenverba.components.document import Document
+from goldenverba.components.types import FileData
+
+from goldenverba.components.interfaces import (
+    VerbaComponent,
+    Reader,
+    Chunker,
+    Embedder,
+    Retriever,
+    Generator,
+)
+from goldenverba.components.managers import (
+    ReaderManager,
+    ChunkerManager,
+    EmbeddingManager,
+    RetrieverManager,
+    GeneratorManager,
+)
 
 load_dotenv()
-
 
 class VerbaManager:
     """Manages all Verba Components."""
@@ -39,6 +43,7 @@ class VerbaManager:
         self.installed_libraries = {}
         self.weaviate_type = ""
         self.client = self.setup_client()
+        self.enable_caching = True
 
         self.verify_installed_libraries()
         self.verify_variables()
@@ -51,17 +56,11 @@ class VerbaManager:
             schema_manager.init_schemas(self.client, embedding, False, True)
 
     def import_data(
-        self,
-        bytes: list[str],
-        contents: list[str],
-        paths: list[str],
-        fileNames: list[str],
-        document_type: str,
-        units: int = 100,
-        overlap: int = 50,
+        self, fileData: list[FileData], textValues: list[str], logging: list[dict]
     ) -> list[Document]:
-        loaded_documents = self.reader_manager.load(
-            bytes, contents, paths, fileNames, document_type
+
+        loaded_documents, logging = self.reader_manager.load(
+            fileData, textValues, logging
         )
 
         filtered_documents = []
@@ -70,85 +69,47 @@ class VerbaManager:
         for document in loaded_documents:
             if not self.check_if_document_exits(document):
                 filtered_documents.append(document)
+            else:
+                logging.append(
+                    {"type": "WARNING", "message": f"{document.name} already exists."}
+                )
 
-        modified_documents = self.chunker_manager.chunk(
-            filtered_documents, units, overlap
+        modified_documents, logging = self.chunker_manager.chunk(
+            filtered_documents, logging
         )
 
-        if self.embedder_manager.embed(modified_documents, client=self.client):
-            msg.good("Embedding successful")
-            return modified_documents
-        else:
-            msg.fail("Embedding failed")
-            return []
+        logging = self.embedder_manager.embed(
+            modified_documents, client=self.client, logging=logging
+        )
+
+        return modified_documents, logging
 
     def reader_set_reader(self, reader: str) -> bool:
-        available, message = self.check_verba_component(
-            self.reader_manager.readers[reader]
-        )
-
-        if available:
-            msg.good(f"Set Reader to {reader}")
-            return self.reader_manager.set_reader(reader)
-        else:
-            msg.warn(message)
-            return False
+        self.reader_manager.set_reader(reader)
 
     def reader_get_readers(self) -> dict[str, Reader]:
         return self.reader_manager.get_readers()
 
     def chunker_set_chunker(self, chunker: str) -> bool:
-        available, message = self.check_verba_component(
-            self.chunker_manager.chunker[chunker]
-        )
-        if available:
-            msg.good(f"Set Chunker to {chunker}")
-            return self.chunker_manager.set_chunker(chunker)
-        else:
-            msg.warn(message)
-            return False
+        return self.chunker_manager.set_chunker(chunker)
 
     def chunker_get_chunker(self) -> dict[str, Chunker]:
         return self.chunker_manager.get_chunkers()
 
     def embedder_set_embedder(self, embedder: str) -> bool:
-        available, message = self.check_verba_component(
-            self.embedder_manager.embedders[embedder]
-        )
-        if available:
-            msg.good(f"Set Embedder to {embedder}")
-            return self.embedder_manager.set_embedder(embedder)
-        else:
-            msg.warn(message)
-            return False
+        return self.embedder_manager.set_embedder(embedder)
 
     def embedder_get_embedder(self) -> dict[str, Embedder]:
         return self.embedder_manager.get_embedders()
 
     def retriever_set_retriever(self, retriever: str) -> bool:
-        available, message = self.check_verba_component(
-            self.retriever_manager.retrievers[retriever]
-        )
-        if available:
-            msg.good(f"Set Retriever to {retriever}")
-            return self.retriever_manager.set_retriever(retriever)
-        else:
-            msg.warn(message)
-            return False
+        return self.retriever_manager.set_retriever(retriever)
 
     def retriever_get_retriever(self) -> dict[str, Retriever]:
         return self.retriever_manager.get_retrievers()
 
     def generator_set_generator(self, generator: str) -> bool:
-        available, message = self.check_verba_component(
-            self.generator_manager.generators[generator]
-        )
-        if available:
-            msg.good(f"Set Generator to {generator}")
-            return self.generator_manager.set_generator(generator)
-        else:
-            msg.warn(message)
-            return False
+        return self.generator_manager.set_generator(generator)
 
     def generator_get_generator(self) -> dict[str, Generator]:
         return self.generator_manager.get_generators()
@@ -177,7 +138,7 @@ class VerbaManager:
                 openai.api_version = os.getenv("OPENAI_API_VERSION")
 
             if os.getenv("OPENAI_API_TYPE") == "azure":
-                openai_header_key_name = "X-Azure-Api-Key"            
+                openai_header_key_name = "X-Azure-Api-Key"
 
             if openai_key != "":
                 additional_header[openai_header_key_name] = openai_key
@@ -192,6 +153,15 @@ class VerbaManager:
         cohere_key = os.environ.get("COHERE_API_KEY", "")
         if cohere_key != "":
             additional_header["X-Cohere-Api-Key"] = cohere_key
+
+        # Check Google Key
+        google_key = os.environ.get("GOOGLE_API_KEY", "")
+        self.environment_variables["GOOGLE_API_KEY"] = False
+        if google_key != "":
+            additional_header["X-Palm-Api-Key"] = google_key
+            self.environment_variables["GOOGLE_API_KEY"] = True
+
+        google_project = os.environ.get("GOOGLE_CLOUD_PROJECT", "")
 
         # Check Verba URL ENV
         weaviate_url = os.environ.get("WEAVIATE_URL_VERBA", "")
@@ -224,11 +194,23 @@ class VerbaManager:
             else:
                 ssl._create_default_https_context = _create_unverified_https_context
 
+            if google_project != "":
+                additional_env_vars = {
+                    "ENABLE_MODULES": "text2vec-openai,generative-openai,qna-openai,text2vec-cohere,text2vec-palm",
+                    "GOOGLE_CLOUD_PROJECT": google_project,
+                }
+            else:
+                additional_env_vars = {
+                    "ENABLE_MODULES": "text2vec-openai,generative-openai,qna-openai,text2vec-cohere",
+                }
+
             msg.info("Using Weaviate Embedded")
             self.weaviate_type = "Weaviate Embedded"
             client = weaviate.Client(
                 additional_headers=additional_header,
-                embedded_options=EmbeddedOptions(),
+                embedded_options=EmbeddedOptions(
+                    additional_env_vars=additional_env_vars
+                ),
             )
 
         if client is not None:
@@ -254,11 +236,11 @@ class VerbaManager:
         Checks which libraries are installed and fills out the self.installed_libraries dictionary for the frontend to access, this will be displayed in the status page.
         """
         try:
-            import PyPDF2
+            import pypdf
 
-            self.installed_libraries["PyPDF2"] = True
+            self.installed_libraries["pypdf"] = True
         except Exception:
-            self.installed_libraries["PyPDF2"] = False
+            self.installed_libraries["pypdf"] = False
 
         try:
             import tiktoken
@@ -275,21 +257,11 @@ class VerbaManager:
             self.installed_libraries["openai"] = False
 
         try:
-            import cohere
+            import vertexai
 
-            self.installed_libraries["cohere"] = True
+            self.installed_libraries["vertexai"] = True
         except Exception:
-            self.installed_libraries["cohere"] = False
-
-        try:
-            import huggingface_hub
-            from huggingface_hub import login
-
-            login(token=os.environ.get("HF_TOKEN", ""), add_to_git_credential=True)
-
-            self.installed_libraries["huggingface_hub"] = True
-        except Exception:
-            self.installed_libraries["huggingface_hub"] = False
+            self.installed_libraries["vertexai"] = False
 
         try:
             import transformers
@@ -297,6 +269,13 @@ class VerbaManager:
             self.installed_libraries["transformers"] = True
         except Exception:
             self.installed_libraries["transformers"] = False
+
+        try:
+            import accelerate
+
+            self.installed_libraries["accelerate"] = True
+        except Exception:
+            self.installed_libraries["accelerate"] = False
 
         try:
             import torch
@@ -316,6 +295,18 @@ class VerbaManager:
         """
         Checks which environment variables are installed and fills out the self.environment_variables dictionary for the frontend to access.
         """
+
+        # Ollama URL
+        if os.environ.get("OLLAMA_URL", "") != "":
+            self.environment_variables["OLLAMA_URL"] = True
+        else:
+            self.environment_variables["OLLAMA_URL"] = False
+
+        if os.environ.get("OLLAMA_MODEL", "") != "":
+            self.environment_variables["OLLAMA_MODEL"] = True
+        else:
+            self.environment_variables["OLLAMA_MODEL"] = False
+
         # OpenAI API Key
         if os.environ.get("OPENAI_API_KEY", "") != "":
             self.environment_variables["OPENAI_API_KEY"] = True
@@ -333,12 +324,6 @@ class VerbaManager:
         else:
             self.environment_variables["COHERE_API_KEY"] = False
 
-        # HuggingFace Key
-        if os.environ.get("HF_TOKEN", "") != "":
-            self.environment_variables["HF_TOKEN"] = True
-        else:
-            self.environment_variables["HF_TOKEN"] = False
-
         # Github Token Key
         if os.environ.get("GITHUB_TOKEN", "") != "":
             self.environment_variables["GITHUB_TOKEN"] = True
@@ -351,12 +336,6 @@ class VerbaManager:
         else:
             self.environment_variables["UNSTRUCTURED_API_KEY"] = False
 
-        # LLAMA2-7B-CHAT-HF
-        if os.environ.get("LLAMA2-7B-CHAT-HF", "") == "True":
-            self.environment_variables["LLAMA2-7B-CHAT-HF"] = True
-        else:
-            self.environment_variables["LLAMA2-7B-CHAT-HF"] = False
-        
         # OpenAI API Type, should be set to "azure" if using Azure OpenAI
         if os.environ.get("OPENAI_API_TYPE", "") != "":
             self.environment_variables["OPENAI_API_TYPE"] = True
@@ -369,49 +348,70 @@ class VerbaManager:
         else:
             self.environment_variables["OPENAI_API_VERSION"] = False
 
+        # GOOGLE_CLOUD_PROJECT
+        if os.environ.get("GOOGLE_CLOUD_PROJECT", "") != "":
+            self.environment_variables["GOOGLE_CLOUD_PROJECT"] = True
+        else:
+            self.environment_variables["GOOGLE_CLOUD_PROJECT"] = False
+
+        # GOOGLE_APPLICATION_CREDENTIALS
+        if os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "") != "":
+            self.environment_variables["GOOGLE_APPLICATION_CREDENTIALS"] = True
+        else:
+            self.environment_variables["GOOGLE_APPLICATION_CREDENTIALS"] = False
+
         # Azure openai ressource name, mandatory when using Azure, should be XXX when endpoint is https://XXX.openai.azure.com
         if os.environ.get("AZURE_OPENAI_RESOURCE_NAME", "") != "":
             self.environment_variables["AZURE_OPENAI_RESOURCE_NAME"] = True
         else:
             self.environment_variables["AZURE_OPENAI_RESOURCE_NAME"] = False
 
-        #Model used for embeddings. mandatory when using Azure. Typically "text-embedding-ada-002"
+        # Model used for embeddings. mandatory when using Azure. Typically "text-embedding-ada-002"
         if os.environ.get("AZURE_OPENAI_EMBEDDING_MODEL", "") != "":
             self.environment_variables["AZURE_OPENAI_EMBEDDING_MODEL"] = True
         else:
             self.environment_variables["AZURE_OPENAI_EMBEDDING_MODEL"] = False
 
-        #Model used for queries. mandatory when using Azure, but can also be used to change the model used for queries when using OpenAI.
+        # Model used for queries. mandatory when using Azure, but can also be used to change the model used for queries when using OpenAI.
         if os.environ.get("OPENAI_MODEL", "") != "":
             self.environment_variables["OPENAI_MODEL"] = True
         else:
             self.environment_variables["OPENAI_MODEL"] = False
 
-        if os.environ.get("OPENAI_API_TYPE", "")=="azure":
-            if not(
-                self.environment_variables["OPENAI_BASE_URL"] and
-                self.environment_variables["AZURE_OPENAI_RESOURCE_NAME"] and
-                self.environment_variables["AZURE_OPENAI_EMBEDDING_MODEL"] and
-                self.environment_variables["OPENAI_MODEL"]
+        if os.environ.get("OPENAI_API_TYPE", "") == "azure":
+            if not (
+                self.environment_variables["OPENAI_BASE_URL"]
+                and self.environment_variables["AZURE_OPENAI_RESOURCE_NAME"]
+                and self.environment_variables["AZURE_OPENAI_EMBEDDING_MODEL"]
+                and self.environment_variables["OPENAI_MODEL"]
             ):
-                raise EnvironmentError("Missing environment variables. When using Azure OpenAI, you need to set OPENAI_BASE_URL, AZURE_OPENAI_RESOURCE_NAME, AZURE_OPENAI_EMBEDDING_MODEL and OPENAI_MODEL. Please check documentation.")
+                raise EnvironmentError(
+                    "Missing environment variables. When using Azure OpenAI, you need to set OPENAI_BASE_URL, AZURE_OPENAI_RESOURCE_NAME, AZURE_OPENAI_EMBEDDING_MODEL and OPENAI_MODEL. Please check documentation."
+                )
 
     def get_schemas(self) -> dict:
         """
         @returns dict - A dictionary with the schema names and their object count.
         """
         schema_info = self.client.schema.get()
+
         schemas = {}
 
-        for _class in schema_info["classes"]:
-            results = (
-                self.client.query.get(_class["class"])
-                .with_limit(10000)
-                .with_additional(properties=["id"])
-                .do()
-            )
-
-            schemas[_class["class"]] = len(results["data"]["Get"][_class["class"]])
+        try:
+            for _class in schema_info["classes"]:
+                results = (
+                    self.client.query.aggregate(_class["class"]).with_meta_count().do()
+                )
+                if "VERBA" in _class["class"]:
+                    schemas[_class["class"]] = (
+                        results.get("data", {})
+                        .get("Aggregate", {})
+                        .get(_class["class"], [{}])[0]
+                        .get("meta", {})
+                        .get("count", 0)
+                    )
+        except Exception as e:
+            msg.error(f"Couldn't retrieve information about Collections, if you're using Weaviate Embedded, try to reset `~/.local/share/weaviate` ({str(e)})")
 
         return schemas
 
@@ -422,7 +422,7 @@ class VerbaManager:
         """
         query_results = (
             self.client.query.get(
-                class_name="Suggestion",
+                class_name="VERBA_Suggestion",
                 properties=["suggestion"],
             )
             .with_bm25(query=query)
@@ -430,7 +430,7 @@ class VerbaManager:
             .do()
         )
 
-        results = query_results["data"]["Get"]["Suggestion"]
+        results = query_results["data"]["Get"]["VERBA_Suggestion"]
 
         if not results:
             return []
@@ -452,7 +452,7 @@ class VerbaManager:
             return
         check_results = (
             self.client.query.get(
-                class_name="Suggestion",
+                class_name="VERBA_Suggestion",
                 properties=["suggestion"],
             )
             .with_where(
@@ -468,9 +468,12 @@ class VerbaManager:
 
         if (
             "data" in check_results
-            and len(check_results["data"]["Get"]["Suggestion"]) > 0
+            and len(check_results["data"]["Get"]["VERBA_Suggestion"]) > 0
         ):
-            if query == check_results["data"]["Get"]["Suggestion"][0]["suggestion"]:
+            if (
+                query
+                == check_results["data"]["Get"]["VERBA_Suggestion"][0]["suggestion"]
+            ):
                 return
 
         with self.client.batch as batch:
@@ -478,7 +481,7 @@ class VerbaManager:
             properties = {
                 "suggestion": query,
             }
-            self.client.batch.add_data_object(properties, "Suggestion")
+            self.client.batch.add_data_object(properties, "VERBA_Suggestion")
 
         msg.info("Added query to suggestions")
 
@@ -486,18 +489,24 @@ class VerbaManager:
         chunks, context = self.retriever_manager.retrieve(
             queries,
             self.client,
-            self.embedder_manager.selected_embedder,
-            self.generator_manager.selected_generator,
+            self.embedder_manager.embedders[self.embedder_manager.selected_embedder],
+            self.generator_manager.generators[
+                self.generator_manager.selected_generator
+            ],
         )
         return chunks, context
 
-    def retrieve_all_documents(self, doc_type: str) -> list:
+    def retrieve_all_documents(self, doc_type: str, page: int, pageSize: int) -> list:
         """Return all documents from Weaviate
         @returns list - Document list.
         """
-        class_name = "Document_" + schema_manager.strip_non_letters(
-            self.embedder_manager.selected_embedder.vectorizer
+        class_name = "VERBA_Document_" + schema_manager.strip_non_letters(
+            self.embedder_manager.embedders[
+                self.embedder_manager.selected_embedder
+            ].vectorizer
         )
+
+        offset = pageSize * (page - 1)
 
         if doc_type == "":
             query_results = (
@@ -506,7 +515,16 @@ class VerbaManager:
                     properties=["doc_name", "doc_type", "doc_link"],
                 )
                 .with_additional(properties=["id"])
-                .with_limit(10000)
+                .with_limit(pageSize)
+                .with_offset(offset)
+                .with_sort(
+                    [
+                        {
+                            "path": ["doc_name"],
+                            "order": "asc",
+                        }
+                    ]
+                )
                 .do()
             )
         else:
@@ -523,11 +541,44 @@ class VerbaManager:
                         "valueText": doc_type,
                     }
                 )
-                .with_limit(10000)
+                .with_limit(pageSize)
+                .with_offset(offset)
+                .with_sort(
+                    [
+                        {
+                            "path": ["doc_name"],
+                            "order": "asc",
+                        }
+                    ]
+                )
                 .do()
             )
 
         results = query_results["data"]["Get"][class_name]
+        return results
+
+    def retrieve_all_document_types(self) -> list:
+        """Aggreagtes and returns all document types from Weaviate
+        @returns list - Document list.
+        """
+        class_name = "VERBA_Document_" + schema_manager.strip_non_letters(
+            self.embedder_manager.embedders[
+                self.embedder_manager.selected_embedder
+            ].vectorizer
+        )
+
+        query_results = (
+            self.client.query.aggregate(class_name)
+            .with_fields("doc_type {count topOccurrences {value occurs}}")
+            .do()
+        )
+
+        results = [
+            doc_type["value"]
+            for doc_type in query_results["data"]["Aggregate"][class_name][0][
+                "doc_type"
+            ]["topOccurrences"]
+        ]
         return results
 
     def retrieve_document(self, doc_id: str) -> dict:
@@ -535,8 +586,10 @@ class VerbaManager:
         @parameter doc_id : str - Document ID
         @returns dict - Document dict.
         """
-        class_name = "Document_" + schema_manager.strip_non_letters(
-            self.embedder_manager.selected_embedder.vectorizer
+        class_name = "VERBA_Document_" + schema_manager.strip_non_letters(
+            self.embedder_manager.embedders[
+                self.embedder_manager.selected_embedder
+            ].vectorizer
         )
 
         document = self.client.data_object.get_by_id(
@@ -548,15 +601,17 @@ class VerbaManager:
     async def generate_answer(
         self, queries: list[str], contexts: list[str], conversation: dict
     ):
-        semantic_query = self.embedder_manager.selected_embedder.conversation_to_query(
-            queries, conversation
-        )
-        (
-            semantic_result,
-            distance,
-        ) = self.embedder_manager.selected_embedder.retrieve_semantic_cache(
-            self.client, semantic_query
-        )
+        semantic_result = None
+        if self.enable_caching:
+            semantic_query = self.embedder_manager.embedders[
+                self.embedder_manager.selected_embedder
+            ].conversation_to_query(queries, conversation)
+            (
+                semantic_result,
+                distance,
+            ) = self.embedder_manager.embedders[
+                self.embedder_manager.selected_embedder
+            ].retrieve_semantic_cache(self.client, semantic_query)
 
         if semantic_result is not None:
             return {
@@ -567,27 +622,32 @@ class VerbaManager:
             }
 
         else:
-            full_text = await self.generator_manager.selected_generator.generate(
-                queries, contexts, conversation
-            )
-            self.embedder_manager.selected_embedder.add_to_semantic_cache(
-                self.client, semantic_query, full_text
-            )
-            self.set_suggestions(" ".join(queries))
+            full_text = await self.generator_manager.generators[
+                self.generator_manager.selected_generator
+            ].generate(queries, contexts, conversation)
+            if self.enable_caching:
+                self.embedder_manager.embedders[
+                    self.embedder_manager.selected_embedder
+                ].add_to_semantic_cache(self.client, semantic_query, full_text)
+                self.set_suggestions(" ".join(queries))
             return full_text
 
     async def generate_stream_answer(
         self, queries: list[str], contexts: list[str], conversation: dict
     ):
-        semantic_query = self.embedder_manager.selected_embedder.conversation_to_query(
-            queries, conversation
-        )
-        (
-            semantic_result,
-            distance,
-        ) = self.embedder_manager.selected_embedder.retrieve_semantic_cache(
-            self.client, semantic_query
-        )
+
+        semantic_result = None
+
+        if self.enable_caching:
+            semantic_query = self.embedder_manager.embedders[
+                self.embedder_manager.selected_embedder
+            ].conversation_to_query(queries, conversation)
+            (
+                semantic_result,
+                distance,
+            ) = self.embedder_manager.embedders[
+                self.embedder_manager.selected_embedder
+            ].retrieve_semantic_cache(self.client, semantic_query)
 
         if semantic_result is not None:
             yield {
@@ -599,18 +659,19 @@ class VerbaManager:
 
         else:
             full_text = ""
-            async for result in self.generator_manager.selected_generator.generate_stream(
-                queries, contexts, conversation
-            ):
+            async for result in self.generator_manager.generators[
+                self.generator_manager.selected_generator
+            ].generate_stream(queries, contexts, conversation):
                 full_text += result["message"]
                 yield result
-            self.set_suggestions(" ".join(queries))
-            self.embedder_manager.selected_embedder.add_to_semantic_cache(
-                self.client, semantic_query, full_text
-            )
+            if self.enable_caching:
+                self.set_suggestions(" ".join(queries))
+                self.embedder_manager.embedders[
+                    self.embedder_manager.selected_embedder
+                ].add_to_semantic_cache(self.client, semantic_query, full_text)
 
     def reset(self):
-        self.client.schema.delete_class("Suggestion")
+        self.client.schema.delete_class("VERBA_Suggestion")
         # Check if all schemas exist for all possible vectorizers
         for vectorizer in schema_manager.VECTORIZERS:
             schema_manager.reset_schemas(self.client, vectorizer)
@@ -624,29 +685,59 @@ class VerbaManager:
         for embedding in schema_manager.EMBEDDINGS:
             schema_manager.init_schemas(self.client, embedding, False, True)
 
+    def reset_documents(self):
+        # Check if all schemas exist for all possible vectorizers
+        for vectorizer in schema_manager.VECTORIZERS:
+            document_class_name = "VERBA_Document_" + schema_manager.strip_non_letters(
+                vectorizer
+            )
+            chunk_class_name = "VERBA_Chunk_" + schema_manager.strip_non_letters(
+                vectorizer
+            )
+            self.client.schema.delete_class(document_class_name)
+            self.client.schema.delete_class(chunk_class_name)
+            schema_manager.init_schemas(self.client, vectorizer, False, True)
+
+        for embedding in schema_manager.EMBEDDINGS:
+            document_class_name = "VERBA_Document_" + schema_manager.strip_non_letters(
+                embedding
+            )
+            chunk_class_name = "VERBA_Chunk_" + schema_manager.strip_non_letters(
+                embedding
+            )
+            self.client.schema.delete_class(document_class_name)
+            self.client.schema.delete_class(chunk_class_name)
+            schema_manager.init_schemas(self.client, embedding, False, True)
+
     def reset_cache(self):
         # Check if all schemas exist for all possible vectorizers
         for vectorizer in schema_manager.VECTORIZERS:
-            class_name = "Cache_" + schema_manager.strip_non_letters(vectorizer)
+            class_name = "VERBA_Cache_" + schema_manager.strip_non_letters(vectorizer)
             self.client.schema.delete_class(class_name)
             schema_manager.init_schemas(self.client, vectorizer, False, True)
 
         for embedding in schema_manager.EMBEDDINGS:
-            class_name = "Cache_" + schema_manager.strip_non_letters(embedding)
+            class_name = "VERBA_Cache_" + schema_manager.strip_non_letters(embedding)
             self.client.schema.delete_class(class_name)
             schema_manager.init_schemas(self.client, embedding, False, True)
 
     def reset_suggestion(self):
-        self.client.schema.delete_class("Suggestion")
+        self.client.schema.delete_class("VERBA_Suggestion")
         schema_manager.init_suggestion(self.client, "", False, True)
+
+    def reset_config(self):
+        self.client.schema.delete_class("VERBA_Config")
+        schema_manager.init_config(self.client, "", False, True)
 
     def check_if_document_exits(self, document: Document) -> bool:
         """Return a document by it's ID (UUID format) from Weaviate
         @parameter document : Document - Document object
         @returns bool - Whether the doc name exist in the cluster.
         """
-        class_name = "Document_" + schema_manager.strip_non_letters(
-            self.embedder_manager.selected_embedder.vectorizer
+        class_name = "VERBA_Document_" + schema_manager.strip_non_letters(
+            self.embedder_manager.embedders[
+                self.embedder_manager.selected_embedder
+            ].vectorizer
         )
 
         results = (
@@ -674,28 +765,18 @@ class VerbaManager:
             return False
 
     def check_verba_component(self, component: VerbaComponent) -> tuple[bool, str]:
-        for library in component.requires_library:
-            if library in self.installed_libraries:
-                if not self.installed_libraries[library]:
-                    return (False, f"{library} not installed")
-            else:
-                return (False, f"{library} not installed")
-
-        for env in component.requires_env:
-            if env in self.environment_variables:
-                if not self.environment_variables[env]:
-                    return (False, f"{env} not set")
-            else:
-                return (False, f"{env} not set")
-
-        return (True, "Available")
+        return component.check_available(
+            self.environment_variables, self.installed_libraries
+        )
 
     def delete_document_by_id(self, doc_id: str) -> None:
-        self.embedder_manager.selected_embedder.remove_document_by_id(
-            self.client, doc_id
-        )
+        self.embedder_manager.embedders[
+            self.embedder_manager.selected_embedder
+        ].remove_document_by_id(self.client, doc_id)
 
-    def search_documents(self, query: str, doc_type: str) -> list:
-        return self.embedder_manager.selected_embedder.search_documents(
-            self.client, query, doc_type
-        )
+    def search_documents(
+        self, query: str, doc_type: str, page: int, pageSize: int
+    ) -> list:
+        return self.embedder_manager.embedders[
+            self.embedder_manager.selected_embedder
+        ].search_documents(self.client, query, doc_type, page, pageSize)

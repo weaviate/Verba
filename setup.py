@@ -2,9 +2,9 @@ from setuptools import find_packages, setup
 
 setup(
     name="goldenverba",
-    version="0.4.0",
+    version="1.0.0",
     packages=find_packages(),
-    python_requires='>=3.10.0',
+    python_requires=">=3.10.0",
     entry_points={
         "console_scripts": [
             "verba=goldenverba.server.cli:cli",
@@ -30,28 +30,23 @@ setup(
         "openai==0.27.9",
         "wasabi==1.1.2",
         "fastapi==0.102.0",
-        "uvicorn[standard]",
+        "uvicorn[standard]==0.29.0",
         "click==8.1.7",
-        "asyncio",
-        "tiktoken==0.5.1",
-        "cohere==4.33",
-        "requests",
-        "pypdf2",
+        "asyncio==3.4.3",
+        "tiktoken==0.6.0",
+        "requests==2.31.0",
+        "pypdf==4.2.0",
     ],
     extras_require={
-        "dev": [
-            "pytest",
-            "wheel",
-            "twine",
-            "black>=23.7.0",
-            "setuptools"
-        ],
+        "dev": ["pytest", "wheel", "twine", "black>=23.7.0", "setuptools"],
         "huggingface": [
-            "sentence-transformers",
-            "transformers",
-            "torch",
-            "huggingface_hub",
-            "accelerate",
+            "sentence-transformers==2.7.0",
+            "transformers==4.40.1",
+            "torch==2.3.0",
+            "accelerate==0.29.2",
         ],
+        "google": [
+            "vertexai==1.46.0",
+        ]
     },
 )

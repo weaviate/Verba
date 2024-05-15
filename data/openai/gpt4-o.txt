@@ -1,0 +1,51 @@
+Introducing GPT-4o
+GPT-4o is our newest flagship model that provides GPT-4-level intelligence but is much faster and improves on its capabilities across text, voice, and vision.
+
+Today, GPT-4o is much better than any existing model at understanding and discussing the images you share. For example, you can now take a picture of a menu in a different language and talk to GPT-4o to translate it, learn about the food's history and significance, and get recommendations. In the future, improvements will allow for more natural, real-time voice conversation and the ability to converse with ChatGPT via real-time video. For example, you could show ChatGPT a live sports game and ask it to explain the rules to you. We plan to launch a new Voice Mode with these new capabilities in an alpha in the coming weeks, with early access for Plus users as we roll out more broadly.
+
+To make advanced AI more accessible and useful worldwide, GPT-4o's language capabilities are improved across quality and speed. ChatGPT also now supports more than 50 languages(opens in a new window) across sign-up and login, user settings, and more.
+
+We are beginning to roll out GPT-4o to ChatGPT Plus and Team users, with availability for Enterprise users coming soon. We are also starting to roll out to ChatGPT Free with usage limits today. Plus users will have a message limit that is up to 5x greater than free users, and Team and Enterprise users will have even higher limits.
+
+Bringing more intelligence and advanced tools for free
+Our mission includes making advanced AI tools available to as many people as possible. Every week, more than a hundred million people use ChatGPT. We are starting to roll out more intelligence and advanced tools to ChatGPT Free users over the coming weeks.
+
+When using GPT-4o, ChatGPT Free users will now have access to features such as:
+
+Experience GPT-4 level intelligence 
+
+Get responses(opens in a new window) from both the model and the web  
+
+Analyze data(opens in a new window) and create charts 
+
+Chat about photos you take
+
+Upload files(opens in a new window) for assistance summarizing, writing or analyzing
+
+Discover and use GPTs and the GPT Store
+
+Build a more helpful experience with Memory
+
+
+
+
+
+
+
+
+
+There will be a limit on the number of messages that free users can send with GPT-4o depending on usage and demand. When the limit is reached, ChatGPT will automatically switch to GPT-3.5 so users can continue their conversations.
+
+
+
+Streamlining your workflow in the new desktop app
+For both free and paid users, we're also launching a new ChatGPT desktop app for macOS that is designed to integrate seamlessly into anything you’re doing on your computer. With a simple keyboard shortcut (Option + Space), you can instantly ask ChatGPT a question. You can also take and discuss screenshots directly in the app.
+
+
+You can now have voice conversations with ChatGPT directly from your computer, starting with Voice Mode that has been available in ChatGPT at launch, with GPT-4o’s new audio and video capabilities coming in the future. Whether you want to brainstorm a new idea for your company, prepare for an interview or have a topic you’d like to discuss, tap the headphone icon in the bottom right corner of the desktop app to start a voice conversation. 
+
+mac-desktop-wave
+We're rolling out the macOS app to Plus users starting today, and we will make it more broadly available in the coming weeks. We also plan to launch a Windows version later this year.
+
+A simplified look and feel for ChatGPT
+We’re introducing a new look and feel for ChatGPT that's designed to be friendlier and more conversational. You’ll notice a new home screen, message layout and more.
