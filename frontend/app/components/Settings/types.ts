@@ -128,7 +128,7 @@ const BaseCustomization: CustomizationSettings = {
       description: "Input Placeholder",
     },
     image: {
-      src: "https://github.com/weaviate/Verba/blob/main/frontend/public/favicon.png?raw=true",
+      src: "https://github.com/weaviate/Verba/blob/main/img/verba_icon.png?raw=true",
       type: "image",
       description: "Logo of the Page",
     },
@@ -210,7 +210,7 @@ const CustomCustomization: CustomizationSettings = {
       description: "Input Placeholder",
     },
     image: {
-      src: "https://github.com/weaviate/Verba/blob/main/frontend/public/favicon.png?raw=true",
+      src: "https://github.com/weaviate/Verba/blob/main/img/verba_icon.png?raw=true",
       type: "image",
       description: "Logo of the Page",
     },
@@ -292,7 +292,7 @@ const DarkModeCustomization: CustomizationSettings = {
       description: "Input Placeholder",
     },
     image: {
-      src: "https://github.com/weaviate/Verba/blob/main/frontend/public/favicon.png?raw=true",
+      src: "https://github.com/weaviate/Verba/blob/main/img/verba_icon.png?raw=true",
       type: "image",
       description: "Logo of the Page",
     },
@@ -576,7 +576,7 @@ export const BaseSettings: Settings = {
     Customization: WeaviateCustomization,
     Chat: BaseChat,
   },
-  GoogleHackathon: {
+  SanaMaxima: {
     Customization: GoogleHackathonCustomization,
     Chat: BaseChat,
   },

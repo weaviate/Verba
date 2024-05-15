@@ -17,7 +17,7 @@ def cli():
 )
 @click.option(
     "--host",
-    default="0.0.0.0",
+    default="localhost",
     help="FastAPI Host",
 )
 @click.option(
