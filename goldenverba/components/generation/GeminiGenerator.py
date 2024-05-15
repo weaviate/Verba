@@ -22,7 +22,7 @@ class GeminiGenerator(Generator):
 
     def __init__(self):
         super().__init__()
-        self.name = "GeminiGenerator"
+        self.name = "Gemini"
         self.description = "Generator using Google's Gemini 1.5 Pro model"
         self.requires_library = ["vertexai"]
         self.requires_env = [
@@ -66,7 +66,6 @@ class GeminiGenerator(Generator):
             generative_multimodal_model = GenerativeModel(
                 "gemini-1.5-pro-preview-0409",
             )
-            msg.info(f"Generated Messages: {[message.role for message in messages]}")
 
             completion = await generative_multimodal_model.generate_content_async(
                 stream=True, contents=messages
@@ -139,10 +138,6 @@ class GeminiGenerator(Generator):
         return messages
 
     def ensure_user_model_alteration(self, messages):
-        msg.info(f"Generated raw Messages: {[message.role for message in messages]}")
-        msg.info(
-            f"Generated raw Messages: {[message.text[:30] for message in messages]}"
-        )
         current_role: str = ""
 
         new_messages: list[Content] = []

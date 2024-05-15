@@ -24,9 +24,9 @@ pip install goldenverba
   - [Unstructured](#unstructured)
   - [OpenAI](#openai)
   - [HuggingFace](#huggingface)
-- [Quickstart: Deploy with pip](#quickstart-deploy-with-pip)
-- [Quickstart: Build from Source](#quickstart-build-from-source)
-- [Quickstart: Deploy with Docker](#quickstart-deploy-with-docker)
+- [Quickstart: Deploy with pip](#how-to-deploy-with-pip)
+- [Quickstart: Build from Source](#how-to-build-from-source)
+- [Quickstart: Deploy with Docker](#how-to-install-verba-with-docker)
 - [💾 Verba Walkthrough](#️verba-walkthrough)
 - [💖 Open Source Contribution](#open-source-contribution)
 - [🚩 Known Issues](#known-issues)
@@ -243,7 +243,7 @@ pip install `.[huggingface]`
 
 > If you're using Docker, modify the Dockerfile accordingly
 
-# Quickstart: Deploy with pip
+# How to deploy with pip
 
 `Python >=3.10.0`
 
@@ -275,7 +275,7 @@ Visit localhost:8000
 
 5. **Create .env file and add environment variables**
 
-# Quickstart: Build from Source
+# How to build from Source
 
 1. **Clone the Verba repos**
 
@@ -311,7 +311,7 @@ Visit localhost:8000
 
 6. **Create .env file and add environment variables**
 
-# Quickstart: Deploy with Docker
+# How to install Verba with Docker
 
 Docker is a set of platform-as-a-service products that use OS-level virtualization to deliver software in packages called containers. To get started with deploying Verba using Docker, follow the steps below. If you need more detailed instructions on Docker usage, check out the [Docker Curriculum](https://docker-curriculum.com/).
 

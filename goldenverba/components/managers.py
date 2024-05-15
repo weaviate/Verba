@@ -265,13 +265,13 @@ class RetrieverManager:
 class GeneratorManager:
     def __init__(self):
         self.generators: dict[str, Generator] = {
-            "GeminiGenerator": GeminiGenerator(),
-            "GPT4Generator": GPT4Generator(),
-            "GPT3Generator": GPT3Generator(),
-            "OllamaGenerator": OllamaGenerator(),
+            "Gemini": GeminiGenerator(),
+            "GPT4-O": GPT4Generator(),
+            "GPT3": GPT3Generator(),
+            "Ollama": OllamaGenerator(),
             "Command R+": CohereGenerator(),
         }
-        self.selected_generator: str = "GPT3Generator"
+        self.selected_generator: str = "GPT3"
 
     async def generate_stream(
         self,

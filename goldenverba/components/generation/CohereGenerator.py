@@ -12,7 +12,7 @@ class CohereGenerator(Generator):
 
     def __init__(self):
         super().__init__()
-        self.name = "CohereGenerator"
+        self.name = "CommandR+"
         self.description = "Generator using Cohere's command-r-plus model"
         self.requires_env = ["COHERE_API_KEY"]
         self.streamable = True
