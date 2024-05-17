@@ -42,6 +42,15 @@ const RAGConfigComponent: React.FC<RAGConfigComponentProps> = ({
     textValues ? textValues[0] : ""
   );
 
+  const ref = React.useRef<HTMLInputElement>(null);
+
+  React.useEffect(() => {
+    if (ref.current !== null) {
+      ref.current.setAttribute("directory", "");
+      ref.current.setAttribute("webkitdirectory", "");
+    }
+  }, [ref]);
+
   const onSelectComponent = (_selected: string) => {
     setRAGConfig((prevConfig: any) => {
       const newConfig = JSON.parse(JSON.stringify(prevConfig));
@@ -138,7 +147,7 @@ const RAGConfigComponent: React.FC<RAGConfigComponentProps> = ({
 
         {RAGComponents.components[RAGComponents.selected].type === "UPLOAD" && (
           <div className="flex lg:flex-row flex-col gap-3">
-            <div className="flex flex-col gap-2 items-center">
+            <div className="flex flex-col gap-2 items-start">
               <div className="flex">
                 <button
                   onClick={() =>
@@ -159,6 +168,29 @@ const RAGConfigComponent: React.FC<RAGConfigComponentProps> = ({
                   onChange={handleUploadFiles}
                   className="hidden"
                   multiple
+                />
+              </div>
+              <div className="flex">
+                <button
+                  onClick={() =>
+                    document
+                      .getElementById(
+                        RAGConfigTitle + RAGComponents.selected + "_upload_dir"
+                      )
+                      ?.click()
+                  }
+                  className="btn border-none bg-button-verba hover:bg-secondary-verba text-text-verba"
+                >
+                  Add Folder
+                </button>
+                <input
+                  id={RAGConfigTitle + RAGComponents.selected + "_upload_dir"}
+                  type="file"
+                  value={files ? undefined : ""}
+                  onChange={handleUploadFiles}
+                  className="hidden"
+                  multiple
+                  ref={ref}
                 />
               </div>
               {files && (
