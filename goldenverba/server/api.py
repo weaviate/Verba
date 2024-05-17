@@ -236,6 +236,15 @@ async def reset_verba(payload: ResetPayload):
 
 @app.post("/api/import_directory")
 async def import_collection(payload: ImportCollectionPayload):
+    """
+    Receive a list of directories and reads all files from it reusing the logic from /api/import
+
+
+    Example call
+    ```
+    http POST localhost:8000/api/import_directory directories:='["YOUR_DIRECTORY_FULL_PATH"]' config:='{}'
+    ```
+    """
     logging = []
 
     if production:
@@ -252,7 +261,11 @@ async def import_collection(payload: ImportCollectionPayload):
         files: list[FileData] = []
         text_values: list[str] = []
         for dir in payload.directories:
-            onlyfiles = [(dir, f) for f in os.listdir(dir) if os.path.isfile(os.path.join(dir, f))]
+            onlyfiles = [
+                (dir, f)
+                for f in os.listdir(dir)
+                if os.path.isfile(os.path.join(dir, f))
+            ]
             for dir, file in onlyfiles:
                 with open(os.path.join(dir, file), "r") as fl:
                     file_ = FileData(
