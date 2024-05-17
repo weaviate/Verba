@@ -4,6 +4,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 import os
+import base64
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -12,6 +13,7 @@ from wasabi import msg  # type: ignore[import]
 import time
 
 from goldenverba import verba_manager
+from goldenverba.components.types import FileData
 from goldenverba.server.types import (
     ResetPayload,
     ConfigPayload,
@@ -20,6 +22,7 @@ from goldenverba.server.types import (
     GetDocumentPayload,
     SearchQueryPayload,
     ImportPayload,
+    ImportCollectionPayload,
 )
 from goldenverba.server.util import get_config, set_config, setup_managers
 
@@ -73,7 +76,9 @@ app.mount("/static", StaticFiles(directory=BASE_DIR / "frontend/out"), name="app
 async def serve_frontend():
     return FileResponse(os.path.join(BASE_DIR, "frontend/out/index.html"))
 
+
 ### GET
+
 
 # Define health check endpoint
 @app.get("/api/health")
@@ -102,6 +107,7 @@ async def health_check():
             },
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
         )
+
 
 # Get Status meta data
 @app.get("/api/get_status")
@@ -146,6 +152,7 @@ async def get_status():
         msg.fail(f"Status retrieval failed: {str(e)}")
         return JSONResponse(content=data)
 
+
 # Get Configuration
 @app.get("/api/config")
 async def retrieve_config():
@@ -164,7 +171,9 @@ async def retrieve_config():
             },
         )
 
+
 ### WEBSOCKETS
+
 
 @app.websocket("/ws/generate_stream")
 async def websocket_generate_stream(websocket: WebSocket):
@@ -195,7 +204,9 @@ async def websocket_generate_stream(websocket: WebSocket):
             )
         msg.good("Succesfully streamed answer")
 
+
 ### POST
+
 
 # Reset Verba
 @app.post("/api/reset")
@@ -222,10 +233,56 @@ async def reset_verba(payload: ResetPayload):
 
     return JSONResponse(status_code=200, content={})
 
+
+@app.post("/api/import_collection")
+async def import_collection(payload: ImportCollectionPayload):
+    logging = []
+
+    if production:
+        logging.append(
+            {"type": "ERROR", "message": "Can't import when in production mode"}
+        )
+        return JSONResponse(
+            content={
+                "logging": logging,
+            }
+        )
+
+    try:
+        files: list[FileData] = []
+        text_values: list[str] = []
+        for dir in payload.directories:
+            onlyfiles = [(dir, f) for f in os.listdir(dir) if os.path.isfile(os.path.join(dir, f))]
+            for dir, file in onlyfiles:
+                with open(os.path.join(dir, file), "r") as fl:
+                    file_ = FileData(
+                        filename=file,
+                        extension=file.split(".")[-1],
+                        content=base64.b64encode(fl.read().encode("utf-8")),
+                    )
+                    files.append(file_)
+        if payload.config != {}:
+            set_config(manager, payload.config)
+        _, logging = manager.import_data(files, text_values, logging)
+
+        return JSONResponse(
+            content={
+                "logging": logging,
+            }
+        )
+
+    except Exception as e:
+        logging.append({"type": "ERROR", "message": str(e)})
+        return JSONResponse(
+            content={
+                "logging": logging,
+            }
+        )
+
+
 # Receive query and return chunks and query answer
 @app.post("/api/import")
 async def import_data(payload: ImportPayload):
-
     logging = []
 
     if production:
@@ -258,9 +315,9 @@ async def import_data(payload: ImportPayload):
             }
         )
 
+
 @app.post("/api/set_config")
 async def update_config(payload: ConfigPayload):
-
     if production:
         return JSONResponse(
             content={
@@ -280,6 +337,7 @@ async def update_config(payload: ConfigPayload):
             "status_msg": "Config Updated",
         }
     )
+
 
 # Receive query and return chunks and query answer
 @app.post("/api/query")
@@ -327,12 +385,13 @@ async def query(payload: QueryPayload):
         msg.warn(f"Query failed: {str(e)}")
         return JSONResponse(
             content={
-                    "chunks": [],
-                    "took": 0,
-                    "context": "",
-                    "error": f"Something went wrong: {str(e)}",
+                "chunks": [],
+                "took": 0,
+                "context": "",
+                "error": f"Something went wrong: {str(e)}",
             }
         )
+
 
 # Retrieve auto complete suggestions based on user input
 @app.post("/api/suggestions")
@@ -351,6 +410,7 @@ async def suggestions(payload: QueryPayload):
                 "suggestions": [],
             }
         )
+
 
 # Retrieve specific document based on UUID
 @app.post("/api/get_document")
@@ -388,6 +448,7 @@ async def get_document(payload: GetDocumentPayload):
             }
         )
 
+
 ## Retrieve and search documents imported to Weaviate
 @app.post("/api/get_all_documents")
 async def get_all_documents(payload: SearchQueryPayload):
@@ -418,7 +479,6 @@ async def get_all_documents(payload: SearchQueryPayload):
 
         documents_obj = []
         for document in documents:
-
             _additional = document["_additional"]
 
             documents_obj.append(
@@ -461,6 +521,7 @@ async def get_all_documents(payload: SearchQueryPayload):
                 "took": 0,
             }
         )
+
 
 # Delete specific document based on UUID
 @app.post("/api/delete_document")

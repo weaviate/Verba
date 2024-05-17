@@ -49,6 +49,9 @@ class ImportPayload(BaseModel):
     textValues: list[str]
     config: dict
 
+class ImportCollectionPayload(BaseModel):
+    directories: list[str]
+    config: dict
 
 class ConfigPayload(BaseModel):
     config: dict
