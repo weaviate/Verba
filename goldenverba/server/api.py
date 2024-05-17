@@ -234,7 +234,7 @@ async def reset_verba(payload: ResetPayload):
     return JSONResponse(status_code=200, content={})
 
 
-@app.post("/api/import_collection")
+@app.post("/api/import_directory")
 async def import_collection(payload: ImportCollectionPayload):
     logging = []
 
