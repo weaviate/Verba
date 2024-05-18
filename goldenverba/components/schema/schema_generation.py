@@ -34,9 +34,9 @@ def verify_vectorizer(
         skip_properties = []
     modified_schema = schema.copy()
 
-    # adding specific config for Azure OpenAI
-    vectorizer_config = None
-    if os.getenv("OPENAI_API_TYPE") == "azure" and vectorizer == "text2vec-openai":
+    #adding specific config for Azure OpenAI
+    vectorizer_config = {}
+    if os.getenv("OPENAI_API_TYPE") == "azure" and vectorizer=="text2vec-openai":
         resourceName = os.getenv("AZURE_OPENAI_RESOURCE_NAME")
         model = os.getenv("AZURE_OPENAI_EMBEDDING_MODEL")
         if resourceName is None or model is None:
@@ -46,6 +46,20 @@ def verify_vectorizer(
         vectorizer_config = {
             "text2vec-openai": {"deploymentId": model, "resourceName": resourceName}
         }
+
+    base_url = os.getenv("OPENAI_BASE_URL", "")
+    if vectorizer == "text2vec-openai" and base_url:
+        # check if base_url ends with v1 and strip it since Weaviate automatically adds v1
+        if base_url.endswith("v1"):
+            base_url = base_url[:-2]
+        if vectorizer_config == {}:
+            vectorizer_config = {
+                "text2vec-openai": {
+                    "baseURL": base_url,
+                }
+            }
+        else:
+            vectorizer_config["text2vec-openai"]["baseURL"] = base_url
 
     # adding specific config for Google
     if vectorizer == "text2vec-palm":
@@ -59,7 +73,7 @@ def verify_vectorizer(
     # Verify Vectorizer
     if vectorizer in VECTORIZERS:
         modified_schema["classes"][0]["vectorizer"] = vectorizer
-        if vectorizer_config is not None:
+        if vectorizer_config != {}:
             modified_schema["classes"][0]["moduleConfig"] = vectorizer_config
         for property in modified_schema["classes"][0]["properties"]:
             if property["name"] in skip_properties:
