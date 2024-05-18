@@ -1,9 +1,8 @@
 from weaviate import Client
 from weaviate.gql.get import HybridFusion
 
-from goldenverba.components.chunking.chunk import Chunk
-from goldenverba.components.embedding.interface import Embedder
-from goldenverba.components.retriever.interface import Retriever
+from goldenverba.components.chunk import Chunk
+from goldenverba.components.interfaces import Embedder, Retriever
 
 
 class WindowRetriever(Retriever):
@@ -13,7 +12,7 @@ class WindowRetriever(Retriever):
 
     def __init__(self):
         super().__init__()
-        self.description = "WindowRetriever uses Hybrid Search to retrieve relevant chunks and adds their surrounding context"
+        self.description = "Retrieve relevant chunks and their surrounding context using Semantic and Keyword Search (Hybrid)"
         self.name = "WindowRetriever"
 
     def retrieve(
@@ -45,7 +44,7 @@ class WindowRetriever(Retriever):
                     ],
                 )
                 .with_additional(properties=["score"])
-                .with_autocut(2)
+                .with_autocut(1)
             )
 
             if needs_vectorization:
@@ -79,9 +78,9 @@ class WindowRetriever(Retriever):
                 chunk_obj.set_score(chunk["_additional"]["score"])
                 chunks.append(chunk_obj)
 
-        sorted_chunks = self.sort_chunks(chunks)
+        sorted_chunks = sorted(chunks, key=lambda x: x.score, reverse=True)
 
-        context = self.combine_context(sorted_chunks, client, embedder)
+        context = self.combine_context(chunks, client, embedder)
 
         return sorted_chunks, context
 
@@ -97,12 +96,15 @@ class WindowRetriever(Retriever):
 
         for chunk in chunks:
             if chunk.doc_name not in doc_name_map:
-                doc_name_map[chunk.doc_name] = {}
+                doc_name_map[chunk.doc_name] = {"score": 0, "chunks":{}}
 
-            doc_name_map[chunk.doc_name][chunk.chunk_id] = chunk
+            doc_name_map[chunk.doc_name]["chunks"][chunk.chunk_id] = chunk
+            doc_name_map[chunk.doc_name]["score"] += float(chunk.score)
+
+        doc_name_map = dict(sorted(doc_name_map.items(), key=lambda item: item[1]['score'], reverse=True))
 
         for doc in doc_name_map:
-            chunk_map = doc_name_map[doc]
+            chunk_map = doc_name_map[doc]["chunks"]
             window = 2
             added_chunks = {}
             for chunk in chunk_map:
@@ -171,15 +173,17 @@ class WindowRetriever(Retriever):
 
             for chunk in added_chunks:
                 if chunk not in doc_name_map[doc]:
-                    doc_name_map[doc][chunk] = added_chunks[chunk]
+                    doc_name_map[doc]["chunks"][chunk] = added_chunks[chunk]
 
         for doc in doc_name_map:
             sorted_dict = {
-                k: doc_name_map[doc][k]
-                for k in sorted(doc_name_map[doc], key=lambda x: int(x))
+                k: doc_name_map[doc]["chunks"][k]
+                for k in sorted(doc_name_map[doc]["chunks"], key=lambda x: int(x))
             }
 
+            context += "--- Document " + doc + " ---" + "\n\n"
+
             for chunk in sorted_dict:
-                context += sorted_dict[chunk].text
+                context += "Chunk "+ str(sorted_dict[chunk].chunk_id) + "\n\n" + sorted_dict[chunk].text + "\n\n"
 
         return context
