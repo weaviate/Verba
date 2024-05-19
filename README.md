@@ -209,7 +209,7 @@ OPENAI_API_KEY=<YOUR_KEY>
 OPENAI_BASE_URL=http://XXX.openai.azure.com
 ```
 
-- Azure OpenAI ressource name, which is XXX if your endpoint is XXX.openai.azure.com
+- Azure OpenAI resource name, which is XXX if your endpoint is XXX.openai.azure.com
 
 ```
 AZURE_OPENAI_RESOURCE_NAME=<YOUR_AZURE_RESOURCE_NAME>
