@@ -118,6 +118,7 @@ Below is a comprehensive list of the API keys and variables you may require:
 | WEAVIATE_URL_VERBA             | URL to your hosted Weaviate Cluster                        | Connect to your [WCS](https://console.weaviate.cloud/) Cluster                    |
 | WEAVIATE_API_KEY_VERBA         | API Credentials to your hosted Weaviate Cluster            | Connect to your [WCS](https://console.weaviate.cloud/) Cluster                    |
 | OPENAI_API_KEY                 | Your API Key                                               | Get Access to [OpenAI](https://openai.com/) Models                                |
+| OPENAI_BASE_URL                | URL to OpenAI instance                                     | Models                                                                            |
 | COHERE_API_KEY                 | Your API Key                                               | Get Access to [Cohere](https://cohere.com/) Models                                |
 | OLLAMA_URL                     | URL to your Ollama instance (e.g. http://localhost:11434 ) | Get Access to [Ollama](https://ollama.com/) Models                                |
 | OLLAMA_MODEL                   | Model Name (e.g. llama)                                    | Get Access to a specific [Ollama](https://ollama.com/) Model                      |

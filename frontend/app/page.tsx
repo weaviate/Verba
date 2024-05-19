@@ -270,12 +270,6 @@ export default function Home() {
               setBaseSetting={setBaseSetting}
             />
           )}
-
-          <footer className="footer footer-center p-4 mt-8 bg-bg-verba text-text-alt-verba">
-            <aside>
-              <p>Build with ♥ and Weaviate © 2024</p>
-            </aside>
-          </footer>
         </div>
       ) : (
         <div className="flex items-center justify-center h-screen gap-2">
@@ -283,6 +277,15 @@ export default function Home() {
           <p>Loading Verba</p>
         </div>
       )}
+      <footer className="footer footer-center p-4 mt-8 bg-bg-verba text-text-alt-verba">
+        <aside>
+          <p>Build with ♥ and Weaviate © 2024</p>
+        </aside>
+      </footer>
+      <img
+        referrerPolicy="no-referrer-when-downgrade"
+        src="https://static.scarf.sh/a.png?x-pxid=ec666e70-aee5-4e87-bc62-0935afae63ac"
+      />
     </main>
   );
 }
