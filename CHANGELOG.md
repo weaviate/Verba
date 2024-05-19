@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.2]
+
+## Added
+
+- Readme Variable: OPENAI_BASE_URL
+
+## Fixed
+
+- https://github.com/weaviate/Verba/pull/173
+- https://github.com/weaviate/Verba/pull/163
+- https://github.com/weaviate/Verba/pull/148
+
 ## [1.0.0] - Beautiful Verba Update
 
 ### Added
