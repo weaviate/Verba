@@ -149,7 +149,15 @@ Verba supports Ollama models. Download and Install Ollama on your device (https:
 
 Tested with `llama3`, `llama3:70b` and `mistral`. The bigger models generally perform better, but need more computational power.
 
+> Ensure that you have the right configurations for the `Embedder` and `Generator` selected before going ahead.
+
 > Make sure Ollama Server runs in the background and that you don't ingest documents with different ollama models since their vector dimension can vary that will lead to errors
+
+You can verify that by running the following command
+
+```
+ollama run llama3
+```
 
 ## Google
 
