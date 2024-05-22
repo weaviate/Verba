@@ -14,10 +14,10 @@ class OllamaEmbedder(Embedder):
         super().__init__()
         self.name = "OllamaEmbedder"
         self.requires_env = ["OLLAMA_URL", "OLLAMA_EMBED_MODEL"]
-        self.description = "Embeds and retrieves objects using Ollama and the model specified in the environment variable 'OLLAMA_EMBED_MODEL'"
+        self.description = "Embeds and retrieves objects using Ollama and the model specified in the environment variable 'OLLAMA_EMBED_MODEL' or 'OLLAMA_MODEL'"
         self.vectorizer = "OLLAMA"
         self.url = os.environ.get("OLLAMA_URL", "")
-        self.model = os.environ.get("OLLAMA_EMBED_MODEL", "")
+        self.model = os.environ.get("OLLAMA_EMBED_MODEL", os.environ.get("OLLAMA_MODEL",""))
 
     def embed(
         self,
