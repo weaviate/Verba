@@ -22,7 +22,8 @@ export const detectHost = async (): Promise<string> => {
 
   const isRootHealthy = await checkUrl(rootUrl);
   if (isRootHealthy) {
-    return "";
+    const root = window.location.origin;
+    return root;
   }
 
   throw new Error("Both health checks failed, please check the Verba Server");

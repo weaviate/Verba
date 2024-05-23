@@ -43,7 +43,7 @@ export default function Home() {
     try {
       const host = await detectHost();
       setAPIHost(host);
-      if (host === "" || host === "http://localhost:8000") {
+      if (host) {
         try {
           const health_response = await fetch(host + "/api/health", {
             method: "GET",

@@ -409,4 +409,4 @@ You can learn more about Verba's architecture and implementation in its [technic
   - Remove the directory `rm ~/.local/share/weaviate`
 
 - **How can I specify the port?**
-  - You can use the port and host flag `verba start --port 9000 -host 0.0.0.0`
+  - You can use the port and host flag `verba start --port 9000 --host 0.0.0.0`
