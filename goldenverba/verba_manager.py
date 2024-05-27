@@ -411,7 +411,7 @@ class VerbaManager:
                         .get("count", 0)
                     )
         except Exception as e:
-            msg.error(f"Couldn't retrieve information about Collections, if you're using Weaviate Embedded, try to reset `~/.local/share/weaviate` ({str(e)})")
+            msg.fail(f"Couldn't retrieve information about Collections, if you're using Weaviate Embedded, try to reset `~/.local/share/weaviate` ({str(e)})")
 
         return schemas
 
