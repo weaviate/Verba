@@ -122,6 +122,7 @@ Below is a comprehensive list of the API keys and variables you may require:
 | COHERE_API_KEY                 | Your API Key                                               | Get Access to [Cohere](https://cohere.com/) Models                                |
 | OLLAMA_URL                     | URL to your Ollama instance (e.g. http://localhost:11434 ) | Get Access to [Ollama](https://ollama.com/) Models                                |
 | OLLAMA_MODEL                   | Model Name (e.g. llama)                                    | Get Access to a specific [Ollama](https://ollama.com/) Model                      |
+| OLLAMA_EMBED_MODEL             | Model Name (e.g. mxbai-embed-large)                        | Get Access to a specific [Ollama](https://ollama.com/) Model for embedding (Defaults to OLLAMA_MODEL if not specified)|
 | UNSTRUCTURED_API_KEY           | Your API Key                                               | Get Access to [Unstructured](https://docs.unstructured.io/welcome) Data Ingestion |
 | UNSTRUCTURED_API_URL           | URL to Unstructured Instance                               | Get Access to [Unstructured](https://docs.unstructured.io/welcome) Data Ingestion |
 | GITHUB_TOKEN                   | Your GitHub Token                                          | Get Access to Data Ingestion via GitHub                                           |
