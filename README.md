@@ -151,8 +151,7 @@ Tested with `llama3`, `llama3:70b` and `mistral`. The bigger models generally pe
 
 > Ensure that you have the right configurations for the `Embedder` and `Generator` selected before going ahead.
 
-![verba-embedder](https://github.com/Badhansen/Verba/assets/37157382/4aedceed-e5e2-4e72-9273-bcd1ccc6f471)
-
+![verba-embedder](https://github.com/Badhansen/Verba/blob/main/img/verba_select_embedder.png)
 
 > Make sure Ollama Server runs in the background and that you don't ingest documents with different ollama models since their vector dimension can vary that will lead to errors
 
@@ -161,8 +160,8 @@ You can verify that by running the following command
 ```
 ollama run llama3
 ```
-![verba-ollama-llama3](https://github.com/Badhansen/Verba/assets/37157382/731d844e-cd68-431f-83d6-802ecaef367f)
 
+![verba-ollama-llama3](https://github.com/Badhansen/Verba/blob/main/img/ollama_running.png)
 
 ## Google
 
