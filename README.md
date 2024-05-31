@@ -113,23 +113,23 @@ Before starting Verba you'll need to configure access to various components depe
 
 Below is a comprehensive list of the API keys and variables you may require:
 
-| Environment Variable           | Value                                                      | Description                                                                       |
-| ------------------------------ | ---------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| WEAVIATE_URL_VERBA             | URL to your hosted Weaviate Cluster                        | Connect to your [WCS](https://console.weaviate.cloud/) Cluster                    |
-| WEAVIATE_API_KEY_VERBA         | API Credentials to your hosted Weaviate Cluster            | Connect to your [WCS](https://console.weaviate.cloud/) Cluster                    |
-| OPENAI_API_KEY                 | Your API Key                                               | Get Access to [OpenAI](https://openai.com/) Models                                |
-| OPENAI_BASE_URL                | URL to OpenAI instance                                     | Models                                                                            |
-| COHERE_API_KEY                 | Your API Key                                               | Get Access to [Cohere](https://cohere.com/) Models                                |
-| OLLAMA_URL                     | URL to your Ollama instance (e.g. http://localhost:11434 ) | Get Access to [Ollama](https://ollama.com/) Models                                |
-| OLLAMA_MODEL                   | Model Name (e.g. llama)                                    | Get Access to a specific [Ollama](https://ollama.com/) Model                      |
-| OLLAMA_EMBED_MODEL             | Model Name (e.g. mxbai-embed-large)                        | Get Access to a specific [Ollama](https://ollama.com/) Model for embedding (Defaults to OLLAMA_MODEL if not specified)|
-| UNSTRUCTURED_API_KEY           | Your API Key                                               | Get Access to [Unstructured](https://docs.unstructured.io/welcome) Data Ingestion |
-| UNSTRUCTURED_API_URL           | URL to Unstructured Instance                               | Get Access to [Unstructured](https://docs.unstructured.io/welcome) Data Ingestion |
-| GITHUB_TOKEN                   | Your GitHub Token                                          | Get Access to Data Ingestion via GitHub                                           |
-| GOOGLE_APPLICATION_CREDENTIALS | Google Credentials                                         | Get Access to Google Models                                                       |
-| GOOGLE_CLOUD_PROJECT           | Google Cloud Project                                       | Get Access to Google Models                                                       |
-| GOOGLE_API_KEY                 | Your API Key                                               | Get Access to Google Models                                                       |
-| VERBA_PRODUCTION               | True                                                       | Run Verba in Production Mode                                                      |
+| Environment Variable           | Value                                                      | Description                                                                                                            |
+| ------------------------------ | ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| WEAVIATE_URL_VERBA             | URL to your hosted Weaviate Cluster                        | Connect to your [WCS](https://console.weaviate.cloud/) Cluster                                                         |
+| WEAVIATE_API_KEY_VERBA         | API Credentials to your hosted Weaviate Cluster            | Connect to your [WCS](https://console.weaviate.cloud/) Cluster                                                         |
+| OPENAI_API_KEY                 | Your API Key                                               | Get Access to [OpenAI](https://openai.com/) Models                                                                     |
+| OPENAI_BASE_URL                | URL to OpenAI instance                                     | Models                                                                                                                 |
+| COHERE_API_KEY                 | Your API Key                                               | Get Access to [Cohere](https://cohere.com/) Models                                                                     |
+| OLLAMA_URL                     | URL to your Ollama instance (e.g. http://localhost:11434 ) | Get Access to [Ollama](https://ollama.com/) Models                                                                     |
+| OLLAMA_MODEL                   | Model Name (e.g. llama)                                    | Get Access to a specific [Ollama](https://ollama.com/) Model                                                           |
+| OLLAMA_EMBED_MODEL             | Model Name (e.g. mxbai-embed-large)                        | Get Access to a specific [Ollama](https://ollama.com/) Model for embedding (Defaults to OLLAMA_MODEL if not specified) |
+| UNSTRUCTURED_API_KEY           | Your API Key                                               | Get Access to [Unstructured](https://docs.unstructured.io/welcome) Data Ingestion                                      |
+| UNSTRUCTURED_API_URL           | URL to Unstructured Instance                               | Get Access to [Unstructured](https://docs.unstructured.io/welcome) Data Ingestion                                      |
+| GITHUB_TOKEN                   | Your GitHub Token                                          | Get Access to Data Ingestion via GitHub                                                                                |
+| GOOGLE_APPLICATION_CREDENTIALS | Google Credentials                                         | Get Access to Google Models                                                                                            |
+| GOOGLE_CLOUD_PROJECT           | Google Cloud Project                                       | Get Access to Google Models                                                                                            |
+| GOOGLE_API_KEY                 | Your API Key                                               | Get Access to Google Models                                                                                            |
+| VERBA_PRODUCTION               | True                                                       | Run Verba in Production Mode                                                                                           |
 
 ## Weaviate
 
@@ -152,7 +152,7 @@ Tested with `llama3`, `llama3:70b` and `mistral`. The bigger models generally pe
 
 > Ensure that you have the right configurations for the `Embedder` and `Generator` selected before going ahead.
 
-![verba-embedder](https://github.com/Badhansen/Verba/blob/main/img/verba_select_embedder.png)
+![verba-embedder](https://github.com/weaviate/Verba/blob/main/img/verba_select_embedder.png)
 
 > Make sure Ollama Server runs in the background and that you don't ingest documents with different ollama models since their vector dimension can vary that will lead to errors
 
@@ -162,7 +162,7 @@ You can verify that by running the following command
 ollama run llama3
 ```
 
-![verba-ollama-llama3](https://github.com/Badhansen/Verba/blob/main/img/ollama_running.png)
+![verba-ollama-llama3](https://github.com/weaviate/Verba/blob/main/img/ollama_running.png)
 
 ## Google
 
