@@ -36,6 +36,10 @@ pip install goldenverba
 
 Verba is a fully-customizable personal assistant for querying and interacting with your data, **either locally or deployed via cloud**. Resolve questions around your documents, cross-reference multiple data points or gain insights from existing knowledge bases. Verba combines state-of-the-art RAG techniques with Weaviate's context-aware database. Choose between different RAG frameworks, data types, chunking & retrieving techniques, and LLM providers based on your individual use-case.
 
+### Watch our newest Verba video here:
+
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/swKKRdLBhas&t/hqdefault.jpg)](https://www.youtube.com/watch?v=swKKRdLBhas&t)
+
 ## Feature Lists
 
 | 🤖 Model Support                  | Implemented | Description                                             |
