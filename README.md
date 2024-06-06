@@ -38,7 +38,7 @@ Verba is a fully-customizable personal assistant for querying and interacting wi
 
 ### Watch our newest Verba video here:
 
-[![VIDEO LINK](https://github.com/weaviate/Verba/blob/1.0.0/img/thumbnail.png)](https://www.youtube.com/watch?v=swKKRdLBhas&t)
+[![VIDEO LINK](https://github.com/weaviate/Verba/blob/main/img/thumbnail.png)](https://www.youtube.com/watch?v=swKKRdLBhas&t)
 
 ## Feature Lists
 
