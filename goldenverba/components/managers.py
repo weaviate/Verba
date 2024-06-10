@@ -23,6 +23,7 @@ from goldenverba.components.embedding.CohereEmbedder import CohereEmbedder
 from goldenverba.components.embedding.MiniLMEmbedder import MiniLMEmbedder
 from goldenverba.components.embedding.GoogleEmbedder import GoogleEmbedder
 from goldenverba.components.embedding.OllamaEmbedder import OllamaEmbedder
+from goldenverba.components.embedding.InfinityEmbedder import InfinityEmbedder
 
 from goldenverba.components.retriever.WindowRetriever import WindowRetriever
 
@@ -170,6 +171,7 @@ class EmbeddingManager:
             "ADAEmbedder": ADAEmbedder(),
             "CohereEmbedder": CohereEmbedder(),
             "OllamaEmbedder": OllamaEmbedder(),
+            "InfinityEmbedder": InfinityEmbedder(),
         }
         self.selected_embedder: str = "ADAEmbedder"
 
