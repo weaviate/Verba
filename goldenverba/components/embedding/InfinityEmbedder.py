@@ -25,13 +25,14 @@ class InfinityEmbedder(Embedder):
         self.requires_library = ["torch", "transformers", "infinity_emb"]
         self.requires_env = ["INFINITY_MODEL_ID"]
         self.description = "Embeds and retrieves objects using Infinity and SentenceTransformer"
-        self.vectorizer = "InfinityEmbedder"
+        self.vectorizer = "infinity-embeddings-model"
 
         if not INFINITY_IMPORTED:
             raise ImportError("The Infinity library is not installed. Please install it using `pip install infinity-emb>=0.0.40`")
         
         # set via INFINITY_MODEL_ID, which is a `;` separated list of model names from huggingface/hub
-        self.engine_array = AsyncEngineArray.from_args([EngineArgs(model_name_or_path = model_name) for model_name in MANAGER.model_id])  
+        self.engine_array = AsyncEngineArray.from_args([EngineArgs(model_name_or_path = model_name) for model_name in MANAGER.model_id])
+        self._default_model = MANAGER.model_id[0]
 
     async def _async_embed(self, sentences: list[str], model_name: str = "") -> list[np.ndarray]:
         """queue the embeddings and usage of the sentences in the engine"""
@@ -62,7 +63,7 @@ class InfinityEmbedder(Embedder):
         @parameter: batch_size : int - Batch Size of Input
         @returns bool - Bool whether the embedding what successful.
         """
-        all_vectors = iter(self._embed( [chunk.text for document in documents for chunk in document.chunks]))
+        all_vectors = iter(self._embed([chunk.text for document in documents for chunk in document.chunks]))
         for document in documents:
             for chunk in document.chunks:
                 chunk.set_vector(next(all_vectors))
@@ -73,3 +74,10 @@ class InfinityEmbedder(Embedder):
 
     def vectorize_query(self, query: str) -> list[float]:
         return self.vectorize_chunk(query)
+    
+def test_infinity_embedder():
+    embedder = InfinityEmbedder()
+    print(embedder.vectorize_chunk("Hello, World!"))
+
+if __name__ == "__main__":
+    test_infinity_embedder()
