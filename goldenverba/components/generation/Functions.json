@@ -1,0 +1,26 @@
+[
+    {
+        "name": "identify_user",
+        "description": "This will identify who the user is and try to guess what their preferences are and how to best respond back to the user.  This function should always be used at the start of a conversation.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "user_expertise": {
+                    "type": "string",
+                    "description": "Based of the question(s) being asked, the system will try to guess what the user's expertise is in the subject. The responses can be Expert, Intermediate, Beginner, or Unknown."
+                },
+                "language_preference": {
+                    "type": "string",
+                    "description": "The language that the user prefers to communicate in. This is determined based on the language the user has asked their question in."
+                },
+                "brevity": {
+                    "type": "string",
+                    "description": "This determines how long the responses should be. This is based on the brevity of the user's question. The responses can be Short, Medium, Long, or Unknown."
+                }
+            },
+            
+            "required": ["user_expertise","meslanguage_preferencesage","brevity"]
+        }
+    }
+    
+]

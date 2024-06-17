@@ -1,9 +1,8 @@
-import os
+import os, json, openai
 from dotenv import load_dotenv
 from goldenverba.components.interfaces import Generator
 
 load_dotenv()
-
 
 class GPT4Generator(Generator):
     """
@@ -42,10 +41,10 @@ class GPT4Generator(Generator):
 
         if conversation is None:
             conversation = {}
-        messages = self.prepare_messages(queries, context, conversation)
+        customprompt = self.run_function(conversation)
+        messages = self.prepare_messages(queries, context, conversation, customprompt)
 
         try:
-            import openai
 
             openai.api_key = os.getenv("OPENAI_API_KEY")
             base_url = os.environ.get("OPENAI_BASE_URL", "")
@@ -58,6 +57,8 @@ class GPT4Generator(Generator):
                 openai.api_base = os.getenv("OPENAI_API_BASE")
             if "OPENAI_API_VERSION" in os.environ:
                 openai.api_version = os.getenv("OPENAI_API_VERSION")
+
+            
 
             chat_completion_arguments = {
                 "model": self.model_name,
@@ -92,8 +93,59 @@ class GPT4Generator(Generator):
         except Exception:
             raise
 
+    def run_function(self,conversation):
+        model = os.getenv("OPENAI_MODEL", "gpt-4-1106-preview")
+        with open('Verba/goldenverba/components/generation/Functions.json') as f:
+            functions = json.load(f)
+        messages = []
+        for message in conversation:
+            if message.type != 'system':
+                messages.append({"role": message.type, "content": message.content})
+
+        response= openai.ChatCompletion.create(
+                model=model,
+                messages=messages,
+                functions=functions,
+                )
+        print(response)
+        response_message = response["choices"][0]["message"]
+        #check to see if the response is a function call
+            
+        if response_message.get("function_call"):
+            # got a response back for a function call
+            print("FUNCTION MODE!")
+            available_functions = {
+                "identify_user": self.identify_user
+            }  # only one function in this example, but you can have multiple
+            function_name = response_message["function_call"]["name"]
+            function_to_call = available_functions[function_name]
+            function_args = json.loads(response_message["function_call"]["arguments"])
+            if function_name == "identify_user":
+
+                function_response = function_to_call(
+                    user_expertise=function_args.get("user_expertise"),
+                    language_preference=function_args.get("language_preference"),
+                    brevity=function_args.get("brevity")
+                )    
+                       
+        return(function_response)
+
+    def identify_user(user_expertise, language_preference, brevity):
+        """
+        Function to identify the user based on the provided expertise, language preference, and brevity.
+        @parameter user_expertise : str - User expertise
+        @parameter language_preference : str - User language preference
+        @parameter brevity : str - User brevity
+        @returns str - Identified user
+        """
+        message = [ {"role": "system",
+                "content": f"You are a chat-bot that specializes in RAG (retreival augemented generation).  You are connected to a vector database and have the ability to pull context into the prompts.  Always use this context to answer and questions the user has.  Do not make up facts and if you are unable to answer the question, simply tell the user that. The user is identified with expertise: {user_expertise}, language preference: {language_preference}, and brevity: {brevity}.  Use this information when responding back to the user and try to respond back in a way that is specific to the user. Always respond back in the language preference but if that is not know then respond in English."
+                    }]
+        
+        return message
+
     def prepare_messages(
-        self, queries: list[str], context: list[str], conversation: dict[str, str]
+        self, queries: list[str], context: list[str], conversation: dict[str, str], customprompt: str
     ) -> dict[str, str]:
         """
         Prepares a list of messages formatted for a Retrieval Augmented Generation chatbot system, including system instructions, previous conversation, and a new user query with context.
@@ -106,15 +158,22 @@ class GPT4Generator(Generator):
 
         Each message in the list is a dictionary with 'role' and 'content' keys, where 'role' is either 'system' or 'user', and 'content' contains the relevant text. This will depend on the LLM used.
         """
+        #Note: The this is where the generative feedback loop should start to identify who the user is
+        
+        if customprompt == "":
+            customprompt = "You are a chat-bot that specializes in RAG (retreival augemented generation).  You are connected to a vector database and have the ability to pull context into the prompts.  Always use this context to answer and questions the user has.  Do not make up facts and if you are unable to answer the question, simply tell the user that."
+
         messages = [
             {
                 "role": "system",
-                "content": "You are an AI Customer Service Chatbot that works for Wayfair.  It is your job to assist users with their questions about orders, shipping, returns, billing, and home services. You are expected to provide accurate and helpful information to customers.  You are not expected to provide personal information or make decisions on behalf of the company.  You are expected to be polite and professional at all times.  You are expected to follow company policies and procedures.  You are expected to escalate issues to a human representative when necessary.  You are expected to maintain customer confidentiality and privacy.  You are expected to follow all laws and regulations.  You are expected to provide excellent customer service.  You are expected to be available to assist customers during your scheduled hours.  You are expected to be responsive to customer inquiries.  You are expected to be knowledgeable about the products and services offered by Wayfair.  You are expected to be able to answer questions about the company and its policies.  You are expected to be able to assist customers with their orders, shipping, returns, billing, and home services.  You are expected to be able to provide accurate and helpful information to customers.  You are expected to be able to resolve customer issues in a timely and professional manner.  You are expected to be able to provide excellent customer service.  You are expected to be able to communicate clearly and effectively with customers.  You are expected to be able to work independently and as part of a team.  You are expected to be able to follow company policies and procedures.  You are expected to be able to follow all laws and regulations.  You are expected to be able to maintain customer confidentiality and privacy.  You are expected to be able to provide excellent customer service.  You are expected to be able to be available to assist customers during your scheduled hours.  You are expected to be able to be responsive to customer inquiries.  You are expected to be able to be knowledgeable about the products and services offered by Wayfair.  You are expected to be able to be able to answer questions about the company and its policies.  You are expected to be able to be able to assist customers with their orders, shipping, returns, billing, and home services.  You are expected to be able to be able to provide accurate and helpful information to customers.  You are expected to be able to be able to resolve customer issues in a timely and professional manner.  You are expected to be able to be able to provide excellent customer service.  You are expected to be able to be able to communicate clearly and effectively with customers. ALWAYS BE FRIENDLY AND HELPFUL and use the provided data within the prompt to best answer questions!",
+                "content": customprompt,
             }
         ]
+        print(messages)
 
         for message in conversation:
-            messages.append({"role": message.type, "content": message.content})
+            if message.type != "system":
+                messages.append({"role": message.type, "content": message.content})
 
         query = " ".join(queries)
         user_context = " ".join(context)
