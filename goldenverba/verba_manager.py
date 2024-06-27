@@ -243,6 +243,13 @@ class VerbaManager:
             self.installed_libraries["pypdf"] = False
 
         try:
+            import docx
+
+            self.installed_libraries["docx"] = True
+        except Exception:
+            self.installed_libraries["docx"] = False
+
+        try:
             import tiktoken
 
             self.installed_libraries["tiktoken"] = True
