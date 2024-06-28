@@ -410,6 +410,43 @@ Your contributions are always welcome! Feel free to contribute ideas, feedback, 
 
 You can learn more about Verba's architecture and implementation in its [technical documentation](./TECHNICAL.md) and [frontend documentation](./FRONTEND.md). It's recommended to have a look at them before making any contributions.
 
+## JSON Files
+
+In Verba you can import JSON with a specific format, this format allows you to add links to the original sources, chunks, metadata and more.
+
+> Currently, one document needs to be in one .json file (this will change in the future)
+
+### Document Structure
+
+```json
+{
+  "text": "<Content>", // Content that will be chunked
+  "type": "<Type>", // Will be used to filter documents
+  "name": "<Document Name>", // Included in the context sent to the LLM
+  "path": "<Path to Local File>", // Currently not implemented, can be empty
+  "link": "<Link to Original Source>", // Link to original sources
+  "timestamp": "<YYYY-MM-DD HH:MM:SS>", // Currently not used, can be empty
+  "reader": "<READER>", // Currently not used, can be empty
+  "meta": {}, // Currently not used
+  "chunks": [] // You can add chunks here and skip the chunking part during the ingestion
+}
+```
+
+### Chunk Structure
+
+```json
+{
+  "text": "<Content>", // Chunk Content
+  "doc_name": "<Document Name>", // Name of the Document
+  "doc_type": "<Document Type>", // Type of the Document
+  "doc_uuid": "<Document UUID>", // UUID of the Document
+  "chunk_id": "<Chunk ID>", // Order of the chunk, starts at 0 - n (n = number of total chunks)
+  "tokens": "<Number of Tokens>", // Number of tokens in the chunk, not used, can be empty
+  "vector": "<Vector>", // Vector of the chunk, not used, can be empty
+  "score": "<Retrieval Score>" // Score of the chunk, will be added by the retriever during runtime, can be empty
+}
+```
+
 ## Known Issues
 
 - **Weaviate Embeeded** currently not working on Windows yet
