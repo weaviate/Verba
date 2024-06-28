@@ -10,7 +10,7 @@ class OllamaGenerator(Generator):
     def __init__(self):
         super().__init__()
         self.name = "Ollama"
-        self.description = "Generator using a local running Ollama Model specified in the ` OLLAMA_MODEL` variable"
+        self.description = f"Generator using a local running Ollama model: {os.environ.get("OLLAMA_MODEL", "No Model Detected")}"
         self.requires_env = ["OLLAMA_URL", "OLLAMA_MODEL"]
         self.streamable = True
         self.context_window = 10000
@@ -51,10 +51,15 @@ class OllamaGenerator(Generator):
                             json_data = json.loads(
                                 line.decode("utf-8")
                             )  # Decode bytes to string then to JSON
-                            message = json_data.get("message", {}).get("content", "")
-                            finish_reason = (
-                                "stop" if json_data.get("done", False) else ""
-                            )
+
+                            if "error" in json_data:
+                                message = json_data.get("error", "Unexpected Error")
+                                finish_reason = "stop"
+                            else:
+                                message = json_data.get("message", {}).get("content", "")
+                                finish_reason = (
+                                    "stop" if json_data.get("done", False) else ""
+                                )
 
                             yield {
                                 "message": message,
@@ -66,8 +71,11 @@ class OllamaGenerator(Generator):
                                 "finish_reason": "stop",
                             }
 
-        except Exception:
-            raise
+        except Exception as e:
+            yield {
+                "message": f"Unexpected error, make sure to have {model} installed: {str(e)}",
+                "finish_reason": "stop",
+                }
 
     def prepare_messages(
         self, queries: list[str], context: list[str], conversation: dict[str, str]

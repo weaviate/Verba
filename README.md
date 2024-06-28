@@ -427,7 +427,7 @@ You can learn more about Verba's architecture and implementation in its [technic
 
 - **How to clear Weaviate Embedded Storage?**
 
-  - Remove the directory `rm ~/.local/share/weaviate`
+  - You'll find the stored data here: `~/.local/share/weaviate`
 
 - **How can I specify the port?**
   - You can use the port and host flag `verba start --port 9000 --host 0.0.0.0`

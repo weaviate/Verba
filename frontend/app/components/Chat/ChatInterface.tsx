@@ -44,7 +44,7 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
 
   const [userInput, setUserInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
-  const [isFetching, setIsFetching] = useState(false);
+  const isFetching = useRef<boolean>(false);
   const [fetchingStatus, setFetchingStatus] = useState<
     "DONE" | "CHUNKS" | "RESPONSE"
   >("DONE");
@@ -107,6 +107,11 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
     localSocket.onmessage = (event) => {
       let data;
 
+      if (!isFetching.current) {
+        setPreviewText("");
+        return;
+      }
+
       try {
         data = JSON.parse(event.data);
       } catch (e) {
@@ -117,7 +122,7 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
       setPreviewText((prev) => prev + newMessageContent);
 
       if (data.finish_reason === "stop") {
-        setIsFetching(false);
+        isFetching.current = false;
         setFetchingStatus("DONE");
         const full_text = data.full_text;
         if (data.cached) {
@@ -144,7 +149,7 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
     localSocket.onerror = (error) => {
       console.error("WebSocket Error:", error);
       triggerNotification("WebSocket Error: " + error, true);
-      setIsFetching(false);
+      isFetching.current = false;
       setFetchingStatus("DONE");
     };
 
@@ -157,7 +162,7 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
         console.error("WebSocket connection died");
       }
       triggerNotification("WebSocket Connection Offline", true);
-      setIsFetching(false);
+      isFetching.current = false;
       setFetchingStatus("DONE");
     };
 
@@ -180,6 +185,13 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
       lastMessageRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
+
+  const cancelGeneration = () => {
+    triggerNotification("Canceled Generation", true);
+    setPreviewText("");
+    isFetching.current = false;
+    setFetchingStatus("DONE");
+  };
 
   const handleSuggestionClick = async (suggestion: string) => {
     // Update the userInput with the clicked suggestion
@@ -295,7 +307,7 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
       return;
     }
 
-    if (isFetching) {
+    if (isFetching.current) {
       return;
     }
 
@@ -316,7 +328,7 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
 
       try {
         // Start the API call
-        setIsFetching(true);
+        isFetching.current = true;
         setFetchingStatus("CHUNKS");
 
         // Start both API calls in parallel
@@ -351,13 +363,13 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
             "Failed to fetch from API: No data received",
             true
           );
-          setIsFetching(false);
+          isFetching.current = false;
           setFetchingStatus("DONE");
         }
       } catch (error) {
         console.error("Failed to fetch from API:", error);
         triggerNotification("Failed to fetch from API: " + error, true);
-        setIsFetching(false);
+        isFetching.current = false;
         setFetchingStatus("DONE");
       }
     }
@@ -367,7 +379,7 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
     if (
       isFetchingSuggestion ||
       query === "" ||
-      isFetching ||
+      isFetching.current ||
       !settingConfig.Chat.settings.suggestion.checked
     ) {
       setSuggestions([]);
@@ -487,18 +499,28 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
           )}
         </div>
 
-        {isFetching && (
-          <div className="flex items-center pl-4 mb-4 gap-3">
-            <PulseLoader
-              color={settingConfig.Customization.settings.text_color.color}
-              loading={true}
-              size={10}
-              speedMultiplier={0.75}
-            />
-            <p>
-              {fetchingStatus === "CHUNKS" && "Retrieving chunks"}
-              {fetchingStatus === "RESPONSE" && "Generating answer"}
-            </p>
+        {isFetching.current && (
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center pl-4 mb-4 gap-3">
+              <PulseLoader
+                color={settingConfig.Customization.settings.text_color.color}
+                loading={true}
+                size={10}
+                speedMultiplier={0.75}
+              />
+              <p>
+                {fetchingStatus === "CHUNKS" && "Retrieving chunks"}
+                {fetchingStatus === "RESPONSE" && "Generating answer"}
+              </p>
+            </div>
+            <div className="items-center justify-center flex">
+              <button
+                onClick={cancelGeneration}
+                className="btn btn-sm text-sm bg-button-verba hover:bg-button-hover-verba text-text-verba"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         )}
       </div>
