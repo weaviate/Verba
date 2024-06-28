@@ -2,6 +2,82 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.3]
+
+## Added
+
+- Cancel Generation Button
+- Added Documentation for JSON Files
+
+## Fixed
+
+- Check error logs coming from Ollama and send it to the frontend
+
+## [1.0.2]
+
+## Added
+
+- Readme Variable: OPENAI_BASE_URL
+
+## Fixed
+
+- https://github.com/weaviate/Verba/pull/173
+- https://github.com/weaviate/Verba/pull/163
+- https://github.com/weaviate/Verba/pull/148
+
+## [1.0.0] - Beautiful Verba Update
+
+### Added
+
+- Added DaisyUI
+- Optimized frontend codebase
+- Fully Reworked Verba Design
+  - Fully Responsive, optimized for all screen sizes
+- Customization Capabilities
+  - Added Default, Darkmode, Weaviate themes
+  - Full text, color, image customization
+- Improve Chat Interface
+  - Better formatting of markdown + code
+  - Keep conversations saved in localBrowser storage
+  - Better Debugging by providing more information about current states
+- Improve Document Viewer Interface
+  - Add Pagination
+  - Add Sorting
+  - Use Aggregation for Filtering
+- Improve Status Overview
+  - Reworked Frontend + Optimize Code
+  - Sort status entries
+  - Improve Loading Speed by using Aggregation
+- Improve Component Selection for both Ingestion and RAG
+  - Added new configuraiton that will be passed between frontend and backend
+  - Cleaned codebase, merged interfaces and managers to single files
+  - Added clean endpoints for better code readability
+  - Reworked on interfaces
+- Added better console and logging for ingestion
+- More Configuration
+  - Enable/Disable Caching and Autocomplete Suggestions
+  - Improved verba_config.json
+- Ability to enable/disable caching + autosuggestions
+- Add Google Gemini as new Embedder and Generator
+- Added .CSV support (all file types available in Unstructured IO)
+- More test data
+- Add Ollama as Generator and Embedding Component
+- Add Support for Cohere R+
+- Improved WindowRetriever Context Generation
+- Show RAW Context in Frontend + Save in LocalStorage
+- Save Settings and Configuration in Weaviate
+
+### Changed
+
+- Changed to AppRouter framework
+- Changed frontend project structure
+- Changed backend project structure
+- Removed Llama Generator Component
+
+### Fixed
+
+- Using Accelerator Library
+
 ## [0.4.0] - 11.04.2024
 
 ### Added
