@@ -54,12 +54,13 @@ Verba is a fully-customizable personal assistant for querying and interacting wi
 | Google (e.g. Gemini)              | ✅          | Embedding and Generation Models by Google               |
 | OpenAI (e.g. GPT4)                | ✅          | Embedding and Generation Models by OpenAI               |
 
-| 📁 Data Support    | Implemented | Description                        |
-| ------------------ | ----------- | ---------------------------------- |
-| PDF Ingestion      | ✅          | Import PDF into Verba              |
-| CSV/XLSX Ingestion | ✅          | Import Table Data into Verba       |
-| Multi-Modal        | planned ⏱️  | Import Multi-Modal Data into Verba |
-| UnstructuredIO     | ✅          | Import Data through Unstructured   |
+| 📁 Data Support    | Implemented | Description                         |
+| ------------------ | ----------- | ----------------------------------- |
+| PDF Ingestion      | ✅          | Import PDF into Verba               |
+| GitHub & GitLab    | ✅          | Import Files from Github and GitLab |
+| CSV/XLSX Ingestion | ✅          | Import Table Data into Verba        |
+| Multi-Modal        | planned ⏱️  | Import Multi-Modal Data into Verba  |
+| UnstructuredIO     | ✅          | Import Data through Unstructured    |
 
 | ✨ RAG Features         | Implemented | Description                                                               |
 | ----------------------- | ----------- | ------------------------------------------------------------------------- |
@@ -134,6 +135,7 @@ Below is a comprehensive list of the API keys and variables you may require:
 | UNSTRUCTURED_API_KEY           | Your API Key                                               | Get Access to [Unstructured](https://docs.unstructured.io/welcome) Data Ingestion                                      |
 | UNSTRUCTURED_API_URL           | URL to Unstructured Instance                               | Get Access to [Unstructured](https://docs.unstructured.io/welcome) Data Ingestion                                      |
 | GITHUB_TOKEN                   | Your GitHub Token                                          | Get Access to Data Ingestion via GitHub                                                                                |
+| GITLAB_TOKEN                   | Your GitLab Token                                          | Get Access to Data Ingestion via GitLab                                                                                |
 | GOOGLE_APPLICATION_CREDENTIALS | Google Credentials                                         | Get Access to Google Models                                                                                            |
 | GOOGLE_CLOUD_PROJECT           | Google Cloud Project                                       | Get Access to Google Models                                                                                            |
 | GOOGLE_API_KEY                 | Your API Key                                               | Get Access to Google Models                                                                                            |

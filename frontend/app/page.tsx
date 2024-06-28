@@ -201,7 +201,7 @@ export default function Home() {
             imageSrc={
               baseSetting[settingTemplate].Customization.settings.image.src
             }
-            version="v1.0.2"
+            version="v1.0.3"
             currentPage={currentPage}
             setCurrentPage={setCurrentPage}
           />

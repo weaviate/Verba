@@ -10,7 +10,7 @@ class OllamaGenerator(Generator):
     def __init__(self):
         super().__init__()
         self.name = "Ollama"
-        self.description = f"Generator using a local running Ollama model: {os.environ.get("OLLAMA_MODEL", "No Model Detected")}"
+        self.description = f"Generator using a local running Ollama model: {os.environ.get('OLLAMA_MODEL', 'No Model Detected')}"
         self.requires_env = ["OLLAMA_URL", "OLLAMA_MODEL"]
         self.streamable = True
         self.context_window = 10000

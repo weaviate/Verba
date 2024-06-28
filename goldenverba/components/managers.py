@@ -14,6 +14,7 @@ from goldenverba.components.interfaces import (
 
 from goldenverba.components.reader.BasicReader import BasicReader
 from goldenverba.components.reader.GitReader import GitHubReader
+from goldenverba.components.reader.GitLabReader import GitLabReader
 from goldenverba.components.reader.UnstructuredAPI import UnstructuredReader
 
 from goldenverba.components.chunking.TokenChunker import TokenChunker
@@ -46,6 +47,7 @@ class ReaderManager:
         self.readers: dict[str, Reader] = {
             "BasicReader": BasicReader(),
             "GitHubReader": GitHubReader(),
+            "GitLabReader": GitLabReader(),
             "UnstructuredAPI": UnstructuredReader(),
         }
         self.selected_reader: str = "BasicReader"
