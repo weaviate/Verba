@@ -5,6 +5,7 @@ __pycache__
 .python-version
 *.egg-info
 venv
+venv*
 dist
 build
 ~
@@ -17,3 +18,5 @@ text-generation-inference
 test.py
 cache.txt
 .ruff_cache
+*_secrets.json
+ollama
