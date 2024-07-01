@@ -463,6 +463,7 @@ In Verba you can import JSON with a specific format, this format allows you to a
 - **Can I use my Ollama Server with the Verba Docker?**
 
   - Yes, you can! Make sure the URL is set to: `OLLAMA_URL=http://host.docker.internal:11434`
+  - If you're running on Linux, you might need to get the IP Gateway of the Ollama server: `OLLAMA_URL="http://YOUR-IP-OF-OLLAMA:11434"`
 
 - **How to clear Weaviate Embedded Storage?**
 
