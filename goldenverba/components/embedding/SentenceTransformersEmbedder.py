@@ -2,8 +2,8 @@ from tqdm import tqdm
 from wasabi import msg
 from weaviate import Client
 
-from goldenverba.components.embedding.interface import Embedder
-from goldenverba.components.reader.document import Document
+from goldenverba.components.interfaces import Embedder
+from goldenverba.components.document import Document
 
 
 class SentenceTransformersEmbedder(Embedder):
@@ -30,6 +30,7 @@ class SentenceTransformersEmbedder(Embedder):
         self,
         documents: list[Document],
         client: Client,
+        logging: list[dict],
     ) -> bool:
         """Embed verba documents and its chunks to Weaviate
         @parameter: documents : list[Document] - List of Verba documents
@@ -44,7 +45,7 @@ class SentenceTransformersEmbedder(Embedder):
             for chunk in document.chunks:
                 chunk.set_vector(self.vectorize_chunk(chunk.text))
 
-        return self.import_data(documents, client)
+        return self.import_data(documents, client, logging)
 
     def vectorize_chunk(self, chunk) -> list[float]:
         return self.model.encode(chunk).tolist()

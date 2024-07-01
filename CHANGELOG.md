@@ -9,6 +9,9 @@ All notable changes to this project will be documented in this file.
 - Cancel Generation Button
 - Added Documentation for JSON Files
 - Added GitLabReader (https://github.com/weaviate/Verba/pull/151)
+- Improved HuggingFace Embedding Models thanks to @tomaarsen
+- MixedBreadEmbedder
+- AllMPNetEmbedder
 
 ## Fixed
 

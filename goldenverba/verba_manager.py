@@ -58,7 +58,7 @@ class VerbaManager:
     def import_data(
         self, fileData: list[FileData], textValues: list[str], logging: list[dict]
     ) -> list[Document]:
-
+        
         loaded_documents, logging = self.reader_manager.load(
             fileData, textValues, logging
         )
@@ -241,6 +241,13 @@ class VerbaManager:
             self.installed_libraries["pypdf"] = True
         except Exception:
             self.installed_libraries["pypdf"] = False
+
+        try:
+            import sentence_transformers
+
+            self.installed_libraries["sentence-transformers"] = True
+        except Exception:
+            self.installed_libraries["sentence-transformers"] = False
 
         try:
             import tiktoken
@@ -769,11 +776,14 @@ class VerbaManager:
             .do()
         )
 
-        if results["data"]["Get"][class_name]:
-            msg.warn(f"{document.name} already exists")
-            return True
+        if "data" in results:
+            if results["data"]["Get"][class_name]:
+                msg.warn(f"{document.name} already exists")
+                return True
         else:
-            return False
+            msg.warn(f"Error occured while checking for duplicates: {results}")
+        
+        return False
 
     def check_verba_component(self, component: VerbaComponent) -> tuple[bool, str]:
         return component.check_available(

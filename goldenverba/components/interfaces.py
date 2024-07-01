@@ -165,8 +165,8 @@ class Embedder(VerbaComponent):
         """
         try:
             if self.vectorizer not in VECTORIZERS and self.vectorizer not in EMBEDDINGS:
-                msg.fail(f"Vectorizer of {self.name} not found")
-                return False
+                msg.fail(f"Vectorizer of {self.vectorizer} not found")
+                raise Exception(f"Vectorizer of {self.vectorizer} not found")
 
             for i, document in enumerate(documents):
                 batches = []

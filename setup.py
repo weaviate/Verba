@@ -39,10 +39,7 @@ setup(
     extras_require={
         "dev": ["pytest", "wheel", "twine", "black>=23.7.0", "setuptools"],
         "huggingface": [
-            "sentence-transformers==2.7.0",
-            "transformers==4.40.1",
-            "torch==2.3.0",
-            "accelerate==0.29.2",
+            "sentence-transformers==3.0.1",
         ],
         "google": [
             "vertexai==1.46.0",
