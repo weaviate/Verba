@@ -11,14 +11,16 @@ services:
     environment:
       - WEAVIATE_URL_VERBA=http://weaviate:8080
       - OPENAI_API_KEY=$OPENAI_API_KEY
+      - COHERE_API_KEY=$COHERE_API_KEY
+      - OLLAMA_URL=http://host.docker.internal:11434
+      - OLLAMA_MODEL=$OLLAMA_MODEL
+      - OLLAMA_EMBED_MODEL=$OLLAMA_EMBED_MODEL
+      - UNSTRUCTURED_API_KEY=$UNSTRUCTURED_API_KEY
+      - UNSTRUCTURED_API_URL=$UNSTRUCTURED_API_URL
+      - GITHUB_TOKEN=$GITHUB_TOKEN
       ## IF YOU WANT AUTHENTICATION, UNCOMENT BELLOW 
       ## AND ADD WEAVIATE SERVICE
       #- WEAVIATE_API_KEY_VERBA=adminkey
-      #- COHERE_API_KEY=YOUR-COHERE-KEY
-      #- UNSTRUCTURED_API_KEY=YOUR-UNSTRUCTURED-KEY
-      #- GITHUB_TOKEN=YOUR-GITHUB-TOKEN
-      #- HF_TOKEN=YOUR-HUGGINGFACE-TOKEN
-      #- LLAMA2-7B-CHAT-HF=ENABLE-LLAMA2?-(True or False)
 
     volumes:
       - ./data:/data/
@@ -40,7 +42,7 @@ services:
       - '8080'
       - --scheme
       - http
-    image: semitechnologies/weaviate:1.21.2
+    image: semitechnologies/weaviate:1.24.2
     ports:
       - 8080:8080
       - 3000:8080
@@ -55,10 +57,10 @@ services:
       start_period: 10s
     environment:
       OPENAI_APIKEY: $OPENAI_API_KEY
+      COHERE_APIKEY: $COHERE_API_KEY
       QUERY_DEFAULTS_LIMIT: 25
       AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: 'true'
       PERSISTENCE_DATA_PATH: '/var/lib/weaviate'
-      # DEFAULT_VECTORIZER_MODULE: 'text2vec-openai'
       ENABLE_MODULES: 'text2vec-openai, generative-openai, qna-openai, text2vec-cohere'
       CLUSTER_HOSTNAME: 'node1'
       #######IF YOU WANT AUTHENTICATION UNCOMMENT BELOW########

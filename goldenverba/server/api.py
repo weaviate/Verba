@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, WebSocket, status
+from fastapi import FastAPI, WebSocket, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
@@ -7,23 +7,27 @@ import os
 from pathlib import Path
 
 from dotenv import load_dotenv
-from pydantic import BaseModel
 from starlette.websockets import WebSocketDisconnect
 from wasabi import msg  # type: ignore[import]
+import time
 
 from goldenverba import verba_manager
-from goldenverba.components.chunking.interface import Chunker
-from goldenverba.components.embedding.interface import Embedder
-from goldenverba.components.generation.interface import Generator
-from goldenverba.components.reader.interface import Reader
-from goldenverba.components.retriever.interface import Retriever
-from goldenverba.server.ConfigManager import ConfigManager
-from goldenverba.server.util import setup_managers
+from goldenverba.server.types import (
+    ResetPayload,
+    ConfigPayload,
+    QueryPayload,
+    GeneratePayload,
+    GetDocumentPayload,
+    SearchQueryPayload,
+    ImportPayload,
+)
+from goldenverba.server.util import get_config, set_config, setup_managers
 
 load_dotenv()
 
 # Check if runs in production
 production_key = os.environ.get("VERBA_PRODUCTION", "")
+tag = os.environ.get("VERBA_GOOGLE_TAG", "")
 if production_key == "True":
     msg.info("API runs in Production Mode")
     production = True
@@ -31,80 +35,7 @@ else:
     production = False
 
 manager = verba_manager.VerbaManager()
-config_manager = ConfigManager()
-
-readers = manager.reader_get_readers()
-chunker = manager.chunker_get_chunker()
-embedders = manager.embedder_get_embedder()
-retrievers = manager.retriever_get_retriever()
-generators = manager.generator_get_generator()
-
-setup_managers(
-    manager, config_manager, readers, chunker, embedders, retrievers, generators
-)
-config_manager.save_config()
-
-
-def create_reader_payload(key: str, reader: Reader) -> dict:
-    available, message = manager.check_verba_component(reader)
-
-    return {
-        "name": key,
-        "description": reader.description,
-        "input_form": reader.input_form,
-        "available": available,
-        "message": message,
-    }
-
-
-def create_chunker_payload(key: str, chunker: Chunker) -> dict:
-    available, message = manager.check_verba_component(chunker)
-
-    return {
-        "name": key,
-        "description": chunker.description,
-        "input_form": chunker.input_form,
-        "units": chunker.default_units,
-        "overlap": chunker.default_overlap,
-        "available": available,
-        "message": message,
-    }
-
-
-def create_embedder_payload(key: str, embedder: Embedder) -> dict:
-    available, message = manager.check_verba_component(embedder)
-
-    return {
-        "name": key,
-        "description": embedder.description,
-        "input_form": embedder.input_form,
-        "available": available,
-        "message": message,
-    }
-
-
-def create_retriever_payload(key: str, retriever: Retriever) -> dict:
-    available, message = manager.check_verba_component(retriever)
-
-    return {
-        "name": key,
-        "description": retriever.description,
-        "available": available,
-        "message": message,
-    }
-
-
-def create_generator_payload(key: str, generator: Generator) -> dict:
-    available, message = manager.check_verba_component(generator)
-
-    return {
-        "name": key,
-        "description": generator.description,
-        "available": available,
-        "message": message,
-        "streamable": generator.streamable,
-    }
-
+setup_managers(manager)
 
 # FastAPI App
 app = FastAPI()
@@ -137,92 +68,27 @@ app.mount(
 app.mount("/static", StaticFiles(directory=BASE_DIR / "frontend/out"), name="app")
 
 
-class QueryPayload(BaseModel):
-    query: str
-
-
-class ConversationItem(BaseModel):
-    type: str
-    content: str
-    typewriter: bool
-
-
-class GeneratePayload(BaseModel):
-    query: str
-    context: str
-    conversation: list[ConversationItem]
-
-
-class SearchQueryPayload(BaseModel):
-    query: str
-    doc_type: str
-
-
-class GetDocumentPayload(BaseModel):
-    document_id: str
-
-
-class LoadPayload(BaseModel):
-    reader: str
-    chunker: str
-    embedder: str
-    fileBytes: list[str]
-    fileNames: list[str]
-    filePath: str
-    document_type: str
-    chunkUnits: int
-    chunkOverlap: int
-
-
-class GetComponentPayload(BaseModel):
-    component: str
-
-
-class SetComponentPayload(BaseModel):
-    component: str
-    selected_component: str
-
-
 @app.get("/")
 @app.head("/")
 async def serve_frontend():
     return FileResponse(os.path.join(BASE_DIR, "frontend/out/index.html"))
 
-
-@app.get("/status")
-async def catch_status():
-    # Check if the path corresponds to a file that exists in the static directory
-    file_path = BASE_DIR / "frontend/out" / "status.html"
-    if os.path.isfile(file_path):
-        return FileResponse(file_path)
-    # Otherwise, serve index.html
-    return FileResponse(os.path.join(BASE_DIR, "frontend/out/index.html"))
-
-
-@app.get("/document_explorer")
-async def catch_explorer():
-    # Check if the path corresponds to a file that exists in the static directory
-    file_path = BASE_DIR / "frontend/out" / "document_explorer.html"
-    if os.path.isfile(file_path):
-        return FileResponse(file_path)
-    # Otherwise, serve index.html
-    return FileResponse(os.path.join(BASE_DIR, "frontend/out/index.html"))
-
+### GET
 
 # Define health check endpoint
 @app.get("/api/health")
-async def root():
+async def health_check():
     try:
         if manager.client.is_ready():
             return JSONResponse(
-                content={
-                    "message": "Alive!",
-                }
+                content={"message": "Alive!", "production": production, "gtag": tag}
             )
         else:
             return JSONResponse(
                 content={
                     "message": "Database not ready!",
+                    "production": production,
+                    "gtag": tag,
                 },
                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             )
@@ -231,360 +97,74 @@ async def root():
         return JSONResponse(
             content={
                 "message": f"Healthcheck failed with {str(e)}",
+                "production": production,
+                "gtag": tag,
             },
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
         )
 
-
-# Define health check endpoint
-@app.get("/api/get_google_tag")
-async def get_google_tag():
-    tag = os.environ.get("VERBA_GOOGLE_TAG", "")
-
-    if tag:
-        msg.good("Google Tag available!")
-
-    return JSONResponse(
-        content={
-            "tag": tag,
-        }
-    )
-
-
-@app.get("/api/get_production")
-async def get_production():
-    return JSONResponse(
-        content={
-            "production": production,
-        }
-    )
-
-
-# Get Readers, Chunkers, and Embedders
-@app.get("/api/get_components")
-async def get_components():
-    msg.info("Retrieving components")
-
-    data = {"readers": [], "chunker": [], "embedder": []}
-
-    for key in readers:
-        current_reader = readers[key]
-        current_reader_data = create_reader_payload(key, current_reader)
-        data["readers"].append(current_reader_data)
-
-    for key in chunker:
-        current_chunker = chunker[key]
-        current_chunker_data = create_chunker_payload(key, current_chunker)
-        data["chunker"].append(current_chunker_data)
-
-    for key in embedders:
-        current_embedder = embedders[key]
-        current_embedder_data = create_embedder_payload(key, current_embedder)
-        data["embedder"].append(current_embedder_data)
-
-    try:
-        data["default_values"] = {
-            "last_reader": create_reader_payload(
-                config_manager.get_reader(), readers[config_manager.get_reader()]
-            ),
-            "last_chunker": create_chunker_payload(
-                config_manager.get_chunker(), chunker[config_manager.get_chunker()]
-            ),
-            "last_embedder": create_embedder_payload(
-                config_manager.get_embedder(), embedders[config_manager.get_embedder()]
-            ),
-            "last_document_type": "Documentation",
-        }
-    except KeyError:
-        # Reset Config
-        msg.warn("Mismatched Config detected, resetting managers")
-        config_manager.default_config()
-        config_manager.save_config()
-        setup_managers(
-            manager, config_manager, readers, chunker, embedders, retrievers, generators
-        )
-        config_manager.save_config()
-        data["default_values"] = {
-            "last_reader": create_reader_payload(
-                config_manager.get_reader(), readers[config_manager.get_reader()]
-            ),
-            "last_chunker": create_chunker_payload(
-                config_manager.get_chunker(), chunker[config_manager.get_chunker()]
-            ),
-            "last_embedder": create_embedder_payload(
-                config_manager.get_embedder(), embedders[config_manager.get_embedder()]
-            ),
-            "last_document_type": "Documentation",
-        }
-
-    return JSONResponse(content=data)
-
-
-@app.post("/api/get_component")
-async def get_component(payload: GetComponentPayload):
-    msg.info(f"Retrieving {payload.component} components")
-
-    data = {"components": []}
-
-    if payload.component == "embedders":
-        data["selected_component"] = create_embedder_payload(
-            manager.embedder_manager.selected_embedder.name,
-            manager.embedder_manager.selected_embedder,
-        )
-
-        for key in embedders:
-            current_embedder = embedders[key]
-            current_embedder_data = create_embedder_payload(key, current_embedder)
-            data["components"].append(current_embedder_data)
-
-    elif payload.component == "retrievers":
-        data["selected_component"] = create_retriever_payload(
-            manager.retriever_manager.selected_retriever.name,
-            manager.retriever_manager.selected_retriever,
-        )
-
-        for key in retrievers:
-            current_retriever = retrievers[key]
-            current_retriever_data = create_retriever_payload(key, current_retriever)
-            data["components"].append(current_retriever_data)
-
-    elif payload.component == "generators":
-        data["selected_component"] = create_generator_payload(
-            manager.generator_manager.selected_generator.name,
-            manager.generator_manager.selected_generator,
-        )
-
-        for key in generators:
-            current_generator = generators[key]
-            current_generator_data = create_generator_payload(key, current_generator)
-            data["components"].append(current_generator_data)
-
-    return JSONResponse(content=data)
-
-
-@app.post("/api/set_component")
-async def set_component(payload: SetComponentPayload):
-    if production:
-        return JSONResponse(content={})
-
-    msg.info(f"Setting {payload.component} to {payload.selected_component}")
-
-    if payload.component == "embedders":
-        manager.embedder_manager.set_embedder(payload.selected_component)
-        config_manager.set_embedder(payload.selected_component)
-
-    elif payload.component == "retrievers":
-        manager.retriever_manager.set_retriever(payload.selected_component)
-        config_manager.set_retriever(payload.selected_component)
-
-    elif payload.component == "generators":
-        manager.generator_manager.set_generator(payload.selected_component)
-        config_manager.set_generator(payload.selected_component)
-
-    config_manager.save_config()
-
-    return JSONResponse(content={})
-
-
 # Get Status meta data
 @app.get("/api/get_status")
 async def get_status():
-    msg.info("Retrieving status")
-
-    data = {
-        "type": manager.weaviate_type,
-        "libraries": manager.installed_libraries,
-        "variables": manager.environment_variables,
-        "schemas": manager.get_schemas(),
-    }
-
-    return JSONResponse(content=data)
-
-
-# Reset Verba
-@app.get("/api/reset")
-async def reset_verba():
-    if production:
-        return JSONResponse(status_code=200, content={})
-
-    msg.info("Resetting verba")
-
-    manager.reset()
-
-    return JSONResponse(status_code=200, content={})
-
-
-# Reset Verba
-@app.get("/api/reset_cache")
-async def reset_cache():
-    if production:
-        return JSONResponse(status_code=200, content={})
-    msg.info("Resetting cache")
-
-    manager.reset_cache()
-
-    return JSONResponse(status_code=200, content={})
-
-
-# Reset Verba suggestions
-@app.get("/api/reset_suggestion")
-async def reset_suggestion():
-    if production:
-        return JSONResponse(status_code=200, content={})
-    msg.info("Resetting suggestions")
-
-    manager.reset_suggestion()
-
-    return JSONResponse(status_code=200, content={})
-
-
-# Receive query and return chunks and query answer
-@app.post("/api/load_data")
-async def load_data(payload: LoadPayload):
-    if production:
-        return JSONResponse(
-            content={
-                "status": "200",
-                "status_msg": "Can't add data when in production mode",
-            }
+    try:
+        schemas = manager.get_schemas()
+        sorted_schemas = dict(
+            sorted(schemas.items(), key=lambda item: item[1], reverse=True)
         )
 
-    manager.reader_set_reader(payload.reader)
-    manager.chunker_set_chunker(payload.chunker)
-    manager.embedder_set_embedder(payload.embedder)
-
-    config_manager.set_reader(payload.reader)
-    config_manager.set_chunker(payload.chunker)
-    config_manager.set_embedder(payload.embedder)
-    config_manager.save_config()
-
-    # Set new default values based on user input
-    current_chunker = manager.chunker_get_chunker()[payload.chunker]
-    current_chunker.default_units = payload.chunkUnits
-    current_chunker.default_overlap = payload.chunkOverlap
-
-    msg.info(
-        f"Received Data to Import: READER({payload.reader}, Documents {len(payload.fileBytes)}, Type {payload.document_type}) CHUNKER ({payload.chunker}, UNITS {payload.chunkUnits}, OVERLAP {payload.chunkOverlap}), EMBEDDER ({payload.embedder})"
-    )
-
-    if payload.fileBytes or payload.filePath:
-        try:
-            documents = manager.import_data(
-                payload.fileBytes,
-                [],
-                [payload.filePath],
-                payload.fileNames,
-                payload.document_type,
-                payload.chunkUnits,
-                payload.chunkOverlap,
+        sorted_libraries = dict(
+            sorted(
+                manager.installed_libraries.items(),
+                key=lambda item: (not item[1], item[0]),
             )
-
-            if documents is None:
-                return JSONResponse(
-                    content={
-                        "status": 200,
-                        "status_msg": "No documents imported",
-                    }
-                )
-
-            document_count = len(documents)
-            chunks_count = sum([len(document.chunks) for document in documents])
-
-            return JSONResponse(
-                content={
-                    "status": 200,
-                    "status_msg": f"Succesfully imported {document_count} documents and {chunks_count} chunks",
-                }
+        )
+        sorted_variables = dict(
+            sorted(
+                manager.environment_variables.items(),
+                key=lambda item: (not item[1], item[0]),
             )
-        except Exception as e:
-            msg.fail(f"Loading data failed {str(e)}")
-            return JSONResponse(
-                content={
-                    "status": "400",
-                    "status_msg": str(e),
-                }
-            )
-    return JSONResponse(
-        content={
-            "status": "200",
-            "status_msg": "No documents received",
+        )
+
+        data = {
+            "type": manager.weaviate_type,
+            "libraries": sorted_libraries,
+            "variables": sorted_variables,
+            "schemas": sorted_schemas,
+            "error": "",
         }
-    )
 
+        msg.info("Status Retrieved")
+        return JSONResponse(content=data)
+    except Exception as e:
+        data = {
+            "type": "",
+            "libraries": {},
+            "variables": {},
+            "schemas": {},
+            "error": f"Status retrieval failed: {str(e)}",
+        }
+        msg.fail(f"Status retrieval failed: {str(e)}")
+        return JSONResponse(content=data)
 
-# Receive query and return chunks and query answer
-@app.post("/api/query")
-async def query(payload: QueryPayload):
-    msg.good(f"Received query: {payload.query}")
+# Get Configuration
+@app.get("/api/config")
+async def retrieve_config():
     try:
-        chunks, context = manager.retrieve_chunks([payload.query])
-
-        results = [
-            {
-                "text": chunk.text,
-                "doc_name": chunk.doc_name,
-                "chunk_id": chunk.chunk_id,
-                "doc_uuid": chunk.doc_uuid,
-                "doc_type": chunk.doc_type,
-                "score": chunk.score,
-            }
-            for chunk in chunks
-        ]
-
-        msg.good(f"Succesfully processed query: {payload.query}")
-
-        if len(chunks) == 0:
-            return JSONResponse(
-                content={
-                    "documents": [],
-                    "context": "",
-                }
-            )
-
-        return JSONResponse(
-            content={
-                "documents": results,
-                "context": context,
-            }
-        )
+        config = get_config(manager)
+        msg.info("Config Retrieved")
+        return JSONResponse(status_code=200, content={"data": config, "error": ""})
 
     except Exception as e:
-        msg.fail(f"Query failed: {str(e)}")
+        msg.warn(f"Could not retrieve configuration: {str(e)}")
         return JSONResponse(
+            status_code=500,
             content={
-                "system": f"Something went wrong! {str(e)}",
-                "context": "",
-                "documents": [],
-            }
+                "data": {},
+                "error": f"Could not retrieve configuration: {str(e)}",
+            },
         )
 
-
-# Receive query and return chunks and query answer
-@app.post("/api/generate")
-async def generate(payload: GeneratePayload):
-    msg.good(f"Received generate call for: {payload.query}")
-    try:
-        answer = await manager.generate_answer(
-            [payload.query], [payload.context], payload.conversation
-        )
-
-        msg.good(f"Succesfully generated answer: {payload.query}")
-
-        return JSONResponse(
-            content={
-                "system": answer,
-            }
-        )
-
-    except Exception as e:
-        raise
-        msg.fail(f"Answer Generation failed: {str(e)}")
-        return JSONResponse(
-            content={
-                "system": f"Something went wrong! {str(e)}",
-            }
-        )
-
+### WEBSOCKETS
 
 @app.websocket("/ws/generate_stream")
 async def websocket_generate_stream(websocket: WebSocket):
@@ -609,12 +189,150 @@ async def websocket_generate_stream(websocket: WebSocket):
             break  # Break out of the loop when the client disconnects
 
         except Exception as e:
-            msg.fail(f"WebSocket Error: {e}")
+            msg.fail(f"WebSocket Error: {str(e)}")
             await websocket.send_json(
-                {"message": e, "finish_reason": "stop", "full_text": e}
+                {"message": e, "finish_reason": "stop", "full_text": str(e)}
             )
         msg.good("Succesfully streamed answer")
 
+### POST
+
+# Reset Verba
+@app.post("/api/reset")
+async def reset_verba(payload: ResetPayload):
+    if production:
+        return JSONResponse(status_code=200, content={})
+
+    try:
+        if payload.resetMode == "VERBA":
+            manager.reset()
+        elif payload.resetMode == "DOCUMENTS":
+            manager.reset_documents()
+        elif payload.resetMode == "CACHE":
+            manager.reset_cache()
+        elif payload.resetMode == "SUGGESTIONS":
+            manager.reset_suggestion()
+        elif payload.resetMode == "CONFIG":
+            manager.reset_config()
+
+        msg.info(f"Resetting Verba ({payload.resetMode})")
+
+    except Exception as e:
+        msg.warn(f"Failed to reset Verba {str(e)}")
+
+    return JSONResponse(status_code=200, content={})
+
+# Receive query and return chunks and query answer
+@app.post("/api/import")
+async def import_data(payload: ImportPayload):
+
+    logging = []
+
+    if production:
+        logging.append(
+            {"type": "ERROR", "message": "Can't import when in production mode"}
+        )
+        return JSONResponse(
+            content={
+                "logging": logging,
+            }
+        )
+
+    try:
+        set_config(manager, payload.config)
+        documents, logging = manager.import_data(
+            payload.data, payload.textValues, logging
+        )
+
+        return JSONResponse(
+            content={
+                "logging": logging,
+            }
+        )
+
+    except Exception as e:
+        logging.append({"type": "ERROR", "message": str(e)})
+        return JSONResponse(
+            content={
+                "logging": logging,
+            }
+        )
+
+@app.post("/api/set_config")
+async def update_config(payload: ConfigPayload):
+
+    if production:
+        return JSONResponse(
+            content={
+                "status": "200",
+                "status_msg": "Config can't be updated in Production Mode",
+            }
+        )
+
+    try:
+        set_config(manager, payload.config)
+    except Exception as e:
+        msg.warn(f"Failed to set new Config {str(e)}")
+
+    return JSONResponse(
+        content={
+            "status": "200",
+            "status_msg": "Config Updated",
+        }
+    )
+
+# Receive query and return chunks and query answer
+@app.post("/api/query")
+async def query(payload: QueryPayload):
+    msg.good(f"Received query: {payload.query}")
+    start_time = time.time()  # Start timing
+    try:
+        chunks, context = manager.retrieve_chunks([payload.query])
+
+        retrieved_chunks = [
+            {
+                "text": chunk.text,
+                "doc_name": chunk.doc_name,
+                "chunk_id": chunk.chunk_id,
+                "doc_uuid": chunk.doc_uuid,
+                "doc_type": chunk.doc_type,
+                "score": chunk.score,
+            }
+            for chunk in chunks
+        ]
+
+        elapsed_time = round(time.time() - start_time, 2)  # Calculate elapsed time
+        msg.good(f"Succesfully processed query: {payload.query} in {elapsed_time}s")
+
+        if len(chunks) == 0:
+            return JSONResponse(
+                content={
+                    "chunks": [],
+                    "took": 0,
+                    "context": "",
+                    "error": "No Chunks Available",
+                }
+            )
+
+        return JSONResponse(
+            content={
+                "error": "",
+                "chunks": retrieved_chunks,
+                "context": context,
+                "took": elapsed_time,
+            }
+        )
+
+    except Exception as e:
+        msg.warn(f"Query failed: {str(e)}")
+        return JSONResponse(
+            content={
+                    "chunks": [],
+                    "took": 0,
+                    "context": "",
+                    "error": f"Something went wrong: {str(e)}",
+            }
+        )
 
 # Retrieve auto complete suggestions based on user input
 @app.post("/api/suggestions")
@@ -634,45 +352,102 @@ async def suggestions(payload: QueryPayload):
             }
         )
 
-
 # Retrieve specific document based on UUID
 @app.post("/api/get_document")
 async def get_document(payload: GetDocumentPayload):
+    # TODO Standarize Document Creation
     msg.info(f"Document ID received: {payload.document_id}")
 
     try:
         document = manager.retrieve_document(payload.document_id)
+        document_properties = document.get("properties", {})
+        document_obj = {
+            "class": document.get("class", "No Class"),
+            "id": document.get("id", payload.document_id),
+            "chunks": document_properties.get("chunk_count", 0),
+            "link": document_properties.get("doc_link", ""),
+            "name": document_properties.get("doc_name", "No name"),
+            "type": document_properties.get("doc_type", "No type"),
+            "text": document_properties.get("text", "No text"),
+            "timestamp": document_properties.get("timestamp", ""),
+        }
+
         msg.good(f"Succesfully retrieved document: {payload.document_id}")
         return JSONResponse(
             content={
-                "document": document,
+                "error": "",
+                "document": document_obj,
             }
         )
     except Exception as e:
         msg.fail(f"Document retrieval failed: {str(e)}")
         return JSONResponse(
             content={
-                "document": {},
+                "error": str(e),
+                "document": None,
             }
         )
 
-
-## Retrieve all documents imported to Weaviate
+## Retrieve and search documents imported to Weaviate
 @app.post("/api/get_all_documents")
 async def get_all_documents(payload: SearchQueryPayload):
+    # TODO Standarize Document Creation
     msg.info("Get all documents request received")
+    start_time = time.time()  # Start timing
 
     try:
-        documents = manager.retrieve_all_documents(payload.doc_type)
-        msg.good(f"Succesfully retrieved document: {len(documents)} documents")
+        if payload.query == "":
+            documents = manager.retrieve_all_documents(
+                payload.doc_type, payload.page, payload.pageSize
+            )
+        else:
+            documents = manager.search_documents(
+                payload.query, payload.doc_type, payload.page, payload.pageSize
+            )
 
-        doc_types = {document["doc_type"] for document in documents}
+        if not documents:
+            return JSONResponse(
+                content={
+                    "documents": [],
+                    "doc_types": [],
+                    "current_embedder": manager.embedder_manager.selected_embedder,
+                    "error": f"No Results found!",
+                    "took": 0,
+                }
+            )
+
+        documents_obj = []
+        for document in documents:
+
+            _additional = document["_additional"]
+
+            documents_obj.append(
+                {
+                    "class": "No Class",
+                    "uuid": _additional.get("id", "none"),
+                    "chunks": document.get("chunk_count", 0),
+                    "link": document.get("doc_link", ""),
+                    "name": document.get("doc_name", "No name"),
+                    "type": document.get("doc_type", "No type"),
+                    "text": document.get("text", "No text"),
+                    "timestamp": document.get("timestamp", ""),
+                }
+            )
+
+        elapsed_time = round(time.time() - start_time, 2)  # Calculate elapsed time
+        msg.good(
+            f"Succesfully retrieved document: {len(documents)} documents in {elapsed_time}s"
+        )
+
+        doc_types = manager.retrieve_all_document_types()
 
         return JSONResponse(
             content={
-                "documents": documents,
+                "documents": documents_obj,
                 "doc_types": list(doc_types),
-                "current_embedder": manager.embedder_manager.selected_embedder.name,
+                "current_embedder": manager.embedder_manager.selected_embedder,
+                "error": "",
+                "took": elapsed_time,
             }
         )
     except Exception as e:
@@ -681,36 +456,17 @@ async def get_all_documents(payload: SearchQueryPayload):
             content={
                 "documents": [],
                 "doc_types": [],
-                "current_embedder": manager.embedder_manager.selected_embedder.name,
+                "current_embedder": manager.embedder_manager.selected_embedder,
+                "error": f"All Document retrieval failed: {str(e)}",
+                "took": 0,
             }
         )
 
-
-## Search for documentation
-@app.post("/api/search_documents")
-async def search_documents(payload: SearchQueryPayload):
-    try:
-        documents = manager.search_documents(payload.query, payload.doc_type)
-        return JSONResponse(
-            content={
-                "documents": documents,
-                "current_embedder": manager.embedder_manager.selected_embedder.name,
-            }
-        )
-    except Exception as e:
-        msg.fail(f"All Document retrieval failed: {str(e)}")
-        return JSONResponse(
-            content={
-                "documents": [],
-                "current_embedder": manager.embedder_manager.selected_embedder.name,
-            }
-        )
-
-
-# Retrieve specific document based on UUID
+# Delete specific document based on UUID
 @app.post("/api/delete_document")
 async def delete_document(payload: GetDocumentPayload):
     if production:
+        msg.warn("Can't delete documents when in Production Mode")
         return JSONResponse(status_code=200, content={})
 
     msg.info(f"Document ID received: {payload.document_id}")
