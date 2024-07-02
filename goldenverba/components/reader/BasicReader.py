@@ -14,24 +14,28 @@ try:
 except Exception:
     msg.warn("pypdf not installed, your base installation might be corrupted.")
 
+try:
+    import docx
+except Exception:
+    msg.warn("python-docx not installed, your base installation might be corrupted.")
 
 class BasicReader(Reader):
     """
-    The BasicReader reads .txt, .md, .mdx, .json and .pdf files.
+    The BasicReader reads .txt, .md, .mdx, .json, .pdf and .docx files.
     """
 
     def __init__(self):
         super().__init__()
         self.name = "BasicReader"
-        self.description = "Imports plain text, pdf, markdown, and json files."
-        self.requires_library = ["pypdf"]
+        self.description = "Imports plain text, pdf, markdown, json and docx files."
+        self.requires_library = ["pypdf", "docx"]
 
     def load(
         self, fileData: list[FileData], textValues: list[str], logging: list[dict]
     ) -> tuple[list[Document], list[str]]:
 
         documents = []
-
+        
         for file in fileData:
             msg.info(f"Loading in {file.filename}")
             logging.append({"type": "INFO", "message": f"Importing {file.filename}"})
@@ -94,6 +98,35 @@ class BasicReader(Reader):
                         reader=self.name,
                     )
                     documents.append(document)
+
+                except Exception as e:
+                    msg.warn(f"Failed to load {file.filename} : {str(e)}")
+                    logging.append(
+                        {
+                            "type": "WARNING",
+                            "message": f"Failed to load {file.filename} : {str(e)}",
+                        }
+                    )
+
+            elif file.extension == "docx":
+                try:
+                    docx_bytes = io.BytesIO(base64.b64decode(file.content))
+
+                    full_text = ""
+                    reader = docx.Document(docx_bytes)
+
+                    for paragraph in reader.paragraphs:
+                        full_text += paragraph.text + "\n"
+                    
+                    document = Document(
+                        name=file.filename,
+                        text=full_text,
+                        type=self.config["document_type"].text,
+                        timestamp=str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
+                        reader=self.name,
+                    )
+                    documents.append(document)
+
                 except Exception as e:
                     msg.warn(f"Failed to load {file.filename} : {str(e)}")
                     logging.append(
