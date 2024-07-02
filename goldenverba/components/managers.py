@@ -177,7 +177,7 @@ class EmbeddingManager:
             "CohereEmbedder": CohereEmbedder(),
             "OllamaEmbedder": OllamaEmbedder(),
         }
-        self.set_embedder("ADAEmbedder")
+        self.selected_embedder: str = "TokenChunker"
 
 
     def embed(

@@ -344,8 +344,9 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
         if (data) {
           if (data.error !== "") {
             triggerNotification(data.error, true);
-            setIsFetching(false);
+            isFetching.current = false;
             setFetchingStatus("DONE");
+            return;
           }
 
           setChunks(data.chunks);

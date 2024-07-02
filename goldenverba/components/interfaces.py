@@ -154,15 +154,6 @@ class Embedder(VerbaComponent):
         """
         raise NotImplementedError("embed method must be implemented by a subclass.")
 
-    def check_embedder_pre_requirements(self) -> tuple[bool, list]:
-        """Check if the embedder has all the necessary pre-requirements.
-        @returns tuple[bool, list] - Bool whether the embedding was successful and list of missing requirements.
-        """
-        missing_env_vars = [var for var in self.requires_env if not os.getenv(var)]
-        if missing_env_vars:
-            return False, [f"Environment:{var}" for var in missing_env_vars]
-        return True, []
-
     def import_data(
         self, documents: list[Document], client: Client, logging: list[dict]
     ) -> bool:

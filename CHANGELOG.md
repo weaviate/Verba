@@ -17,6 +17,7 @@ All notable changes to this project will be documented in this file.
 ## Fixed
 
 - Check error logs coming from Ollama and send it to the frontend
+- Check If Chunks Are NoneType
 
 ## [1.0.2]
 
