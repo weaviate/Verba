@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 ## Added
 
 - Cancel Generation Button
+- Added .docx support
 - Added Documentation for JSON Files
 - Added GitLabReader (https://github.com/weaviate/Verba/pull/151)
 - Improved HuggingFace Embedding Models thanks to @tomaarsen

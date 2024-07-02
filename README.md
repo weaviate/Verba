@@ -69,6 +69,7 @@ Verba is a fully-customizable personal assistant for querying and interacting wi
 | PDF Ingestion      | ✅          | Import PDF into Verba               |
 | GitHub & GitLab    | ✅          | Import Files from Github and GitLab |
 | CSV/XLSX Ingestion | ✅          | Import Table Data into Verba        |
+| .DOCX              | ✅          | Import .docx files                  |
 | Multi-Modal        | planned ⏱️  | Import Multi-Modal Data into Verba  |
 | UnstructuredIO     | ✅          | Import Data through Unstructured    |
 
