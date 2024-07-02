@@ -14,6 +14,7 @@ from goldenverba.components.interfaces import (
 
 from goldenverba.components.reader.BasicReader import BasicReader
 from goldenverba.components.reader.GitReader import GitHubReader
+from goldenverba.components.reader.GitLabReader import GitLabReader
 from goldenverba.components.reader.UnstructuredAPI import UnstructuredReader
 
 from goldenverba.components.chunking.TokenChunker import TokenChunker
@@ -23,6 +24,8 @@ from goldenverba.components.embedding.CohereEmbedder import CohereEmbedder
 from goldenverba.components.embedding.MiniLMEmbedder import MiniLMEmbedder
 from goldenverba.components.embedding.GoogleEmbedder import GoogleEmbedder
 from goldenverba.components.embedding.OllamaEmbedder import OllamaEmbedder
+from goldenverba.components.embedding.AllMPNetEmbedder import AllMPNetEmbedder
+from goldenverba.components.embedding.MixedbreadEmbedder import MixedbreadEmbedder
 
 from goldenverba.components.retriever.WindowRetriever import WindowRetriever
 
@@ -46,6 +49,7 @@ class ReaderManager:
         self.readers: dict[str, Reader] = {
             "BasicReader": BasicReader(),
             "GitHubReader": GitHubReader(),
+            "GitLabReader": GitLabReader(),
             "UnstructuredAPI": UnstructuredReader(),
         }
         self.selected_reader: str = "BasicReader"
@@ -167,6 +171,8 @@ class EmbeddingManager:
         self.embedders: dict[str, Embedder] = {
             "GoogleEmbedder": GoogleEmbedder(),
             "MiniLMEmbedder": MiniLMEmbedder(),
+            "AllMPNetEmbedder": AllMPNetEmbedder(),
+            "MixedbreadEmbedder": MixedbreadEmbedder(),
             "ADAEmbedder": ADAEmbedder(),
             "CohereEmbedder": CohereEmbedder(),
             "OllamaEmbedder": OllamaEmbedder(),

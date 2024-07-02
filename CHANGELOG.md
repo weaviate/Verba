@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.3]
+
+## Added
+
+- Cancel Generation Button
+- Added .docx support
+- Added Documentation for JSON Files
+- Added GitLabReader (https://github.com/weaviate/Verba/pull/151)
+- Improved HuggingFace Embedding Models thanks to @tomaarsen
+- MixedBreadEmbedder
+- AllMPNetEmbedder
+
+## Fixed
+
+- Check error logs coming from Ollama and send it to the frontend
+
 ## [1.0.2]
 
 ## Added

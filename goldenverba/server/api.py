@@ -251,7 +251,7 @@ async def import_data(payload: ImportPayload):
         )
 
     except Exception as e:
-        logging.append({"type": "ERROR", "message": str(e)})
+        logging.append({"type": "ERROR", "message": "Unexpected error: "+str(e)})
         return JSONResponse(
             content={
                 "logging": logging,

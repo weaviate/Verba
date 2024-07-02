@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="goldenverba",
-    version="1.0.2",
+    version="1.0.3",
     packages=find_packages(),
     python_requires=">=3.10.0",
     entry_points={
@@ -35,14 +35,12 @@ setup(
         "tiktoken==0.6.0",
         "requests==2.31.0",
         "pypdf==4.2.0",
+        "python-docx==1.1.2",
     ],
     extras_require={
         "dev": ["pytest", "wheel", "twine", "black>=23.7.0", "setuptools"],
         "huggingface": [
-            "sentence-transformers==2.7.0",
-            "transformers==4.40.1",
-            "torch==2.3.0",
-            "accelerate==0.29.2",
+            "sentence-transformers==3.0.1",
         ],
         "google": [
             "vertexai==1.46.0",

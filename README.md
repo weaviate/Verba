@@ -36,6 +36,14 @@ pip install goldenverba
 
 Verba is a fully-customizable personal assistant for querying and interacting with your data, **either locally or deployed via cloud**. Resolve questions around your documents, cross-reference multiple data points or gain insights from existing knowledge bases. Verba combines state-of-the-art RAG techniques with Weaviate's context-aware database. Choose between different RAG frameworks, data types, chunking & retrieving techniques, and LLM providers based on your individual use-case.
 
+## Open Source Spirit
+
+**Weaviate** is proud to offer this open-source project for the community. While we strive to address issues promptly, please understand that it may not be maintained with the same rigor as production software. We welcome and encourage community contributions to help keep it running smoothly. Your support in fixing open issues quickly is greatly appreciated.
+
+### Watch our newest Verba video here:
+
+[![VIDEO LINK](https://github.com/weaviate/Verba/blob/main/img/thumbnail.png)](https://www.youtube.com/watch?v=swKKRdLBhas&t)
+
 ## Feature Lists
 
 | 🤖 Model Support                  | Implemented | Description                                             |
@@ -46,12 +54,24 @@ Verba is a fully-customizable personal assistant for querying and interacting wi
 | Google (e.g. Gemini)              | ✅          | Embedding and Generation Models by Google               |
 | OpenAI (e.g. GPT4)                | ✅          | Embedding and Generation Models by OpenAI               |
 
-| 📁 Data Support    | Implemented | Description                        |
-| ------------------ | ----------- | ---------------------------------- |
-| PDF Ingestion      | ✅          | Import PDF into Verba              |
-| CSV/XLSX Ingestion | ✅          | Import Table Data into Verba       |
-| Multi-Modal        | planned ⏱️  | Import Multi-Modal Data into Verba |
-| UnstructuredIO     | ✅          | Import Data through Unstructured   |
+| 🤖 Embedding Support | Implemented | Description                              |
+| -------------------- | ----------- | ---------------------------------------- |
+| Ollama               | ✅          | Local Embedding Models powered by Ollama |
+| MiniLMEmbedder       | ✅          | powered by HuggingFace                   |
+| AllMPNetEmbedder     | ✅          | powered by HuggingFace                   |
+| MixedbreadEmbedder   | ✅          | powered by HuggingFace                   |
+| Cohere               | ✅          | Embedding Models by Cohere               |
+| Google               | ✅          | Embedding Models by Google               |
+| OpenAI               | ✅          | Embedding Models by OpenAI               |
+
+| 📁 Data Support    | Implemented | Description                         |
+| ------------------ | ----------- | ----------------------------------- |
+| PDF Ingestion      | ✅          | Import PDF into Verba               |
+| GitHub & GitLab    | ✅          | Import Files from Github and GitLab |
+| CSV/XLSX Ingestion | ✅          | Import Table Data into Verba        |
+| .DOCX              | ✅          | Import .docx files                  |
+| Multi-Modal        | planned ⏱️  | Import Multi-Modal Data into Verba  |
+| UnstructuredIO     | ✅          | Import Data through Unstructured    |
 
 | ✨ RAG Features         | Implemented | Description                                                               |
 | ----------------------- | ----------- | ------------------------------------------------------------------------- |
@@ -113,22 +133,24 @@ Before starting Verba you'll need to configure access to various components depe
 
 Below is a comprehensive list of the API keys and variables you may require:
 
-| Environment Variable           | Value                                                      | Description                                                                       |
-| ------------------------------ | ---------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| WEAVIATE_URL_VERBA             | URL to your hosted Weaviate Cluster                        | Connect to your [WCS](https://console.weaviate.cloud/) Cluster                    |
-| WEAVIATE_API_KEY_VERBA         | API Credentials to your hosted Weaviate Cluster            | Connect to your [WCS](https://console.weaviate.cloud/) Cluster                    |
-| OPENAI_API_KEY                 | Your API Key                                               | Get Access to [OpenAI](https://openai.com/) Models                                |
-| OPENAI_BASE_URL                | URL to OpenAI instance                                     | Models                                                                            |
-| COHERE_API_KEY                 | Your API Key                                               | Get Access to [Cohere](https://cohere.com/) Models                                |
-| OLLAMA_URL                     | URL to your Ollama instance (e.g. http://localhost:11434 ) | Get Access to [Ollama](https://ollama.com/) Models                                |
-| OLLAMA_MODEL                   | Model Name (e.g. llama)                                    | Get Access to a specific [Ollama](https://ollama.com/) Model                      |
-| UNSTRUCTURED_API_KEY           | Your API Key                                               | Get Access to [Unstructured](https://docs.unstructured.io/welcome) Data Ingestion |
-| UNSTRUCTURED_API_URL           | URL to Unstructured Instance                               | Get Access to [Unstructured](https://docs.unstructured.io/welcome) Data Ingestion |
-| GITHUB_TOKEN                   | Your GitHub Token                                          | Get Access to Data Ingestion via GitHub                                           |
-| GOOGLE_APPLICATION_CREDENTIALS | Google Credentials                                         | Get Access to Google Models                                                       |
-| GOOGLE_CLOUD_PROJECT           | Google Cloud Project                                       | Get Access to Google Models                                                       |
-| GOOGLE_API_KEY                 | Your API Key                                               | Get Access to Google Models                                                       |
-| VERBA_PRODUCTION               | True                                                       | Run Verba in Production Mode                                                      |
+| Environment Variable           | Value                                                      | Description                                                                                                            |
+| ------------------------------ | ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| WEAVIATE_URL_VERBA             | URL to your hosted Weaviate Cluster                        | Connect to your [WCS](https://console.weaviate.cloud/) Cluster                                                         |
+| WEAVIATE_API_KEY_VERBA         | API Credentials to your hosted Weaviate Cluster            | Connect to your [WCS](https://console.weaviate.cloud/) Cluster                                                         |
+| OPENAI_API_KEY                 | Your API Key                                               | Get Access to [OpenAI](https://openai.com/) Models                                                                     |
+| OPENAI_BASE_URL                | URL to OpenAI instance                                     | Models                                                                                                                 |
+| COHERE_API_KEY                 | Your API Key                                               | Get Access to [Cohere](https://cohere.com/) Models                                                                     |
+| OLLAMA_URL                     | URL to your Ollama instance (e.g. http://localhost:11434 ) | Get Access to [Ollama](https://ollama.com/) Models                                                                     |
+| OLLAMA_MODEL                   | Model Name (e.g. llama)                                    | Get Access to a specific [Ollama](https://ollama.com/) Model                                                           |
+| OLLAMA_EMBED_MODEL             | Model Name (e.g. mxbai-embed-large)                        | Get Access to a specific [Ollama](https://ollama.com/) Model for embedding (Defaults to OLLAMA_MODEL if not specified) |
+| UNSTRUCTURED_API_KEY           | Your API Key                                               | Get Access to [Unstructured](https://docs.unstructured.io/welcome) Data Ingestion                                      |
+| UNSTRUCTURED_API_URL           | URL to Unstructured Instance                               | Get Access to [Unstructured](https://docs.unstructured.io/welcome) Data Ingestion                                      |
+| GITHUB_TOKEN                   | Your GitHub Token                                          | Get Access to Data Ingestion via GitHub                                                                                |
+| GITLAB_TOKEN                   | Your GitLab Token                                          | Get Access to Data Ingestion via GitLab                                                                                |
+| GOOGLE_APPLICATION_CREDENTIALS | Google Credentials                                         | Get Access to Google Models                                                                                            |
+| GOOGLE_CLOUD_PROJECT           | Google Cloud Project                                       | Get Access to Google Models                                                                                            |
+| GOOGLE_API_KEY                 | Your API Key                                               | Get Access to Google Models                                                                                            |
+| VERBA_PRODUCTION               | True                                                       | Run Verba in Production Mode                                                                                           |
 
 ## Weaviate
 
@@ -149,7 +171,19 @@ Verba supports Ollama models. Download and Install Ollama on your device (https:
 
 Tested with `llama3`, `llama3:70b` and `mistral`. The bigger models generally perform better, but need more computational power.
 
+> Ensure that you have the right configurations for the `Embedder` and `Generator` selected before going ahead.
+
+![verba-embedder](https://github.com/weaviate/Verba/blob/main/img/verba_select_embedder.png)
+
 > Make sure Ollama Server runs in the background and that you don't ingest documents with different ollama models since their vector dimension can vary that will lead to errors
+
+You can verify that by running the following command
+
+```
+ollama run llama3
+```
+
+![verba-ollama-llama3](https://github.com/weaviate/Verba/blob/main/img/ollama_running.png)
 
 ## Google
 
@@ -232,7 +266,8 @@ WAIT_TIME_BETWEEN_INGESTION_QUERIES_MS="100"
 
 ## HuggingFace
 
-If you want to use the HuggingFace Features, make sure to install the correct Verba package.
+If you want to use the HuggingFace Features, make sure to install the correct Verba package. It will install required packages to use the local embedding models.
+Please note that on startup, Verba will automatically download and install all embedding models, if you just want specific models, please remove unwanted models from the `goldenverba/compoonents/managers.py` file.
 
 ```bash
 pip install goldenverba[huggingface]
@@ -389,6 +424,43 @@ Your contributions are always welcome! Feel free to contribute ideas, feedback, 
 
 You can learn more about Verba's architecture and implementation in its [technical documentation](./TECHNICAL.md) and [frontend documentation](./FRONTEND.md). It's recommended to have a look at them before making any contributions.
 
+## JSON Files
+
+In Verba you can import JSON with a specific format, this format allows you to add links to the original sources, chunks, metadata and more.
+
+> Currently, one document needs to be in one .json file (this will change in the future)
+
+### Document Structure
+
+```json
+{
+  "text": "<Content>", // Content that will be chunked
+  "type": "<Type>", // Will be used to filter documents
+  "name": "<Document Name>", // Included in the context sent to the LLM
+  "path": "<Path to Local File>", // Currently not implemented, can be empty
+  "link": "<Link to Original Source>", // Link to original sources
+  "timestamp": "<YYYY-MM-DD HH:MM:SS>", // Currently not used, can be empty
+  "reader": "<READER>", // Currently not used, can be empty
+  "meta": {}, // Currently not used
+  "chunks": [] // You can add chunks here and skip the chunking part during the ingestion
+}
+```
+
+### Chunk Structure
+
+```json
+{
+  "text": "<Content>", // Chunk Content
+  "doc_name": "<Document Name>", // Name of the Document
+  "doc_type": "<Document Type>", // Type of the Document
+  "doc_uuid": "<Document UUID>", // UUID of the Document
+  "chunk_id": "<Chunk ID>", // Order of the chunk, starts at 0 - n (n = number of total chunks)
+  "tokens": "<Number of Tokens>", // Number of tokens in the chunk, not used, can be empty
+  "vector": "<Vector>", // Vector of the chunk, not used, can be empty
+  "score": "<Retrieval Score>" // Score of the chunk, will be added by the retriever during runtime, can be empty
+}
+```
+
 ## Known Issues
 
 - **Weaviate Embeeded** currently not working on Windows yet
@@ -403,10 +475,11 @@ You can learn more about Verba's architecture and implementation in its [technic
 - **Can I use my Ollama Server with the Verba Docker?**
 
   - Yes, you can! Make sure the URL is set to: `OLLAMA_URL=http://host.docker.internal:11434`
+  - If you're running on Linux, you might need to get the IP Gateway of the Ollama server: `OLLAMA_URL="http://YOUR-IP-OF-OLLAMA:11434"`
 
 - **How to clear Weaviate Embedded Storage?**
 
-  - Remove the directory `rm ~/.local/share/weaviate`
+  - You'll find the stored data here: `~/.local/share/weaviate`
 
 - **How can I specify the port?**
   - You can use the port and host flag `verba start --port 9000 --host 0.0.0.0`
