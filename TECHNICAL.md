@@ -90,6 +90,14 @@ class Chunk:
 **Purpose:**
 The Embedder takes the chunked data, transforms it into vectorized form, and ingests it into Weaviate.
 
+**Implementation:**
+- Embedder Manager: Manages the embedding process and the selection of the current embedding strategy.
+    - ADAEmbedder: Embeds chunks based on OpenAI's ADA Model
+    - MiniLMEmbedder: Embeds chunks based on Sentence Transformer
+    - AllMPNetEmbedder: Embeds chunks based on Sentence Transformer
+    - MixedbreadEmbedder: Embeds chunks based on Sentence Transformer
+    - CohereEmbedder: Embeds chunks based on Cohere's Embedding Model
+
 **Input: List[Document]**
 
 ### 4. Retrievers

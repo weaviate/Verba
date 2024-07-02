@@ -54,12 +54,23 @@ Verba is a fully-customizable personal assistant for querying and interacting wi
 | Google (e.g. Gemini)              | ✅          | Embedding and Generation Models by Google               |
 | OpenAI (e.g. GPT4)                | ✅          | Embedding and Generation Models by OpenAI               |
 
-| 📁 Data Support    | Implemented | Description                        |
-| ------------------ | ----------- | ---------------------------------- |
-| PDF Ingestion      | ✅          | Import PDF into Verba              |
-| CSV/XLSX Ingestion | ✅          | Import Table Data into Verba       |
-| Multi-Modal        | planned ⏱️  | Import Multi-Modal Data into Verba |
-| UnstructuredIO     | ✅          | Import Data through Unstructured   |
+| 🤖 Embedding Support | Implemented | Description                              |
+| -------------------- | ----------- | ---------------------------------------- |
+| Ollama               | ✅          | Local Embedding Models powered by Ollama |
+| MiniLMEmbedder       | ✅          | powered by HuggingFace                   |
+| AllMPNetEmbedder     | ✅          | powered by HuggingFace                   |
+| MixedbreadEmbedder   | ✅          | powered by HuggingFace                   |
+| Cohere               | ✅          | Embedding Models by Cohere               |
+| Google               | ✅          | Embedding Models by Google               |
+| OpenAI               | ✅          | Embedding Models by OpenAI               |
+
+| 📁 Data Support    | Implemented | Description                         |
+| ------------------ | ----------- | ----------------------------------- |
+| PDF Ingestion      | ✅          | Import PDF into Verba               |
+| GitHub & GitLab    | ✅          | Import Files from Github and GitLab |
+| CSV/XLSX Ingestion | ✅          | Import Table Data into Verba        |
+| Multi-Modal        | planned ⏱️  | Import Multi-Modal Data into Verba  |
+| UnstructuredIO     | ✅          | Import Data through Unstructured    |
 
 | ✨ RAG Features         | Implemented | Description                                                               |
 | ----------------------- | ----------- | ------------------------------------------------------------------------- |
@@ -134,6 +145,7 @@ Below is a comprehensive list of the API keys and variables you may require:
 | UNSTRUCTURED_API_KEY           | Your API Key                                               | Get Access to [Unstructured](https://docs.unstructured.io/welcome) Data Ingestion                                      |
 | UNSTRUCTURED_API_URL           | URL to Unstructured Instance                               | Get Access to [Unstructured](https://docs.unstructured.io/welcome) Data Ingestion                                      |
 | GITHUB_TOKEN                   | Your GitHub Token                                          | Get Access to Data Ingestion via GitHub                                                                                |
+| GITLAB_TOKEN                   | Your GitLab Token                                          | Get Access to Data Ingestion via GitLab                                                                                |
 | GOOGLE_APPLICATION_CREDENTIALS | Google Credentials                                         | Get Access to Google Models                                                                                            |
 | GOOGLE_CLOUD_PROJECT           | Google Cloud Project                                       | Get Access to Google Models                                                                                            |
 | GOOGLE_API_KEY                 | Your API Key                                               | Get Access to Google Models                                                                                            |
@@ -253,7 +265,8 @@ WAIT_TIME_BETWEEN_INGESTION_QUERIES_MS="100"
 
 ## HuggingFace
 
-If you want to use the HuggingFace Features, make sure to install the correct Verba package.
+If you want to use the HuggingFace Features, make sure to install the correct Verba package. It will install required packages to use the local embedding models.
+Please note that on startup, Verba will automatically download and install all embedding models, if you just want specific models, please remove unwanted models from the `goldenverba/compoonents/managers.py` file.
 
 ```bash
 pip install goldenverba[huggingface]
@@ -410,6 +423,43 @@ Your contributions are always welcome! Feel free to contribute ideas, feedback, 
 
 You can learn more about Verba's architecture and implementation in its [technical documentation](./TECHNICAL.md) and [frontend documentation](./FRONTEND.md). It's recommended to have a look at them before making any contributions.
 
+## JSON Files
+
+In Verba you can import JSON with a specific format, this format allows you to add links to the original sources, chunks, metadata and more.
+
+> Currently, one document needs to be in one .json file (this will change in the future)
+
+### Document Structure
+
+```json
+{
+  "text": "<Content>", // Content that will be chunked
+  "type": "<Type>", // Will be used to filter documents
+  "name": "<Document Name>", // Included in the context sent to the LLM
+  "path": "<Path to Local File>", // Currently not implemented, can be empty
+  "link": "<Link to Original Source>", // Link to original sources
+  "timestamp": "<YYYY-MM-DD HH:MM:SS>", // Currently not used, can be empty
+  "reader": "<READER>", // Currently not used, can be empty
+  "meta": {}, // Currently not used
+  "chunks": [] // You can add chunks here and skip the chunking part during the ingestion
+}
+```
+
+### Chunk Structure
+
+```json
+{
+  "text": "<Content>", // Chunk Content
+  "doc_name": "<Document Name>", // Name of the Document
+  "doc_type": "<Document Type>", // Type of the Document
+  "doc_uuid": "<Document UUID>", // UUID of the Document
+  "chunk_id": "<Chunk ID>", // Order of the chunk, starts at 0 - n (n = number of total chunks)
+  "tokens": "<Number of Tokens>", // Number of tokens in the chunk, not used, can be empty
+  "vector": "<Vector>", // Vector of the chunk, not used, can be empty
+  "score": "<Retrieval Score>" // Score of the chunk, will be added by the retriever during runtime, can be empty
+}
+```
+
 ## Known Issues
 
 - **Weaviate Embeeded** currently not working on Windows yet
@@ -424,10 +474,11 @@ You can learn more about Verba's architecture and implementation in its [technic
 - **Can I use my Ollama Server with the Verba Docker?**
 
   - Yes, you can! Make sure the URL is set to: `OLLAMA_URL=http://host.docker.internal:11434`
+  - If you're running on Linux, you might need to get the IP Gateway of the Ollama server: `OLLAMA_URL="http://YOUR-IP-OF-OLLAMA:11434"`
 
 - **How to clear Weaviate Embedded Storage?**
 
-  - Remove the directory `rm ~/.local/share/weaviate`
+  - You'll find the stored data here: `~/.local/share/weaviate`
 
 - **How can I specify the port?**
   - You can use the port and host flag `verba start --port 9000 --host 0.0.0.0`

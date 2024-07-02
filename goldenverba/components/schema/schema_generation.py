@@ -10,7 +10,7 @@ VECTORIZERS = {
     "text2vec-openai",
     "text2vec-cohere",
 }  # Needs to match with Weaviate modules
-EMBEDDINGS = {"MiniLM", "OLLAMA"}  # Custom Vectors
+EMBEDDINGS = {"all-MiniLM-L6-v2", "OLLAMA", "mixedbread-ai/mxbai-embed-large-v1", "all-mpnet-base-v2"}  # Custom Vectors
 
 google_project = os.getenv("GOOGLE_CLOUD_PROJECT")
 if google_project != None:

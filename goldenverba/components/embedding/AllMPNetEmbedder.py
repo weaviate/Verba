@@ -3,10 +3,10 @@ from goldenverba.components.embedding.SentenceTransformersEmbedder import (
 )
 
 
-class MiniLMEmbedder(SentenceTransformersEmbedder):
+class AllMPNetEmbedder(SentenceTransformersEmbedder):
     """
-    MiniLMEmbedder for Verba.
+    AllMPNetEmbedder for Verba.
     """
 
     def __init__(self):
-        super().__init__(vectorizer="all-MiniLM-L6-v2")
+        super().__init__(vectorizer="all-mpnet-base-v2")
