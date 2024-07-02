@@ -341,10 +341,11 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
         });
 
         const data: QueryPayload = await response.json();
-
         if (data) {
           if (data.error !== "") {
             triggerNotification(data.error, true);
+            setIsFetching(false);
+            setFetchingStatus("DONE");
           }
 
           setChunks(data.chunks);

@@ -326,6 +326,7 @@ async def query(payload: QueryPayload):
     except Exception as e:
         msg.warn(f"Query failed: {str(e)}")
         return JSONResponse(
+            status_code=500,
             content={
                     "chunks": [],
                     "took": 0,

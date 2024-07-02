@@ -1,5 +1,6 @@
 from weaviate import Client
 from weaviate.gql.get import HybridFusion
+from wasabi import msg
 
 from goldenverba.components.chunk import Chunk
 from goldenverba.components.interfaces import Embedder, Retriever
@@ -67,16 +68,29 @@ class WindowRetriever(Retriever):
                     ],
                 ).do()
 
-            for chunk in query_results["data"]["Get"][chunk_class]:
-                chunk_obj = Chunk(
-                    chunk["text"],
-                    chunk["doc_name"],
-                    chunk["doc_type"],
-                    chunk["doc_uuid"],
-                    chunk["chunk_id"],
-                )
-                chunk_obj.set_score(chunk["_additional"]["score"])
-                chunks.append(chunk_obj)
+            if "errors" in query_results:
+                for error in query_results["errors"]:
+                    msg.fail(f"The query retriever result in the window retriever contains an error: ({str(error)})")
+
+            query_result_by_chunk_class = query_results["data"]["Get"].get(chunk_class)
+
+            if query_result_by_chunk_class is not None:
+                try:
+                    iter(query_result_by_chunk_class)
+                    for chunk in query_result_by_chunk_class:
+                        chunk_obj = Chunk(
+                            chunk["text"],
+                            chunk["doc_name"],
+                            chunk["doc_type"],
+                            chunk["doc_uuid"],
+                            chunk["chunk_id"],
+                        )
+                        chunk_obj.set_score(chunk["_additional"]["score"])
+                        chunks.append(chunk_obj)
+                except TypeError:
+                    msg.fail(f"{chunk_class} is not iterable.")
+            else:
+                msg.info(f"No data found for {chunk_class}.")
 
         sorted_chunks = sorted(chunks, key=lambda x: x.score, reverse=True)
 
