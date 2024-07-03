@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from goldenverba.components.types import FileData
+from typing import Union
 
 
 class QueryPayload(BaseModel):
@@ -9,6 +10,16 @@ class QueryPayload(BaseModel):
 class ConversationItem(BaseModel):
     type: str
     content: str
+
+
+class ConversationLineItem(BaseModel):
+    type: str
+    content: Union[str, dict]
+
+
+class QueryLinePayload(BaseModel):
+    query: str
+    conversation: list[ConversationLineItem]
 
 
 class GeneratePayload(BaseModel):

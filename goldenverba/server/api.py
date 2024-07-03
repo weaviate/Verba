@@ -1,9 +1,10 @@
-from fastapi import FastAPI, WebSocket, status
+from fastapi import FastAPI, WebSocket, status, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 import os
+import httpx
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -16,6 +17,7 @@ from goldenverba.server.types import (
     ResetPayload,
     ConfigPayload,
     QueryPayload,
+    QueryLinePayload,
     GeneratePayload,
     GetDocumentPayload,
     SearchQueryPayload,
@@ -23,8 +25,33 @@ from goldenverba.server.types import (
 )
 from goldenverba.server.util import get_config, set_config, setup_managers
 
+from linebot.v3 import (
+    WebhookHandler,
+    WebhookParser
+)
+from linebot.v3.exceptions import (
+    InvalidSignatureError
+)
+from linebot.v3.messaging import (
+    AsyncApiClient,
+    AsyncMessagingApi,
+    Configuration,
+    ReplyMessageRequest,
+    PushMessageRequest,
+    TextMessage
+)
+from linebot.v3.webhooks import (
+    MessageEvent,
+    TextMessageContent
+)
+import requests
+import json
+import sys
+
 load_dotenv()
 
+channel_access_token = os.environ.get("LINE_CHANNEL_ACCESS_TOKEN", "")
+channel_secret = os.environ.get("LINE_CHANNEL_SECRET", "")
 # Check if runs in production
 production_key = os.environ.get("VERBA_PRODUCTION", "")
 tag = os.environ.get("VERBA_GOOGLE_TAG", "")
@@ -37,11 +64,30 @@ else:
 manager = verba_manager.VerbaManager()
 setup_managers(manager)
 
+
+# get channel_secret and channel_access_token from your environment variable
+# channel_secret = os.getenv(LINE_CHANNEL_SECRET, None)
+# channel_access_token = os.getenv(LINE_CHANNEL_ACCESS_TOKEN, None)
+if channel_secret is None:
+    print('Specify  as environment variable.')
+    sys.exit(1)
+if channel_access_token is None:
+    print('Specify  as environment variable.')
+    sys.exit(1)
+
+configuration = Configuration(
+    access_token=channel_access_token
+)
+
+
 # FastAPI App
 app = FastAPI()
+async_api_client = AsyncApiClient(configuration)
+line_bot_api = AsyncMessagingApi(async_api_client)
+parser = WebhookParser(channel_secret)
 
 origins = [
-    "http://localhost:3000",
+    "http://localhost:3001",
     "https://verba-golden-ragtriever.onrender.com",
     "http://localhost:8000",
 ]
@@ -333,6 +379,105 @@ async def query(payload: QueryPayload):
                     "error": f"Something went wrong: {str(e)}",
             }
         )
+    
+# Receive query and return chunks and query answer
+@app.post("/api/get_anwser")
+async def query(payload: QueryLinePayload):
+    msg.good(f"Received query: {payload.query}")
+    start_time = time.time()  # Start timing
+    try:
+        chunks, context = manager.retrieve_chunks([payload.query])
+
+        elapsed_time = round(time.time() - start_time, 2)  # Calculate elapsed time
+        msg.good(f"Succesfully processed query: {payload.query} in {elapsed_time}s")
+
+        full_text = await manager.generate_answer(
+                [payload.query], [context], payload.conversation
+            )
+
+        return JSONResponse(
+            { "message": full_text}
+        )
+
+    except Exception as e:
+        msg.warn(f"Query failed: {str(e)}")
+        return JSONResponse(
+            content={
+                    "took": 0,
+                    "message": "",
+                    "error": f"Something went wrong: {str(e)}",
+            }
+        )
+    
+
+@app.post("/callback")
+async def handle_callback(request: Request):
+    signature = request.headers['X-Line-Signature']
+
+    # get request body as text
+    body = await request.body()
+    body = body.decode()
+
+    try:
+        events = parser.parse(body, signature)
+    except InvalidSignatureError:
+        raise HTTPException(status_code=400, detail="Invalid signature")
+
+    for event in events:
+        user_id = event.source.user_id
+        question = event.message.text
+        msg.good(f"--------------------")
+
+        # # Lấy 5 câu hỏi gần nhất của user
+        recent_questions = manager.get_recent_questions(user_id)
+
+        conversation = manager.convert_to_conversation(recent_questions)
+
+        # Gọi API /test
+        api_url = 'http://localhost:8000/api/get_anwser'
+        headers = {
+            'Content-Type': 'application/json'
+        }
+        data = {
+            'query': question,
+            'conversation': conversation
+        }
+
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.post(api_url, headers=headers, json=data, timeout=30.0)
+                if response.status_code == 200:
+                    response_data = response.json()
+                    reply = response_data.get('message', 'No message received')
+
+                    reply_message = reply['message'] if isinstance(reply, dict) and 'message' in reply else reply
+                    print(reply_message)
+                    if reply_message.strip().upper() == "NO ANSWER":
+                        await line_bot_api.push_message(
+                            PushMessageRequest(
+                                to="U431840422534906a5a65aa42b81daf30",
+                                messages=[TextMessage(text='お客様がサポートを必要としています。リンク https://chat.line.biz/ にアクセスして、お客様のサポートをお願いします。')]
+                            )
+                        )
+
+                    manager.save_to_json(user_id, question, reply_message)
+                else:
+                    print(f"Failed to call API /test. Status code: {response.status_code}")
+                    reply_message = 'Failed to call API /test'
+        except requests.exceptions.RequestException as e:
+            print(f"Error calling API /test: {e}")
+            reply_message = 'Error calling API /test'
+        
+        if reply_message.strip().upper() == "NO ANSWER":
+            reply_message = "ご質問の内容は記録され、オペレーターに転送されます。お待ちください。"
+        await line_bot_api.reply_message(
+            ReplyMessageRequest(
+                reply_token=event.reply_token,
+                messages=[TextMessage(text=reply_message)]
+            )
+        )
+
+    return 'OK'
 
 # Retrieve auto complete suggestions based on user input
 @app.post("/api/suggestions")

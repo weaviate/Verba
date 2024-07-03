@@ -1,5 +1,6 @@
 import os
 import ssl
+import json
 
 import weaviate
 from dotenv import load_dotenv, find_dotenv
@@ -785,3 +786,63 @@ class VerbaManager:
         return self.embedder_manager.embedders[
             self.embedder_manager.selected_embedder
         ].search_documents(self.client, query, doc_type, page, pageSize)
+    
+    # Hàm lưu dữ liệu vào file JSON
+    def save_to_json(self, user_id, question, answer):
+        file_path = '/home/miichi/dxgai/dxGAI/user_questions.json'
+
+        if not os.path.exists(file_path):
+            with open(file_path, 'w') as f:
+                json.dump([], f)
+
+        with open(file_path, 'r') as f:
+            data = json.load(f)
+
+        data.append({
+            'user_id': user_id,
+            'question': question,
+            'answer': answer
+        })
+
+        with open(file_path, 'w') as f:
+            json.dump(data, f, indent=4)
+
+    # Hàm lấy 5 câu hỏi gần nhất của user
+    
+    def get_recent_questions(self, user_id, num_questions=5):
+        file_path = 'user_questions.json'
+        recent_questions = []
+
+        try:
+            if os.path.exists(file_path):
+                with open(file_path, 'r') as file:
+                    data = json.load(file)
+                    user_data = [entry for entry in data if entry.get('user_id') == user_id]
+                    if isinstance(user_data, list):
+                        recent_questions = user_data[-num_questions:]
+                    else:
+                        print(f"Invalid data retrieved for user_id {user_id}: {user_data}")
+            else:
+                print(f"File {file_path} not found.")
+        except FileNotFoundError:
+            print(f"File {file_path} not found.")
+        except json.JSONDecodeError:
+            print(f"Failed to decode JSON from {file_path}.")
+        
+        msg.info(recent_questions)
+        return recent_questions
+    
+    # Hàm chuyển đổi dữ liệu sang dạng conversation
+    def convert_to_conversation(self, data):
+        conversation = []
+        for entry in data:
+            if "question" in entry and "answer" in entry:
+                conversation.append({
+                    "type": "user",
+                    "content": entry["question"]
+                })
+                conversation.append({
+                    "type": "system",
+                    "content": entry["answer"]
+                })
+        return conversation
