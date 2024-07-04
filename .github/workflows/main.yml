@@ -1,5 +1,7 @@
 name: Sync Fork and Build Docker Image
 on: 
+  push:
+    branches: [main]
   workflow_dispatch:
   schedule:
     - cron: "0 4 * * *"
