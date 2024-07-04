@@ -1,4 +1,4 @@
-# **NOTE** I forked this because there was no official Verba docker image and I wanted one in the Dockerhub Registry as I pull images on my Synology NAS via the Container app. This will automate so that an image will be created whenever there are changes to Verba 'Main' repo.
+# **NOTE** I forked this because there was no official Verba docker image and I wanted one in the Dockerhub Registry as I pull images on my Synology NAS via the Container app. This will automate so that an image will be created whenever there are changes to Verba 'Main' repo. Check the .github folder to take a look at the github action file.
 
 # Verba
 
