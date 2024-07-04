@@ -20,10 +20,8 @@ class SentenceTransformersEmbedder(Embedder):
         self.model = None
         try:
             from sentence_transformers import SentenceTransformer
-
             self.model = SentenceTransformer(self.vectorizer)
         except Exception as e:
-            msg.warn(str(e))
             pass
 
     def embed(

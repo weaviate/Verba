@@ -237,71 +237,60 @@ class VerbaManager:
         """
         try:
             import pypdf
-
             self.installed_libraries["pypdf"] = True
         except Exception:
             self.installed_libraries["pypdf"] = False
 
         try:
             import docx
-            
             self.installed_libraries["docx"] = True
         except Exception:
             self.installed_libraries["docx"] = False
             
         try:
             import sentence_transformers
-            
             self.installed_libraries["sentence-transformers"] = True
         except Exception:
             self.installed_libraries["sentence-transformers"] = False
 
-
         try:
             import tiktoken
-
             self.installed_libraries["tiktoken"] = True
         except Exception:
             self.installed_libraries["tiktoken"] = False
 
         try:
             import openai
-
             self.installed_libraries["openai"] = True
         except Exception:
             self.installed_libraries["openai"] = False
 
         try:
             import vertexai
-
             self.installed_libraries["vertexai"] = True
         except Exception:
             self.installed_libraries["vertexai"] = False
 
         try:
             import transformers
-
             self.installed_libraries["transformers"] = True
         except Exception:
             self.installed_libraries["transformers"] = False
 
         try:
             import accelerate
-
             self.installed_libraries["accelerate"] = True
         except Exception:
             self.installed_libraries["accelerate"] = False
 
         try:
             import torch
-
             if torch.cuda.is_available():
                 msg.info("CUDA is available. Using CUDA...")
             elif torch.backends.mps.is_available():
                 msg.info("MPS is available. Using MPS...")
             else:
                 msg.info("Neither CUDA nor MPS is available. Using CPU...")
-
             self.installed_libraries["torch"] = True
         except Exception:
             self.installed_libraries["torch"] = False
