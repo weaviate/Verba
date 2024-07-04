@@ -10,6 +10,8 @@ from goldenverba.components.document import Document
 from goldenverba.components.interfaces import Reader
 from goldenverba.components.types import FileData
 
+from goldenverba.server.ImportLogger import LoggerManager
+
 
 class UnstructuredReader(Reader):
     """
@@ -23,9 +25,9 @@ class UnstructuredReader(Reader):
         self.name = "UnstructuredAPI"
         self.description = "Uses the Unstructured API to import multiple file types such as plain text and documents (.pdf, .csv). Requires an Unstructured API Key"
 
-    def load(
-        self, fileData: list[FileData], textValues: list[str], logging: list[dict]
-    ) -> tuple[list[Document], list[str]]:
+    async def load(
+        self, fileData: list[FileData], textValues: list[str], logger: LoggerManager
+    ) -> list[Document]:
 
         documents = []
 
@@ -35,11 +37,9 @@ class UnstructuredReader(Reader):
         api_key = os.environ.get("UNSTRUCTURED_API_KEY", "")
 
         if api_key == "":
-            logging.append(
-                {"type": "ERROR", "message": f"No Unstructed API Key detected"}
-            )
-            msg.warn(f"No Unstructed API Key detected")
-            return documents, logging
+            await logger.send_error(f"No Unstructed API Key detected")
+            msg.fail(f"No Unstructed API Key detected")
+            return []
 
         headers = {
             "accept": "application/json",
@@ -52,7 +52,7 @@ class UnstructuredReader(Reader):
 
         for file in fileData:
             msg.info(f"Loading in {file.filename}")
-            logging.append({"type": "INFO", "message": f"Importing {file.filename}"})
+            await logger.send_info(f"Importing {file.filename}")
 
             file_bytes = io.BytesIO(base64.b64decode(file.content))
             file_data = {"files": (file.filename, file_bytes)}
@@ -67,12 +67,7 @@ class UnstructuredReader(Reader):
                     msg.warn(
                         f"Failed to load {file.filename} : {json_response['detail']}"
                     )
-                    logging.append(
-                        {
-                            "type": "ERROR",
-                            "message": f"Failed to load {file.filename} : {json_response['detail']}",
-                        }
-                    )
+                    await logger.send_error(f"Failed to load {file.filename} : {json_response['detail']}")
                     continue
 
                 full_content = ""
@@ -83,12 +78,7 @@ class UnstructuredReader(Reader):
 
                 if full_content == "":
                     msg.warn(f"Empty Text for {file.filename}")
-                    logging.append(
-                        {
-                            "type": "WARNING",
-                            "message": f"Empty Text for {file.filename}",
-                        }
-                    )
+                    await logger.send_warning(f"Empty Text for {file.filename}")
                     continue
 
                 document = Document(
@@ -102,11 +92,6 @@ class UnstructuredReader(Reader):
 
             except Exception as e:
                 msg.warn(f"Failed to load {file.filename} : {str(e)}")
-                logging.append(
-                    {
-                        "type": "WARNING",
-                        "message": f"Failed to load {file.filename} : {str(e)}",
-                    }
-                )
+                await logger.send_warning(f"Failed to load {file.filename} : {str(e)}")
 
-        return documents, logging
+        return documents

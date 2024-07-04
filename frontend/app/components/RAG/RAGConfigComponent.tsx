@@ -116,19 +116,24 @@ const RAGConfigComponent: React.FC<RAGConfigComponentProps> = ({
         </div>
 
         <div className="flex flex-col gap-1">
-          <div className="flex lg:flex-row flex-col gap-1">
-            <p className="lg:text-base text-xs">You selected: </p>
-            <p className="font-bold lg:text-base text-sm">
-              {RAGComponents.selected}
+          {RAGComponents && RAGComponents.selected && (
+            <div className="flex lg:flex-row flex-col gap-1">
+              <p className="lg:text-base text-xs">You selected: </p>
+              <p className="font-bold lg:text-base text-sm">
+                {RAGComponents.selected}
+              </p>
+            </div>
+          )}
+          {RAGComponents && RAGComponents.selected && (
+            <p className="text-sm text-text-alt-verba">
+              {RAGComponents.components[RAGComponents.selected].description}
             </p>
-          </div>
-          <p className="text-sm text-text-alt-verba">
-            {RAGComponents.components[RAGComponents.selected].description}
-          </p>
+          )}
         </div>
 
         <div className=" flex-col gap-4 grid grid-cols-1 lg:grid-cols-1">
           {RAGConfig &&
+            RAGComponents.selected &&
             Object.entries(
               RAGComponents.components[RAGComponents.selected].config
             ).map(([key, settingValue]) =>
@@ -136,92 +141,95 @@ const RAGConfigComponent: React.FC<RAGConfigComponentProps> = ({
             )}
         </div>
 
-        {RAGComponents.components[RAGComponents.selected].type === "UPLOAD" && (
-          <div className="flex lg:flex-row flex-col gap-3">
-            <div className="flex flex-col gap-2 items-center">
-              <div className="flex">
-                <button
-                  onClick={() =>
-                    document
-                      .getElementById(
-                        RAGConfigTitle + RAGComponents.selected + "_upload"
-                      )
-                      ?.click()
-                  }
-                  className="btn border-none bg-button-verba hover:bg-secondary-verba text-text-verba"
-                >
-                  Add Files
-                </button>
-                <input
-                  id={RAGConfigTitle + RAGComponents.selected + "_upload"}
-                  type="file"
-                  value={files ? undefined : ""}
-                  onChange={handleUploadFiles}
-                  className="hidden"
-                  multiple
-                />
-              </div>
-              {files && (
+        {RAGComponents.selected &&
+          RAGComponents.components[RAGComponents.selected].type ===
+            "UPLOAD" && (
+            <div className="flex lg:flex-row flex-col gap-3">
+              <div className="flex flex-col gap-2 items-center">
                 <div className="flex">
                   <button
-                    onClick={() => {
-                      setFiles(null);
-                    }}
-                    className="btn text-sm border-none bg-warning-verba hover:bg-button-hover-verba "
+                    onClick={() =>
+                      document
+                        .getElementById(
+                          RAGConfigTitle + RAGComponents.selected + "_upload"
+                        )
+                        ?.click()
+                    }
+                    className="btn border-none bg-button-verba hover:bg-secondary-verba text-text-verba"
                   >
-                    Clear Files
+                    Add Files
                   </button>
-                </div>
-              )}
-            </div>
-            {files && (
-              <div className="flex gap-2">
-                <p className="flex text-text-alt-verba text-sm ">Files:</p>
-                <div className="flex flex-col gap-1 overflow-y-auto h-[15vh] border-2 p-2 rounded-lg border-bg-verba">
-                  {files &&
-                    Array.from(files).map((file, index) => (
-                      <p key={index + file.name}>{file.name}</p>
-                    ))}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {RAGComponents.components[RAGComponents.selected].type === "URL" && (
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center justify-center">
-              {(textValues.length > 0 && currentText !== textValues[0]) ||
-              (currentText != "" && textValues.length <= 0) ? (
-                <p>*Enter URL</p>
-              ) : (
-                <p>Enter URL</p>
-              )}
-            </div>
-            <div className="flex flex-row gap-2 w-full items-center justify-center">
-              <div className="flex flex-col items-center justify-center gap-1 w-full">
-                <label className="input input-bordered flex items-center w-full bg-bg-verba">
                   <input
-                    type="text"
-                    className="grow"
-                    value={currentText}
-                    onChange={(e) => {
-                      setCurrentText(e.target.value);
-                    }}
+                    id={RAGConfigTitle + RAGComponents.selected + "_upload"}
+                    type="file"
+                    value={files ? undefined : ""}
+                    onChange={handleUploadFiles}
+                    className="hidden"
+                    multiple
                   />
-                </label>
+                </div>
+                {files && (
+                  <div className="flex">
+                    <button
+                      onClick={() => {
+                        setFiles(null);
+                      }}
+                      className="btn text-sm border-none bg-warning-verba hover:bg-button-hover-verba "
+                    >
+                      Clear Files
+                    </button>
+                  </div>
+                )}
               </div>
-              <button
-                onClick={() => {
-                  setTextValues([currentText]);
-                }}
-                className="btn bg-bg-verba border-none hover:bg-secondary-verba"
-              >
-                <FaCheck />
-              </button>
+              {files && (
+                <div className="flex gap-2">
+                  <p className="flex text-text-alt-verba text-sm ">Files:</p>
+                  <div className="flex flex-col gap-1 overflow-y-auto h-[15vh] border-2 p-2 rounded-lg border-bg-verba">
+                    {files &&
+                      Array.from(files).map((file, index) => (
+                        <p key={index + file.name}>{file.name}</p>
+                      ))}
+                  </div>
+                </div>
+              )}
             </div>
-          </div>
-        )}
+          )}
+
+        {RAGComponents.selected &&
+          RAGComponents.components[RAGComponents.selected].type === "URL" && (
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center justify-center">
+                {(textValues.length > 0 && currentText !== textValues[0]) ||
+                (currentText != "" && textValues.length <= 0) ? (
+                  <p>*Enter URL</p>
+                ) : (
+                  <p>Enter URL</p>
+                )}
+              </div>
+              <div className="flex flex-row gap-2 w-full items-center justify-center">
+                <div className="flex flex-col items-center justify-center gap-1 w-full">
+                  <label className="input input-bordered flex items-center w-full bg-bg-verba">
+                    <input
+                      type="text"
+                      className="grow"
+                      value={currentText}
+                      onChange={(e) => {
+                        setCurrentText(e.target.value);
+                      }}
+                    />
+                  </label>
+                </div>
+                <button
+                  onClick={() => {
+                    setTextValues([currentText]);
+                  }}
+                  className="btn bg-bg-verba border-none hover:bg-secondary-verba"
+                >
+                  <FaCheck />
+                </button>
+              </div>
+            </div>
+          )}
 
         <div></div>
       </div>

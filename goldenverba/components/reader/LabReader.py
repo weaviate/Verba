@@ -12,6 +12,8 @@ from goldenverba.components.document import Document
 from goldenverba.components.interfaces import Reader
 from goldenverba.components.types import FileData
 
+from goldenverba.server.ImportLogger import LoggerManager
+
 
 class GitLabReader(Reader):
     """
@@ -25,32 +27,27 @@ class GitLabReader(Reader):
         self.requires_env = ["GITLAB_TOKEN"]
         self.description = "Downloads only text files from a GitLab repository and ingests it into Verba. Use this format {owner}/{name}/{branch}/{folder} (e.g gitlab-org/gitlab/master/doc)"
 
-    def load(self, fileData: list[FileData], textValues: list[str], logging: list[dict]) -> tuple[list[Document], list[str]]:
+    async def load(self, fileData: list[FileData], textValues: list[str], logger: LoggerManager) -> list[Document]:
         
         if len(textValues) <= 0:
-            logging.append({"type": "ERROR", "message": f"No GitHLab Link detected"})
-            return [], logging
+            await logger.send_error(f"No GitLab Link detected")
+            return []
         elif textValues[0] == "":
-            logging.append({"type": "ERROR", "message": f"Empty GitLab URL"})
-            return [], logging
+            await logger.send_error(f"Empty GitLab URL")
+            return []
 
         gitlab_link = textValues[0]
 
         if not self.is_valid_gitlab_path(gitlab_link):
-            logging.append(
-                {
-                    "type": "ERROR",
-                    "message": f"GitLab URL {gitlab_link} not matching pattern: project_id/branch/folder",
-                }
-            )
-            return [], logging
+            await logger.send_error(f"GitLab URL {gitlab_link} not matching pattern: project_id/branch/folder")
+            return []
         
         documents = []
-        docs, logging = self.fetch_docs(gitlab_link, logging)
+        docs = await self.fetch_docs(gitlab_link, await logger)
 
         for _file in docs:
             try:
-                logging.append({"type": "INFO", "message": f"Downloading {_file}"})
+                await logger.send_info(f"Downloading {_file}")
                 content, link, _path = self.download_file(gitlab_link, _file)
                 if ".json" in _file:
                     json_obj = json.loads(str(content))
@@ -74,18 +71,13 @@ class GitLabReader(Reader):
 
             except Exception as e:
                 msg.warn(f"Couldn't load, skipping {_file}: {str(e)}")
-                logging.append(
-                    {
-                        "type": "WARNING",
-                        "message": f"Couldn't load, skipping {_file}: {str(e)}",
-                    }
-                )
+                await logger.send_warning(f"Couldn't load, skipping {_file}: {str(e)}")
                 continue
 
-        return documents, logging
+        return documents
 
 
-    def fetch_docs(self, path: str, logging) -> list:
+    async def fetch_docs(self, path: str, logger: LoggerManager) -> list:
         split = path.split("/")
         project_path = urllib.parse.quote(split[0] + "/" + split[1], safe='')
         branch = split[2]
@@ -112,13 +104,10 @@ class GitLabReader(Reader):
 
         msg.info(f"Fetched {len(files)} filenames from {url} (checking folder {folder_path})")
 
-        logging.append({
-                "type": "SUCCESS",
-                "message": f"Fetched {len(files)} filenames from {url} (checking folder {folder_path})",
-            }
-        )
+        logger.send_success(f"Fetched {len(files)} filenames from {url} (checking folder {folder_path})")
+
         
-        return files, logging
+        return files
 
     def download_file(self, path: str, file_path: str) -> str:
         split = path.split("/")

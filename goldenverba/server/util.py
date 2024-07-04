@@ -35,7 +35,7 @@ def get_config(manager: VerbaManager) -> dict:
     available_environments = manager.environment_variables
     available_libraries = manager.installed_libraries
 
-    readers = manager.reader_manager.get_readers()
+    readers = manager.reader_manager.readers
     reader_config = {
         "components": {
             reader: readers[reader].get_meta(
@@ -43,7 +43,7 @@ def get_config(manager: VerbaManager) -> dict:
             )
             for reader in readers
         },
-        "selected": manager.reader_manager.selected_reader,
+        "selected": None,
     }
 
     chunkers = manager.chunker_manager.get_chunkers()
@@ -122,7 +122,6 @@ def set_config(manager: VerbaManager, combined_config: dict):
         manager.enable_caching = enable_caching
 
     # Set Selected
-    manager.reader_manager.set_reader(config.get("Reader", {}).get("selected", ""))
     manager.chunker_manager.set_chunker(config.get("Chunker", {}).get("selected", ""))
     manager.embedder_manager.set_embedder(
         config.get("Embedder", {}).get("selected", "")
@@ -135,7 +134,7 @@ def set_config(manager: VerbaManager, combined_config: dict):
     )
 
     # Set Config
-    readers = manager.reader_manager.get_readers()
+    readers = manager.reader_manager.readers
     for _reader in config.get("Reader", {}).get("components", {}):
         if _reader in readers:
             readers[_reader].set_config(

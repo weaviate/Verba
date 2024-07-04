@@ -2,6 +2,8 @@ from goldenverba.components.document import Document
 from goldenverba.components.chunk import Chunk
 from goldenverba.components.types import InputText, FileData, InputNumber
 
+from goldenverba.server.ImportLogger import LoggerManager
+
 import os
 import time
 from dotenv import load_dotenv
@@ -86,20 +88,22 @@ class Reader(VerbaComponent):
         super().__init__()
         self.type = "UPLOAD"  # "TEXT"
         self.config = {
-            "document_type": InputText(
+                "document_type": InputText(
                 type="text",
                 text="Document",
                 description="Choose a label for your documents for filtering",
             )
         }
 
-    def load(
-        self, fileData: list[FileData], textValues: list[str], logging: list[dict]
-    ) -> tuple[list[Document], list[str]]:
+    async def load(
+        self, fileData: list[FileData], textValues: list[str], logger: LoggerManager
+    ) -> list[Document]:
         """Ingest data into Weaviate
+        @parameter: reader: str - Identifier of the Reader
         @parameter: fileData : list[FileData] - List of filename and bytes pairs
         @parameter: textValues : list[str] - List of strings, e.g. URLs etc
-        @returns tuple[list[Document], list[str]] - A tuple of a list of documents and a list of strings displayed as logging on the frontend.
+        @parameter: logger: LoggerManager - Logger that sends logs to the frontend
+        @returns list[Document] - A list of documents
         """
         raise NotImplementedError("load method must be implemented by a subclass.")
 

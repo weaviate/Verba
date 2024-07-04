@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.0] Ultimate Weaviate
+
+## Added
+
+- Async Ingestion with realtime logging
+
 ## [1.0.3]
 
 ## Added

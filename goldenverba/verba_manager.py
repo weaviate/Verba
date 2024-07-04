@@ -7,6 +7,7 @@ from wasabi import msg
 from weaviate.embedded import EmbeddedOptions
 
 import goldenverba.components.schema.schema_generation as schema_manager
+from goldenverba.server.ImportLogger import LoggerManager
 
 from goldenverba.components.chunk import Chunk
 from goldenverba.components.document import Document
@@ -55,13 +56,16 @@ class VerbaManager:
         for embedding in schema_manager.EMBEDDINGS:
             schema_manager.init_schemas(self.client, embedding, False, True)
 
-    def import_data(
-        self, fileData: list[FileData], textValues: list[str], logging: list[dict]
-    ) -> list[Document]:
+    async def import_data(self, reader: str, fileData: list[FileData], textValues: list[str], logger: LoggerManager):
         
-        loaded_documents, logging = self.reader_manager.load(
-            fileData, textValues, logging
+        loaded_documents = await self.reader_manager.load(
+            reader, fileData, textValues, logger
         )
+
+        await logger.send_success("Imported documents")
+        await logger.send_stop()
+        
+        return
 
         filtered_documents = []
 
@@ -70,19 +74,15 @@ class VerbaManager:
             if not self.check_if_document_exits(document):
                 filtered_documents.append(document)
             else:
-                logging.append(
-                    {"type": "WARNING", "message": f"{document.name} already exists."}
-                )
+                logger.send_message(f"{document.name} already exists.",2)
 
-        modified_documents, logging = self.chunker_manager.chunk(
-            filtered_documents, logging
+        modified_documents = self.chunker_manager.chunk(
+            filtered_documents, logger
         )
 
-        logging = self.embedder_manager.embed(
-            modified_documents, client=self.client, logging=logging
+        self.embedder_manager.embed(
+            modified_documents, client=self.client, logger=logger
         )
-
-        return modified_documents, logging
 
     def reader_set_reader(self, reader: str) -> bool:
         self.reader_manager.set_reader(reader)

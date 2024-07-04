@@ -11,10 +11,11 @@ from goldenverba.components.interfaces import (
     Retriever,
     Generator,
 )
+from goldenverba.server.ImportLogger import LoggerManager
 
 from goldenverba.components.reader.BasicReader import BasicReader
 from goldenverba.components.reader.GitReader import GitHubReader
-from goldenverba.components.reader.GitLabReader import GitLabReader
+from goldenverba.components.reader.LabReader import GitLabReader
 from goldenverba.components.reader.UnstructuredAPI import UnstructuredReader
 
 from goldenverba.components.chunking.TokenChunker import TokenChunker
@@ -52,55 +53,43 @@ class ReaderManager:
             "GitLabReader": GitLabReader(),
             "UnstructuredAPI": UnstructuredReader(),
         }
-        self.selected_reader: str = "BasicReader"
 
-    def load(
-        self, fileData: list[FileData], textValues: list[str], logging: list[dict]
-    ) -> tuple[list[Document], list[str]]:
+    async def load(
+        self, reader: str, fileData: list[FileData], textValues: list[str], logger: LoggerManager
+    ) -> list[Document]:
 
-        start_time = time.time()  # Start timing
+        try:
+            start_time = time.time()  # Start timing
 
-        if len(fileData) > 0:
-            logging.append(
-                {
-                    "type": "INFO",
-                    "message": f"Importing {len(fileData)} files with {self.selected_reader}",
-                }
-            )
-        else:
-            logging.append(
-                {
-                    "type": "INFO",
-                    "message": f"Importing {textValues} with {self.selected_reader}",
-                }
-            )
+            if len(fileData) > 0:
+                await logger.send_info(f"Importing {len(fileData)} files with {reader}")
+            elif len(textValues) > 0:
+                await logger.send_info(f"Importing {textValues} with {reader}")
+            else:
+                await logger.send_warning(f"No data detected")
+                return []
 
-        documents, logging = self.readers[self.selected_reader].load(
-            fileData, textValues, logging
-        )
+            if reader in self.readers:
+                #documents = await self.readers[reader].load(
+                #    fileData, textValues, logger
+                #)
+                time.sleep(1)
 
-        elapsed_time = round(time.time() - start_time, 2)  # Calculate elapsed time
+                elapsed_time = round(time.time() - start_time, 2)  # Calculate elapsed time
 
-        msg.good(f"Loaded {len(documents)} documents in {elapsed_time}s")
-        logging.append(
-            {
-                "type": "SUCCESS",
-                "message": f"Loaded {len(documents)} documents in {elapsed_time}s",
-            }
-        )
+                msg.good(f"Loaded {len(documents)} documents in {elapsed_time}s")
+                await logger.send_success(f"Loaded {len(documents)} documents in {elapsed_time}s")
 
-        return documents, logging
+                return documents
+            else:
+                msg.fail(f"{reader} Reader not found")
+                await logger.send_error(f"{reader} Reader not found")
 
-    def set_reader(self, reader: str):
-        if reader in self.readers:
-            msg.info(f"Setting READER to {reader}")
-            self.selected_reader = reader
-        else:
-            msg.warn(f"Reader {reader} not found")
-
-    def get_readers(self) -> dict[str, Reader]:
-        return self.readers
-
+            return []
+        except Exception as e:
+            msg.fail(f"Failed to load documents: {str(e)}")
+            await logger.send_error(f"Failed to load documents: {str(e)}")
+            return []
 
 class ChunkerManager:
     def __init__(self):

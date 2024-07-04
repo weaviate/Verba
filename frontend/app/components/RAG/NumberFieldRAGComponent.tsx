@@ -37,7 +37,7 @@ const NumberFieldRAGComponent: React.FC<NumberFieldRAGComponentProps> = ({
   return (
     <div key={title} className="flex flex-col gap-1">
       <div className="flex items-center justify-center lg:text-base text-sm">
-        <p>{NumberFieldSetting.description}</p>
+        <p>{NumberFieldSetting?.description}</p>
       </div>
       <div className="flex items-center justify-center">
         <label className="input input-bordered flex items-center gap-2 w-full lg:text-base text-sm bg-bg-verba">

@@ -3,6 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
+from goldenverba.server.ImportLogger import LoggerManager
+
 import os
 from pathlib import Path
 
@@ -195,6 +197,41 @@ async def websocket_generate_stream(websocket: WebSocket):
             )
         msg.good("Succesfully streamed answer")
 
+
+@app.websocket("/ws/import_stream")
+async def websocket_import_stream(websocket: WebSocket):
+
+    await websocket.accept()
+    logger = LoggerManager(websocket)
+
+    if production:
+        await logger.send_stop()
+    else:
+        while True:  # Start a loop to keep the connection alive.
+            try:
+                data = await websocket.receive_text()
+                # Parse and validate the JSON string using Pydantic model
+                payload = ImportPayload.model_validate_json(data)
+
+                set_config(manager, payload.config)
+
+                reader = payload.config.get("RAG",{}).get("Reader", {}).get("selected")
+                if reader != None:
+                    await manager.import_data(reader, payload.data, payload.textValues, logger)
+                else:
+                    await logger.send_error("No Reader selected!")
+
+            except WebSocketDisconnect:
+                msg.warn("Import WebSocket connection closed by client.")
+                await logger.send_stop()
+                break
+
+            except Exception as e:
+                msg.fail(f"Import WebSocket Error: {str(e)}")
+                await logger.send_stop()
+                break
+
+
 ### POST
 
 # Reset Verba
@@ -221,42 +258,6 @@ async def reset_verba(payload: ResetPayload):
         msg.warn(f"Failed to reset Verba {str(e)}")
 
     return JSONResponse(status_code=200, content={})
-
-# Receive query and return chunks and query answer
-@app.post("/api/import")
-async def import_data(payload: ImportPayload):
-
-    logging = []
-
-    if production:
-        logging.append(
-            {"type": "ERROR", "message": "Can't import when in production mode"}
-        )
-        return JSONResponse(
-            content={
-                "logging": logging,
-            }
-        )
-
-    try:
-        set_config(manager, payload.config)
-        documents, logging = manager.import_data(
-            payload.data, payload.textValues, logging
-        )
-
-        return JSONResponse(
-            content={
-                "logging": logging,
-            }
-        )
-
-    except Exception as e:
-        logging.append({"type": "ERROR", "message": "Unexpected error: "+str(e)})
-        return JSONResponse(
-            content={
-                "logging": logging,
-            }
-        )
 
 @app.post("/api/set_config")
 async def update_config(payload: ConfigPayload):

@@ -1,11 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, use } from "react";
 import { SettingsConfiguration } from "../Settings/types";
 import RAGConfigComponent from "./RAGConfigComponent";
 import { RAGConfig, ConsoleMessage, ImportResponse } from "./types";
 import { FaFileImport } from "react-icons/fa";
 import { MdCancel } from "react-icons/md";
+
+import { getImportWebSocketApiHost } from "./util";
 
 import PulseLoader from "react-spinners/PulseLoader";
 import { Settings } from "../Settings/types";
@@ -41,8 +43,67 @@ const RAGComponent: React.FC<RAGComponentProps> = ({
   const [files, setFiles] = useState<FileList | null>(null);
   const [textValues, setTextValues] = useState<string[]>([]);
   const [isFetching, setIsFetching] = useState(false);
+  const [reconnect, setReconnect] = useState(false);
 
   const [consoleLog, setConsoleLog] = useState<ConsoleMessage[]>([]);
+  const [socket, setSocket] = useState<WebSocket | null>(null);
+
+  useEffect(() => {
+    setReconnect(true);
+  }, []);
+
+  // Setup Import WebSocket and messages
+  useEffect(() => {
+    const socketHost = getImportWebSocketApiHost();
+    const localSocket = new WebSocket(socketHost);
+
+    localSocket.onopen = () => {
+      console.log("Import WebSocket connection opened to " + socketHost);
+      addToConsole("INFO", "Ready for data import");
+    };
+
+    localSocket.onmessage = (event) => {
+      let data;
+
+      const timestamp = new Date().toLocaleString();
+      console.log("AAAH I GOT MEESAGGGE at " + timestamp);
+
+      try {
+        data = JSON.parse(event.data);
+      } catch (e) {
+        console.error("Received data is not valid JSON:", event.data);
+        return;
+      }
+      if (data.type === "STOP") {
+        setIsFetching(false);
+      } else {
+        setConsoleLog((oldItems) => [...oldItems, data]);
+      }
+    };
+
+    localSocket.onerror = (error) => {
+      console.error("Import WebSocket Error:", error);
+    };
+
+    localSocket.onclose = (event) => {
+      if (event.wasClean) {
+        console.log(
+          `Import WebSocket connection closed cleanly, code=${event.code}, reason=${event.reason}`
+        );
+        addToConsole("INFO", "Connection closed");
+      } else {
+        console.error("WebSocket connection died");
+      }
+    };
+
+    setSocket(localSocket);
+
+    return () => {
+      if (localSocket.readyState !== WebSocket.CLOSED) {
+        localSocket.close();
+      }
+    };
+  }, [reconnect]);
 
   const saveSettings = () => {
     setRAGConfig(currentRAGSettings);
@@ -63,7 +124,7 @@ const RAGComponent: React.FC<RAGComponentProps> = ({
     }
 
     try {
-      addToConsole("INFO", "Importing...");
+      addToConsole("INFO", "Starting Import");
       const fileData = files ? await processFiles(files) : [];
       setFiles(null);
       if (fileData) {
@@ -76,26 +137,20 @@ const RAGComponent: React.FC<RAGComponentProps> = ({
           textValues: textValues,
         };
 
-        const response = await fetch(APIHost + "/api/import", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        });
-
-        const data: ImportResponse = await response.json();
-
-        if (data) {
-          for (let i = 0; i < data.logging.length; i++) {
-            setConsoleLog((oldItems) => [...oldItems, data.logging[i]]);
-          }
-          setIsFetching(false);
+        if (socket?.readyState === WebSocket.OPEN) {
+          socket.send(JSON.stringify(payload));
         } else {
+          console.error(
+            "WebSocket is not open. ReadyState:",
+            socket?.readyState
+          );
           setIsFetching(false);
+          addToConsole(
+            "WARNING",
+            "Lost connection to backend, trying to reconnect..."
+          );
+          setReconnect((prevState) => !prevState);
         }
-      } else {
-        setIsFetching(false);
       }
     } catch (error) {
       console.error("Failed to fetch from API:", error);

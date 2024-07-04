@@ -9,6 +9,8 @@ from goldenverba.components.document import Document
 from goldenverba.components.interfaces import Reader
 from goldenverba.components.types import FileData
 
+from goldenverba.server.ImportLogger import LoggerManager
+
 try:
     from pypdf import PdfReader
 except Exception:
@@ -30,15 +32,15 @@ class BasicReader(Reader):
         self.description = "Imports plain text, pdf, markdown, json and docx files."
         self.requires_library = ["pypdf", "docx"]
 
-    def load(
-        self, fileData: list[FileData], textValues: list[str], logging: list[dict]
-    ) -> tuple[list[Document], list[str]]:
+    async def load(
+        self, fileData: list[FileData], textValues: list[str], logger: LoggerManager
+    ) -> list[Document]:
 
         documents = []
         
         for file in fileData:
             msg.info(f"Loading in {file.filename}")
-            logging.append({"type": "INFO", "message": f"Importing {file.filename}"})
+            await logger.send_info(f"Loading {file.filename}")
 
             decoded_bytes = base64.b64decode(file.content)
 
@@ -56,12 +58,8 @@ class BasicReader(Reader):
 
                 except Exception as e:
                     msg.warn(f"Failed to load {file.filename} : {str(e)}")
-                    logging.append(
-                        {
-                            "type": "WARNING",
-                            "message": f"Failed to load {file.filename} : {str(e)}",
-                        }
-                    )
+                    await logger.send_warning(f"Failed to load {file.filename} : {str(e)}")
+
 
             elif file.extension == "json":
                 try:
@@ -73,12 +71,7 @@ class BasicReader(Reader):
 
                 except Exception as e:
                     msg.warn(f"Failed to load {file.filename} : {str(e)}")
-                    logging.append(
-                        {
-                            "type": "WARNING",
-                            "message": f"Failed to load {file.filename} : {str(e)}",
-                        }
-                    )
+                    await logger.send_warning(f"Failed to load {file.filename} : {str(e)}")
 
             elif file.extension == "pdf":
                 try:
@@ -101,12 +94,7 @@ class BasicReader(Reader):
 
                 except Exception as e:
                     msg.warn(f"Failed to load {file.filename} : {str(e)}")
-                    logging.append(
-                        {
-                            "type": "WARNING",
-                            "message": f"Failed to load {file.filename} : {str(e)}",
-                        }
-                    )
+                    await logger.send_warning(f"Failed to load {file.filename} : {str(e)}")
 
             elif file.extension == "docx":
                 try:
@@ -129,22 +117,12 @@ class BasicReader(Reader):
 
                 except Exception as e:
                     msg.warn(f"Failed to load {file.filename} : {str(e)}")
-                    logging.append(
-                        {
-                            "type": "WARNING",
-                            "message": f"Failed to load {file.filename} : {str(e)}",
-                        }
-                    )
+                    await logger.send_warning(f"Failed to load {file.filename} : {str(e)}")
 
             else:
                 msg.warn(
                     f"{file.filename} with extension {file.extension} not supported by BasicReader."
                 )
-                logging.append(
-                    {
-                        "type": "WARNING",
-                        "message": f"{file.filename} with extension {file.extension} not supported by BasicReader.",
-                    }
-                )
+                await logger.send_warning(f"{file.filename} with extension {file.extension} not supported by BasicReader.")
 
-        return documents, logging
+        return documents

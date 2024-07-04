@@ -11,6 +11,8 @@ from goldenverba.components.document import Document
 from goldenverba.components.interfaces import Reader
 from goldenverba.components.types import FileData
 
+from goldenverba.server.ImportLogger import LoggerManager
+
 
 class GitHubReader(Reader):
     """
@@ -24,34 +26,29 @@ class GitHubReader(Reader):
         self.requires_env = ["GITHUB_TOKEN"]
         self.description = "Retrieves all text files (.txt, .md, .mdx, .json) from a GitHub Repository and imports them into Verba. Use this format {owner}/{repo}/{branch}/{folder}"
 
-    def load(
-        self, fileData: list[FileData], textValues: list[str], logging: list[dict]
-    ) -> tuple[list[Document], list[str]]:
+    async def load(
+        self, fileData: list[FileData], textValues: list[str], logger: LoggerManager
+    ) -> list[Document]:
 
         if len(textValues) <= 0:
-            logging.append({"type": "ERROR", "message": f"No GitHub Link detected"})
-            return [], logging
+            await logger.send_error(f"No GitHub Link detected")
+            return []
         elif textValues[0] == "":
-            logging.append({"type": "ERROR", "message": f"Empty GitHub URL"})
-            return [], logging
+            await logger.send_error(f"Empty GitHub URL")
+            return []
 
         github_link = textValues[0]
 
         if not self.is_valid_github_path(github_link):
-            logging.append(
-                {
-                    "type": "ERROR",
-                    "message": f"GitHub URL {github_link} not matching pattern: owner/repo/branch/folder",
-                }
-            )
-            return [], logging
+            await logger.send_error(f"GitHub URL {github_link} not matching pattern: owner/repo/branch/folder")
+            return []
 
         documents = []
-        docs, logging = self.fetch_docs(github_link, logging)
+        docs = await self.fetch_docs(github_link, await logger)
 
         for _file in docs:
             try:
-                logging.append({"type": "INFO", "message": f"Downloading {_file}"})
+                await logger.send_info(f"Downloading {_file}")
                 content, link, _path = self.download_file(github_link, _file)
                 if ".json" in _file:
                     json_obj = json.loads(str(content))
@@ -75,17 +72,12 @@ class GitHubReader(Reader):
 
             except Exception as e:
                 msg.warn(f"Couldn't load, skipping {_file}: {str(e)}")
-                logging.append(
-                    {
-                        "type": "WARNING",
-                        "message": f"Couldn't load, skipping {_file}: {str(e)}",
-                    }
-                )
+                await logger.send_warning(f"Couldn't load, skipping {_file}: {str(e)}")
                 continue
 
-        return documents, logging
+        return documents, 
 
-    def fetch_docs(self, path: str, logging) -> list:
+    async def fetch_docs(self, path: str, logger: LoggerManager) -> list:
         """Fetch filenames from Github
         @parameter path : str - Path to a GitHub repository
         @returns list - List of document names.
@@ -118,13 +110,9 @@ class GitHubReader(Reader):
         msg.info(
             f"Fetched {len(files)} filenames from {url} (checking folder {folder_path})"
         )
-        logging.append(
-            {
-                "type": "SUCCESS",
-                "message": f"Fetched {len(files)} filenames from {url} (checking folder {folder_path})",
-            }
-        )
-        return files, logging
+        await logger.send_success(f"Fetched {len(files)} filenames from {url} (checking folder {folder_path})")
+
+        return files
 
     def download_file(self, path: str, file_path: str) -> str:
         """Download files from Github based on filename
