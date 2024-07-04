@@ -23,9 +23,16 @@ jobs:
         run: |
           git fetch --all
           git checkout main
-          CHANGES=$(git log HEAD..upstream/main --oneline)
-          if [ -n "$CHANGES" ]; then
+          git merge origin/main  # Merge any local changes
+          UPSTREAM_CHANGES=$(git log HEAD..upstream/main --oneline)
+          if [ -n "$UPSTREAM_CHANGES" ]; then
             git merge --no-edit upstream/main
+            CHANGES=true
+          else
+            CHANGES=false
+          fi
+          LOCAL_CHANGES=$(git status --porcelain)
+          if [ -n "$LOCAL_CHANGES" ] || [ "$CHANGES" = true ]; then
             git push origin main
             echo "changes=true" >> $GITHUB_OUTPUT
           else
