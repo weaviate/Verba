@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       
@@ -18,22 +18,26 @@ jobs:
           git config user.name github-actions
           git config user.email github-actions@github.com
 
+      - name: Add upstream remote
+        run: |
+          git remote add upstream https://github.com/weaviate/Verba.git
+          git fetch upstream
+
       - name: Sync fork
         id: sync
         run: |
-          git fetch --all
           git checkout main
           git merge origin/main  # Merge any local changes
           UPSTREAM_CHANGES=$(git log HEAD..upstream/main --oneline)
           if [ -n "$UPSTREAM_CHANGES" ]; then
-            git merge --no-edit upstream/main
+            git merge --no-edit upstream/main || (echo "Merge conflict detected. Please resolve manually." && exit 1)
             CHANGES=true
           else
             CHANGES=false
           fi
           LOCAL_CHANGES=$(git status --porcelain)
           if [ -n "$LOCAL_CHANGES" ] || [ "$CHANGES" = true ]; then
-            git push origin main
+            git push origin main || (echo "Failed to push changes. Please check your permissions." && exit 1)
             echo "changes=true" >> $GITHUB_OUTPUT
           else
             echo "No changes to sync"
