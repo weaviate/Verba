@@ -57,4 +57,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKER_HUB_USER_NAME }}/create-on-manual-run:latest
+          tags: ${{ secrets.DOCKER_HUB_USER_NAME }}/verba:latest
