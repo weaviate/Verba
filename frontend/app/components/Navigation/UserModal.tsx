@@ -7,8 +7,8 @@ interface UserModalComponentProps {
   title: string;
   text: string;
   triggerAccept?: (a: any) => void;
-  triggerValue?: any;
-  triggerString?: string;
+  triggerValue?: any | null;
+  triggerString?: string | null;
 }
 
 const UserModalComponent: React.FC<UserModalComponentProps> = ({
@@ -26,7 +26,7 @@ const UserModalComponent: React.FC<UserModalComponentProps> = ({
         <p className="whitespace-pre-wrap">{text}</p>
         <div className="modal-action">
           <form method="dialog">
-            {triggerAccept && triggerValue && triggerString && (
+            {triggerAccept && triggerString && (
               <button
                 className="btn text-text-verba bg-primary-verba border-none hover:bg-button-hover-verba"
                 onClick={() => {

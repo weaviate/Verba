@@ -11,6 +11,7 @@ import RAGComponent from "./components/RAG/RAGComponent";
 import { HealthPayload } from "./components/Status/types";
 import { RAGConfig, RAGResponse } from "./components/RAG/types";
 import { detectHost } from "./api";
+import IngestionView from "./components/Ingestion/IngestionView";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { fonts, FontKey } from "./info";
 import PulseLoader from "react-spinners/PulseLoader";
@@ -235,16 +236,10 @@ export default function Home() {
           )}
 
           {currentPage === "ADD" && !production && (
-            <RAGComponent
-              baseSetting={baseSetting}
-              settingTemplate={settingTemplate}
-              buttonTitle="Import"
+            <IngestionView
               settingConfig={baseSetting[settingTemplate]}
-              APIHost={APIHost}
               RAGConfig={RAGConfig}
               setRAGConfig={setRAGConfig}
-              setCurrentPage={setCurrentPage}
-              showComponents={["Reader", "Chunker", "Embedder"]}
             />
           )}
 

@@ -109,29 +109,6 @@ const Navbar: React.FC<NavbarProps> = ({
             setPage="CHAT"
           />
           <NavbarButton
-            hide={false}
-            APIHost={APIHost}
-            Icon={IoDocumentSharp}
-            iconSize={icon_size}
-            title="Documents"
-            currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
-            setPage="DOCUMENTS"
-          />
-          <NavbarButton
-            hide={production}
-            APIHost={APIHost}
-            Icon={HiOutlineStatusOnline}
-            iconSize={icon_size}
-            title="Admin"
-            currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
-            setPage="STATUS"
-          />
-          <div
-            className={` ${production ? "h-[0vh]" : "sm:h-[3vh] lg:h-[5vh] mx-1"} hidden sm:block bg-text-alt-verba w-px`}
-          ></div>
-          <NavbarButton
             hide={production}
             APIHost={APIHost}
             Icon={IoMdAddCircle}
@@ -141,6 +118,19 @@ const Navbar: React.FC<NavbarProps> = ({
             setCurrentPage={setCurrentPage}
             setPage="ADD"
           />
+          <NavbarButton
+            hide={false}
+            APIHost={APIHost}
+            Icon={IoDocumentSharp}
+            iconSize={icon_size}
+            title="Documents"
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            setPage="DOCUMENTS"
+          />
+          <div
+            className={` ${production ? "h-[0vh]" : "sm:h-[3vh] lg:h-[5vh] mx-1"} hidden sm:block bg-text-alt-verba w-px`}
+          ></div>
           <NavbarButton
             hide={production}
             APIHost={APIHost}
@@ -160,6 +150,16 @@ const Navbar: React.FC<NavbarProps> = ({
             currentPage={currentPage}
             setCurrentPage={setCurrentPage}
             setPage="SETTINGS"
+          />
+          <NavbarButton
+            hide={production}
+            APIHost={APIHost}
+            Icon={HiOutlineStatusOnline}
+            iconSize={icon_size}
+            title="Admin"
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            setPage="STATUS"
           />
           <div
             className={`sm:h-[3vh] lg:h-[5vh] mx-1 hidden sm:block bg-text-alt-verba w-px`}

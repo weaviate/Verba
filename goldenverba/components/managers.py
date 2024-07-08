@@ -44,15 +44,11 @@ try:
 except Exception:
     msg.warn("tiktoken not installed, your base installation might be corrupted.")
 
+readers = [BasicReader(), GitHubReader(), GitLabReader(), UnstructuredReader()]
 
 class ReaderManager:
     def __init__(self):
-        self.readers: dict[str, Reader] = {
-            "BasicReader": BasicReader(),
-            "GitHubReader": GitHubReader(),
-            "GitLabReader": GitLabReader(),
-            "UnstructuredAPI": UnstructuredReader(),
-        }
+        self.readers: dict[str, Reader] = { reader.name : reader for reader in readers }
 
     async def load(
         self, reader: str, fileData: list[FileData], textValues: list[str], logger: LoggerManager
@@ -70,9 +66,9 @@ class ReaderManager:
                 return []
 
             if reader in self.readers:
-                #documents = await self.readers[reader].load(
-                #    fileData, textValues, logger
-                #)
+                documents = await self.readers[reader].load(
+                    fileData, textValues, logger
+                )
                 time.sleep(1)
 
                 elapsed_time = round(time.time() - start_time, 2)  # Calculate elapsed time
@@ -166,7 +162,7 @@ class EmbeddingManager:
             "CohereEmbedder": CohereEmbedder(),
             "OllamaEmbedder": OllamaEmbedder(),
         }
-        self.selected_embedder: str = "TokenChunker"
+        self.selected_embedder: str = "ADAEmbedder"
 
 
     def embed(

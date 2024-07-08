@@ -43,7 +43,7 @@ def get_config(manager: VerbaManager) -> dict:
             )
             for reader in readers
         },
-        "selected": None,
+        "selected": list(readers.values())[0].name,
     }
 
     chunkers = manager.chunker_manager.get_chunkers()

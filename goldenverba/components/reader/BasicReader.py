@@ -28,7 +28,7 @@ class BasicReader(Reader):
 
     def __init__(self):
         super().__init__()
-        self.name = "BasicReader"
+        self.name = "Default"
         self.description = "Imports plain text, pdf, markdown, json and docx files."
         self.requires_library = ["pypdf", "docx"]
 
