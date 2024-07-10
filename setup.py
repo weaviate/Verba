@@ -12,7 +12,12 @@ setup(
     },
     author="Weaviate",
     author_email="edward@weaviate.io",
-    description="Welcome to Verba: The Golden RAGtriever, an open-source initiative designed to offer a streamlined, user-friendly interface for Retrieval-Augmented Generation (RAG) applications. In just a few easy steps, dive into your data and make meaningful interactions!",
+    description=(
+        "Welcome to Verba: The Golden RAGtriever, an open-source initiative designed "
+        "to offer a streamlined, user-friendly interface for Retrieval-Augmented "
+        "Generation (RAG) applications. In just a few easy steps, dive into your data "
+        "and make meaningful interactions!"
+    ),
     long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
     url="https://github.com/weaviate/Verba",
@@ -24,40 +29,30 @@ setup(
     ],
     include_package_data=True,
     install_requires=[
-        "weaviate-client==3.23.1",
-        "python-dotenv==1.0.0",
+        "weaviate-client==4.6.5",
+        "python-dotenv==1.0.1",
         "openai==1.35.13",
         "wasabi==1.1.2",
-        "fastapi==0.102.0",
+        "fastapi==0.111.0",
         "langsmith==0.1.85",
         "langchain-openai==0.1.14",
         "langchain==0.2.7",
         "uvicorn[standard]==0.29.0",
         "click==8.1.7",
         "asyncio==3.4.3",
-        "tiktoken==0.6.0",
+        "tiktoken==0.7.0",
         "requests==2.31.0",
         "pypdf==4.2.0",
         "python-docx==1.1.2",
     ],
     extras_require={
-        "dev": [
-            "pytest",
-            "wheel",
-            "twine",
-            "black>=23.7.0",
-            "setuptools"
-        ],
-        "huggingface": [
-            "sentence-transformers==3.0.1"
-        ],
-        "google": [
-            "vertexai==1.46.0"
-        ],
+        "dev": ["pytest", "wheel", "twine", "black>=23.7.0", "setuptools"],
+        "huggingface": ["sentence-transformers==3.0.1"],
+        "google": ["vertexai==1.46.0"],
         "langsmith": [
             "langsmith==0.1.85",
             "langchain==0.2.7",
-            "langchain-openai==0.1.14"
+            "langchain-openai==0.1.14",
         ],
-    }
+    },
 )
