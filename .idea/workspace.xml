@@ -5,36 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1d0caa1c-31aa-40d1-83e5-363680d78047" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/rag-weave.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/ruff.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/test_files/Confirm the calibration.pdf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/test_files/FAQ Data collection.pdf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/test_files/FAQ No communication to PMAC.pdf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/test_files/FAQ_RoboRail_Calibration_v0.0_290324.pdf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/test_files/FAQ_RoboRail_Chuck_alignment_calibration_v0.0_080424.pdf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/test_files/FAQ_RoboRail_measurement_v0.0_020524.pdf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/test_files/Operators manual_RoboRail V2.2_170424.pdf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/test_files/extracted/FAQ Data collection.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/test_files/extracted/FAQ No communication to PMAC.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/test_files/extracted/FAQ_RoboRail_Calibration_v0.0_290324.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/test_files/extracted/FAQ_RoboRail_Chuck_alignment_calibration_v0.0_080424.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/test_files/extracted/FAQ_RoboRail_measurement_v0.0_020524.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/test_files/extracted/Operators manual_RoboRail V2.2_170424-parsed.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/goldenverba/components/save_unstructured.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/unstructured_response_20240710_173703.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/unstructured_response_20240710_200612.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/goldenverba/components/generation/GPT3Generator.py" beforeDir="false" afterPath="$PROJECT_DIR$/goldenverba/components/generation/GPT3Generator.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/goldenverba/components/generation/GPT4Generator.py" beforeDir="false" afterPath="$PROJECT_DIR$/goldenverba/components/generation/GPT4Generator.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/goldenverba/components/reader/UnstructuredAPI.py" beforeDir="false" afterPath="$PROJECT_DIR$/goldenverba/components/reader/UnstructuredAPI.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/goldenverba/verba_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/goldenverba/verba_manager.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/setup.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,6 +15,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "RyanLisse"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/RyanLisse/rag-weave.git",
+    "accountId": "b5a05caf-e790-4c5f-9c0e-ee13f08bc782"
+  }
+}]]></component>
   <component name="ProjectColorInfo"><![CDATA[{
   "associatedIndex": 5
 }]]></component>
