@@ -45,6 +45,7 @@ class UnstructuredReader(Reader):
             "accept": "application/json",
             "unstructured-api-key": api_key,
         }
+        print(headers)
 
         data = {
             "strategy": "auto",
@@ -62,7 +63,7 @@ class UnstructuredReader(Reader):
                     url, headers=headers, data=data, files=file_data
                 )
                 json_response = response.json()
-                
+
                 if "detail" in json_response:
                     msg.warn(
                         f"Failed to load {file.filename} : {json_response['detail']}"

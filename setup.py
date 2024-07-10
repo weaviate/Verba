@@ -29,6 +29,7 @@ setup(
         "openai==0.27.9",
         "wasabi==1.1.2",
         "fastapi==0.102.0",
+        "langsmith==0.1.85",
         "uvicorn[standard]==0.29.0",
         "click==8.1.7",
         "asyncio==3.4.3",
@@ -44,6 +45,9 @@ setup(
         ],
         "google": [
             "vertexai==1.46.0",
-        ]
+        ],
+        "langsmith": [
+             "langsmith==0.1.85",
+        ],
     },
 )

@@ -1,0 +1,349 @@
+[
+    {
+        "type": "Title",
+        "element_id": "5b51a3676f82dac4b7511cbb996db2a9",
+        "text": "Create diagnostic data collection",
+        "metadata": {
+            "filetype": "application/pdf",
+            "languages": [
+                "eng"
+            ],
+            "page_number": 1,
+            "filename": "FAQ Data collection.pdf"
+        }
+    },
+    {
+        "type": "NarrativeText",
+        "element_id": "c254e8c3fd0495225c85a597c64d21f8",
+        "text": "Whenever there is a problem on your RoboRail machine, our technical support team is always ready to help you. Our team has several diagnostic tools at their disposal. To help you successfully it is very important that the following information is as complete as possible.",
+        "metadata": {
+            "filetype": "application/pdf",
+            "languages": [
+                "eng"
+            ],
+            "page_number": 1,
+            "parent_id": "5b51a3676f82dac4b7511cbb996db2a9",
+            "filename": "FAQ Data collection.pdf"
+        }
+    },
+    {
+        "type": "NarrativeText",
+        "element_id": "652c7a59fde4d86df0fcb78a528738c0",
+        "text": "Step 1. Advanced, Generate data collection",
+        "metadata": {
+            "filetype": "application/pdf",
+            "languages": [
+                "eng"
+            ],
+            "page_number": 1,
+            "parent_id": "5b51a3676f82dac4b7511cbb996db2a9",
+            "filename": "FAQ Data collection.pdf"
+        }
+    },
+    {
+        "type": "Image",
+        "element_id": "0d938f83bcdad23b12468a6434145410",
+        "text": "HGG nfoed it ot homed it I )",
+        "metadata": {
+            "filetype": "application/pdf",
+            "languages": [
+                "eng"
+            ],
+            "page_number": 1,
+            "filename": "FAQ Data collection.pdf"
+        }
+    },
+    {
+        "type": "NarrativeText",
+        "element_id": "ad1a87c56e4cb80f6768bd97d5377139",
+        "text": "Step 2. Create data collection following the questions in the screen:",
+        "metadata": {
+            "filetype": "application/pdf",
+            "languages": [
+                "eng"
+            ],
+            "page_number": 1,
+            "filename": "FAQ Data collection.pdf"
+        }
+    },
+    {
+        "type": "ListItem",
+        "element_id": "bc02d4422bdda0368b689b26e545d60e",
+        "text": "Machine number on the type plate, • Description of What went wrong, • When did the problem start, • Other information HGG might need",
+        "metadata": {
+            "filetype": "application/pdf",
+            "languages": [
+                "eng"
+            ],
+            "page_number": 1,
+            "filename": "FAQ Data collection.pdf"
+        }
+    },
+    {
+        "type": "NarrativeText",
+        "element_id": "871c94bb6f1d2cfa7bef2b1d808cc3ff",
+        "text": "Step 3. Add additional cutting files from external applications",
+        "metadata": {
+            "filetype": "application/pdf",
+            "languages": [
+                "eng"
+            ],
+            "page_number": 1,
+            "filename": "FAQ Data collection.pdf"
+        }
+    },
+    {
+        "type": "Image",
+        "element_id": "42fc6365e5193a68f40cf8fc5734a326",
+        "text": "",
+        "metadata": {
+            "filetype": "application/pdf",
+            "languages": [
+                "eng"
+            ],
+            "page_number": 1,
+            "filename": "FAQ Data collection.pdf"
+        }
+    },
+    {
+        "type": "NarrativeText",
+        "element_id": "66fa2aba1be00176d89a9ea479e78042",
+        "text": "Step 4. Create collection",
+        "metadata": {
+            "filetype": "application/pdf",
+            "languages": [
+                "eng"
+            ],
+            "page_number": 1,
+            "filename": "FAQ Data collection.pdf"
+        }
+    },
+    {
+        "type": "Title",
+        "element_id": "a7a96bffc9ea75cb02e73919ea8f5575",
+        "text": "Send to HGG",
+        "metadata": {
+            "filetype": "application/pdf",
+            "languages": [
+                "eng"
+            ],
+            "page_number": 2,
+            "filename": "FAQ Data collection.pdf"
+        }
+    },
+    {
+        "type": "NarrativeText",
+        "element_id": "ed610f8306e7cece268a29807fd72728",
+        "text": "You are now ready to send the information to HGG. We advise you to use an FTP server rather than email. Most email firewalls will block unrecognized file formats, also most emails have a data limit of 10 Mb or sometimes 15 Mb per email.",
+        "metadata": {
+            "filetype": "application/pdf",
+            "languages": [
+                "eng"
+            ],
+            "page_number": 2,
+            "parent_id": "a7a96bffc9ea75cb02e73919ea8f5575",
+            "filename": "FAQ Data collection.pdf"
+        }
+    },
+    {
+        "type": "NarrativeText",
+        "element_id": "0c142d3a187ba6d8a5a67b4f06e863a2",
+        "text": "There are several free File Transfer Protocol servers available, HGG recommends WeTransfer:",
+        "metadata": {
+            "filetype": "application/pdf",
+            "languages": [
+                "eng"
+            ],
+            "page_number": 2,
+            "parent_id": "a7a96bffc9ea75cb02e73919ea8f5575",
+            "filename": "FAQ Data collection.pdf"
+        }
+    },
+    {
+        "type": "NarrativeText",
+        "element_id": "74d34bfb125939bf183fd010685ebda0",
+        "text": "• E mail to HGG: service@hgg.nl",
+        "metadata": {
+            "filetype": "application/pdf",
+            "languages": [
+                "eng"
+            ],
+            "page_number": 2,
+            "parent_id": "a7a96bffc9ea75cb02e73919ea8f5575",
+            "filename": "FAQ Data collection.pdf"
+        }
+    },
+    {
+        "type": "NarrativeText",
+        "element_id": "65eaf2d7ca994046d4e3c502e06fd730",
+        "text": "• Enter your own e-mail address",
+        "metadata": {
+            "filetype": "application/pdf",
+            "languages": [
+                "eng"
+            ],
+            "page_number": 2,
+            "parent_id": "a7a96bffc9ea75cb02e73919ea8f5575",
+            "filename": "FAQ Data collection.pdf"
+        }
+    },
+    {
+        "type": "NarrativeText",
+        "element_id": "c0c81b3625038e396a2cce32fb8ac59c",
+        "text": "• Enter your machine number in the ‘Message’ so that it can easily be identified by HGG.",
+        "metadata": {
+            "filetype": "application/pdf",
+            "languages": [
+                "eng"
+            ],
+            "page_number": 2,
+            "parent_id": "a7a96bffc9ea75cb02e73919ea8f5575",
+            "filename": "FAQ Data collection.pdf"
+        }
+    },
+    {
+        "type": "NarrativeText",
+        "element_id": "ff2c095ea91998dba6984124294011c4",
+        "text": "Add your files. Click on the blue cross, browse to your files.",
+        "metadata": {
+            "filetype": "application/pdf",
+            "languages": [
+                "eng"
+            ],
+            "page_number": 2,
+            "parent_id": "a7a96bffc9ea75cb02e73919ea8f5575",
+            "filename": "FAQ Data collection.pdf"
+        }
+    },
+    {
+        "type": "Title",
+        "element_id": "20ca1adc294d22132a7f57caf0515b26",
+        "text": "o",
+        "metadata": {
+            "filetype": "application/pdf",
+            "languages": [
+                "eng"
+            ],
+            "page_number": 2,
+            "filename": "FAQ Data collection.pdf"
+        }
+    },
+    {
+        "type": "UncategorizedText",
+        "element_id": "0eccce6532a53f1a0565da5701fbaef4",
+        "text": "++",
+        "metadata": {
+            "filetype": "application/pdf",
+            "languages": [
+                "eng"
+            ],
+            "page_number": 2,
+            "parent_id": "20ca1adc294d22132a7f57caf0515b26",
+            "filename": "FAQ Data collection.pdf"
+        }
+    },
+    {
+        "type": "Title",
+        "element_id": "688f50ce3e56ea2a96bf31f8513c89c2",
+        "text": "Files:",
+        "metadata": {
+            "filetype": "application/pdf",
+            "languages": [
+                "eng"
+            ],
+            "page_number": 2,
+            "filename": "FAQ Data collection.pdf"
+        }
+    },
+    {
+        "type": "Image",
+        "element_id": "49d2135493b5a552fdba8c49935a3dcb",
+        "text": "° Add your files Your email",
+        "metadata": {
+            "filetype": "application/pdf",
+            "languages": [
+                "eng"
+            ],
+            "page_number": 2,
+            "filename": "FAQ Data collection.pdf"
+        }
+    },
+    {
+        "type": "NarrativeText",
+        "element_id": "04e7822609c533ac2e56d7cea43074df",
+        "text": "• Most recent data collection file, e.g.: 2024_02_25- 12_13_24_341_.7z",
+        "metadata": {
+            "filetype": "application/pdf",
+            "languages": [
+                "eng"
+            ],
+            "page_number": 2,
+            "filename": "FAQ Data collection.pdf"
+        }
+    },
+    {
+        "type": "NarrativeText",
+        "element_id": "1c3cb9453ebedaf9ed3c9f33857447ed",
+        "text": "• Photos of the on-screen error messages.",
+        "metadata": {
+            "filetype": "application/pdf",
+            "languages": [
+                "eng"
+            ],
+            "page_number": 2,
+            "filename": "FAQ Data collection.pdf"
+        }
+    },
+    {
+        "type": "NarrativeText",
+        "element_id": "62edb434185a83d046f748b6bdba6d36",
+        "text": "• Photos of the machine.",
+        "metadata": {
+            "filetype": "application/pdf",
+            "languages": [
+                "eng"
+            ],
+            "page_number": 2,
+            "filename": "FAQ Data collection.pdf"
+        }
+    },
+    {
+        "type": "NarrativeText",
+        "element_id": "0296023a180544717f80c26f639f4594",
+        "text": "• Photos of the part or cut that caused the problem.",
+        "metadata": {
+            "filetype": "application/pdf",
+            "languages": [
+                "eng"
+            ],
+            "page_number": 2,
+            "filename": "FAQ Data collection.pdf"
+        }
+    },
+    {
+        "type": "NarrativeText",
+        "element_id": "22968dd8b1e4b2931abb3c4bdcf25511",
+        "text": "• A description of what went wrong.",
+        "metadata": {
+            "filetype": "application/pdf",
+            "languages": [
+                "eng"
+            ],
+            "page_number": 2,
+            "filename": "FAQ Data collection.pdf"
+        }
+    },
+    {
+        "type": "NarrativeText",
+        "element_id": "805b8959413b13177b3ed8c8193bdf66",
+        "text": "• Any drawings or design files of the part that caused the problem.",
+        "metadata": {
+            "filetype": "application/pdf",
+            "languages": [
+                "eng"
+            ],
+            "page_number": 2,
+            "filename": "FAQ Data collection.pdf"
+        }
+    }
+]

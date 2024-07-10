@@ -1,6 +1,6 @@
 import os
 import ssl
-
+import langsmith
 import weaviate
 from dotenv import load_dotenv, find_dotenv
 from wasabi import msg
@@ -37,6 +37,8 @@ class VerbaManager:
         self.reader_manager = ReaderManager()
         self.chunker_manager = ChunkerManager()
         self.embedder_manager = EmbeddingManager()
+        self.langsmith_client = langsmith.Client(api_key=os.getenv("LANGSMITH_API_KEY"))
+
         self.retriever_manager = RetrieverManager()
         self.generator_manager = GeneratorManager()
         self.environment_variables = {}
@@ -640,6 +642,10 @@ class VerbaManager:
             full_text = await self.generator_manager.generators[
                 self.generator_manager.selected_generator
             ].generate(queries, contexts, conversation)
+            
+            # Log the generation with LangSmith
+            self.langsmith_client.log_generation(queries, full_text)
+            
             if self.enable_caching:
                 self.embedder_manager.embedders[
                     self.embedder_manager.selected_embedder
