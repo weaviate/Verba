@@ -2,11 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
-## [2.0.0] Ultimate Weaviate
+## [2.0.0] Importastic
 
 ## Added
 
 - Async Ingestion with realtime logging
+- Added new File Selection Interface
+- Add Directory Upload
+- Control Settings per file/url individually
+- Import indivdual files or all
 
 ## [1.0.3]
 
