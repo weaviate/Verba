@@ -226,13 +226,15 @@ const FileSelectionView: React.FC<FileSelectionViewProps> = ({
       {/* Import Footer */}
       <div className="bg-bg-alt-verba rounded-2xl flex gap-2 p-6 items-center justify-end h-min w-full">
         <div className="flex gap-3 justify-end">
-          <button className="flex btn border-none text-text-verba bg-secondary-verba hover:bg-button-hover-verba gap-2">
-            <FaFileImport size={15} />
-            <p>Import All</p>
-          </button>
+          {selectedFileData && (
+            <button className="flex btn border-none text-text-verba bg-secondary-verba hover:bg-button-hover-verba gap-2">
+              <FaFileImport size={15} />
+              <p>Import Selected</p>
+            </button>
+          )}
           <button className="flex btn border-none text-text-verba bg-button-verba hover:bg-button-hover-verba gap-2">
             <FaFileImport size={15} />
-            <p>Import Selected</p>
+            <p>Import All</p>
           </button>
           <button
             onClick={openDeleteModal}

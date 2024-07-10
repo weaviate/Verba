@@ -3,6 +3,7 @@
 import React, { useState, useEffect, use } from "react";
 
 import FileSelectionView from "./FileSelectionView";
+import ConfigurationView from "./ConfigurationView";
 import { SettingsConfiguration } from "../Settings/types";
 
 import { FileMap } from "./types";
@@ -40,7 +41,15 @@ const IngestionView: React.FC<IngestionViewProps> = ({
         />
       </div>
 
-      <div className="flex w-1/2"></div>
+      <div className="flex w-1/2">
+        {selectedFileData && (
+          <ConfigurationView
+            settingConfig={settingConfig}
+            selectedFileData={selectedFileData}
+            setSelectedFileData={setSelectedFileData}
+          />
+        )}
+      </div>
     </div>
   );
 };

@@ -6,7 +6,7 @@ interface UserModalComponentProps {
   modal_id: string;
   title: string;
   text: string;
-  triggerAccept?: (a: any) => void;
+  triggerAccept?: null | ((a: any) => void);
   triggerValue?: any | null;
   triggerString?: string | null;
 }
