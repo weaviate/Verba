@@ -22,7 +22,7 @@ class GitLabReader(Reader):
 
     def __init__(self):
         super().__init__()
-        self.name = "GitLabReader"
+        self.name = "GitLab"
         self.type = "URL"
         self.requires_env = ["GITLAB_TOKEN"]
         self.description = "Downloads only text files from a GitLab repository and ingests it into Verba. Use this format {owner}/{name}/{branch}/{folder} (e.g gitlab-org/gitlab/master/doc)"

@@ -22,7 +22,7 @@ class UnstructuredReader(Reader):
         super().__init__()
         self.file_types = [".pdf"]
         self.requires_env = ["UNSTRUCTURED_API_KEY"]
-        self.name = "UnstructuredAPI"
+        self.name = "Unstructured"
         self.description = "Uses the Unstructured API to import multiple file types such as plain text and documents (.pdf, .csv). Requires an Unstructured API Key"
 
     async def load(

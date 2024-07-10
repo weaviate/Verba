@@ -21,7 +21,7 @@ class GitHubReader(Reader):
 
     def __init__(self):
         super().__init__()
-        self.name = "GitHubReader"
+        self.name = "GitHub"
         self.type = "URL"
         self.requires_env = ["GITHUB_TOKEN"]
         self.description = "Retrieves all text files (.txt, .md, .mdx, .json) from a GitHub Repository and imports them into Verba. Use this format {owner}/{repo}/{branch}/{folder}"

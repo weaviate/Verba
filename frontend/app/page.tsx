@@ -235,13 +235,15 @@ export default function Home() {
             />
           )}
 
-          {currentPage === "ADD" && !production && (
+          <div
+            className={`${currentPage === "ADD" && !production ? "" : "hidden"}`}
+          >
             <IngestionView
               settingConfig={baseSetting[settingTemplate]}
               RAGConfig={RAGConfig}
               setRAGConfig={setRAGConfig}
             />
-          )}
+          </div>
 
           {currentPage === "RAG" && !production && (
             <RAGComponent

@@ -8,6 +8,8 @@ import { SettingsConfiguration } from "../Settings/types";
 import { FileMap } from "./types";
 import { RAGConfig } from "../RAG/types";
 
+import { FileData } from "./types";
+
 interface IngestionViewProps {
   settingConfig: SettingsConfiguration;
   RAGConfig: RAGConfig | null;
@@ -20,6 +22,10 @@ const IngestionView: React.FC<IngestionViewProps> = ({
   setRAGConfig,
 }) => {
   const [fileMap, setFileMap] = useState<FileMap>({});
+  const [selectedFileData, setSelectedFileData] = useState<FileData | null>(
+    null
+  );
+
   return (
     <div className="flex justify-center gap-3 h-[80vh] ">
       <div className="flex w-1/2">
@@ -29,6 +35,8 @@ const IngestionView: React.FC<IngestionViewProps> = ({
           setFileMap={setFileMap}
           RAGConfig={RAGConfig}
           setRAGConfig={setRAGConfig}
+          selectedFileData={selectedFileData}
+          setSelectedFileData={setSelectedFileData}
         />
       </div>
 

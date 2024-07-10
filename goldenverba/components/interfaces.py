@@ -86,7 +86,7 @@ class Reader(VerbaComponent):
 
     def __init__(self):
         super().__init__()
-        self.type = "UPLOAD"  # "TEXT"
+        self.type = "FILE"  # "URL"
         self.config = {
                 "document_type": InputText(
                 type="text",

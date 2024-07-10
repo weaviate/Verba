@@ -9,9 +9,11 @@ import { FaFileImport } from "react-icons/fa";
 import { MdCancel } from "react-icons/md";
 import { GoFileDirectoryFill } from "react-icons/go";
 
+import { closeOnClick } from "./util";
+
 import UserModalComponent from "../Navigation/UserModal";
 
-import { FileMap } from "./types";
+import { FileMap, FileData } from "./types";
 import { RAGConfig } from "../RAG/types";
 
 interface FileSelectionViewProps {
@@ -20,6 +22,8 @@ interface FileSelectionViewProps {
   setFileMap: (f: FileMap) => void;
   RAGConfig: RAGConfig | null;
   setRAGConfig: (r_: RAGConfig | null) => void;
+  selectedFileData: FileData | null;
+  setSelectedFileData: (f: FileData) => void;
 }
 
 const FileSelectionView: React.FC<FileSelectionViewProps> = ({
@@ -28,6 +32,8 @@ const FileSelectionView: React.FC<FileSelectionViewProps> = ({
   setFileMap,
   RAGConfig,
   setRAGConfig,
+  selectedFileData,
+  setSelectedFileData,
 }) => {
   const ref = React.useRef<HTMLInputElement>(null);
 
@@ -64,7 +70,7 @@ const FileSelectionView: React.FC<FileSelectionViewProps> = ({
 
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
-
+        const newRAGConfig: RAGConfig = JSON.parse(JSON.stringify(RAGConfig));
         const filename = file.name;
         const extension = file.name.split(".").pop() || "";
         const fileContent = await readFileContent(file);
@@ -75,7 +81,7 @@ const FileSelectionView: React.FC<FileSelectionViewProps> = ({
           isURL: false,
           content: fileContent,
           labels: ["Document"],
-          rag_config: RAGConfig,
+          rag_config: newRAGConfig,
           status: "READY",
         };
       }
@@ -86,9 +92,12 @@ const FileSelectionView: React.FC<FileSelectionViewProps> = ({
     }
   };
 
-  const handleAddURL = () => {
+  const handleAddURL = (URLReader: string) => {
     if (RAGConfig) {
       const newFileMap: FileMap = { ...fileMap };
+      const newRAGConfig: RAGConfig = JSON.parse(JSON.stringify(RAGConfig));
+      newRAGConfig["Reader"].selected = URLReader;
+
       const now = new Date();
       const filename = now.toISOString();
       const extension = "URL";
@@ -99,7 +108,7 @@ const FileSelectionView: React.FC<FileSelectionViewProps> = ({
         isURL: true,
         content: "",
         labels: ["Document"],
-        rag_config: RAGConfig,
+        rag_config: newRAGConfig,
         status: "READY",
       };
 
@@ -143,7 +152,7 @@ const FileSelectionView: React.FC<FileSelectionViewProps> = ({
         <div className="flex gap-3 justify-end">
           <button
             onClick={() => document.getElementById("files_upload")?.click()}
-            className="flex btn text-text-verba bg-button-verba hover:bg-button-hover-verba gap-2"
+            className="flex border-none btn text-text-verba bg-button-verba hover:bg-button-hover-verba gap-2"
           >
             <IoMdAddCircle size={15} />
             <p>Add Files</p>
@@ -157,7 +166,7 @@ const FileSelectionView: React.FC<FileSelectionViewProps> = ({
           />
           <button
             onClick={() => document.getElementById("dir_upload")?.click()}
-            className="flex btn text-text-verba bg-button-verba hover:bg-button-hover-verba gap-2"
+            className="flex btn border-none text-text-verba bg-button-verba hover:bg-button-hover-verba gap-2"
           >
             <GoFileDirectoryFill size={15} />
             <p>Add Directory</p>
@@ -170,13 +179,34 @@ const FileSelectionView: React.FC<FileSelectionViewProps> = ({
             className="hidden"
             multiple
           />
-          <button
-            onClick={handleAddURL}
-            className="flex btn text-text-verba bg-button-verba hover:bg-button-hover-verba gap-2"
-          >
-            <IoMdAddCircle size={15} />
-            <p>Add URL</p>
-          </button>
+          <div className="dropdown dropdown-bottom">
+            <button
+              tabIndex={0}
+              className="flex btn border-none text-text-verba bg-button-verba hover:bg-button-hover-verba gap-2"
+            >
+              <IoMdAddCircle size={15} />
+              <p>Add URL</p>
+            </button>
+            <ul
+              tabIndex={0}
+              className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
+            >
+              {RAGConfig &&
+                Object.entries(RAGConfig["Reader"].components)
+                  .filter(([key, component]) => component.type === "URL")
+                  .map(([key, component]) => (
+                    <li
+                      key={"URL_" + component.name + key}
+                      onClick={() => {
+                        handleAddURL(component.name);
+                        closeOnClick();
+                      }}
+                    >
+                      <a>{component.name}</a>
+                    </li>
+                  ))}
+            </ul>
+          </div>
         </div>
       </div>
 
@@ -187,6 +217,8 @@ const FileSelectionView: React.FC<FileSelectionViewProps> = ({
             key={"FileComponent_" + key}
             fileData={fileData}
             handleDeleteFile={handleDeleteFile}
+            selectedFileData={selectedFileData}
+            setSelectedFileData={setSelectedFileData}
           />
         ))}
       </div>
@@ -194,17 +226,17 @@ const FileSelectionView: React.FC<FileSelectionViewProps> = ({
       {/* Import Footer */}
       <div className="bg-bg-alt-verba rounded-2xl flex gap-2 p-6 items-center justify-end h-min w-full">
         <div className="flex gap-3 justify-end">
-          <button className="flex btn text-text-verba bg-secondary-verba hover:bg-button-hover-verba gap-2">
+          <button className="flex btn border-none text-text-verba bg-secondary-verba hover:bg-button-hover-verba gap-2">
             <FaFileImport size={15} />
             <p>Import All</p>
           </button>
-          <button className="flex btn text-text-verba bg-button-verba hover:bg-button-hover-verba gap-2">
+          <button className="flex btn border-none text-text-verba bg-button-verba hover:bg-button-hover-verba gap-2">
             <FaFileImport size={15} />
             <p>Import Selected</p>
           </button>
           <button
             onClick={openDeleteModal}
-            className="flex btn text-text-verba bg-button-verba hover:bg-warning-verba gap-2"
+            className="flex btn border-none text-text-verba bg-button-verba hover:bg-warning-verba gap-2"
           >
             <MdCancel size={15} />
             <p>Clear Files</p>
