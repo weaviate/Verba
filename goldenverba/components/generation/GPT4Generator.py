@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 from goldenverba.components.interfaces import Generator
+from langsmith import traceable
 
 load_dotenv()
 
@@ -20,6 +21,7 @@ class GPT4Generator(Generator):
         self.model_name = os.getenv("OPENAI_MODEL", "gpt-4o")
         self.context_window = 10000
 
+    @traceable
     async def generate_stream(
         self,
         queries: list[str],
