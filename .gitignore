@@ -21,4 +21,5 @@ cache.txt
 *_secrets.json
 ollama
 .aider*
-!/.aider.tags.cache.v3/
+/.aider.tags.cache.v3/
+/.data
