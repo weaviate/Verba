@@ -26,10 +26,12 @@ setup(
     install_requires=[
         "weaviate-client==3.23.1",
         "python-dotenv==1.0.0",
-        "openai==0.27.9",
+        "openai==1.35.13",
         "wasabi==1.1.2",
         "fastapi==0.102.0",
         "langsmith==0.1.85",
+        "langchain-openai==0.1.14",
+        "langchain==0.2.7",
         "uvicorn[standard]==0.29.0",
         "click==8.1.7",
         "asyncio==3.4.3",
@@ -39,15 +41,23 @@ setup(
         "python-docx==1.1.2",
     ],
     extras_require={
-        "dev": ["pytest", "wheel", "twine", "black>=23.7.0", "setuptools"],
+        "dev": [
+            "pytest",
+            "wheel",
+            "twine",
+            "black>=23.7.0",
+            "setuptools"
+        ],
         "huggingface": [
-            "sentence-transformers==3.0.1",
+            "sentence-transformers==3.0.1"
         ],
         "google": [
-            "vertexai==1.46.0",
+            "vertexai==1.46.0"
         ],
         "langsmith": [
-             "langsmith==0.1.85",
+            "langsmith==0.1.85",
+            "langchain==0.2.7",
+            "langchain-openai==0.1.14"
         ],
-    },
+    }
 )
