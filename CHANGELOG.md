@@ -11,6 +11,8 @@ All notable changes to this project will be documented in this file.
 - Add Directory Upload
 - Control Settings per file/url individually
 - Import indivdual files or all
+- Overwrite existing files
+- Add multiple labels to documents
 
 ## [1.0.3]
 

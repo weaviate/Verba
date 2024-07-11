@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, use } from "react";
-import { FileData } from "./types";
+import { FileData, FileMap } from "./types";
 import { FaTrash } from "react-icons/fa";
 import { GoTriangleDown } from "react-icons/go";
 
@@ -14,24 +14,39 @@ import { closeOnClick } from "./util";
 
 interface FileComponentProps {
   fileData: FileData;
+  fileMap: FileMap;
+  setFileMap: (f: FileMap) => void;
   handleDeleteFile: (name: string) => void;
-  selectedFileData: FileData | null;
-  setSelectedFileData: (f: FileData) => void;
+  selectedFileData: string | null;
+  setSelectedFileData: (f: string | null) => void;
 }
 
 const FileComponent: React.FC<FileComponentProps> = ({
   fileData,
+  fileMap,
+  setFileMap,
   handleDeleteFile,
   selectedFileData,
   setSelectedFileData,
 }) => {
   const [URLValue, setURLValue] = useState("");
   const [editURL, setEditURL] = useState(true);
-  const [currentFileData, setCurrentFileData] = useState<FileData>(fileData);
+
+  useEffect(() => {
+    if (selectedFileData) {
+      if (fileMap[selectedFileData].isURL) {
+        setURLValue(
+          fileMap[selectedFileData].content
+            ? fileMap[selectedFileData].content
+            : ""
+        );
+      }
+    }
+  }, [fileMap, selectedFileData]);
 
   const openDeleteModal = () => {
     const modal = document.getElementById(
-      "remove_file_" + currentFileData.filename
+      "remove_file_" + fileMap[fileData.fileID].filename
     );
     if (modal instanceof HTMLDialogElement) {
       modal.showModal();
@@ -39,17 +54,38 @@ const FileComponent: React.FC<FileComponentProps> = ({
   };
 
   const switchEditMode = () => {
+    if (editURL) {
+      const newFileData: FileData = JSON.parse(
+        JSON.stringify(fileMap[fileData.fileID])
+      );
+      newFileData.content = URLValue;
+      const newFileMap: FileMap = { ...fileMap };
+      newFileMap[fileData.fileID] = newFileData;
+      setFileMap(newFileMap);
+    }
+
     setEditURL((prevState) => !prevState);
   };
 
   const changeReader = (r: string) => {
-    const newFileData: FileData = JSON.parse(JSON.stringify(currentFileData));
+    const newFileData: FileData = JSON.parse(
+      JSON.stringify(fileMap[fileData.fileID])
+    );
     const newRAGConfig: RAGConfig = JSON.parse(
-      JSON.stringify(currentFileData.rag_config)
+      JSON.stringify(fileMap[fileData.fileID].rag_config)
     );
     newRAGConfig["Reader"].selected = r;
     newFileData.rag_config = newRAGConfig;
-    setCurrentFileData(newFileData);
+    const newFileMap: FileMap = { ...fileMap };
+    newFileMap[fileData.fileID] = newFileData;
+    setFileMap(newFileMap);
+
+    if (
+      selectedFileData &&
+      selectedFileData === fileMap[fileData.fileID].filename
+    ) {
+      setSelectedFileData(fileData.fileID);
+    }
   };
 
   function renderUploadComponents(
@@ -78,8 +114,8 @@ const FileComponent: React.FC<FileComponentProps> = ({
       <div
         className="dropdown dropdown-bottom flex justify-start items-center min-w-[11vw] tooltip tooltip-right"
         data-tip={
-          currentFileData.rag_config["Reader"].components[
-            currentFileData.rag_config["Reader"].selected
+          fileMap[fileData.fileID].rag_config["Reader"].components[
+            fileMap[fileData.fileID].rag_config["Reader"].selected
           ].description
         }
       >
@@ -89,21 +125,21 @@ const FileComponent: React.FC<FileComponentProps> = ({
           className="btn bg-button-verba hover:bg-button-hover-verba text-text-verba w-full flex justify-start border-none"
         >
           <GoTriangleDown size={15} />
-          <p>{currentFileData.rag_config["Reader"].selected}</p>
+          <p>{fileMap[fileData.fileID].rag_config["Reader"].selected}</p>
         </button>
         <ul
           tabIndex={0}
           className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
         >
-          {currentFileData.isURL
+          {fileMap[fileData.fileID].isURL
             ? renderUploadComponents(
-                currentFileData.rag_config,
+                fileMap[fileData.fileID].rag_config,
                 changeReader,
                 closeOnClick,
                 "URL"
               )
             : renderUploadComponents(
-                currentFileData.rag_config,
+                fileMap[fileData.fileID].rag_config,
                 changeReader,
                 closeOnClick,
                 "FILE"
@@ -112,19 +148,19 @@ const FileComponent: React.FC<FileComponentProps> = ({
       </div>
 
       {/* If is not URL Component */}
-      {!currentFileData.isURL && (
+      {!fileMap[fileData.fileID].isURL && (
         <button
           onClick={() => {
-            setSelectedFileData(currentFileData);
+            setSelectedFileData(fileData.fileID);
           }}
-          className={`flex ${selectedFileData && selectedFileData.filename === currentFileData.filename ? "bg-secondary-verba hover:bg-button-hover-verba" : "bg-button-verba hover:bg-secondary-verba"}  w-full p-3 rounded-lg transition-colors duration-300 ease-in-out border-none`}
+          className={`flex ${selectedFileData && selectedFileData === fileMap[fileData.fileID].fileID ? "bg-secondary-verba hover:bg-button-hover-verba" : "bg-button-verba hover:bg-secondary-verba"}  w-full p-3 rounded-lg transition-colors duration-300 ease-in-out border-none`}
         >
-          <p className="text-text-verba">{currentFileData.filename}</p>
+          <p className="text-text-verba">{fileMap[fileData.fileID].filename}</p>
         </button>
       )}
 
       {/* If is URL Component and edit mode */}
-      {currentFileData.isURL && editURL && (
+      {fileMap[fileData.fileID].isURL && editURL && (
         <div className="flex items-center justify-center gap-2 w-full">
           <label className="input flex items-center gap-2 w-full bg-bg-verba">
             <input
@@ -132,7 +168,7 @@ const FileComponent: React.FC<FileComponentProps> = ({
               className="grow w-full"
               placeholder={
                 "Enter " +
-                currentFileData.rag_config["Reader"].selected +
+                fileMap[fileData.fileID].rag_config["Reader"].selected +
                 " URL here"
               }
               value={URLValue}
@@ -144,18 +180,18 @@ const FileComponent: React.FC<FileComponentProps> = ({
         </div>
       )}
 
-      {currentFileData.isURL && !editURL && (
+      {fileMap[fileData.fileID].isURL && !editURL && (
         <button
           onClick={() => {
-            setSelectedFileData(currentFileData);
+            setSelectedFileData(fileData.fileID);
           }}
-          className={`flex ${selectedFileData && selectedFileData.filename === currentFileData.filename ? "bg-secondary-verba hover:bg-button-hover-verba" : "bg-button-verba hover:bg-secondary-verba"}  w-full p-3 rounded-lg transition-colors duration-300 ease-in-out border-none`}
+          className={`flex ${selectedFileData && selectedFileData === fileMap[fileData.fileID].fileID ? "bg-secondary-verba hover:bg-button-hover-verba" : "bg-button-verba hover:bg-secondary-verba"}  w-full p-3 rounded-lg transition-colors duration-300 ease-in-out border-none`}
         >
           <p className="text-text-verba">{URLValue}</p>
         </button>
       )}
 
-      {currentFileData.isURL && (
+      {fileMap[fileData.fileID].isURL && (
         <div className="flex justify-end items-center">
           <button
             onClick={switchEditMode}
@@ -175,17 +211,17 @@ const FileComponent: React.FC<FileComponentProps> = ({
         </button>
       </div>
       <UserModalComponent
-        modal_id={"remove_file_" + currentFileData.filename}
+        modal_id={"remove_file_" + fileMap[fileData.fileID].filename}
         title={"Remove File"}
         text={
-          currentFileData.isURL
+          fileMap[fileData.fileID].isURL
             ? "Do you want to remove the URL?"
             : "Do you want to remove " +
-              currentFileData.filename +
+              fileMap[fileData.fileID].filename +
               " from the selection?"
         }
         triggerString="Delete"
-        triggerValue={currentFileData.filename}
+        triggerValue={fileMap[fileData.fileID].fileID}
         triggerAccept={handleDeleteFile}
       />
     </div>

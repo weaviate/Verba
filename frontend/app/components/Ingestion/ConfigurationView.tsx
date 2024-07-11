@@ -24,13 +24,17 @@ import BasicSettingView from "./BasicSettingView";
 
 interface ConfigurationViewProps {
   settingConfig: SettingsConfiguration;
-  selectedFileData: FileData | null;
-  setSelectedFileData: (f: FileData | null) => void;
+  selectedFileData: string | null;
+  setSelectedFileData: (f: string | null) => void;
+  fileMap: FileMap;
+  setFileMap: (f: FileMap) => void;
 }
 
 const ConfigurationView: React.FC<ConfigurationViewProps> = ({
   settingConfig,
   selectedFileData,
+  fileMap,
+  setFileMap,
   setSelectedFileData,
 }) => {
   const [selectedSetting, setSelectedSetting] = useState<
@@ -56,7 +60,7 @@ const ConfigurationView: React.FC<ConfigurationViewProps> = ({
             className={`flex ${selectedSetting === "Basic" ? "bg-primary-verba hover:bg-button-hover-verba" : "bg-button-verba hover:bg-button-hover-verba"} border-none btn text-text-verba gap-2`}
           >
             <IoSettingsSharp size={15} />
-            <p>Settings</p>
+            <p>Overview</p>
           </button>
 
           <button
@@ -106,6 +110,8 @@ const ConfigurationView: React.FC<ConfigurationViewProps> = ({
           <BasicSettingView
             selectedFileData={selectedFileData}
             setSelectedFileData={setSelectedFileData}
+            fileMap={fileMap}
+            setFileMap={setFileMap}
           />
         )}
       </div>
@@ -114,10 +120,6 @@ const ConfigurationView: React.FC<ConfigurationViewProps> = ({
       <div className="bg-bg-alt-verba rounded-2xl flex gap-2 p-6 items-center justify-end h-min w-full">
         <div className="flex gap-3 justify-end">
           <button className="flex btn border-none text-text-verba bg-secondary-verba hover:bg-button-hover-verba gap-2">
-            <VscSave size={15} />
-            <p>Save Settings</p>
-          </button>
-          <button className="flex btn border-none text-text-verba bg-button-verba hover:bg-button-hover-verba gap-2">
             <VscSaveAll size={15} />
             <p>Apply to All</p>
           </button>

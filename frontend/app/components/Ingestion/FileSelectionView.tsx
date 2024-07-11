@@ -22,8 +22,8 @@ interface FileSelectionViewProps {
   setFileMap: (f: FileMap) => void;
   RAGConfig: RAGConfig | null;
   setRAGConfig: (r_: RAGConfig | null) => void;
-  selectedFileData: FileData | null;
-  setSelectedFileData: (f: FileData) => void;
+  selectedFileData: string | null;
+  setSelectedFileData: (f: string | null) => void;
 }
 
 const FileSelectionView: React.FC<FileSelectionViewProps> = ({
@@ -53,10 +53,16 @@ const FileSelectionView: React.FC<FileSelectionViewProps> = ({
 
   const handleDeleteFile = (filename: string | null) => {
     if (filename === null) {
+      setSelectedFileData(null);
       setFileMap({});
     } else {
       const newFileMap = { ...fileMap };
       delete newFileMap[filename];
+
+      if (filename === selectedFileData) {
+        setSelectedFileData(null);
+      }
+
       setFileMap(newFileMap);
     }
   };
@@ -72,16 +78,20 @@ const FileSelectionView: React.FC<FileSelectionViewProps> = ({
         const file = files[i];
         const newRAGConfig: RAGConfig = JSON.parse(JSON.stringify(RAGConfig));
         const filename = file.name;
+        const fileID = file.name;
         const extension = file.name.split(".").pop() || "";
         const fileContent = await readFileContent(file);
 
-        newFileMap[filename] = {
+        newFileMap[fileID] = {
+          fileID,
           filename,
           extension,
           isURL: false,
+          overwrite: false,
           content: fileContent,
           labels: ["Document"],
           rag_config: newRAGConfig,
+          file_size: calculateBytesFromHexString(fileContent),
           status: "READY",
         };
       }
@@ -100,15 +110,19 @@ const FileSelectionView: React.FC<FileSelectionViewProps> = ({
 
       const now = new Date();
       const filename = now.toISOString();
+      const fileID = filename;
       const extension = "URL";
 
-      newFileMap[filename] = {
+      newFileMap[fileID] = {
+        fileID,
         filename,
         extension,
         isURL: true,
+        overwrite: false,
         content: "",
         labels: ["Document"],
         rag_config: newRAGConfig,
+        file_size: 0,
         status: "READY",
       };
 
@@ -136,6 +150,12 @@ const FileSelectionView: React.FC<FileSelectionViewProps> = ({
       };
       reader.readAsArrayBuffer(file);
     });
+  };
+
+  const calculateBytesFromHexString = (hexString: string): number => {
+    // Each byte is represented by two hex characters and a space
+    const bytes = hexString.split(" ").length;
+    return bytes;
   };
 
   return (
@@ -219,6 +239,8 @@ const FileSelectionView: React.FC<FileSelectionViewProps> = ({
             handleDeleteFile={handleDeleteFile}
             selectedFileData={selectedFileData}
             setSelectedFileData={setSelectedFileData}
+            fileMap={fileMap}
+            setFileMap={setFileMap}
           />
         ))}
       </div>

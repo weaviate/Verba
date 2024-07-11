@@ -23,9 +23,7 @@ const IngestionView: React.FC<IngestionViewProps> = ({
   setRAGConfig,
 }) => {
   const [fileMap, setFileMap] = useState<FileMap>({});
-  const [selectedFileData, setSelectedFileData] = useState<FileData | null>(
-    null
-  );
+  const [selectedFileData, setSelectedFileData] = useState<string | null>(null);
 
   return (
     <div className="flex justify-center gap-3 h-[80vh] ">
@@ -46,6 +44,8 @@ const IngestionView: React.FC<IngestionViewProps> = ({
           <ConfigurationView
             settingConfig={settingConfig}
             selectedFileData={selectedFileData}
+            fileMap={fileMap}
+            setFileMap={setFileMap}
             setSelectedFileData={setSelectedFileData}
           />
         )}
