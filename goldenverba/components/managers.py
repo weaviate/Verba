@@ -179,7 +179,6 @@ class EmbeddingManager:
         }
         self.selected_embedder: str = "ADAEmbedder"
 
-
     def embed(
         self,
         documents: list[Document],
@@ -278,7 +277,8 @@ class GeneratorManager:
             "Ollama": OllamaGenerator(),
             "Command R+": CohereGenerator(),
         }
-        self.selected_generator: str = "GPT3"
+        self.selected_generator: str = "Gemini"
+        print(f"Available generators: {self.generators.keys()}")  # Debug statement
 
     async def generate_stream(
         self,
@@ -350,6 +350,7 @@ class GeneratorManager:
         if generator in self.generators:
             msg.info(f"Setting GENERATOR to {generator}")
             self.selected_generator = generator
+            print(f"Selected generator: {self.selected_generator}")  # Debug statement
             return True
         else:
             msg.warn(f"Generator {generator} not found")

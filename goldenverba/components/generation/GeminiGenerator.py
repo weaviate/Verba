@@ -23,14 +23,14 @@ class GeminiGenerator(Generator):
     def __init__(self):
         super().__init__()
         self.name = "Gemini"
-        self.description = "Generator using Google's Gemini 1.5 Pro model"
+        self.description = "Generator using Google's Gemini 1.5 flash model"
         self.requires_library = ["vertexai"]
         self.requires_env = [
             "GOOGLE_APPLICATION_CREDENTIALS",
             "GOOGLE_CLOUD_PROJECT",
         ]
         self.streamable = True
-        self.model_name = os.getenv("GEMINI_MODEL", "gemini-1.5-pro-preview-0409")
+        self.model_name = os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
         self.context_window = 10000
 
     async def generate_stream(
@@ -64,7 +64,7 @@ class GeminiGenerator(Generator):
             vertexai.init(project=project_id, location=REGION)
 
             generative_multimodal_model = GenerativeModel(
-                "gemini-1.5-pro-preview-0409",
+                "gemini-1.5-flash",
             )
 
             completion = await generative_multimodal_model.generate_content_async(

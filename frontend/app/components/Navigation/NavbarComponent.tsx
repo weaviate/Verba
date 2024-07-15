@@ -1,16 +1,15 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
+import { FaGithub } from "react-icons/fa";
+import { HiOutlineStatusOnline } from "react-icons/hi";
+import { IoBuildSharp } from "react-icons/io5";
 import { IoChatbubbleSharp } from "react-icons/io5";
 import { IoDocumentSharp } from "react-icons/io5";
-import { HiOutlineStatusOnline } from "react-icons/hi";
 import { IoMdAddCircle } from "react-icons/io";
 import { IoSettingsSharp } from "react-icons/io5";
-import { FaGithub } from "react-icons/fa";
-import { IoBuildSharp } from "react-icons/io5";
 import { LuMenu } from "react-icons/lu";
-
 import NavbarButton from "./NavButton";
 import { getGitHubStars } from "./util";
 
@@ -96,7 +95,9 @@ const Navbar: React.FC<NavbarProps> = ({
         {/* Pages */}
         <div className="lg:flex hidden lg:flex-row items-center lg:gap-3 justify-between">
           <div
-            className={` ${production ? "h-[0vh]" : "sm:h-[3vh] lg:h-[5vh] mx-1"} hidden sm:block bg-text-alt-verba w-px`}
+            className={` ${
+              production ? "h-[0vh]" : "sm:h-[3vh] lg:h-[5vh] mx-1"
+            } hidden sm:block bg-text-alt-verba w-px`}
           ></div>
           <NavbarButton
             hide={false}
@@ -129,7 +130,9 @@ const Navbar: React.FC<NavbarProps> = ({
             setPage="STATUS"
           />
           <div
-            className={` ${production ? "h-[0vh]" : "sm:h-[3vh] lg:h-[5vh] mx-1"} hidden sm:block bg-text-alt-verba w-px`}
+            className={` ${
+              production ? "h-[0vh]" : "sm:h-[3vh] lg:h-[5vh] mx-1"
+            } hidden sm:block bg-text-alt-verba w-px`}
           ></div>
           <NavbarButton
             hide={production}
@@ -164,7 +167,7 @@ const Navbar: React.FC<NavbarProps> = ({
           <div
             className={`sm:h-[3vh] lg:h-[5vh] mx-1 hidden sm:block bg-text-alt-verba w-px`}
           ></div>
-          <button
+          {/* <button
             className={`md:hidden btn md:btn-sm lg:btn-md lg:flex items-center justify-center border-none bg-secondary-verba hover:bg-button-hover-verba`}
             onClick={handleGitHubClick}
           >
@@ -172,7 +175,7 @@ const Navbar: React.FC<NavbarProps> = ({
             <p className="text-xs sm:hidden md:flex text-text-verba ">
               {gitHubStars}
             </p>
-          </button>
+          </button> */}
           <p className="hidden lg:flex text-xs text-text-alt-verba">
             {version}
           </p>
@@ -242,12 +245,12 @@ const Navbar: React.FC<NavbarProps> = ({
                       </li>
                     )}
 
-                    <li onClick={handleGitHubClick}>
+                    {/* <li onClick={handleGitHubClick}>
                       <a>GitHub</a>
                     </li>
                     <li className="items-center justify-center text-xs text-text-alt-verba mt-2">
                       {version}
-                    </li>
+                    </li> */}
                   </ul>
                 </details>
               </li>
