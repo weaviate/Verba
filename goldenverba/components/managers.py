@@ -1,5 +1,6 @@
 from wasabi import msg
 from weaviate import Client
+import asyncio
 
 from goldenverba.components.document import Document
 from goldenverba.components.chunk import Chunk
@@ -12,6 +13,7 @@ from goldenverba.components.interfaces import (
     Generator,
 )
 from goldenverba.server.ImportLogger import LoggerManager
+from goldenverba.server.types import FileConfig, FileStatus
 
 from goldenverba.components.reader.BasicReader import BasicReader
 from goldenverba.components.reader.GitReader import GitHubReader
@@ -51,41 +53,28 @@ class ReaderManager:
         self.readers: dict[str, Reader] = { reader.name : reader for reader in readers }
 
     async def load(
-        self, reader: str, fileData: list[FileData], textValues: list[str], logger: LoggerManager
+        self, reader: str, fileConfig: FileConfig,  logger: LoggerManager
     ) -> list[Document]:
 
         try:
-            start_time = time.time()  # Start timing
-
-            if len(fileData) > 0:
-                await logger.send_info(f"Importing {len(fileData)} files with {reader}")
-            elif len(textValues) > 0:
-                await logger.send_info(f"Importing {textValues} with {reader}")
-            else:
-                await logger.send_warning(f"No data detected")
-                return []
+            loop = asyncio.get_running_loop()
+            start_time = loop.time() 
 
             if reader in self.readers:
-                documents = await self.readers[reader].load(
-                    fileData, textValues, logger
-                )
-                time.sleep(1)
 
-                elapsed_time = round(time.time() - start_time, 2)  # Calculate elapsed time
+                document = await self.readers[reader].load(fileConfig)
+                elapsed_time = round(loop.time() - start_time, 2)
 
-                msg.good(f"Loaded {len(documents)} documents in {elapsed_time}s")
-                await logger.send_success(f"Loaded {len(documents)} documents in {elapsed_time}s")
+                await logger.send_report(fileConfig.fileID, FileStatus.LOADING, f"Succesfully loaded {fileConfig.filename}", took=elapsed_time)
 
-                return documents
+                return document
             else:
                 msg.fail(f"{reader} Reader not found")
-                await logger.send_error(f"{reader} Reader not found")
 
-            return []
+            return None
         except Exception as e:
             msg.fail(f"Failed to load documents: {str(e)}")
-            await logger.send_error(f"Failed to load documents: {str(e)}")
-            return []
+            return None
 
 class ChunkerManager:
     def __init__(self):

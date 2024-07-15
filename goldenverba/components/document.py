@@ -4,58 +4,20 @@ from goldenverba.components.chunk import Chunk
 class Document:
     def __init__(
         self,
-        text: str = "",
-        type: str = "",
-        name: str = "",
-        path: str = "",
-        link: str = "",
-        timestamp: str = "",
-        reader: str = "",
-        meta: dict = None,
+        title: str = "",
+        content: str = "",
+        extension: str = "",
+        labels: list[str] = [],
+        source: str = "",
+        meta: dict = {},
     ):
-        if meta is None:
-            meta = {}
-        self._text = text
-        self._type = type
-        self._name = name
-        self._path = path
-        self._link = link
-        self._timestamp = timestamp
-        self._reader = reader
-        self._meta = meta
+        self.title = title
+        self.content = content
+        self.extension = extension
+        self.labels = labels
+        self.source = source
+        self.meta = meta
         self.chunks: list[Chunk] = []
-
-    @property
-    def text(self):
-        return self._text
-
-    @property
-    def type(self):
-        return self._type
-
-    @property
-    def name(self):
-        return self._name
-
-    @property
-    def path(self):
-        return self._path
-
-    @property
-    def link(self):
-        return self._link
-
-    @property
-    def timestamp(self):
-        return self._timestamp
-
-    @property
-    def reader(self):
-        return self._reader
-
-    @property
-    def meta(self):
-        return self._meta
 
     @staticmethod
     def to_json(document) -> dict:

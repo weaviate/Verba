@@ -1,17 +1,19 @@
 import os
 import ssl
+import time
 
 import weaviate
 from dotenv import load_dotenv, find_dotenv
 from wasabi import msg
 from weaviate.embedded import EmbeddedOptions
+import asyncio
 
 import goldenverba.components.schema.schema_generation as schema_manager
 from goldenverba.server.ImportLogger import LoggerManager
 
 from goldenverba.components.chunk import Chunk
 from goldenverba.components.document import Document
-from goldenverba.components.types import FileData
+from goldenverba.server.types import ImportStreamPayload, FileConfig,FileStatus
 
 from goldenverba.components.interfaces import (
     VerbaComponent,
@@ -56,16 +58,17 @@ class VerbaManager:
         for embedding in schema_manager.EMBEDDINGS:
             schema_manager.init_schemas(self.client, embedding, False, True)
 
-    async def import_data(self, reader: str, fileData: list[FileData], textValues: list[str], logger: LoggerManager):
-        
-        loaded_documents = await self.reader_manager.load(
-            reader, fileData, textValues, logger
-        )
+    async def import_document(self, fileConfig: FileConfig, logger: LoggerManager):
 
-        await logger.send_success("Imported documents")
-        await logger.send_stop()
-        
-        return
+        await asyncio.sleep(1)
+
+        await logger.send_report(fileConfig.fileID, status=FileStatus.STARTING, message="Starting Import", took=0)
+
+        await asyncio.sleep(2)
+
+        document = await self.reader_manager.load(fileConfig.rag_config["Reader"].selected, fileConfig, logger)
+
+        return 
 
         filtered_documents = []
 

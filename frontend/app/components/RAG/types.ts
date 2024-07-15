@@ -48,6 +48,12 @@ export type RAGComponentConfig = {
   available: boolean;
 };
 
+export type ConfigSetting = {
+  type: string;
+  value: string | number;
+  description: string;
+};
+
 export type RAGSetting = {
-  [key: string]: TextFieldSetting | NumberFieldSetting;
+  [key: string]: ConfigSetting;
 };

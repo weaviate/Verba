@@ -1,6 +1,7 @@
 from goldenverba.components.document import Document
 from goldenverba.components.chunk import Chunk
-from goldenverba.components.types import InputText, FileData, InputNumber
+from goldenverba.components.types import FileData, InputConfig
+from goldenverba.server.types import FileConfig
 
 from goldenverba.server.ImportLogger import LoggerManager
 
@@ -87,16 +88,9 @@ class Reader(VerbaComponent):
     def __init__(self):
         super().__init__()
         self.type = "FILE"  # "URL"
-        self.config = {
-                "document_type": InputText(
-                type="text",
-                text="Document",
-                description="Choose a label for your documents for filtering",
-            )
-        }
 
     async def load(
-        self, fileData: list[FileData], textValues: list[str], logger: LoggerManager
+        self, fileConfig: FileConfig
     ) -> list[Document]:
         """Ingest data into Weaviate
         @parameter: reader: str - Identifier of the Reader
@@ -116,10 +110,10 @@ class Chunker(VerbaComponent):
     def __init__(self):
         super().__init__()
         self.config = {
-            "units": InputNumber(
+            "units": InputConfig(
                 type="number", value=100, description="Choose the units per chunks"
             ),
-            "overlap": InputNumber(
+            "overlap": InputConfig(
                 type="number",
                 value=50,
                 description="Choose the units for overlap between chunks",

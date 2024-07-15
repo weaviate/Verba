@@ -8,6 +8,7 @@ from wasabi import msg
 from goldenverba.components.document import Document
 from goldenverba.components.interfaces import Reader
 from goldenverba.components.types import FileData
+from goldenverba.server.types import FileConfig
 
 from goldenverba.server.ImportLogger import LoggerManager
 
@@ -29,100 +30,90 @@ class BasicReader(Reader):
     def __init__(self):
         super().__init__()
         self.name = "Default"
-        self.description = "Imports plain text, pdf, markdown, json and docx files."
+        self.description = "Supports all text files (.txt, .md, .pdf, .docx, .json, .mdx)"
         self.requires_library = ["pypdf", "docx"]
 
     async def load(
-        self, fileData: list[FileData], textValues: list[str], logger: LoggerManager
+        self, fileConfig: FileConfig
     ) -> list[Document]:
 
-        documents = []
-        
-        for file in fileData:
-            msg.info(f"Loading in {file.filename}")
-            await logger.send_info(f"Loading {file.filename}")
+        document = None
+    
+        msg.info(f"Loading in {fileConfig.filename}")
+        decoded_bytes = base64.b64decode(fileConfig.content)
 
-            decoded_bytes = base64.b64decode(file.content)
-
-            if file.extension in ["txt", "md", "mdx"]:
-                try:
-                    original_text = decoded_bytes.decode("utf-8")
-                    document = Document(
-                        name=file.filename,
-                        text=original_text,
-                        type=self.config["document_type"].text,
-                        timestamp=str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
-                        reader=self.name,
-                    )
-                    documents.append(document)
-
-                except Exception as e:
-                    msg.warn(f"Failed to load {file.filename} : {str(e)}")
-                    await logger.send_warning(f"Failed to load {file.filename} : {str(e)}")
-
-
-            elif file.extension == "json":
-                try:
-                    decoded_bytes = base64.b64decode(file.content)
-                    original_text = decoded_bytes.decode("utf-8")
-                    json_obj = json.loads(original_text)
-                    document = Document.from_json(json_obj)
-                    documents.append(document)
-
-                except Exception as e:
-                    msg.warn(f"Failed to load {file.filename} : {str(e)}")
-                    await logger.send_warning(f"Failed to load {file.filename} : {str(e)}")
-
-            elif file.extension == "pdf":
-                try:
-                    pdf_bytes = io.BytesIO(base64.b64decode(file.content))
-
-                    full_text = ""
-                    reader = PdfReader(pdf_bytes)
-
-                    for page in reader.pages:
-                        full_text += page.extract_text() + "\n\n"
-
-                    document = Document(
-                        name=file.filename,
-                        text=full_text,
-                        type=self.config["document_type"].text,
-                        timestamp=str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
-                        reader=self.name,
-                    )
-                    documents.append(document)
-
-                except Exception as e:
-                    msg.warn(f"Failed to load {file.filename} : {str(e)}")
-                    await logger.send_warning(f"Failed to load {file.filename} : {str(e)}")
-
-            elif file.extension == "docx":
-                try:
-                    docx_bytes = io.BytesIO(base64.b64decode(file.content))
-
-                    full_text = ""
-                    reader = docx.Document(docx_bytes)
-
-                    for paragraph in reader.paragraphs:
-                        full_text += paragraph.text + "\n"
-                    
-                    document = Document(
-                        name=file.filename,
-                        text=full_text,
-                        type=self.config["document_type"].text,
-                        timestamp=str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
-                        reader=self.name,
-                    )
-                    documents.append(document)
-
-                except Exception as e:
-                    msg.warn(f"Failed to load {file.filename} : {str(e)}")
-                    await logger.send_warning(f"Failed to load {file.filename} : {str(e)}")
-
-            else:
-                msg.warn(
-                    f"{file.filename} with extension {file.extension} not supported by BasicReader."
+        if fileConfig.extension in ["txt", "md", "mdx"]:
+            try:
+                original_text = decoded_bytes.decode("utf-8")
+                document = Document(
+                    title=fileConfig.filename,
+                    content=original_text,
+                    extension=fileConfig.extension,
+                    labels=fileConfig.labels,
+                    source=fileConfig.source,
+                    meta={}
                 )
-                await logger.send_warning(f"{file.filename} with extension {file.extension} not supported by BasicReader.")
 
-        return documents
+            except Exception as e:
+                msg.warn(f"Failed to load {fileConfig.filename} : {str(e)}")
+
+        elif fileConfig.extension == "json":
+            try:
+                decoded_bytes = base64.b64decode(fileConfig.content)
+                original_text = decoded_bytes.decode("utf-8")
+                json_obj = json.loads(original_text)
+                document = Document.from_json(json_obj)
+
+            except Exception as e:
+                msg.warn(f"Failed to load {fileConfig.filename} : {str(e)}")
+
+        elif fileConfig.extension == "pdf":
+            try:
+                pdf_bytes = io.BytesIO(base64.b64decode(fileConfig.content))
+
+                full_text = ""
+                reader = PdfReader(pdf_bytes)
+
+                for page in reader.pages:
+                    full_text += page.extract_text() + "\n\n"
+
+                document = Document(
+                    title=fileConfig.filename,
+                    content=full_text,
+                    extension=fileConfig.extension,
+                    labels=fileConfig.labels,
+                    source=fileConfig.source,
+                    meta={}
+                )
+
+            except Exception as e:
+                msg.warn(f"Failed to load {fileConfig.filename} : {str(e)}")
+
+        elif fileConfig.extension == "docx":
+            try:
+                docx_bytes = io.BytesIO(base64.b64decode(fileConfig.content))
+
+                full_text = ""
+                reader = docx.Document(docx_bytes)
+
+                for paragraph in reader.paragraphs:
+                    full_text += paragraph.text + "\n"
+                
+                document = Document(
+                    title=fileConfig.filename,
+                    content=full_text,
+                    extension=fileConfig.extension,
+                    labels=fileConfig.labels,
+                    source=fileConfig.sourc,
+                    meta={}
+                )
+
+            except Exception as e:
+                msg.warn(f"Failed to load {fileConfig.filename} : {str(e)}")
+        
+        else:
+            msg.warn(
+                f"{fileConfig.filename} with extension {fileConfig.extension} not supported by BasicReader."
+            )
+
+        return document

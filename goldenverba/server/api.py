@@ -2,6 +2,7 @@ from fastapi import FastAPI, WebSocket, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
+import asyncio
 
 from goldenverba.server.ImportLogger import LoggerManager
 
@@ -22,6 +23,8 @@ from goldenverba.server.types import (
     GetDocumentPayload,
     SearchQueryPayload,
     ImportPayload,
+    ImportStreamPayload,
+    FileConfig
 )
 from goldenverba.server.util import get_config, set_config, setup_managers
 
@@ -197,6 +200,27 @@ async def websocket_generate_stream(websocket: WebSocket):
             )
         msg.good("Succesfully streamed answer")
 
+@app.websocket("/ws/import_files")
+async def websocket_import_files(websocket: WebSocket):
+
+    await websocket.accept()
+    logger = LoggerManager(websocket)
+
+    while True:  # Start a loop to keep the connection alive.
+        try:
+            data = await websocket.receive_text()
+            # Parse and validate the JSON string using Pydantic model
+            fileConfig = FileConfig.model_validate_json(data)
+
+            await manager.import_document(fileConfig, logger)
+
+        except WebSocketDisconnect:
+            msg.warn("Import WebSocket connection closed by client.")
+            break
+
+        except Exception as e:
+            msg.fail(f"Import WebSocket Error: {str(e)}")
+            break
 
 @app.websocket("/ws/import_stream")
 async def websocket_import_stream(websocket: WebSocket):

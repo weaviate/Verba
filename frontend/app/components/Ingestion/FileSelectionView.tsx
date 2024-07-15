@@ -8,6 +8,7 @@ import { IoMdAddCircle } from "react-icons/io";
 import { FaFileImport } from "react-icons/fa";
 import { MdCancel } from "react-icons/md";
 import { GoFileDirectoryFill } from "react-icons/go";
+import { TbPlugConnected } from "react-icons/tb";
 
 import { closeOnClick } from "./util";
 
@@ -24,6 +25,9 @@ interface FileSelectionViewProps {
   setRAGConfig: (r_: RAGConfig | null) => void;
   selectedFileData: string | null;
   setSelectedFileData: (f: string | null) => void;
+  importSelected: () => void;
+  reconnect: () => void;
+  socketStatus: "ONLINE" | "OFFLINE";
 }
 
 const FileSelectionView: React.FC<FileSelectionViewProps> = ({
@@ -34,6 +38,9 @@ const FileSelectionView: React.FC<FileSelectionViewProps> = ({
   setRAGConfig,
   selectedFileData,
   setSelectedFileData,
+  importSelected,
+  socketStatus,
+  reconnect,
 }) => {
   const ref = React.useRef<HTMLInputElement>(null);
 
@@ -86,6 +93,8 @@ const FileSelectionView: React.FC<FileSelectionViewProps> = ({
           fileID,
           filename,
           extension,
+          status_report: {},
+          source: "",
           isURL: false,
           overwrite: false,
           content: fileContent,
@@ -116,8 +125,10 @@ const FileSelectionView: React.FC<FileSelectionViewProps> = ({
       newFileMap[fileID] = {
         fileID,
         filename,
+        status_report: {},
         extension,
         isURL: true,
+        source: "",
         overwrite: false,
         content: "",
         labels: ["Document"],
@@ -130,27 +141,28 @@ const FileSelectionView: React.FC<FileSelectionViewProps> = ({
     }
   };
 
-  const readFileContent = (file: File): Promise<string> => {
+  function arrayBufferToBase64(buffer: ArrayBuffer): string {
+    let binary = "";
+    const bytes = new Uint8Array(buffer);
+    const len = bytes.byteLength;
+    for (let i = 0; i < len; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    return btoa(binary); // Encode the binary string to base64
+  }
+
+  function readFileContent(file: File): Promise<string> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onload = (event) => {
-        if (event.target && event.target.result instanceof ArrayBuffer) {
-          const arrayBuffer = event.target.result;
-          const byteArray = new Uint8Array(arrayBuffer);
-          const byteString = Array.from(byteArray)
-            .map((byte) => byte.toString(16).padStart(2, "0"))
-            .join(" ");
-          resolve(byteString);
-        } else {
-          reject(new Error("Failed to read file content"));
-        }
+      reader.onload = () => {
+        const arrayBuffer = reader.result as ArrayBuffer;
+        const content = arrayBufferToBase64(arrayBuffer);
+        resolve(content); // Resolve with the base64 content
       };
-      reader.onerror = (event) => {
-        reject(new Error("Error reading file: " + event.target?.error));
-      };
+      reader.onerror = () => reject(reader.error);
       reader.readAsArrayBuffer(file);
     });
-  };
+  }
 
   const calculateBytesFromHexString = (hexString: string): number => {
     // Each byte is represented by two hex characters and a space
@@ -246,27 +258,45 @@ const FileSelectionView: React.FC<FileSelectionViewProps> = ({
       </div>
 
       {/* Import Footer */}
-      <div className="bg-bg-alt-verba rounded-2xl flex gap-2 p-6 items-center justify-end h-min w-full">
-        <div className="flex gap-3 justify-end">
-          {selectedFileData && (
-            <button className="flex btn border-none text-text-verba bg-secondary-verba hover:bg-button-hover-verba gap-2">
+      {socketStatus === "ONLINE" ? (
+        <div className="bg-bg-alt-verba rounded-2xl flex gap-2 p-6 items-center justify-end h-min w-full">
+          <div className="flex gap-3 justify-end">
+            {selectedFileData && (
+              <button
+                onClick={importSelected}
+                className="flex btn border-none text-text-verba bg-secondary-verba hover:bg-button-hover-verba gap-2"
+              >
+                <FaFileImport size={15} />
+                <p>Import Selected</p>
+              </button>
+            )}
+            <button className="flex btn border-none text-text-verba bg-button-verba hover:bg-button-hover-verba gap-2">
               <FaFileImport size={15} />
-              <p>Import Selected</p>
+              <p>Import All</p>
             </button>
-          )}
-          <button className="flex btn border-none text-text-verba bg-button-verba hover:bg-button-hover-verba gap-2">
-            <FaFileImport size={15} />
-            <p>Import All</p>
-          </button>
-          <button
-            onClick={openDeleteModal}
-            className="flex btn border-none text-text-verba bg-button-verba hover:bg-warning-verba gap-2"
-          >
-            <MdCancel size={15} />
-            <p>Clear Files</p>
-          </button>
+            <button
+              onClick={openDeleteModal}
+              className="flex btn border-none text-text-verba bg-button-verba hover:bg-warning-verba gap-2"
+            >
+              <MdCancel size={15} />
+              <p>Clear Files</p>
+            </button>
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="bg-bg-alt-verba rounded-2xl flex gap-2 p-6 items-center justify-end h-min w-full">
+          <div className="flex gap-3 justify-end">
+            <button
+              onClick={reconnect}
+              className="flex btn border-none text-text-verba bg-button-verba hover:bg-button-hover-verba gap-2"
+            >
+              <TbPlugConnected size={15} />
+              <p>Reconnect to Verba</p>
+            </button>
+          </div>
+        </div>
+      )}
+
       <UserModalComponent
         modal_id={"remove_all_files"}
         title={"Clear all files?"}

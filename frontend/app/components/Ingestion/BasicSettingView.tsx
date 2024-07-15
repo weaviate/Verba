@@ -259,7 +259,7 @@ const BasicSettingView: React.FC<BasicSettingViewProps> = ({
           <input
             type="checkbox"
             className="checkbox checkbox-md"
-            onClick={(e) =>
+            onChange={(e) =>
               setOverwrite((e.target as HTMLInputElement).checked)
             }
             checked={
@@ -360,7 +360,7 @@ const BasicSettingView: React.FC<BasicSettingViewProps> = ({
                     // Create a shallow copy of the object
                     const objCopy = { ...fileMap[selectedFileData] };
                     // Delete the `content` property
-                    delete objCopy.content;
+                    objCopy.content = "File Content";
                     // Convert to a pretty-printed JSON string
                     return JSON.stringify(objCopy, null, 2);
                   })()

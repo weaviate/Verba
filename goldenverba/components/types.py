@@ -1,18 +1,10 @@
 from pydantic import BaseModel
-from typing import Literal
+from typing import Literal, Union
 
-
-class InputText(BaseModel):
-    type: Literal["text"]
-    text: str
+class InputConfig(BaseModel):
+    type: Literal["number", "text"]
+    value: Union[int, str]
     description: str
-
-
-class InputNumber(BaseModel):
-    type: Literal["number"]
-    value: int
-    description: str
-
 
 class FileData(BaseModel):
     filename: str
