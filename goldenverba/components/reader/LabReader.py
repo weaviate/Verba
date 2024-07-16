@@ -10,8 +10,6 @@ from wasabi import msg
 
 from goldenverba.components.document import Document
 from goldenverba.components.interfaces import Reader
-from goldenverba.components.types import FileData
-
 from goldenverba.server.ImportLogger import LoggerManager
 
 
@@ -27,7 +25,7 @@ class GitLabReader(Reader):
         self.requires_env = ["GITLAB_TOKEN"]
         self.description = "Downloads only text files from a GitLab repository and ingests it into Verba. Use this format {owner}/{name}/{branch}/{folder} (e.g gitlab-org/gitlab/master/doc)"
 
-    async def load(self, fileData: list[FileData], textValues: list[str], logger: LoggerManager) -> list[Document]:
+    async def load(self, fileData: list, textValues: list[str], logger: LoggerManager) -> list[Document]:
         
         if len(textValues) <= 0:
             await logger.send_error(f"No GitLab Link detected")

@@ -20,7 +20,7 @@ import { RAGConfig } from "../RAG/types";
 interface FileSelectionViewProps {
   settingConfig: SettingsConfiguration;
   fileMap: FileMap;
-  setFileMap: (f: FileMap) => void;
+  setFileMap: React.Dispatch<React.SetStateAction<FileMap>>;
   RAGConfig: RAGConfig | null;
   setRAGConfig: (r_: RAGConfig | null) => void;
   selectedFileData: string | null;

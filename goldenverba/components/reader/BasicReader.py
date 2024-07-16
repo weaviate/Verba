@@ -7,7 +7,6 @@ from wasabi import msg
 
 from goldenverba.components.document import Document
 from goldenverba.components.interfaces import Reader
-from goldenverba.components.types import FileData
 from goldenverba.server.types import FileConfig
 
 from goldenverba.server.ImportLogger import LoggerManager

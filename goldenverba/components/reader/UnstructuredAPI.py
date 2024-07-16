@@ -8,7 +8,6 @@ from wasabi import msg
 
 from goldenverba.components.document import Document
 from goldenverba.components.interfaces import Reader
-from goldenverba.components.types import FileData
 
 from goldenverba.server.ImportLogger import LoggerManager
 
@@ -26,7 +25,7 @@ class UnstructuredReader(Reader):
         self.description = "Uses the Unstructured API to import multiple file types such as plain text and documents (.pdf, .csv). Requires an Unstructured API Key"
 
     async def load(
-        self, fileData: list[FileData], textValues: list[str], logger: LoggerManager
+        self, fileData: list, textValues: list[str], logger: LoggerManager
     ) -> list[Document]:
 
         documents = []

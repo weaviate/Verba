@@ -9,7 +9,6 @@ from wasabi import msg
 
 from goldenverba.components.document import Document
 from goldenverba.components.interfaces import Reader
-from goldenverba.components.types import FileData
 
 from goldenverba.server.ImportLogger import LoggerManager
 
@@ -27,7 +26,7 @@ class GitHubReader(Reader):
         self.description = "Retrieves all text files (.txt, .md, .mdx, .json) from a GitHub Repository and imports them into Verba. Use this format {owner}/{repo}/{branch}/{folder}"
 
     async def load(
-        self, fileData: list[FileData], textValues: list[str], logger: LoggerManager
+        self, fileData: list, textValues: list[str], logger: LoggerManager
     ) -> list[Document]:
 
         if len(textValues) <= 0:

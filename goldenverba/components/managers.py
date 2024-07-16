@@ -4,11 +4,11 @@ import asyncio
 
 from goldenverba.components.document import Document
 from goldenverba.components.chunk import Chunk
-from goldenverba.components.types import FileData
 from goldenverba.components.interfaces import (
     Reader,
     Chunker,
     Embedder,
+    Embedding,
     Retriever,
     Generator,
 )
@@ -40,14 +40,18 @@ from goldenverba.components.generation.OllamaGenerator import OllamaGenerator
 
 import time
 
-
 try:
     import tiktoken
 except Exception:
     msg.warn("tiktoken not installed, your base installation might be corrupted.")
 
+### Add new components here ###
+
 readers = [BasicReader(), GitHubReader(), GitLabReader(), UnstructuredReader()]
 chunkers = [TokenChunker()]
+embedders = [ADAEmbedder(), MiniLMEmbedder(), AllMPNetEmbedder(), MixedbreadEmbedder(), CohereEmbedder(), OllamaEmbedder(), GoogleEmbedder()]
+
+### ----------------------- ###
 
 class ReaderManager:
     def __init__(self):
@@ -62,14 +66,14 @@ class ReaderManager:
             if reader in self.readers:
                 document = await self.readers[reader].load(fileConfig)
                 elapsed_time = round(loop.time() - start_time, 2)
-                await logger.send_report(fileConfig.fileID, FileStatus.LOADING, f"Succesfully loaded {fileConfig.filename}", took=elapsed_time)
+                await logger.send_report(fileConfig.fileID, FileStatus.LOADING, f"Loaded {fileConfig.filename}", took=elapsed_time)
+                await logger.send_report(fileConfig.fileID, FileStatus.CHUNKING, "", took=0)
                 return document
             else:
                 raise Exception(f"{reader} Reader not found")
 
         except Exception as e:
-            await logger.send_report(fileConfig.fileID, FileStatus.ERROR, f"Failed to load documents: {str(e)}", took=0)
-            return None
+            raise e
 
 class ChunkerManager:
     def __init__(self):
@@ -80,79 +84,45 @@ class ChunkerManager:
             loop = asyncio.get_running_loop()
             start_time = loop.time() 
             if chunker in self.chunkers:
-                chunked_document = await self.chunkers[chunker].chunk(fileConfig, document)
+                config = fileConfig.rag_config["Chunker"].components[chunker].config
+                chunked_document = await self.chunkers[chunker].chunk(config, document)
                 elapsed_time = round(loop.time() - start_time, 2)
-                await logger.send_report(fileConfig.fileID, FileStatus.CHUNKING, f"Succesfully chunked {fileConfig.filename} into", took=elapsed_time)
+                await logger.send_report(fileConfig.fileID, FileStatus.CHUNKING, f"Split {fileConfig.filename} into {len(document.chunks)} chunks", took=elapsed_time)
+                await logger.send_report(fileConfig.fileID, FileStatus.EMBEDDING, "", took=0)
                 return chunked_document
             else:
                 raise Exception(f"{chunker} Chunker not found")
-        
         except Exception as e:
-            await logger.send_report(fileConfig.fileID, FileStatus.ERROR, f"Failed to load documents: {str(e)}", took=0)
-            return None
-
+            raise e
 
 class EmbeddingManager:
     def __init__(self):
-        self.embedders: dict[str, Embedder] = {
-            "GoogleEmbedder": GoogleEmbedder(),
-            "MiniLMEmbedder": MiniLMEmbedder(),
-            "AllMPNetEmbedder": AllMPNetEmbedder(),
-            "MixedbreadEmbedder": MixedbreadEmbedder(),
-            "ADAEmbedder": ADAEmbedder(),
-            "CohereEmbedder": CohereEmbedder(),
-            "OllamaEmbedder": OllamaEmbedder(),
-        }
-        self.selected_embedder: str = "ADAEmbedder"
+        self.embedders: dict[str, Embedding] = { embedder.name : embedder for embedder in embedders }
 
-
-    def embed(
+    async def vectorize(
         self,
-        documents: list[Document],
-        client: Client,
-        logging: list[dict],
-        batch_size: int = 100,
-    ) -> bool:
-        """Embed verba documents and its chunks to Weaviate
-        @parameter: documents : list[Document] - List of Verba documents
-        @parameter: client : Client - Weaviate Client
-        @parameter: batch_size : int - Batch Size of Input
-        @returns bool - Bool whether the embedding what successful.
+        embedder: str,
+        fileConfig: FileConfig,
+        document: Document,
+        logger: LoggerManager
+    ) -> Document:
+        """Vectorizes chunks
+        @parameter: documents : Document - Verba document
+        @returns Document - Document with vectorized chunks
         """
-        start_time = time.time()  # Start timing
-        logging.append(
-            {
-                "type": "INFO",
-                "message": f"Starting Embedding with {self.selected_embedder}",
-            }
-        )
-        successful_embedding = self.embedders[self.selected_embedder].embed(
-            documents, client, logging
-        )
-        elapsed_time = round(time.time() - start_time, 2)  # Calculate elapsed time
-        msg.good(
-            f"Embedding completed with {len(documents)} Documents and {sum([len(document.chunks) for document in documents])} chunks in {elapsed_time}s"
-        )
-        logging.append(
-            {
-                "type": "SUCCESS",
-                "message": f"Embedding completed with {len(documents)} Documents and {sum([len(document.chunks) for document in documents])} chunks in {elapsed_time}s",
-            }
-        )
-        return successful_embedding
-
-    def set_embedder(self, embedder: str) -> bool:
-        if embedder in self.embedders:
-            msg.info(f"Setting EMBEDDER to {embedder}")
-            self.selected_embedder = embedder
-            return True
-        else:
-            msg.warn(f"Embedder {embedder} not found")
-            return False
-
-    def get_embedders(self) -> dict[str, Embedder]:
-        return self.embedders
-
+        try:
+            loop = asyncio.get_running_loop()
+            start_time = loop.time() 
+            if embedder in self.embedders:
+                config = fileConfig.rag_config["Embedder"].components[embedder].config
+                vectorized_document = await self.embedders[embedder].vectorize(config, document)
+                elapsed_time = round(loop.time() - start_time, 2)
+                await logger.send_report(fileConfig.fileID, FileStatus.EMBEDDING, f"Vectorized all chunks", took=elapsed_time)
+                return vectorized_document
+            else:
+                raise Exception(f"{embedder} Embedder not found")
+        except Exception as e:
+            raise e
 
 class RetrieverManager:
     def __init__(self):

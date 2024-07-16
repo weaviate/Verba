@@ -1,6 +1,6 @@
 from goldenverba.components.document import Document
 from goldenverba.components.chunk import Chunk
-from goldenverba.components.types import FileData, InputConfig
+from goldenverba.components.types import InputConfig
 from goldenverba.server.types import FileConfig
 
 from goldenverba.server.ImportLogger import LoggerManager
@@ -93,11 +93,8 @@ class Reader(VerbaComponent):
         self, fileConfig: FileConfig
     ) -> list[Document]:
         """Ingest data into Weaviate
-        @parameter: reader: str - Identifier of the Reader
-        @parameter: fileData : list[FileData] - List of filename and bytes pairs
-        @parameter: textValues : list[str] - List of strings, e.g. URLs etc
-        @parameter: logger: LoggerManager - Logger that sends logs to the frontend
-        @returns list[Document] - A list of documents
+        @parameter: fileConfig: FileConfig - FileConfiguration sent by the frontend
+        @returns Document - Verba document
         """
         raise NotImplementedError("load method must be implemented by a subclass.")
 
@@ -122,12 +119,24 @@ class Chunker(VerbaComponent):
 
     async def chunk(self, fileConfig: FileConfig, document: Document):
         """Chunk verba documents into chunks based on units and overlap.
-
-        @parameter: documents : list[Document] - List of Verba documents
-        @returns list[str] - List of documents that contain the chunks.
+        @parameter: fileConfig : FileConfig - FileConfiguration sent by the frontend
+        @parameter: document : Document - Verba document to chunk
         """
         raise NotImplementedError("chunk method must be implemented by a subclass.")
 
+class Embedding(VerbaComponent):
+    """
+    Interface for Verba Embedder Components.
+    """
+    def __init__(self):
+        super().__init__()
+        self.model = ""
+
+    async def vectorize(self, config: dict, document: Document) -> Document:
+        """Embed verba documents and its chunks to Weaviate
+        @parameter: document : Document - Verba Document
+        """
+        raise NotImplementedError("embed method must be implemented by a subclass.")
 
 class Embedder(VerbaComponent):
     """

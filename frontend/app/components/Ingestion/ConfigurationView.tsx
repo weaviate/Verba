@@ -12,22 +12,25 @@ import { FaLayerGroup } from "react-icons/fa";
 import { MdOutlineDataset } from "react-icons/md";
 import { VscSave } from "react-icons/vsc";
 import { VscSaveAll } from "react-icons/vsc";
+import { HiDocumentReport } from "react-icons/hi";
 
 import { closeOnClick } from "./util";
 
 import UserModalComponent from "../Navigation/UserModal";
+import ReportView from "./ReportView";
 
 import { FileMap, FileData } from "./types";
 import { RAGConfig } from "../RAG/types";
 
 import BasicSettingView from "./BasicSettingView";
+import ChunkingView from "./ChunkingView";
 
 interface ConfigurationViewProps {
   settingConfig: SettingsConfiguration;
   selectedFileData: string | null;
   setSelectedFileData: (f: string | null) => void;
   fileMap: FileMap;
-  setFileMap: (f: FileMap) => void;
+  setFileMap: React.Dispatch<React.SetStateAction<FileMap>>;
 }
 
 const ConfigurationView: React.FC<ConfigurationViewProps> = ({
@@ -38,8 +41,21 @@ const ConfigurationView: React.FC<ConfigurationViewProps> = ({
   setSelectedFileData,
 }) => {
   const [selectedSetting, setSelectedSetting] = useState<
-    "Basic" | "Chunking" | "Embedding" | "Metadata"
+    "Basic" | "Chunking" | "Embedding" | "Metadata" | "Report"
   >("Basic");
+
+  useEffect(() => {
+    if (selectedFileData) {
+      if (fileMap[selectedFileData].status != "READY") {
+        setSelectedSetting("Report");
+      } else if (
+        selectedSetting === "Report" &&
+        fileMap[selectedFileData].status === "READY"
+      ) {
+        setSelectedSetting("Basic");
+      }
+    }
+  }, [fileMap, selectedFileData]);
 
   return (
     <div className="flex flex-col gap-2 w-full">
@@ -52,56 +68,78 @@ const ConfigurationView: React.FC<ConfigurationViewProps> = ({
             display_text="Import Config"
           />
         </div>
-        <div className="flex gap-3 justify-end">
-          <button
-            onClick={() => {
-              setSelectedSetting("Basic");
-            }}
-            className={`flex ${selectedSetting === "Basic" ? "bg-primary-verba hover:bg-button-hover-verba" : "bg-button-verba hover:bg-button-hover-verba"} border-none btn text-text-verba gap-2`}
-          >
-            <IoSettingsSharp size={15} />
-            <p>Overview</p>
-          </button>
+        {selectedFileData && fileMap[selectedFileData].status === "READY" ? (
+          <div className="flex gap-3 justify-end">
+            <button
+              onClick={() => {
+                setSelectedSetting("Basic");
+              }}
+              className={`flex ${selectedSetting === "Basic" ? "bg-primary-verba hover:bg-button-hover-verba" : "bg-button-verba hover:bg-button-hover-verba"} border-none btn text-text-verba gap-2`}
+            >
+              <IoSettingsSharp size={15} />
+              <p>Overview</p>
+            </button>
 
-          <button
-            onClick={() => {
-              setSelectedSetting("Chunking");
-            }}
-            className={`flex ${selectedSetting === "Chunking" ? "bg-primary-verba hover:bg-button-hover-verba" : "bg-button-verba hover:bg-button-hover-verba"} border-none btn text-text-verba gap-2`}
-          >
-            <PiChartPieSliceFill size={15} />
-            <p>Chunking</p>
-          </button>
+            <button
+              onClick={() => {
+                setSelectedSetting("Chunking");
+              }}
+              className={`flex ${selectedSetting === "Chunking" ? "bg-primary-verba hover:bg-button-hover-verba" : "bg-button-verba hover:bg-button-hover-verba"} border-none btn text-text-verba gap-2`}
+            >
+              <PiChartPieSliceFill size={15} />
+              <p>Chunking</p>
+            </button>
 
-          <button
-            onClick={() => {
-              setSelectedSetting("Embedding");
-            }}
-            className={`flex ${selectedSetting === "Embedding" ? "bg-primary-verba hover:bg-button-hover-verba" : "bg-button-verba hover:bg-button-hover-verba"} border-none btn text-text-verba gap-2`}
-          >
-            <FaLayerGroup size={15} />
-            <p>Embedding</p>
-          </button>
+            <button
+              onClick={() => {
+                setSelectedSetting("Embedding");
+              }}
+              className={`flex ${selectedSetting === "Embedding" ? "bg-primary-verba hover:bg-button-hover-verba" : "bg-button-verba hover:bg-button-hover-verba"} border-none btn text-text-verba gap-2`}
+            >
+              <FaLayerGroup size={15} />
+              <p>Embedding</p>
+            </button>
 
-          <button
-            onClick={() => {
-              setSelectedSetting("Metadata");
-            }}
-            className={`flex ${selectedSetting === "Metadata" ? "bg-primary-verba hover:bg-button-hover-verba" : "bg-button-verba hover:bg-button-hover-verba"} border-none btn text-text-verba gap-2`}
-          >
-            <MdOutlineDataset size={15} />
-            <p>Metadata</p>
-          </button>
+            <button
+              onClick={() => {
+                setSelectedSetting("Metadata");
+              }}
+              className={`flex ${selectedSetting === "Metadata" ? "bg-primary-verba hover:bg-button-hover-verba" : "bg-button-verba hover:bg-button-hover-verba"} border-none btn text-text-verba gap-2`}
+            >
+              <MdOutlineDataset size={15} />
+              <p>Metadata</p>
+            </button>
 
-          <button
-            onClick={() => {
-              setSelectedFileData(null);
-            }}
-            className="flex btn btn-square border-none text-text-verba bg-button-verba hover:bg-warning-verba gap-2"
-          >
-            <MdCancel size={15} />
-          </button>
-        </div>
+            <button
+              onClick={() => {
+                setSelectedFileData(null);
+              }}
+              className="flex btn btn-square border-none text-text-verba bg-button-verba hover:bg-warning-verba gap-2"
+            >
+              <MdCancel size={15} />
+            </button>
+          </div>
+        ) : (
+          <div className="flex gap-3 justify-end">
+            <button
+              onClick={() => {
+                setSelectedSetting("Report");
+              }}
+              className={`flex ${selectedSetting === "Report" ? "bg-primary-verba hover:bg-button-hover-verba" : "bg-button-verba hover:bg-button-hover-verba"} border-none btn text-text-verba gap-2`}
+            >
+              <HiDocumentReport size={15} />
+              <p>Report</p>
+            </button>
+            <button
+              onClick={() => {
+                setSelectedFileData(null);
+              }}
+              className="flex btn btn-square border-none text-text-verba bg-button-verba hover:bg-warning-verba gap-2"
+            >
+              <MdCancel size={15} />
+            </button>
+          </div>
+        )}
       </div>
 
       {/* File List */}
@@ -114,24 +152,36 @@ const ConfigurationView: React.FC<ConfigurationViewProps> = ({
             setFileMap={setFileMap}
           />
         )}
+        {selectedSetting === "Chunking" && (
+          <ChunkingView
+            selectedFileData={selectedFileData}
+            fileMap={fileMap}
+            setFileMap={setFileMap}
+          />
+        )}
+        {selectedSetting === "Report" && (
+          <ReportView selectedFileData={selectedFileData} fileMap={fileMap} />
+        )}
       </div>
 
       {/* Import Footer */}
       <div className="bg-bg-alt-verba rounded-2xl flex gap-2 p-6 items-center justify-end h-min w-full">
-        <div className="flex gap-3 justify-end">
-          <button className="flex btn border-none text-text-verba bg-secondary-verba hover:bg-button-hover-verba gap-2">
-            <VscSaveAll size={15} />
-            <p>Apply to All</p>
-          </button>
-          <button className="flex btn border-none text-text-verba bg-button-verba hover:bg-button-hover-verba gap-2">
-            <IoSettingsSharp size={15} />
-            <p>Set as Default</p>
-          </button>
-          <button className="flex btn border-none text-text-verba bg-button-verba hover:bg-warning-verba gap-2">
-            <MdCancel size={15} />
-            <p>Reset</p>
-          </button>
-        </div>
+        {selectedFileData && fileMap[selectedFileData].status === "READY" && (
+          <div className="flex gap-3 justify-end">
+            <button className="flex btn border-none text-text-verba bg-secondary-verba hover:bg-button-hover-verba gap-2">
+              <VscSaveAll size={15} />
+              <p>Apply to All</p>
+            </button>
+            <button className="flex btn border-none text-text-verba bg-button-verba hover:bg-button-hover-verba gap-2">
+              <IoSettingsSharp size={15} />
+              <p>Set as Default</p>
+            </button>
+            <button className="flex btn border-none text-text-verba bg-button-verba hover:bg-warning-verba gap-2">
+              <MdCancel size={15} />
+              <p>Reset</p>
+            </button>
+          </div>
+        )}
       </div>
       <UserModalComponent
         modal_id={"apply_setting_to_all"}

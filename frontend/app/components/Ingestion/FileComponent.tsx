@@ -1,9 +1,11 @@
 "use client";
 
 import React, { useState, useEffect, use } from "react";
-import { FileData, FileMap } from "./types";
+import { FileData, FileMap, statusColorMap, statusTextMap } from "./types";
 import { FaTrash } from "react-icons/fa";
 import { GoTriangleDown } from "react-icons/go";
+import { FaCheckCircle } from "react-icons/fa";
+import { MdError } from "react-icons/md";
 
 import UserModalComponent from "../Navigation/UserModal";
 import { RAGConfig } from "../RAG/types";
@@ -112,10 +114,23 @@ const FileComponent: React.FC<FileComponentProps> = ({
   return (
     <div className="flex justify-between items-center gap-2 rounded-2xl p-1 w-full">
       {fileMap[fileData.fileID].status != "READY" ? (
-        <div className="min-w-[11vw] flex gap-2 text-text-verba bg-bg-alt-verba p-3">
-          <span className="loading loading-spinner loading-sm"></span>
-          <p>{fileMap[fileData.fileID].status}</p>
-        </div>
+        <button
+          className={`min-w-[11vw] flex gap-2 items-center justify-center text-text-verba ${statusColorMap[fileMap[fileData.fileID].status]} hover:bg-button-hover-verba rounded-lg p-3`}
+        >
+          {fileMap[fileData.fileID].status != "DONE" &&
+          fileMap[fileData.fileID].status != "ERROR" ? (
+            <span className="loading loading-spinner loading-sm"></span>
+          ) : (
+            ""
+          )}
+          {fileMap[fileData.fileID].status === "DONE" && (
+            <FaCheckCircle size={15} />
+          )}
+          {fileMap[fileData.fileID].status === "ERROR" && <MdError size={15} />}
+          <p className="text-sm">
+            {statusTextMap[fileMap[fileData.fileID].status]}
+          </p>
+        </button>
       ) : (
         <div
           className="dropdown dropdown-bottom flex justify-start items-center min-w-[11vw] tooltip tooltip-right"

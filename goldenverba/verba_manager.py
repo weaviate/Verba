@@ -59,40 +59,44 @@ class VerbaManager:
             schema_manager.init_schemas(self.client, embedding, False, True)
 
     async def import_document(self, fileConfig: FileConfig, logger: LoggerManager):
+        try:
+            loop = asyncio.get_running_loop()
+            start_time = loop.time() 
 
-        loop = asyncio.get_running_loop()
-        start_time = loop.time() 
+            # TODO Check for duplicate filename
+            # Check if document names exist in DB
+            # for document in loaded_documents:
+            #    if not self.check_if_document_exits(document):
+            #        filtered_documents.append(document)
+            #    else:
+            #        logger.send_message(f"{document.name} already exists.",2)
 
-        await asyncio.sleep(1)
+            await logger.send_report(fileConfig.fileID, status=FileStatus.STARTING, message="Starting Import", took=0)
 
-        # TODO Check for duplicate filename
-        # Check if document names exist in DB
-        # for document in loaded_documents:
-        #    if not self.check_if_document_exits(document):
-        #        filtered_documents.append(document)
-        #    else:
-        #        logger.send_message(f"{document.name} already exists.",2)
+            load_task = asyncio.create_task(self.reader_manager.load(fileConfig.rag_config["Reader"].selected, fileConfig, logger))
+            document = await load_task
 
-        await logger.send_report(fileConfig.fileID, status=FileStatus.STARTING, message="Starting Import", took=0)
+            chunk_task = asyncio.create_task(self.chunker_manager.chunk(fileConfig.rag_config["Chunker"].selected, fileConfig, document, logger))
+            chunked_document = await chunk_task
 
-        await asyncio.sleep(2)
+            embedding_task = asyncio.create_task(self.embedder_manager.vectorize(fileConfig.rag_config["Embedder"].selected, fileConfig, document, logger))
+            vectorized_document = await embedding_task
 
-        document = await self.reader_manager.load(fileConfig.rag_config["Reader"].selected, fileConfig, logger)
-        chunked_document = await self.chunker_manager.chunk(fileConfig.rag_config["Chunker"].selected, fileConfig, document, logger)
+            await logger.send_report(fileConfig.fileID, status=FileStatus.DONE, message=f"Successfully imported {fileConfig.filename} into Verba", took=round(loop.time() - start_time, 2))
 
-        await logger.send_report(fileConfig.fileID, status=FileStatus.DONE, message=f"Successfully ingested {fileConfig.filename}", took=round(loop.time() - start_time, 2))
+        except Exception as e:
+            await logger.send_report(fileConfig.fileID, status=FileStatus.ERROR, message=f"Error when importing {fileConfig.filename}: {str(e)}", took=0)
+            return 
 
-        return 
+            filtered_documents = []
 
-        filtered_documents = []
+            modified_documents = self.chunker_manager.chunk(
+                filtered_documents, logger
+            )
 
-        modified_documents = self.chunker_manager.chunk(
-            filtered_documents, logger
-        )
-
-        self.embedder_manager.embed(
-            modified_documents, client=self.client, logger=logger
-        )
+            self.embedder_manager.embed(
+                modified_documents, client=self.client, logger=logger
+            )
 
     def setup_client(self):
         """

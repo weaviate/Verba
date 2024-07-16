@@ -21,6 +21,7 @@ export type FileData = {
     | "NER"
     | "EXTRACTION"
     | "SUMMARIZING"
+    | "WAITING"
     | "DONE"
     | "ERROR";
   rag_config: RAGConfig;
@@ -43,9 +44,40 @@ export type StatusReport = {
     | "EXTRACTION"
     | "SUMMARIZING"
     | "DONE"
+    | "WAITING"
     | "ERROR";
   message: string;
   took: number;
+};
+
+export const statusColorMap = {
+  DONE: "bg-secondary-verba",
+  ERROR: "bg-warning-verba",
+  READY: "bg-button-verba",
+  STARTING: "bg-button-verba",
+  CHUNKING: "bg-button-verba",
+  LOADING: "bg-button-verba",
+  EMBEDDING: "bg-button-verba",
+  INGESTING: "bg-button-verba",
+  NER: "bg-button-verba",
+  EXTRACTION: "bg-button-verba",
+  SUMMARIZING: "bg-button-verba",
+  WAITING: "bg-button-verba",
+};
+
+export const statusTextMap = {
+  DONE: "Finished",
+  ERROR: "Failed",
+  READY: "Ready",
+  STARTING: "Importing...",
+  CHUNKING: "Chunking...",
+  LOADING: "Loading...",
+  EMBEDDING: "Embedding...",
+  INGESTING: "Weaviating...",
+  NER: "Extracting NER...",
+  EXTRACTION: "Extraction REL...",
+  SUMMARIZING: "Summarizing...",
+  WAITING: "Waiting...",
 };
 
 export type FileMap = {

@@ -1,6 +1,5 @@
 from pydantic import BaseModel
 from enum import Enum
-from goldenverba.components.types import FileData
 from typing import Dict, Union
 
 
@@ -47,7 +46,7 @@ class LoadPayload(BaseModel):
 
 
 class ImportPayload(BaseModel):
-    data: list[FileData]
+    data: list
     textValues: list[str]
     config: dict    
 

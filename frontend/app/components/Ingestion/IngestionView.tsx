@@ -103,9 +103,25 @@ const IngestionView: React.FC<IngestionViewProps> = ({
     });
   };
 
+  const setInitialStatus = (fileID: string) => {
+    setFileMap((prevFileMap) => {
+      if (fileID in prevFileMap) {
+        const newFileData: FileData = JSON.parse(
+          JSON.stringify(prevFileMap[fileID])
+        );
+        const newFileMap: FileMap = { ...prevFileMap };
+        newFileData.status = "WAITING";
+        newFileMap[fileID] = newFileData;
+        return newFileMap;
+      }
+      return prevFileMap;
+    });
+  };
+
   const importSelected = () => {
-    if (selectedFileData) {
+    if (selectedFileData && fileMap[selectedFileData].status === "READY") {
       if (socket?.readyState === WebSocket.OPEN) {
+        setInitialStatus(selectedFileData);
         socket.send(JSON.stringify(fileMap[selectedFileData]));
       } else {
         console.error("WebSocket is not open. ReadyState:", socket?.readyState);
@@ -116,11 +132,17 @@ const IngestionView: React.FC<IngestionViewProps> = ({
 
   const importAll = () => {
     for (const fileID in fileMap) {
-      if (socket?.readyState === WebSocket.OPEN) {
-        socket.send(JSON.stringify(fileMap[fileID]));
-      } else {
-        console.error("WebSocket is not open. ReadyState:", socket?.readyState);
-        setReconnect((prevState) => !prevState);
+      if (fileMap[fileID].status === "READY") {
+        if (socket?.readyState === WebSocket.OPEN) {
+          setInitialStatus(fileID);
+          socket.send(JSON.stringify(fileMap[fileID]));
+        } else {
+          console.error(
+            "WebSocket is not open. ReadyState:",
+            socket?.readyState
+          );
+          setReconnect((prevState) => !prevState);
+        }
       }
     }
   };

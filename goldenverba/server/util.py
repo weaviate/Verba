@@ -57,7 +57,7 @@ def get_config(manager: VerbaManager) -> dict:
         "selected": list(chunkers.values())[0].name,
     }
 
-    embedders = manager.embedder_manager.get_embedders()
+    embedders = manager.embedder_manager.embedders
     embedder_config = {
         "components": {
             embedder: embedders[embedder].get_meta(
@@ -65,7 +65,7 @@ def get_config(manager: VerbaManager) -> dict:
             )
             for embedder in embedders
         },
-        "selected": manager.embedder_manager.selected_embedder,
+        "selected": list(embedders.values())[0].name,
     }
 
     retrievers = manager.retriever_manager.get_retrievers()
@@ -122,9 +122,6 @@ def set_config(manager: VerbaManager, combined_config: dict):
         manager.enable_caching = enable_caching
 
     # Set Selected
-    manager.embedder_manager.set_embedder(
-        config.get("Embedder", {}).get("selected", "")
-    )
     manager.retriever_manager.set_retriever(
         config.get("Retriever", {}).get("selected", "")
     )
@@ -153,7 +150,7 @@ def set_config(manager: VerbaManager, combined_config: dict):
                 .get("config", {})
             )
 
-    embedders = manager.embedder_manager.get_embedders()
+    embedders = manager.embedder_manager.embedders
     for _embedder in config.get("Embedder", {}).get("components", {}):
         if _embedder in embedders:
             embedders[_embedder].set_config(

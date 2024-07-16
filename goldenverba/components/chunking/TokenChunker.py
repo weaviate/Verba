@@ -26,7 +26,10 @@ class TokenChunker(Chunker):
         self.description = "Splits documents based on word tokens"
         self.encoding = tiktoken.encoding_for_model("gpt-3.5-turbo")
 
-    async def chunk(self, fileConfig: FileConfig, document: Document):
+    async def chunk(self, config: dict, document: Document) -> Document:
+
+        units = int(config["units"].value)
+        overlap = int(config["overlap"].value)
 
         # Skip if document already contains chunks
         if len(document.chunks) > 0:
@@ -36,8 +39,8 @@ class TokenChunker(Chunker):
 
         # If Split Size is higher than actual Token Count or if Split Size is Zero
         if (
-            self.config["units"].value > len(encoded_tokens)
-            or self.config["units"].value == 0
+            units > len(encoded_tokens)
+            or units == 0
         ):
             doc_chunk = Chunk(
                 content=document.text,
@@ -48,16 +51,16 @@ class TokenChunker(Chunker):
                 meta={}
             )
 
-        if self.config["overlap"].value >= self.config["units"].value:
-            msg.warn(f"Overlap value is greater than unit (Units {self.config['units'].value}/ Overlap {self.config['overlap'].value})")
-            self.config["overlap"].value = self.config["units"].value - 1
+        if overlap >= units:
+            msg.warn(f"Overlap value is greater than unit (Units {config['units'].value}/ Overlap {config['overlap'].value})")
+            overlap = units - 1
 
         i = 0
         split_id_counter = 0
         while i < len(encoded_tokens):
             # Overlap
             start_i = i
-            end_i = min(i + self.config["units"].value, len(encoded_tokens))
+            end_i = min(i + units, len(encoded_tokens))
 
             chunk_tokens = encoded_tokens[start_i:end_i]
             chunk_text = self.encoding.decode(chunk_tokens)
@@ -79,5 +82,7 @@ class TokenChunker(Chunker):
                 break
 
             i += (
-                self.config["units"].value - self.config["overlap"].value
+                units - overlap
             )  # Step forward, considering overlap
+
+        return document
