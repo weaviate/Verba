@@ -6,7 +6,7 @@ import FileSelectionView from "./FileSelectionView";
 import ConfigurationView from "./ConfigurationView";
 import { SettingsConfiguration } from "../Settings/types";
 
-import { FileMap } from "./types";
+import { FileMap, StatusReport } from "./types";
 import { RAGConfig } from "../RAG/types";
 
 import { getImportWebSocketApiHost } from "../RAG/util";
@@ -48,12 +48,10 @@ const IngestionView: React.FC<IngestionViewProps> = ({
     };
 
     localSocket.onmessage = (event) => {
-      let data;
       setSocketStatus("ONLINE");
-
       try {
-        data = JSON.parse(event.data);
-        console.log(data);
+        const data: StatusReport = JSON.parse(event.data);
+        updateStatus(data);
       } catch (e) {
         console.error("Received data is not valid JSON:", event.data);
         return;
@@ -89,6 +87,22 @@ const IngestionView: React.FC<IngestionViewProps> = ({
     setReconnect((prevState) => !prevState);
   };
 
+  const updateStatus = (data: StatusReport) => {
+    setFileMap((prevFileMap) => {
+      if (data && data.fileID in prevFileMap) {
+        const newFileData: FileData = JSON.parse(
+          JSON.stringify(prevFileMap[data.fileID])
+        );
+        const newFileMap: FileMap = { ...prevFileMap };
+        newFileData.status = data.status;
+        newFileData.status_report[data.status] = data;
+        newFileMap[data.fileID] = newFileData;
+        return newFileMap;
+      }
+      return prevFileMap;
+    });
+  };
+
   const importSelected = () => {
     if (selectedFileData) {
       if (socket?.readyState === WebSocket.OPEN) {
@@ -100,9 +114,22 @@ const IngestionView: React.FC<IngestionViewProps> = ({
     }
   };
 
+  const importAll = () => {
+    for (const fileID in fileMap) {
+      if (socket?.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify(fileMap[fileID]));
+      } else {
+        console.error("WebSocket is not open. ReadyState:", socket?.readyState);
+        setReconnect((prevState) => !prevState);
+      }
+    }
+  };
+
   return (
     <div className="flex justify-center gap-3 h-[80vh] ">
-      <div className="flex w-1/2">
+      <div
+        className={`${selectedFileData ? "hidden lg:flex lg:w-[45vw]" : "w-full lg:w-[45vw] lg:flex"}`}
+      >
         <FileSelectionView
           settingConfig={settingConfig}
           fileMap={fileMap}
@@ -112,12 +139,15 @@ const IngestionView: React.FC<IngestionViewProps> = ({
           selectedFileData={selectedFileData}
           setSelectedFileData={setSelectedFileData}
           importSelected={importSelected}
+          importAll={importAll}
           socketStatus={socketStatus}
           reconnect={reconnectToVerba}
         />
       </div>
 
-      <div className="flex w-1/2">
+      <div
+        className={`${selectedFileData ? "lg:w-[55vw] w-full flex" : "hidden lg:flex lg:w-[55vw]"}`}
+      >
         {selectedFileData && socketStatus === "ONLINE" && (
           <ConfigurationView
             settingConfig={settingConfig}

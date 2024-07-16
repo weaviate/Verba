@@ -9,7 +9,6 @@ export type FileData = {
   source: string;
   content: string;
   labels: string[];
-  rag_config: RAGConfig;
   file_size: number;
   status_report: StatusReportMap;
   status:
@@ -24,6 +23,7 @@ export type FileData = {
     | "SUMMARIZING"
     | "DONE"
     | "ERROR";
+  rag_config: RAGConfig;
 };
 
 export type StatusReportMap = {
@@ -31,6 +31,19 @@ export type StatusReportMap = {
 };
 
 export type StatusReport = {
+  fileID: string;
+  status:
+    | "READY"
+    | "STARTING"
+    | "LOADING"
+    | "CHUNKING"
+    | "EMBEDDING"
+    | "INGESTING"
+    | "NER"
+    | "EXTRACTION"
+    | "SUMMARIZING"
+    | "DONE"
+    | "ERROR";
   message: string;
   took: number;
 };

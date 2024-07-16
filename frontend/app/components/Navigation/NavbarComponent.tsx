@@ -181,7 +181,7 @@ const Navbar: React.FC<NavbarProps> = ({
         {/* Menu */}
         <div className="flex flex-row items-center sm:gap-1 lg:gap-5 justify-between">
           <div className="lg:hidden sm:flex md:ml-4 sm:mr-8">
-            <ul className="menu md:menu-md sm:menu-sm sm:menu-horizontal bg-base-200 rounded-box bg-bg-alt-verba z-50">
+            <ul className="menu md:menu-md sm:menu-sm sm:menu-horizontal bg-base-200 rounded-box hover:bg-button-hover-verba bg-button-verba z-50">
               <li>
                 <details>
                   <summary>

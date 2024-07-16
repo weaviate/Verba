@@ -1,5 +1,5 @@
 from fastapi import WebSocket
-from goldenverba.server.types import FileStatus
+from goldenverba.server.types import FileStatus, StatusReport
 from wasabi import msg
 
 class LoggerManager:
@@ -8,10 +8,11 @@ class LoggerManager:
 
     async def send_report(self, file_Id: str, status: FileStatus, message: str, took: float):
         msg.info(f"{status} | {file_Id} | {message} | {took}")
-        payload = {
-                    "file_ID": file_Id,
+        payload : StatusReport = {
+                    "fileID": file_Id,
                     "status": status,
-                    "report": { status: { "message" : message, "took": took } }
+                    "message": message,
+                    "took": took,
                     }
 
         await self.socket.send_json(payload)

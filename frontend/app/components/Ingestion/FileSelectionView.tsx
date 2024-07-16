@@ -26,6 +26,7 @@ interface FileSelectionViewProps {
   selectedFileData: string | null;
   setSelectedFileData: (f: string | null) => void;
   importSelected: () => void;
+  importAll: () => void;
   reconnect: () => void;
   socketStatus: "ONLINE" | "OFFLINE";
 }
@@ -41,6 +42,7 @@ const FileSelectionView: React.FC<FileSelectionViewProps> = ({
   importSelected,
   socketStatus,
   reconnect,
+  importAll,
 }) => {
   const ref = React.useRef<HTMLInputElement>(null);
 
@@ -59,19 +61,19 @@ const FileSelectionView: React.FC<FileSelectionViewProps> = ({
   };
 
   const handleDeleteFile = (filename: string | null) => {
-    if (filename === null) {
-      setSelectedFileData(null);
-      setFileMap({});
-    } else {
-      const newFileMap = { ...fileMap };
-      delete newFileMap[filename];
-
-      if (filename === selectedFileData) {
+    setFileMap((prevFileMap: FileMap): FileMap => {
+      if (filename === null) {
         setSelectedFileData(null);
+        return {};
+      } else {
+        if (filename === selectedFileData) {
+          setSelectedFileData(null);
+        }
+        const newFileMap: FileMap = { ...prevFileMap };
+        delete newFileMap[filename];
+        return newFileMap;
       }
-
-      setFileMap(newFileMap);
-    }
+    });
   };
 
   const handleUploadFiles = async (
@@ -165,8 +167,16 @@ const FileSelectionView: React.FC<FileSelectionViewProps> = ({
   }
 
   const calculateBytesFromHexString = (hexString: string): number => {
-    // Each byte is represented by two hex characters and a space
-    const bytes = hexString.split(" ").length;
+    // Remove any spaces from the hex string
+    const cleanedHexString = hexString.replace(/\s+/g, "");
+
+    // Ensure the string length is even (two characters per byte)
+    if (cleanedHexString.length % 2 !== 0) {
+      throw new Error("Invalid hex string length.");
+    }
+
+    // Each byte is represented by two hex characters
+    const bytes = cleanedHexString.length / 2;
     return bytes;
   };
 
@@ -270,7 +280,10 @@ const FileSelectionView: React.FC<FileSelectionViewProps> = ({
                 <p>Import Selected</p>
               </button>
             )}
-            <button className="flex btn border-none text-text-verba bg-button-verba hover:bg-button-hover-verba gap-2">
+            <button
+              onClick={importAll}
+              className="flex btn border-none text-text-verba bg-button-verba hover:bg-button-hover-verba gap-2"
+            >
               <FaFileImport size={15} />
               <p>Import All</p>
             </button>

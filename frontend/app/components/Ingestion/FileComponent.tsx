@@ -111,41 +111,48 @@ const FileComponent: React.FC<FileComponentProps> = ({
 
   return (
     <div className="flex justify-between items-center gap-2 rounded-2xl p-1 w-full">
-      <div
-        className="dropdown dropdown-bottom flex justify-start items-center min-w-[11vw] tooltip tooltip-right"
-        data-tip={
-          fileMap[fileData.fileID].rag_config["Reader"].components[
-            fileMap[fileData.fileID].rag_config["Reader"].selected
-          ].description
-        }
-      >
-        <button
-          tabIndex={0}
-          role="button"
-          className="btn bg-button-verba hover:bg-button-hover-verba text-text-verba w-full flex justify-start border-none"
+      {fileMap[fileData.fileID].status != "READY" ? (
+        <div className="min-w-[11vw] flex gap-2 text-text-verba bg-bg-alt-verba p-3">
+          <span className="loading loading-spinner loading-sm"></span>
+          <p>{fileMap[fileData.fileID].status}</p>
+        </div>
+      ) : (
+        <div
+          className="dropdown dropdown-bottom flex justify-start items-center min-w-[11vw] tooltip tooltip-right"
+          data-tip={
+            fileMap[fileData.fileID].rag_config["Reader"].components[
+              fileMap[fileData.fileID].rag_config["Reader"].selected
+            ].description
+          }
         >
-          <GoTriangleDown size={15} />
-          <p>{fileMap[fileData.fileID].rag_config["Reader"].selected}</p>
-        </button>
-        <ul
-          tabIndex={0}
-          className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
-        >
-          {fileMap[fileData.fileID].isURL
-            ? renderUploadComponents(
-                fileMap[fileData.fileID].rag_config,
-                changeReader,
-                closeOnClick,
-                "URL"
-              )
-            : renderUploadComponents(
-                fileMap[fileData.fileID].rag_config,
-                changeReader,
-                closeOnClick,
-                "FILE"
-              )}
-        </ul>
-      </div>
+          <button
+            tabIndex={0}
+            role="button"
+            className="btn bg-button-verba hover:bg-button-hover-verba text-text-verba w-full flex justify-start border-none"
+          >
+            <GoTriangleDown size={15} />
+            <p>{fileMap[fileData.fileID].rag_config["Reader"].selected}</p>
+          </button>
+          <ul
+            tabIndex={0}
+            className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
+          >
+            {fileMap[fileData.fileID].isURL
+              ? renderUploadComponents(
+                  fileMap[fileData.fileID].rag_config,
+                  changeReader,
+                  closeOnClick,
+                  "URL"
+                )
+              : renderUploadComponents(
+                  fileMap[fileData.fileID].rag_config,
+                  changeReader,
+                  closeOnClick,
+                  "FILE"
+                )}
+          </ul>
+        </div>
+      )}
 
       {/* If is not URL Component */}
       {!fileMap[fileData.fileID].isURL && (

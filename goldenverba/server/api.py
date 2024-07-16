@@ -206,18 +206,14 @@ async def websocket_import_files(websocket: WebSocket):
     await websocket.accept()
     logger = LoggerManager(websocket)
 
-    while True:  # Start a loop to keep the connection alive.
+    while True:
         try:
             data = await websocket.receive_text()
-            # Parse and validate the JSON string using Pydantic model
             fileConfig = FileConfig.model_validate_json(data)
-
-            await manager.import_document(fileConfig, logger)
-
+            asyncio.create_task(manager.import_document(fileConfig, logger))
         except WebSocketDisconnect:
             msg.warn("Import WebSocket connection closed by client.")
             break
-
         except Exception as e:
             msg.fail(f"Import WebSocket Error: {str(e)}")
             break

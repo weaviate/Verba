@@ -41,19 +41,11 @@ class BasicReader(Reader):
     
         msg.info(f"Loading in {fileConfig.filename}")
         decoded_bytes = base64.b64decode(fileConfig.content)
+        fileContent = ""
 
         if fileConfig.extension in ["txt", "md", "mdx"]:
             try:
-                original_text = decoded_bytes.decode("utf-8")
-                document = Document(
-                    title=fileConfig.filename,
-                    content=original_text,
-                    extension=fileConfig.extension,
-                    labels=fileConfig.labels,
-                    source=fileConfig.source,
-                    meta={}
-                )
-
+                fileContent = decoded_bytes.decode("utf-8")
             except Exception as e:
                 msg.warn(f"Failed to load {fileConfig.filename} : {str(e)}")
 
@@ -63,6 +55,7 @@ class BasicReader(Reader):
                 original_text = decoded_bytes.decode("utf-8")
                 json_obj = json.loads(original_text)
                 document = Document.from_json(json_obj)
+                return document
 
             except Exception as e:
                 msg.warn(f"Failed to load {fileConfig.filename} : {str(e)}")
@@ -77,14 +70,7 @@ class BasicReader(Reader):
                 for page in reader.pages:
                     full_text += page.extract_text() + "\n\n"
 
-                document = Document(
-                    title=fileConfig.filename,
-                    content=full_text,
-                    extension=fileConfig.extension,
-                    labels=fileConfig.labels,
-                    source=fileConfig.source,
-                    meta={}
-                )
+                fileContent = full_text
 
             except Exception as e:
                 msg.warn(f"Failed to load {fileConfig.filename} : {str(e)}")
@@ -98,22 +84,25 @@ class BasicReader(Reader):
 
                 for paragraph in reader.paragraphs:
                     full_text += paragraph.text + "\n"
-                
-                document = Document(
-                    title=fileConfig.filename,
-                    content=full_text,
-                    extension=fileConfig.extension,
-                    labels=fileConfig.labels,
-                    source=fileConfig.sourc,
-                    meta={}
-                )
+
+                fileContent = full_text
 
             except Exception as e:
                 msg.warn(f"Failed to load {fileConfig.filename} : {str(e)}")
         
         else:
-            msg.warn(
-                f"{fileConfig.filename} with extension {fileConfig.extension} not supported by BasicReader."
-            )
+            raise Exception(f"{fileConfig.filename} with extension {fileConfig.extension} not supported by BasicReader.")
+
+
+        document = Document(
+            title=fileConfig.filename,
+            content=fileContent,
+            extension=fileConfig.extension,
+            labels=fileConfig.labels,
+            source=fileConfig.source,
+            fileSize=fileConfig.file_size,
+            meta={}
+        )
+
 
         return document

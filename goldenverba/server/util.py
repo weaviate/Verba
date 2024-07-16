@@ -46,7 +46,7 @@ def get_config(manager: VerbaManager) -> dict:
         "selected": list(readers.values())[0].name,
     }
 
-    chunkers = manager.chunker_manager.get_chunkers()
+    chunkers = manager.chunker_manager.chunkers
     chunkers_config = {
         "components": {
             chunker: chunkers[chunker].get_meta(
@@ -54,7 +54,7 @@ def get_config(manager: VerbaManager) -> dict:
             )
             for chunker in chunkers
         },
-        "selected": manager.chunker_manager.selected_chunker,
+        "selected": list(chunkers.values())[0].name,
     }
 
     embedders = manager.embedder_manager.get_embedders()
@@ -122,7 +122,6 @@ def set_config(manager: VerbaManager, combined_config: dict):
         manager.enable_caching = enable_caching
 
     # Set Selected
-    manager.chunker_manager.set_chunker(config.get("Chunker", {}).get("selected", ""))
     manager.embedder_manager.set_embedder(
         config.get("Embedder", {}).get("selected", "")
     )
@@ -144,7 +143,7 @@ def set_config(manager: VerbaManager, combined_config: dict):
                 .get("config", {})
             )
 
-    chunkers = manager.chunker_manager.get_chunkers()
+    chunkers = manager.chunker_manager.chunkers
     for _chunker in config.get("Chunker", {}).get("components", {}):
         if _chunker in chunkers:
             chunkers[_chunker].set_config(

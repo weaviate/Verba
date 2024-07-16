@@ -60,24 +60,31 @@ class VerbaManager:
 
     async def import_document(self, fileConfig: FileConfig, logger: LoggerManager):
 
+        loop = asyncio.get_running_loop()
+        start_time = loop.time() 
+
         await asyncio.sleep(1)
+
+        # TODO Check for duplicate filename
+        # Check if document names exist in DB
+        # for document in loaded_documents:
+        #    if not self.check_if_document_exits(document):
+        #        filtered_documents.append(document)
+        #    else:
+        #        logger.send_message(f"{document.name} already exists.",2)
 
         await logger.send_report(fileConfig.fileID, status=FileStatus.STARTING, message="Starting Import", took=0)
 
         await asyncio.sleep(2)
 
         document = await self.reader_manager.load(fileConfig.rag_config["Reader"].selected, fileConfig, logger)
+        chunked_document = await self.chunker_manager.chunk(fileConfig.rag_config["Chunker"].selected, fileConfig, document, logger)
+
+        await logger.send_report(fileConfig.fileID, status=FileStatus.DONE, message=f"Successfully ingested {fileConfig.filename}", took=round(loop.time() - start_time, 2))
 
         return 
 
         filtered_documents = []
-
-        # Check if document names exist in DB
-        for document in loaded_documents:
-            if not self.check_if_document_exits(document):
-                filtered_documents.append(document)
-            else:
-                logger.send_message(f"{document.name} already exists.",2)
 
         modified_documents = self.chunker_manager.chunk(
             filtered_documents, logger
@@ -86,36 +93,6 @@ class VerbaManager:
         self.embedder_manager.embed(
             modified_documents, client=self.client, logger=logger
         )
-
-    def reader_set_reader(self, reader: str) -> bool:
-        self.reader_manager.set_reader(reader)
-
-    def reader_get_readers(self) -> dict[str, Reader]:
-        return self.reader_manager.get_readers()
-
-    def chunker_set_chunker(self, chunker: str) -> bool:
-        return self.chunker_manager.set_chunker(chunker)
-
-    def chunker_get_chunker(self) -> dict[str, Chunker]:
-        return self.chunker_manager.get_chunkers()
-
-    def embedder_set_embedder(self, embedder: str) -> bool:
-        return self.embedder_manager.set_embedder(embedder)
-
-    def embedder_get_embedder(self) -> dict[str, Embedder]:
-        return self.embedder_manager.get_embedders()
-
-    def retriever_set_retriever(self, retriever: str) -> bool:
-        return self.retriever_manager.set_retriever(retriever)
-
-    def retriever_get_retriever(self) -> dict[str, Retriever]:
-        return self.retriever_manager.get_retrievers()
-
-    def generator_set_generator(self, generator: str) -> bool:
-        return self.generator_manager.set_generator(generator)
-
-    def generator_get_generator(self) -> dict[str, Generator]:
-        return self.generator_manager.get_generators()
 
     def setup_client(self):
         """

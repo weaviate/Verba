@@ -120,7 +120,7 @@ class Chunker(VerbaComponent):
             ),
         }
 
-    def chunk(self, documents: list[Document], logging: list[dict]) -> list[Document]:
+    async def chunk(self, fileConfig: FileConfig, document: Document):
         """Chunk verba documents into chunks based on units and overlap.
 
         @parameter: documents : list[Document] - List of Verba documents

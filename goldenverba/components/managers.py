@@ -47,6 +47,7 @@ except Exception:
     msg.warn("tiktoken not installed, your base installation might be corrupted.")
 
 readers = [BasicReader(), GitHubReader(), GitLabReader(), UnstructuredReader()]
+chunkers = [TokenChunker()]
 
 class ReaderManager:
     def __init__(self):
@@ -55,89 +56,40 @@ class ReaderManager:
     async def load(
         self, reader: str, fileConfig: FileConfig,  logger: LoggerManager
     ) -> list[Document]:
-
         try:
             loop = asyncio.get_running_loop()
             start_time = loop.time() 
-
             if reader in self.readers:
-
                 document = await self.readers[reader].load(fileConfig)
                 elapsed_time = round(loop.time() - start_time, 2)
-
                 await logger.send_report(fileConfig.fileID, FileStatus.LOADING, f"Succesfully loaded {fileConfig.filename}", took=elapsed_time)
-
                 return document
             else:
-                msg.fail(f"{reader} Reader not found")
+                raise Exception(f"{reader} Reader not found")
 
-            return None
         except Exception as e:
-            msg.fail(f"Failed to load documents: {str(e)}")
+            await logger.send_report(fileConfig.fileID, FileStatus.ERROR, f"Failed to load documents: {str(e)}", took=0)
             return None
 
 class ChunkerManager:
     def __init__(self):
-        self.chunker: dict[str, Chunker] = {
-            "TokenChunker": TokenChunker(),
-        }
-        self.selected_chunker: str = "TokenChunker"
+        self.chunkers: dict[str, Chunker] = { chunker.name : chunker for chunker in chunkers }
 
-    def chunk(self, documents: list[Document], logging: list[dict]) -> list[Document]:
-        logging.append(
-            {
-                "type": "INFO",
-                "message": f"Starting Chunking with {self.selected_chunker}",
-            }
-        )
-        start_time = time.time()  # Start timing
-        chunked_docs, logging = self.chunker[self.selected_chunker].chunk(
-            documents, logging
-        )
-        if self.check_chunks(chunked_docs):
-            elapsed_time = round(time.time() - start_time, 2)  # Calculate elapsed time
-            msg.good(
-                f"Chunking completed with {sum([len(document.chunks) for document in chunked_docs])} chunks in {elapsed_time}s"
-            )
-            logging.append(
-                {
-                    "type": "SUCCESS",
-                    "message": f"Chunking completed with {sum([len(document.chunks) for document in chunked_docs])} chunks in {elapsed_time}s",
-                }
-            )
-            return chunked_docs, logging
-        return []
-
-    def set_chunker(self, chunker: str) -> bool:
-        if chunker in self.chunker:
-            msg.info(f"Setting CHUNKER to {chunker}")
-            self.selected_chunker = chunker
-            return True
-        else:
-            msg.warn(f"Chunker {chunker} not found")
-            return False
-
-    def get_chunkers(self) -> dict[str, Chunker]:
-        return self.chunker
-
-    def check_chunks(self, documents: list[Document]) -> bool:
-        """Checks token count of chunks which are hardcapped to 1000 tokens per chunk
-        @parameter: documents : list[Document] - List of Verba documents
-        @returns bool - Whether the chunks are within the token range.
-        """
-        encoding = tiktoken.encoding_for_model("gpt-3.5-turbo")
-
-        for document in documents:
-            chunks = document.chunks
-            for chunk in chunks:
-                tokens = encoding.encode(chunk.text, disallowed_special=())
-                chunk.set_tokens(tokens)
-                if len(tokens) > 1000:
-                    raise Exception(
-                        "Chunk detected with more than 1000 tokens which exceeds the maximum size. Please reduce size of your chunk."
-                    )
-
-        return True
+    async def chunk(self, chunker: str, fileConfig: FileConfig, document: Document, logger: LoggerManager) -> Document:
+        try:
+            loop = asyncio.get_running_loop()
+            start_time = loop.time() 
+            if chunker in self.chunkers:
+                chunked_document = await self.chunkers[chunker].chunk(fileConfig, document)
+                elapsed_time = round(loop.time() - start_time, 2)
+                await logger.send_report(fileConfig.fileID, FileStatus.CHUNKING, f"Succesfully chunked {fileConfig.filename} into", took=elapsed_time)
+                return chunked_document
+            else:
+                raise Exception(f"{chunker} Chunker not found")
+        
+        except Exception as e:
+            await logger.send_report(fileConfig.fileID, FileStatus.ERROR, f"Failed to load documents: {str(e)}", took=0)
+            return None
 
 
 class EmbeddingManager:

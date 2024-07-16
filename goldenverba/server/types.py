@@ -98,6 +98,12 @@ class RAGComponentClass(BaseModel):
     selected: str
     components: dict[str, RAGComponentConfig]
 
+class StatusReport(BaseModel):
+    fileID: str
+    status: str
+    message: str
+    took: float
+
 class FileConfig(BaseModel):
     fileID: str
     filename: str

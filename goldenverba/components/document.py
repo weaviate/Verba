@@ -7,6 +7,7 @@ class Document:
         title: str = "",
         content: str = "",
         extension: str = "",
+        fileSize: int = 0,
         labels: list[str] = [],
         source: str = "",
         meta: dict = {},
@@ -14,6 +15,7 @@ class Document:
         self.title = title
         self.content = content
         self.extension = extension
+        self.fileSize = fileSize
         self.labels = labels
         self.source = source
         self.meta = meta

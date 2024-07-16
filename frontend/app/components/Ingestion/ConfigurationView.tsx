@@ -49,7 +49,7 @@ const ConfigurationView: React.FC<ConfigurationViewProps> = ({
           <InfoComponent
             settingConfig={settingConfig}
             tooltip_text="Configure all import settings related to chunking, embedding, adding meta data and more. You can save made changes individually or apply them to all other files"
-            display_text="Import Configuration"
+            display_text="Import Config"
           />
         </div>
         <div className="flex gap-3 justify-end">

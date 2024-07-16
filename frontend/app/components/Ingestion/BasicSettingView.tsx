@@ -28,8 +28,10 @@ const BasicSettingView: React.FC<BasicSettingViewProps> = ({
   setFileMap,
 }) => {
   const [filename, setFilename] = useState("");
+  const [source, setSource] = useState("");
   const [label, setLabel] = useState("");
   const [editFilename, setEditFilename] = useState(false);
+  const [editSource, setEditSource] = useState(false);
 
   useEffect(() => {
     if (selectedFileData) {
@@ -42,6 +44,7 @@ const BasicSettingView: React.FC<BasicSettingViewProps> = ({
       } else {
         setFilename(fileMap[selectedFileData].filename);
       }
+      setSource(fileMap[selectedFileData].source);
     }
   }, [fileMap, selectedFileData]);
 
@@ -63,6 +66,19 @@ const BasicSettingView: React.FC<BasicSettingViewProps> = ({
     setEditFilename((prevState) => !prevState);
   };
 
+  const switchSourceEditMode = () => {
+    if (editSource && selectedFileData) {
+      const newFileData: FileData = JSON.parse(
+        JSON.stringify(fileMap[selectedFileData])
+      );
+      newFileData.source = source;
+      const newFileMap: FileMap = { ...fileMap };
+      newFileMap[selectedFileData] = newFileData;
+      setFileMap(newFileMap);
+    }
+    setEditSource((prevState) => !prevState);
+  };
+
   const openDebugModal = () => {
     const modal = document.getElementById("File_Debug_Modal");
     if (modal instanceof HTMLDialogElement) {
@@ -71,22 +87,12 @@ const BasicSettingView: React.FC<BasicSettingViewProps> = ({
   };
 
   const formatByteSize = (bytes: number): string => {
-    if (bytes < 1024) {
-      // File size in Bytes
-      return `${bytes} B`;
-    } else if (bytes < 1024 * 1024) {
-      // File size in Kilobytes
-      const sizeInKB = (bytes / 1024).toFixed(2);
-      return `${sizeInKB} KB`;
-    } else if (bytes < 1024 * 1024 * 1024) {
-      // File size in Megabytes
-      const sizeInMB = (bytes / (1024 * 1024)).toFixed(2);
-      return `${sizeInMB} MB`;
-    } else {
-      // File size in Gigabytes
-      const sizeInGB = (bytes / (1024 * 1024 * 1024)).toFixed(2);
-      return `${sizeInGB} GB`;
-    }
+    const sizes = ["B", "KB", "MB", "GB", "TB"];
+    if (bytes === 0) return "0 B";
+
+    const i = Math.floor(Math.log(bytes) / Math.log(1024));
+    const size = bytes / Math.pow(1024, i);
+    return `${size.toFixed(2)} ${sizes[i]}`;
   };
 
   const setOverwrite = (o: boolean) => {
@@ -181,6 +187,32 @@ const BasicSettingView: React.FC<BasicSettingViewProps> = ({
             className="btn btn-square bg-button-verba border-none hover:bg-secondary-verba text-text-verba"
           >
             {editFilename ? (
+              <IoIosCheckmark size={20} />
+            ) : (
+              <MdModeEdit size={15} />
+            )}
+          </button>
+        </div>
+
+        {/* Source */}
+        <div className="flex gap-2 justify-between items-center text-text-verba">
+          <p className="flex min-w-[8vw]">Source Link</p>
+          <label className="input flex items-center gap-2 w-full bg-bg-verba">
+            <input
+              type="text"
+              className="grow w-full"
+              value={source}
+              onChange={(e) => {
+                setSource(e.target.value);
+              }}
+              disabled={!editSource}
+            />
+          </label>
+          <button
+            onClick={switchSourceEditMode}
+            className="btn btn-square bg-button-verba border-none hover:bg-secondary-verba text-text-verba"
+          >
+            {editSource ? (
               <IoIosCheckmark size={20} />
             ) : (
               <MdModeEdit size={15} />
