@@ -15,14 +15,14 @@ from goldenverba.server.ImportLogger import LoggerManager
 from goldenverba.components.types import InputConfig
 
 
-class TokenChunker(Chunker):
+class TokenHeimer(Chunker):
     """
     TokenChunker for Verba built with tiktoken.
     """
 
     def __init__(self):
         super().__init__()
-        self.name = "Token"
+        self.name = "TokenHeimer"
         self.requires_library = ["tiktoken"]
         self.description = "Splits documents based on word tokens"
         self.encoding = tiktoken.encoding_for_model("gpt-3.5-turbo")

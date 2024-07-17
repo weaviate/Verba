@@ -14,10 +14,10 @@ class Chunk:
         self.end = end
         self.tokens = tokens
         self.meta = meta
-
         self.vector = None
         self.score = None
         self.doc_uuid = None
+        self.isResponse = False
 
 
 

@@ -1,6 +1,7 @@
 import os
 import ssl
 import time
+import importlib
 
 import weaviate
 from dotenv import load_dotenv, find_dotenv
@@ -29,6 +30,7 @@ from goldenverba.components.managers import (
     EmbeddingManager,
     RetrieverManager,
     GeneratorManager,
+    WeaviateManager
 )
 
 load_dotenv()
@@ -42,21 +44,18 @@ class VerbaManager:
         self.embedder_manager = EmbeddingManager()
         self.retriever_manager = RetrieverManager()
         self.generator_manager = GeneratorManager()
+        self.weaviate_manager = WeaviateManager()
+        self.config_uuid = "e0adcc12-9bad-4588-8a1e-bab0af6ed485"
         self.environment_variables = {}
         self.installed_libraries = {}
         self.weaviate_type = ""
-        self.client = self.setup_client()
         self.enable_caching = True
 
         self.verify_installed_libraries()
         self.verify_variables()
 
-        # Check if all schemas exist for all possible vectorizers
-        for vectorizer in schema_manager.VECTORIZERS:
-            schema_manager.init_schemas(self.client, vectorizer, False, True)
-
-        for embedding in schema_manager.EMBEDDINGS:
-            schema_manager.init_schemas(self.client, embedding, False, True)
+        self.weaviate_manager.connect()
+        self.weaviate_manager.verify_collections(self.environment_variables, self.installed_libraries)
 
     async def import_document(self, fileConfig: FileConfig, logger: LoggerManager):
         try:
@@ -88,316 +87,138 @@ class VerbaManager:
             await logger.send_report(fileConfig.fileID, status=FileStatus.ERROR, message=f"Error when importing {fileConfig.filename}: {str(e)}", took=0)
             return 
 
-            filtered_documents = []
+    def create_config(self) -> dict:
+        """Creates the RAG Configuration and returns the full Verba Config with also Settings"""
 
-            modified_documents = self.chunker_manager.chunk(
-                filtered_documents, logger
-            )
+        setting_config = {}
 
-            self.embedder_manager.embed(
-                modified_documents, client=self.client, logger=logger
-            )
+        available_environments = self.environment_variables
+        available_libraries = self.installed_libraries
 
-    def setup_client(self):
-        """
-        @returns Optional[Client] - The Weaviate Client.
-        """
-        msg.info("Setting up client")
-
-        additional_header = {}
-        client = None
-
-        openai_header_key_name = "X-OpenAI-Api-Key"
-
-        # Check OpenAI ENV KEY
-        try:
-            import openai
-
-            openai_key = os.environ.get("OPENAI_API_KEY", "")
-            if "OPENAI_API_TYPE" in os.environ:
-                openai.api_type = os.getenv("OPENAI_API_TYPE")
-            if "OPENAI_BASE_URL" in os.environ:
-                openai.api_base = os.getenv("OPENAI_BASE_URL")
-            if "OPENAI_API_VERSION" in os.environ:
-                openai.api_version = os.getenv("OPENAI_API_VERSION")
-
-            if os.getenv("OPENAI_API_TYPE") == "azure":
-                openai_header_key_name = "X-Azure-Api-Key"
-
-            if openai_key != "":
-                additional_header[openai_header_key_name] = openai_key
-                self.environment_variables["OPENAI_API_KEY"] = True
-                openai.api_key = openai_key
-            else:
-                self.environment_variables["OPENAI_API_KEY"] = False
-
-        except Exception:
-            self.environment_variables["OPENAI_API_KEY"] = False
-
-        cohere_key = os.environ.get("COHERE_API_KEY", "")
-        if cohere_key != "":
-            additional_header["X-Cohere-Api-Key"] = cohere_key
-
-        # Check Google Key
-        google_key = os.environ.get("GOOGLE_API_KEY", "")
-        self.environment_variables["GOOGLE_API_KEY"] = False
-        if google_key != "":
-            additional_header["X-Palm-Api-Key"] = google_key
-            self.environment_variables["GOOGLE_API_KEY"] = True
-
-        google_project = os.environ.get("GOOGLE_CLOUD_PROJECT", "")
-
-        # Check Verba URL ENV
-        weaviate_url = os.environ.get("WEAVIATE_URL_VERBA", "")
-        if weaviate_url != "":
-            weaviate_key = os.environ.get("WEAVIATE_API_KEY_VERBA", "")
-            if weaviate_key != "":
-                self.environment_variables["WEAVIATE_API_KEY_VERBA"] = True
-                auth_config = weaviate.AuthApiKey(api_key=weaviate_key)
-                msg.info("Auth information provided")
-                client = weaviate.Client(
-                    url=weaviate_url,
-                    additional_headers=additional_header,
-                    auth_client_secret=auth_config,
+        readers = self.reader_manager.readers
+        reader_config = {
+            "components": {
+                reader: readers[reader].get_meta(
+                    available_environments, available_libraries
                 )
-            else:
-                msg.info("No Auth information provided")
-                client = weaviate.Client(
-                    url=weaviate_url,
-                    additional_headers=additional_header,
+                for reader in readers
+            },
+            "selected": list(readers.values())[0].name,
+        }
+
+        chunkers = self.chunker_manager.chunkers
+        chunkers_config = {
+            "components": {
+                chunker: chunkers[chunker].get_meta(
+                    available_environments, available_libraries
                 )
-            self.environment_variables["WEAVIATE_URL_VERBA"] = True
-            self.weaviate_type = "Weaviate Cluster"
+                for chunker in chunkers
+            },
+            "selected": list(chunkers.values())[0].name,
+        }
 
-        # Use Weaviate Embedded
+        embedders = self.embedder_manager.embedders
+        embedder_config = {
+            "components": {
+                embedder: embedders[embedder].get_meta(
+                    available_environments, available_libraries
+                )
+                for embedder in embedders
+            },
+            "selected": list(embedders.values())[0].name,
+        }
+
+        retrievers = self.retriever_manager.get_retrievers()
+        retrievers_config = {
+            "components": {
+                retriever: retrievers[retriever].get_meta(
+                    available_environments, available_libraries
+                )
+                for retriever in retrievers
+            },
+            "selected": list(retrievers.values())[0].name,
+        }
+
+        generators = self.generator_manager.get_generators()
+        generator_config = {
+            "components": {
+                generator: generators[generator].get_meta(
+                    available_environments, available_libraries
+                )
+                for generator in generators
+            },
+            "selected": list(generators.values())[0].name,
+        }
+
+        return {
+            "RAG": {
+                "Reader": reader_config,
+                "Chunker": chunkers_config,
+                "Embedder": embedder_config,
+                "Retriever": retrievers_config,
+                "Generator": generator_config,
+            },
+            "SETTING": setting_config,
+        }
+
+    def set_config(self, config: dict):
+        msg.info("Saving Configuration")
+        self.weaviate_manager.set_config(self.config_uuid, config)
+
+    def load_config(self):
+        """Check if a Configuration File exists in the database, if yes, check if corrupted. Returns a valid configuration file"""
+        loaded_config = self.weaviate_manager.get_config(self.config_uuid)
+        if loaded_config is not None:
+            msg.info("Using Existing Configuration")
+            return loaded_config
         else:
-            try:
-                _create_unverified_https_context = ssl._create_unverified_context
-            except AttributeError:
-                pass
-            else:
-                ssl._create_default_https_context = _create_unverified_https_context
-
-            if google_project != "":
-                additional_env_vars = {
-                    "ENABLE_MODULES": "text2vec-openai,generative-openai,qna-openai,text2vec-cohere,text2vec-palm",
-                    "GOOGLE_CLOUD_PROJECT": google_project,
-                }
-            else:
-                additional_env_vars = {
-                    "ENABLE_MODULES": "text2vec-openai,generative-openai,qna-openai,text2vec-cohere",
-                }
-
-            msg.info("Using Weaviate Embedded")
-            self.weaviate_type = "Weaviate Embedded"
-            client = weaviate.Client(
-                additional_headers=additional_header,
-                embedded_options=EmbeddedOptions(
-                    additional_env_vars=additional_env_vars
-                ),
-            )
-
-        if client is not None:
-            msg.good("Connected to Weaviate")
-
-            # Batch Configuration
-            def batch_callback(logs: dict):
-                if logs is not None:
-                    for result in logs:
-                        if "result" in result and "errors" in result["result"]:
-                            if "error" in result["result"]["errors"]:
-                                msg.fail(result["result"])
-
-            client.batch.configure(callback=batch_callback)
-
-        else:
-            msg.fail("Connection to Weaviate failed")
-
-        return client
+            msg.info("Creating Configuration")
+            return self.create_config()
+        
+    def reset_config(self):
+        msg.info("Resetting Configuration")
+        self.weaviate_manager.reset_config(self.config_uuid)
 
     def verify_installed_libraries(self) -> None:
         """
         Checks which libraries are installed and fills out the self.installed_libraries dictionary for the frontend to access, this will be displayed in the status page.
         """
-        try:
-            import pypdf
+        reader = [lib for reader in self.reader_manager.readers for lib in self.reader_manager.readers[reader].requires_library]
+        chunker = [lib for chunker in self.chunker_manager.chunkers for lib in self.chunker_manager.chunkers[chunker].requires_library]
+        embedder = [lib for embedder in self.embedder_manager.embedders for lib in self.embedder_manager.embedders[embedder].requires_library]
+        retriever = [lib for retriever in self.retriever_manager.retrievers for lib in self.retriever_manager.retrievers[retriever].requires_library]
+        generator = [lib for generator in self.generator_manager.generators for lib in self.generator_manager.generators[generator].requires_library]
 
-            self.installed_libraries["pypdf"] = True
-        except Exception:
-            self.installed_libraries["pypdf"] = False
+        required_libraries = reader + chunker + embedder + retriever + generator
+        unique_libraries = set(required_libraries)
 
-        try:
-            import docx
-            
-            self.installed_libraries["docx"] = True
-        except Exception:
-            self.installed_libraries["docx"] = False
-            
-        try:
-            import sentence_transformers
-            
-            self.installed_libraries["sentence-transformers"] = True
-        except Exception:
-            self.installed_libraries["sentence-transformers"] = False
-
-
-        try:
-            import tiktoken
-
-            self.installed_libraries["tiktoken"] = True
-        except Exception:
-            self.installed_libraries["tiktoken"] = False
-
-        try:
-            import openai
-
-            self.installed_libraries["openai"] = True
-        except Exception:
-            self.installed_libraries["openai"] = False
-
-        try:
-            import vertexai
-
-            self.installed_libraries["vertexai"] = True
-        except Exception:
-            self.installed_libraries["vertexai"] = False
-
-        try:
-            import transformers
-
-            self.installed_libraries["transformers"] = True
-        except Exception:
-            self.installed_libraries["transformers"] = False
-
-        try:
-            import accelerate
-
-            self.installed_libraries["accelerate"] = True
-        except Exception:
-            self.installed_libraries["accelerate"] = False
-
-        try:
-            import torch
-
-            if torch.cuda.is_available():
-                msg.info("CUDA is available. Using CUDA...")
-            elif torch.backends.mps.is_available():
-                msg.info("MPS is available. Using MPS...")
-            else:
-                msg.info("Neither CUDA nor MPS is available. Using CPU...")
-
-            self.installed_libraries["torch"] = True
-        except Exception:
-            self.installed_libraries["torch"] = False
+        for lib in unique_libraries:
+            try:
+                importlib.import_module(lib)
+                self.installed_libraries[lib] = True
+            except Exception:
+                self.installed_libraries[lib] = False
 
     def verify_variables(self) -> None:
         """
         Checks which environment variables are installed and fills out the self.environment_variables dictionary for the frontend to access.
         """
+        reader = [lib for reader in self.reader_manager.readers for lib in self.reader_manager.readers[reader].requires_env]
+        chunker = [lib for chunker in self.chunker_manager.chunkers for lib in self.chunker_manager.chunkers[chunker].requires_env]
+        embedder = [lib for embedder in self.embedder_manager.embedders for lib in self.embedder_manager.embedders[embedder].requires_env]
+        retriever = [lib for retriever in self.retriever_manager.retrievers for lib in self.retriever_manager.retrievers[retriever].requires_env]
+        generator = [lib for generator in self.generator_manager.generators for lib in self.generator_manager.generators[generator].requires_env]
 
-        # Ollama URL
-        if os.environ.get("OLLAMA_URL", "") != "":
-            self.environment_variables["OLLAMA_URL"] = True
-        else:
-            self.environment_variables["OLLAMA_URL"] = False
+        required_envs = reader + chunker + embedder + retriever + generator
+        unique_envs = set(required_envs)
 
-        if os.environ.get("OLLAMA_MODEL", "") != "":
-            self.environment_variables["OLLAMA_MODEL"] = True
-        else:
-            self.environment_variables["OLLAMA_MODEL"] = False
-
-        if os.environ.get("OLLAMA_EMBED_MODEL", "") != "":
-            self.environment_variables["OLLAMA_EMBED_MODEL"] = True
-        else:
-            self.environment_variables["OLLAMA_EMBED_MODEL"] = False
-
-        # OpenAI API Key
-        if os.environ.get("OPENAI_API_KEY", "") != "":
-            self.environment_variables["OPENAI_API_KEY"] = True
-        else:
-            self.environment_variables["OPENAI_API_KEY"] = False
-
-        if os.environ.get("OPENAI_BASE_URL", "") != "":
-            self.environment_variables["OPENAI_BASE_URL"] = True
-        else:
-            self.environment_variables["OPENAI_BASE_URL"] = False
-
-        # Cohere API Key
-        if os.environ.get("COHERE_API_KEY", "") != "":
-            self.environment_variables["COHERE_API_KEY"] = True
-        else:
-            self.environment_variables["COHERE_API_KEY"] = False
-
-        # Github Token Key
-        if os.environ.get("GITHUB_TOKEN", "") != "":
-            self.environment_variables["GITHUB_TOKEN"] = True
-        else:
-            self.environment_variables["GITHUB_TOKEN"] = False
-
-        # GitLab Token Key
-        if os.environ.get("GITLAB_TOKEN", "") != "":
-            self.environment_variables["GITLAB_TOKEN"] = True
-        else:
-            self.environment_variables["GITLAB_TOKEN"] = False
-
-        # Unstructured Token Key
-        if os.environ.get("UNSTRUCTURED_API_KEY", "") != "":
-            self.environment_variables["UNSTRUCTURED_API_KEY"] = True
-        else:
-            self.environment_variables["UNSTRUCTURED_API_KEY"] = False
-
-        # OpenAI API Type, should be set to "azure" if using Azure OpenAI
-        if os.environ.get("OPENAI_API_TYPE", "") != "":
-            self.environment_variables["OPENAI_API_TYPE"] = True
-        else:
-            self.environment_variables["OPENAI_API_TYPE"] = False
-
-        # OpenAI API Version
-        if os.environ.get("OPENAI_API_VERSION", "") != "":
-            self.environment_variables["OPENAI_API_VERSION"] = True
-        else:
-            self.environment_variables["OPENAI_API_VERSION"] = False
-
-        # GOOGLE_CLOUD_PROJECT
-        if os.environ.get("GOOGLE_CLOUD_PROJECT", "") != "":
-            self.environment_variables["GOOGLE_CLOUD_PROJECT"] = True
-        else:
-            self.environment_variables["GOOGLE_CLOUD_PROJECT"] = False
-
-        # GOOGLE_APPLICATION_CREDENTIALS
-        if os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "") != "":
-            self.environment_variables["GOOGLE_APPLICATION_CREDENTIALS"] = True
-        else:
-            self.environment_variables["GOOGLE_APPLICATION_CREDENTIALS"] = False
-
-        # Azure openai ressource name, mandatory when using Azure, should be XXX when endpoint is https://XXX.openai.azure.com
-        if os.environ.get("AZURE_OPENAI_RESOURCE_NAME", "") != "":
-            self.environment_variables["AZURE_OPENAI_RESOURCE_NAME"] = True
-        else:
-            self.environment_variables["AZURE_OPENAI_RESOURCE_NAME"] = False
-
-        # Model used for embeddings. mandatory when using Azure. Typically "text-embedding-ada-002"
-        if os.environ.get("AZURE_OPENAI_EMBEDDING_MODEL", "") != "":
-            self.environment_variables["AZURE_OPENAI_EMBEDDING_MODEL"] = True
-        else:
-            self.environment_variables["AZURE_OPENAI_EMBEDDING_MODEL"] = False
-
-        # Model used for queries. mandatory when using Azure, but can also be used to change the model used for queries when using OpenAI.
-        if os.environ.get("OPENAI_MODEL", "") != "":
-            self.environment_variables["OPENAI_MODEL"] = True
-        else:
-            self.environment_variables["OPENAI_MODEL"] = False
-
-        if os.environ.get("OPENAI_API_TYPE", "") == "azure":
-            if not (
-                self.environment_variables["OPENAI_BASE_URL"]
-                and self.environment_variables["AZURE_OPENAI_RESOURCE_NAME"]
-                and self.environment_variables["AZURE_OPENAI_EMBEDDING_MODEL"]
-                and self.environment_variables["OPENAI_MODEL"]
-            ):
-                raise EnvironmentError(
-                    "Missing environment variables. When using Azure OpenAI, you need to set OPENAI_BASE_URL, AZURE_OPENAI_RESOURCE_NAME, AZURE_OPENAI_EMBEDDING_MODEL and OPENAI_MODEL. Please check documentation."
-                )
+        for env in unique_envs:
+            if os.environ.get(env) is not None:
+                self.environment_variables[env] = True
+            else:
+                self.environment_variables[env] = False
+   
+   ########
 
     def get_schemas(self) -> dict:
         """
@@ -735,9 +556,7 @@ class VerbaManager:
         self.client.schema.delete_class("VERBA_Suggestion")
         schema_manager.init_suggestion(self.client, "", False, True)
 
-    def reset_config(self):
-        self.client.schema.delete_class("VERBA_Config")
-        schema_manager.init_config(self.client, "", False, True)
+
 
     def check_if_document_exits(self, document: Document) -> bool:
         """Return a document by it's ID (UUID format) from Weaviate

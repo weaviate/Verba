@@ -22,6 +22,7 @@ interface NavbarProps {
   currentPage: string;
   APIHost: string | null;
   production: boolean;
+  handleViewChange: (v: string) => void;
   setCurrentPage: (
     page: "CHAT" | "DOCUMENTS" | "STATUS" | "ADD" | "SETTINGS" | "RAG"
   ) => void;
@@ -43,6 +44,7 @@ const Navbar: React.FC<NavbarProps> = ({
   currentPage,
   setCurrentPage,
   production,
+  handleViewChange,
 }) => {
   const [gitHubStars, setGitHubStars] = useState("0");
   const icon_size = 18;

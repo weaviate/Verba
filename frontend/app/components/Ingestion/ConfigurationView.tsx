@@ -23,7 +23,7 @@ import { FileMap, FileData } from "./types";
 import { RAGConfig } from "../RAG/types";
 
 import BasicSettingView from "./BasicSettingView";
-import ChunkingView from "./ChunkingView";
+import ComponentView from "./ComponentView";
 
 interface ConfigurationViewProps {
   settingConfig: SettingsConfiguration;
@@ -153,10 +153,19 @@ const ConfigurationView: React.FC<ConfigurationViewProps> = ({
           />
         )}
         {selectedSetting === "Chunking" && (
-          <ChunkingView
+          <ComponentView
             selectedFileData={selectedFileData}
             fileMap={fileMap}
             setFileMap={setFileMap}
+            component_name="Chunker"
+          />
+        )}
+        {selectedSetting === "Embedding" && (
+          <ComponentView
+            selectedFileData={selectedFileData}
+            fileMap={fileMap}
+            setFileMap={setFileMap}
+            component_name="Embedder"
           />
         )}
         {selectedSetting === "Report" && (

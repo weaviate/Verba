@@ -12,8 +12,9 @@ import { RAGConfig } from "../RAG/types";
 import { IoIosCheckmark } from "react-icons/io";
 import { FaCheckCircle } from "react-icons/fa";
 import { MdModeEdit } from "react-icons/md";
+import { MdError } from "react-icons/md";
 
-import { statusTextMap } from "./types";
+import { statusTextMap, statusColorMap } from "./types";
 
 import { closeOnClick } from "./util";
 
@@ -67,28 +68,39 @@ const ReportView: React.FC<ReportViewProps> = ({
 
         <div className="divider"></div>
 
-        <ul className="timeline timeline-vertical">
+        <div className="flex flex-col gap-3 text-text-verba">
           {selectedFileData &&
             Object.entries(fileMap[selectedFileData].status_report).map(
               ([status, statusReport]) => (
-                <li>
-                  <div className="timeline-start">
-                    {statusTextMap[statusReport.status]}{" "}
-                    {statusReport.took != 0
-                      ? "(" + statusReport.took + "s)"
-                      : ""}
-                  </div>
-                  <div className="timeline-middle">
-                    <FaCheckCircle size={15} />
-                  </div>
-                  <div className="timeline-end timeline-box">
-                    {statusReport.message}
-                  </div>
-                  <hr />
-                </li>
+                <div className="flex">
+                  <p className="flex min-w-[8vw] gap-2 items-center text-text-verba">
+                    {statusReport.status === "DONE" && (
+                      <FaCheckCircle size={15} />
+                    )}
+                    {statusReport.status === "ERROR" && <MdError size={15} />}
+                    {statusTextMap[statusReport.status]}
+                  </p>
+                  <label
+                    className={`input flex items-center gap-2 w-full ${statusColorMap[statusReport.status]} bg-bg-verba`}
+                  >
+                    <input
+                      type="text"
+                      className="grow w-full"
+                      value={
+                        statusReport.took != 0
+                          ? statusReport.message +
+                            " (" +
+                            statusReport.took +
+                            "s)"
+                          : statusReport.message
+                      }
+                      disabled={true}
+                    />
+                  </label>
+                </div>
               )
             )}
-        </ul>
+        </div>
 
         <div className="divider"></div>
 

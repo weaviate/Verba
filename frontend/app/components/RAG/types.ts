@@ -52,6 +52,7 @@ export type ConfigSetting = {
   type: string;
   value: string | number;
   description: string;
+  values: string[];
 };
 
 export type RAGSetting = {

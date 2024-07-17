@@ -1,6 +1,12 @@
 from wasabi import msg
-from weaviate import Client
+import weaviate
+import re
+from weaviate.client import WeaviateClient
+from weaviate.auth import AuthApiKey
+from weaviate.classes.config import Property, DataType
+import os
 import asyncio
+import json
 
 from goldenverba.components.document import Document
 from goldenverba.components.chunk import Chunk
@@ -21,14 +27,13 @@ from goldenverba.components.reader.LabReader import GitLabReader
 from goldenverba.components.reader.UnstructuredAPI import UnstructuredReader
 
 from goldenverba.components.chunking.TokenChunker import TokenChunker
+from goldenverba.components.chunking.TokenHeimer import TokenHeimer
 
-from goldenverba.components.embedding.ADAEmbedder import ADAEmbedder
+from goldenverba.components.embedding.OpenAIEmbedder import OpenAIEmbedder
 from goldenverba.components.embedding.CohereEmbedder import CohereEmbedder
-from goldenverba.components.embedding.MiniLMEmbedder import MiniLMEmbedder
 from goldenverba.components.embedding.GoogleEmbedder import GoogleEmbedder
 from goldenverba.components.embedding.OllamaEmbedder import OllamaEmbedder
-from goldenverba.components.embedding.AllMPNetEmbedder import AllMPNetEmbedder
-from goldenverba.components.embedding.MixedbreadEmbedder import MixedbreadEmbedder
+from goldenverba.components.embedding.SentenceTransformersEmbedder import SentenceTransformersEmbedder
 
 from goldenverba.components.retriever.WindowRetriever import WindowRetriever
 
@@ -48,8 +53,8 @@ except Exception:
 ### Add new components here ###
 
 readers = [BasicReader(), GitHubReader(), GitLabReader(), UnstructuredReader()]
-chunkers = [TokenChunker()]
-embedders = [ADAEmbedder(), MiniLMEmbedder(), AllMPNetEmbedder(), MixedbreadEmbedder(), CohereEmbedder(), OllamaEmbedder(), GoogleEmbedder()]
+chunkers = [TokenChunker(), TokenHeimer()]
+embedders = [OpenAIEmbedder(), SentenceTransformersEmbedder(), CohereEmbedder(), OllamaEmbedder(), GoogleEmbedder()]
 
 ### ----------------------- ###
 
@@ -64,7 +69,9 @@ class ReaderManager:
             loop = asyncio.get_running_loop()
             start_time = loop.time() 
             if reader in self.readers:
-                document = await self.readers[reader].load(fileConfig)
+                config = fileConfig.rag_config["Reader"].components[reader]
+                document : Document = await self.readers[reader].load(fileConfig)
+                document.meta["Reader"] = json.dumps(config)
                 elapsed_time = round(loop.time() - start_time, 2)
                 await logger.send_report(fileConfig.fileID, FileStatus.LOADING, f"Loaded {fileConfig.filename}", took=elapsed_time)
                 await logger.send_report(fileConfig.fileID, FileStatus.CHUNKING, "", took=0)
@@ -86,6 +93,7 @@ class ChunkerManager:
             if chunker in self.chunkers:
                 config = fileConfig.rag_config["Chunker"].components[chunker].config
                 chunked_document = await self.chunkers[chunker].chunk(config, document)
+                chunked_document.meta["Chunker"] = json.dumps(fileConfig.rag_config["Chunker"].components[chunker])
                 elapsed_time = round(loop.time() - start_time, 2)
                 await logger.send_report(fileConfig.fileID, FileStatus.CHUNKING, f"Split {fileConfig.filename} into {len(document.chunks)} chunks", took=elapsed_time)
                 await logger.send_report(fileConfig.fileID, FileStatus.EMBEDDING, "", took=0)
@@ -115,10 +123,14 @@ class EmbeddingManager:
             start_time = loop.time() 
             if embedder in self.embedders:
                 config = fileConfig.rag_config["Embedder"].components[embedder].config
-                vectorized_document = await self.embedders[embedder].vectorize(config, document)
+                content = [chunk.content for chunk in document.chunks]
+                embeddings = await self.embedders[embedder].vectorize(config, content)
+                for vector, chunk in zip(embeddings,document.chunks):
+                    chunk.vector = vector
+                document.meta["Embedder"] = json.dumps(fileConfig.rag_config["Embedder"].components[embedder])
                 elapsed_time = round(loop.time() - start_time, 2)
                 await logger.send_report(fileConfig.fileID, FileStatus.EMBEDDING, f"Vectorized all chunks", took=elapsed_time)
-                return vectorized_document
+                return document
             else:
                 raise Exception(f"{embedder} Embedder not found")
         except Exception as e:
@@ -134,7 +146,7 @@ class RetrieverManager:
     def retrieve(
         self,
         queries: list[str],
-        client: Client,
+        client,
         embedder: Embedder,
         generator: Generator,
     ) -> list[Chunk]:
@@ -163,7 +175,6 @@ class RetrieverManager:
 
     def get_retrievers(self) -> dict[str, Retriever]:
         return self.retrievers
-
 
 class GeneratorManager:
     def __init__(self):
@@ -253,3 +264,101 @@ class GeneratorManager:
 
     def get_generators(self) -> dict[str, Generator]:
         return self.generators
+
+class WeaviateManager:
+    def __init__(self):
+        self.client : WeaviateClient = None
+        self.document_collection_name = "VERBA_DOCUMENTS"
+        self.config_collection_name = "VERBA_CONFIG"
+        self.suggestion_collection_name = "VERBA_SUGGESTION"
+        self.embedding_table = {}
+
+    ### Connection Handling
+
+    def connect_to_cluster(self, w_url, w_key):
+        if w_url is not None and w_key is not None:
+            msg.info(f"Connecting to Weaviate Cluster {w_url} with Auth")
+            self.client = weaviate.connect_to_weaviate_cloud(
+                cluster_url=w_url,
+                auth_credentials=AuthApiKey(w_key),
+            )
+        elif w_url is not None and w_key is None:
+            msg.info(f"Connecting to Weaviate Cluster {w_url} without Auth")
+            self.client = weaviate.connect_to_weaviate_cloud(
+                cluster_url=w_url,
+            )
+
+    def connect_to_docker(self):
+        msg.info(f"Connecting to Weaviate Docker")
+        self.client = weaviate.connect_to_local()
+
+    def connect_to_embedded(self):
+        msg.info(f"Connecting to Weaviate Embedded")
+        self.client = weaviate.connect_to_embedded()
+
+    def connect(self):
+        try:
+            weaviate_url = os.environ.get("WEAVIATE_URL_VERBA", None)
+            weaviate_key = os.environ.get("WEAVIATE_API_KEY_VERBA", None)
+
+            if weaviate_url is not None and weaviate_key is not None:
+                self.connect_to_cluster(weaviate_url, weaviate_key)
+            else:
+                self.connect_to_embedded()
+        
+            if self.client is not None and self.client.is_ready():
+                msg.good("Succesfully Connected to Weaviate")
+
+        except Exception as e:
+            msg.fail(f"Couldn't connect to Weaviate, check your URL/API KEY: {str(e)}")
+
+    ### Collection Handling
+
+    def verify_collection(self, collection_name: str):
+        if not self.client.collections.exists(collection_name):
+            msg.info(f"Collection: {collection_name} does not exist, creating new collection.")
+            self.client.collections.create(
+                name=collection_name
+            )
+        else:
+            document_collection = self.client.collections.get(collection_name)
+            response = document_collection.aggregate.over_all(total_count=True)
+            if response.total_count > 0:
+                msg.info(f"Collection: {collection_name} exists with {response.total_count} objects stored")
+
+    def verify_embedding_collections(self, environment_variables, libraries):
+        for embedder in embedders:
+            if embedder.check_available(environment_variables,libraries):
+                if "Model" in embedder.config:
+                    for _embedder in embedder.config["Model"].values:
+                        self.embedding_table[_embedder] = "VERBA_Embedding_"+re.sub(r"[^a-zA-Z0-9]", "_", _embedder)
+                        self.verify_collection(self.embedding_table[_embedder])
+
+    def verify_collections(self, environment_variables, libraries):
+        self.verify_collection(self.document_collection_name)
+        self.verify_collection(self.suggestion_collection_name)
+        self.verify_collection(self.config_collection_name)
+        self.verify_embedding_collections(environment_variables, libraries)
+
+    ### Configuration Handling
+
+    def get_config(self, uuid: str) -> dict:
+        config_collection = self.client.collections.get(self.config_collection_name)
+        if config_collection.data.exists(uuid):
+            config = config_collection.query.fetch_object_by_id(uuid)
+            return json.loads(config.properties["config"])
+        else:
+            return None
+        
+    def set_config(self, uuid: str, config: dict):
+        config_collection = self.client.collections.get(self.config_collection_name)
+        if config_collection.data.exists(uuid):
+            config_collection.data.delete_by_id(uuid)
+        config_collection.data.insert(properties={"config":json.dumps(config)}, uuid=uuid)
+
+    def reset_config(self, uuid: str):
+        config_collection = self.client.collections.get(self.config_collection_name)
+        if config_collection.data.exists(uuid):
+            config_collection.data.delete_by_id(uuid)
+
+

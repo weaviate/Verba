@@ -17,12 +17,14 @@ interface IngestionViewProps {
   settingConfig: SettingsConfiguration;
   RAGConfig: RAGConfig | null;
   setRAGConfig: (r_: RAGConfig | null) => void;
+  setReconnectMain: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const IngestionView: React.FC<IngestionViewProps> = ({
   settingConfig,
   RAGConfig,
   setRAGConfig,
+  setReconnectMain,
 }) => {
   const [fileMap, setFileMap] = useState<FileMap>({});
   const [selectedFileData, setSelectedFileData] = useState<string | null>(null);
@@ -85,6 +87,7 @@ const IngestionView: React.FC<IngestionViewProps> = ({
 
   const reconnectToVerba = () => {
     setReconnect((prevState) => !prevState);
+    setReconnectMain((prevState) => !prevState);
   };
 
   const updateStatus = (data: StatusReport) => {

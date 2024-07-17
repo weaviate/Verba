@@ -83,6 +83,7 @@ class ConfigSetting(BaseModel):
     type: str
     value: str | int
     description: str
+    values: list[str]
 
 class RAGComponentConfig(BaseModel):
     name: str

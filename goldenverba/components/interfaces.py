@@ -41,32 +41,21 @@ class VerbaComponent:
         self.type = ""
 
     def get_meta(self, envs, libs) -> dict:
-        _metadata = {
+        
+        if len(self.config) > 0:
+            config = {_c: self.config[_c].model_dump() for _c in self.config}
+        else:
+            config = {}
+
+        return {
             "name": self.name,
             "variables": self.requires_env,
             "library": self.requires_library,
             "description": self.description,
             "type": self.type,
-            "config": {_c: self.config[_c].model_dump() for _c in self.config},
+            "config": config,
             "available": self.check_available(envs, libs),
         }
-        return _metadata
-
-    def set_config(self, new_config: dict):
-        for _k in new_config:
-            if _k in self.config:
-                if self.config[_k].type == "text":
-                    if self.config[_k].text != new_config[_k].get("text", ""):
-                        self.config[_k].text = new_config[_k].get("text", "")
-                        msg.info(
-                            f"Updating {self.name} config ({_k}) {self.config[_k].text} -> {new_config[_k].get('text','')}"
-                        )
-                if self.config[_k].type == "number":
-                    if self.config[_k].value != int(new_config[_k].get("value", 0)):
-                        msg.info(
-                            f"Updating {self.name} config ({_k}) {self.config[_k].value} -> {new_config[_k].get('value',0)}"
-                        )
-                        self.config[_k].value = int(new_config[_k].get("value", 0))
 
     def check_available(self, envs, libs) -> bool:
         if self.requires_env:
@@ -106,16 +95,7 @@ class Chunker(VerbaComponent):
 
     def __init__(self):
         super().__init__()
-        self.config = {
-            "units": InputConfig(
-                type="number", value=100, description="Choose the units per chunks"
-            ),
-            "overlap": InputConfig(
-                type="number",
-                value=50,
-                description="Choose the units for overlap between chunks",
-            ),
-        }
+        self.config = {}
 
     async def chunk(self, fileConfig: FileConfig, document: Document):
         """Chunk verba documents into chunks based on units and overlap.
@@ -132,9 +112,11 @@ class Embedding(VerbaComponent):
         super().__init__()
         self.model = ""
 
-    async def vectorize(self, config: dict, document: Document) -> Document:
+    async def vectorize(self, config: dict, content: list[str]) -> list[float]:
         """Embed verba documents and its chunks to Weaviate
-        @parameter: document : Document - Verba Document
+        @parameter: config : dict - Embedder Configuration
+        @parameter: content : list[str] - List of strings to embed
+        @return: list[float] - List of embeddings
         """
         raise NotImplementedError("embed method must be implemented by a subclass.")
 

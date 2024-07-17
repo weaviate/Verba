@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import Navbar from "./components/Navigation/NavbarComponent";
 import SettingsComponent from "./components/Settings/SettingsComponent";
 import ChatComponent from "./components/Chat/ChatComponent";
@@ -18,9 +19,7 @@ import PulseLoader from "react-spinners/PulseLoader";
 
 export default function Home() {
   // Page States
-  const [currentPage, setCurrentPage] = useState<
-    "CHAT" | "DOCUMENTS" | "STATUS" | "ADD" | "SETTINGS" | "RAG"
-  >("CHAT");
+  const [currentPage, setCurrentPage] = useState("CHAT");
 
   const [production, setProduction] = useState(false);
   const [gtag, setGtag] = useState("");
@@ -37,8 +36,13 @@ export default function Home() {
 
   // RAG Config
   const [RAGConfig, setRAGConfig] = useState<RAGConfig | null>(null);
+  const [reconnect, setReconnect] = useState(false);
 
   const [APIHost, setAPIHost] = useState<string | null>(null);
+
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   const fetchHost = async () => {
     try {
@@ -94,8 +98,23 @@ export default function Home() {
   };
 
   useEffect(() => {
-    fetchHost();
+    setReconnect(true);
   }, []);
+
+  useEffect(() => {
+    fetchHost();
+  }, [reconnect]);
+
+  useEffect(() => {
+    const viewParam = searchParams.get("view");
+    setCurrentPage(viewParam ? viewParam : "CHAT");
+  }, [searchParams]);
+
+  const handleViewChange = (view: string) => {
+    const newSearchParams = new URLSearchParams(searchParams.toString());
+    newSearchParams.set("view", view);
+    router.push(`${pathname}?${newSearchParams}`, undefined);
+  };
 
   const importConfig = async () => {
     if (!APIHost || !baseSetting) {
@@ -193,6 +212,7 @@ export default function Home() {
           <Navbar
             APIHost={APIHost}
             production={production}
+            handleViewChange={handleViewChange}
             title={
               baseSetting[settingTemplate].Customization.settings.title.text
             }
@@ -207,7 +227,9 @@ export default function Home() {
             setCurrentPage={setCurrentPage}
           />
 
-          {currentPage === "CHAT" && (
+          <div
+            className={`${currentPage === "CHAT" && !production ? "" : "hidden"}`}
+          >
             <ChatComponent
               production={production}
               settingConfig={baseSetting[settingTemplate]}
@@ -215,7 +237,7 @@ export default function Home() {
               RAGConfig={RAGConfig}
               setCurrentPage={setCurrentPage}
             />
-          )}
+          </div>
 
           {currentPage === "DOCUMENTS" && (
             <DocumentViewerComponent
@@ -242,6 +264,7 @@ export default function Home() {
               settingConfig={baseSetting[settingTemplate]}
               RAGConfig={RAGConfig}
               setRAGConfig={setRAGConfig}
+              setReconnectMain={setReconnect}
             />
           </div>
 

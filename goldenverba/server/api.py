@@ -26,7 +26,6 @@ from goldenverba.server.types import (
     ImportStreamPayload,
     FileConfig
 )
-from goldenverba.server.util import get_config, set_config, setup_managers
 
 load_dotenv()
 
@@ -40,7 +39,7 @@ else:
     production = False
 
 manager = verba_manager.VerbaManager()
-setup_managers(manager)
+#setup_managers(manager)
 
 # FastAPI App
 app = FastAPI()
@@ -84,14 +83,14 @@ async def serve_frontend():
 @app.get("/api/health")
 async def health_check():
     try:
-        if manager.client.is_ready():
+        if manager.weaviate_manager.client.is_ready():
             return JSONResponse(
                 content={"message": "Alive!", "production": production, "gtag": tag}
             )
         else:
             return JSONResponse(
                 content={
-                    "message": "Database not ready!",
+                    "message": "Weaviate Database Not Ready",
                     "production": production,
                     "gtag": tag,
                 },
@@ -155,8 +154,7 @@ async def get_status():
 @app.get("/api/config")
 async def retrieve_config():
     try:
-        config = get_config(manager)
-        msg.info("Config Retrieved")
+        config = manager.load_config()
         return JSONResponse(status_code=200, content={"data": config, "error": ""})
 
     except Exception as e:
@@ -254,7 +252,6 @@ async def websocket_import_stream(websocket: WebSocket):
 
 ### POST
 
-# Reset Verba
 @app.post("/api/reset")
 async def reset_verba(payload: ResetPayload):
     if production:
@@ -291,7 +288,7 @@ async def update_config(payload: ConfigPayload):
         )
 
     try:
-        set_config(manager, payload.config)
+        manager.set_config(payload.config)
     except Exception as e:
         msg.warn(f"Failed to set new Config {str(e)}")
 

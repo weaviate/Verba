@@ -4,51 +4,35 @@ from weaviate import Client
 
 from goldenverba.components.interfaces import Embedder
 from goldenverba.components.document import Document
+from goldenverba.components.types import InputConfig
 
+try:
+    from sentence_transformers import SentenceTransformer
+except Exception as e:
+    pass
 
 class SentenceTransformersEmbedder(Embedder):
     """
     SentenceTransformersEmbedder base class for Verba.
     """
 
-    def __init__(self, vectorizer: str):
+    def __init__(self):
         super().__init__()
-        self.vectorizer = vectorizer
-        self.name = self.__class__.__name__
-        self.description = f"Embeds and retrieves objects using SentenceTransformer with the {self.vectorizer} model"
-        self.requires_library = ["sentence-transformers"]
-        self.model = None
+        self.name = "SentenceTransformers"
+        self.requires_library = ["sentence_transformers"]
+        self.description = "Embeds and retrieves objects using SentenceTransformer"
+        self.config = {
+            "Model": InputConfig(
+                type="dropdown", value="all-MiniLM-L6-v2", description="Select an HuggingFace Embedding Model", values=["all-MiniLM-L6-v2","mixedbread-ai/mxbai-embed-large-v1","all-mpnet-base-v2"]
+            ),
+        }
+
+    async def vectorize(self, config: dict, content: list[str]) -> list[float]:
         try:
-            from sentence_transformers import SentenceTransformer
-
-            self.model = SentenceTransformer(self.vectorizer)
+            model_name = config.get("Model", {"value": "all-MiniLM-L6-v2"}).value
+            model = SentenceTransformer(model_name)
+            embeddings = model.encode(content).tolist()
+            return embeddings
         except Exception as e:
-            msg.warn(str(e))
-            pass
-
-    def embed(
-        self,
-        documents: list[Document],
-        client: Client,
-        logging: list[dict],
-    ) -> bool:
-        """Embed verba documents and its chunks to Weaviate
-        @parameter: documents : list[Document] - List of Verba documents
-        @parameter: client : Client - Weaviate Client
-        @parameter: batch_size : int - Batch Size of Input
-        @returns bool - Bool whether the embedding what successful.
-        """
-        # TODO: Call model.encode with a list of chunks instead of a single chunk for faster inference
-        for document in tqdm(
-            documents, total=len(documents), desc="Vectorizing document chunks"
-        ):
-            for chunk in document.chunks:
-                chunk.set_vector(self.vectorize_chunk(chunk.text))
-
-        return self.import_data(documents, client, logging)
-
-    def vectorize_chunk(self, chunk) -> list[float]:
-        return self.model.encode(chunk).tolist()
-
-    def vectorize_query(self, query: str) -> list[float]:
-        return self.vectorize_chunk(query)
+            raise Exception(f"Failed to vectorize chunks: {str(e)}")
+            
