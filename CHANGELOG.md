@@ -7,12 +7,21 @@ All notable changes to this project will be documented in this file.
 ## Added
 
 - Async Ingestion with realtime logging
+- Migrated to Weaviate v4 Client
 - Added new File Selection Interface
 - Add Directory Upload
 - Control Settings per file/url individually
 - Import indivdual files or all
 - Overwrite existing files
 - Add multiple labels to documents
+- More configuration for readers, chunkers, and embedders
+- Improved Document Search UI
+- Added DocumentExplorer with
+  - Content View
+  - Chunk View
+  - Vector View
+  - Graph View
+  - Metadata View
 
 ## [1.0.3]
 

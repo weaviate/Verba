@@ -118,6 +118,10 @@ const DocumentExplorer: React.FC<DocumentExplorerProps> = ({
             <FaInfoCircle size={15} />
             <p>View Source</p>
           </button>
+          <button className="flex btn border-none text-text-verba bg-button-verba hover:bg-button-hover-verba gap-2">
+            <FaInfoCircle size={15} />
+            <p>View Metadata</p>
+          </button>
           <button className="flex btn border-none text-text-verba bg-button-verba hover:bg-warning-verba gap-2">
             <MdCancel size={15} />
             <p>Delete</p>
