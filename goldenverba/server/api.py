@@ -216,39 +216,6 @@ async def websocket_import_files(websocket: WebSocket):
             msg.fail(f"Import WebSocket Error: {str(e)}")
             break
 
-@app.websocket("/ws/import_stream")
-async def websocket_import_stream(websocket: WebSocket):
-
-    await websocket.accept()
-    logger = LoggerManager(websocket)
-
-    if production:
-        await logger.send_stop()
-    else:
-        while True:  # Start a loop to keep the connection alive.
-            try:
-                data = await websocket.receive_text()
-                # Parse and validate the JSON string using Pydantic model
-                payload = ImportPayload.model_validate_json(data)
-
-                set_config(manager, payload.config)
-
-                reader = payload.config.get("RAG",{}).get("Reader", {}).get("selected")
-                if reader != None:
-                    await manager.import_data(reader, payload.data, payload.textValues, logger)
-                else:
-                    await logger.send_error("No Reader selected!")
-
-            except WebSocketDisconnect:
-                msg.warn("Import WebSocket connection closed by client.")
-                await logger.send_stop()
-                break
-
-            except Exception as e:
-                msg.fail(f"Import WebSocket Error: {str(e)}")
-                await logger.send_stop()
-                break
-
 
 ### POST
 
