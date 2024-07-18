@@ -61,12 +61,12 @@ class VerbaManager:
             loop = asyncio.get_running_loop()
             start_time = loop.time() 
 
-            duplicate_uuid = await self.weaviate_manager.exist_document_name(fileConfig.fileID)
+            duplicate_uuid = await self.weaviate_manager.exist_document_name(fileConfig.filename)
             if duplicate_uuid is not None and not fileConfig.overwrite:
-                raise Exception(f"{fileConfig.fileID} already exists in Verba")
+                raise Exception(f"{fileConfig.filename} already exists in Verba")
             elif duplicate_uuid is not None and fileConfig.overwrite:
                 await self.weaviate_manager.delete_document(duplicate_uuid)
-                await logger.send_report(fileConfig.fileID, status=FileStatus.STARTING, message=f"Overwriting {fileConfig.fileID}", took=0)
+                await logger.send_report(fileConfig.fileID, status=FileStatus.STARTING, message=f"Overwriting {fileConfig.filename}", took=0)
             else:
                 await logger.send_report(fileConfig.fileID, status=FileStatus.STARTING, message="Starting Import", took=0)
 
@@ -328,67 +328,6 @@ class VerbaManager:
             ],
         )
         return chunks, context
-
-    def retrieve_all_documents(self, doc_type: str, page: int, pageSize: int) -> list:
-        """Return all documents from Weaviate
-        @returns list - Document list.
-        """
-        class_name = "VERBA_Document_" + schema_manager.strip_non_letters(
-            self.embedder_manager.embedders[
-                self.embedder_manager.selected_embedder
-            ].vectorizer
-        )
-
-        offset = pageSize * (page - 1)
-
-        if doc_type == "":
-            query_results = (
-                self.client.query.get(
-                    class_name=class_name,
-                    properties=["doc_name", "doc_type", "doc_link"],
-                )
-                .with_additional(properties=["id"])
-                .with_limit(pageSize)
-                .with_offset(offset)
-                .with_sort(
-                    [
-                        {
-                            "path": ["doc_name"],
-                            "order": "asc",
-                        }
-                    ]
-                )
-                .do()
-            )
-        else:
-            query_results = (
-                self.client.query.get(
-                    class_name=class_name,
-                    properties=["doc_name", "doc_type", "doc_link"],
-                )
-                .with_additional(properties=["id"])
-                .with_where(
-                    {
-                        "path": ["doc_type"],
-                        "operator": "Equal",
-                        "valueText": doc_type,
-                    }
-                )
-                .with_limit(pageSize)
-                .with_offset(offset)
-                .with_sort(
-                    [
-                        {
-                            "path": ["doc_name"],
-                            "order": "asc",
-                        }
-                    ]
-                )
-                .do()
-            )
-
-        results = query_results["data"]["Get"][class_name]
-        return results
 
     def retrieve_all_document_types(self) -> list:
         """Aggreagtes and returns all document types from Weaviate

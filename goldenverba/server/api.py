@@ -377,72 +377,30 @@ async def get_document(payload: GetDocumentPayload):
 ## Retrieve and search documents imported to Weaviate
 @app.post("/api/get_all_documents")
 async def get_all_documents(payload: SearchQueryPayload):
-    # TODO Standarize Document Creation
-    msg.info("Get all documents request received")
-    start_time = time.time()  # Start timing
+    loop = asyncio.get_running_loop()
+    start_time = loop.time() 
 
     try:
-        if payload.query == "":
-            documents = manager.retrieve_all_documents(
-                payload.doc_type, payload.page, payload.pageSize
-            )
-        else:
-            documents = manager.search_documents(
-                payload.query, payload.doc_type, payload.page, payload.pageSize
-            )
+        retrieval_task = asyncio.create_task(manager.weaviate_manager.get_documents(payload.query, payload.pageSize, payload.page))
+        documents = await retrieval_task
 
-        if not documents:
-            return JSONResponse(
-                content={
-                    "documents": [],
-                    "doc_types": [],
-                    "current_embedder": manager.embedder_manager.selected_embedder,
-                    "error": f"No Results found!",
-                    "took": 0,
-                }
-            )
-
-        documents_obj = []
-        for document in documents:
-
-            _additional = document["_additional"]
-
-            documents_obj.append(
-                {
-                    "class": "No Class",
-                    "uuid": _additional.get("id", "none"),
-                    "chunks": document.get("chunk_count", 0),
-                    "link": document.get("doc_link", ""),
-                    "name": document.get("doc_name", "No name"),
-                    "type": document.get("doc_type", "No type"),
-                    "text": document.get("text", "No text"),
-                    "timestamp": document.get("timestamp", ""),
-                }
-            )
-
-        elapsed_time = round(time.time() - start_time, 2)  # Calculate elapsed time
         msg.good(
-            f"Succesfully retrieved document: {len(documents)} documents in {elapsed_time}s"
+            f"Succesfully retrieved document: {len(documents)} documents"
         )
-
-        doc_types = manager.retrieve_all_document_types()
-
         return JSONResponse(
             content={
-                "documents": documents_obj,
-                "doc_types": list(doc_types),
-                "current_embedder": manager.embedder_manager.selected_embedder,
+                "documents": documents,
+                "label": [],
                 "error": "",
-                "took": elapsed_time,
+                "took": round(loop.time() - start_time, 2),
             }
         )
     except Exception as e:
-        msg.fail(f"All Document retrieval failed: {str(e)}")
+        msg.fail(f"Retrieving all documents failed: {str(e)}")
         return JSONResponse(
             content={
                 "documents": [],
-                "doc_types": [],
-                "current_embedder": manager.embedder_manager.selected_embedder,
+                "label": [],
                 "error": f"All Document retrieval failed: {str(e)}",
                 "took": 0,
             }
@@ -455,7 +413,10 @@ async def delete_document(payload: GetDocumentPayload):
         msg.warn("Can't delete documents when in Production Mode")
         return JSONResponse(status_code=200, content={})
 
-    msg.info(f"Document ID received: {payload.document_id}")
+    try:
+        msg.info(f"Deleting {payload.uuid}")
+        await manager.weaviate_manager.delete_document(payload.uuid)
+    except Exception as e:
+        msg.fail(f"Deleting Document with ID {payload.uuid} failed: {str(e)}")
 
-    manager.delete_document_by_id(payload.document_id)
-    return JSONResponse(content={})
+    return JSONResponse(status_code=200, content={})

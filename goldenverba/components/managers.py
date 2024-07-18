@@ -4,7 +4,7 @@ import re
 from weaviate.client import WeaviateClient
 from weaviate.auth import AuthApiKey
 from weaviate.classes.config import Property, DataType
-from weaviate.classes.query import Filter
+from weaviate.classes.query import Filter, Sort
 from weaviate.collections.classes.data import DataObject
 import os
 import asyncio
@@ -396,7 +396,7 @@ class WeaviateManager:
             for _id in chunk_ids:
                 embedder_collection.data.delete_by_id(_id)
             raise Exception(f"Chunk Mismatch detected after importing: Imported:{response.total_count} | Existing: {len(document.chunks)}")
-
+    
     ### Document CRUD
         
     async def exist_document_name(self, name: str) -> str:
@@ -406,6 +406,9 @@ class WeaviateManager:
             return None
         
     async def delete_document(self, uuid: str):
+        if not self.client.collections.get(self.document_collection_name).data.exists(uuid):
+            return
+
         document_obj =  self.client.collections.get(self.document_collection_name).query.fetch_object_by_id(uuid)
         embedding_config = json.loads(document_obj.properties.get("meta")["Embedder"])
         embedder = embedding_config["config"]["Model"]["value"]
@@ -416,6 +419,17 @@ class WeaviateManager:
         self.client.collections.get(self.document_collection_name).data.delete_by_id(uuid)
         for chunk in self.client.collections.get(self.embedding_table[embedder]).query.fetch_objects(filters=Filter.by_property("doc_uuid").equal(uuid)).objects:
             self.client.collections.get(self.embedding_table[embedder]).data.delete_by_id(chunk.uuid)
+
+    async def get_documents(self, query: str, pageSize: int, page: int) -> list[dict]:
+        offset = pageSize * (page - 1)
+        document_collection = self.client.collections.get(self.document_collection_name)
+
+        if query == "":
+            response = document_collection.query.fetch_objects(limit=pageSize, offset=offset, sort=Sort.by_property("title", ascending=True))
+        else:
+            response = document_collection.query.bm25(query=query, limit=pageSize, offset=offset)
+
+        return [{"title":doc.properties["title"], "uuid":str(doc.uuid), "labels":doc.properties["labels"]} for doc in response.objects]
 
 
 

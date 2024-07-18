@@ -12,23 +12,17 @@ export type DocumentPayload = {
   document: Document;
 };
 
-export type AllDocumentsPayload = {
+export type DocumentsPreviewPayload = {
   error: string;
-  documents: Document[];
-  doc_types: string[];
-  current_embedder: string;
+  documents: DocumentPreview[];
+  labels: string[];
   took: number;
 };
 
-export type Document = {
-  text: string;
-  name: string;
-  chunks: number;
+export type DocumentPreview = {
+  title: string;
   uuid: string;
-  type: string;
-  class: string;
-  timestamp: string;
-  link: string;
+  labels: string[];
 };
 
 export type FormattedDocument = {

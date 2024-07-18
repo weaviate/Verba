@@ -20,13 +20,13 @@ class GeneratePayload(BaseModel):
 
 class SearchQueryPayload(BaseModel):
     query: str
-    doc_type: str
+    labels: list[str]
     page: int
     pageSize: int
 
 
 class GetDocumentPayload(BaseModel):
-    document_id: str
+    uuid: str
 
 
 class ResetPayload(BaseModel):

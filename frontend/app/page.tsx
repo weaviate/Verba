@@ -5,7 +5,7 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import Navbar from "./components/Navigation/NavbarComponent";
 import SettingsComponent from "./components/Settings/SettingsComponent";
 import ChatComponent from "./components/Chat/ChatComponent";
-import DocumentViewerComponent from "./components/Document/DocumentViewerComponent";
+import DocumentView from "./components/Document/DocumentView";
 import StatusComponent from "./components/Status/StatusComponent";
 import { Settings, BaseSettings } from "./components/Settings/types";
 import RAGComponent from "./components/RAG/RAGComponent";
@@ -239,15 +239,17 @@ export default function Home() {
             />
           </div>
 
-          {currentPage === "DOCUMENTS" && (
-            <DocumentViewerComponent
+          <div
+            className={`${currentPage === "DOCUMENTS" && !production ? "" : "hidden"}`}
+          >
+            <DocumentView
               RAGConfig={RAGConfig}
               production={production}
               setCurrentPage={setCurrentPage}
               settingConfig={baseSetting[settingTemplate]}
               APIHost={APIHost}
             />
-          )}
+          </div>
 
           {currentPage === "STATUS" && !production && (
             <StatusComponent
