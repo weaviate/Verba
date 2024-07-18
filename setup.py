@@ -24,7 +24,7 @@ setup(
     ],
     include_package_data=True,
     install_requires=[
-        "weaviate-client==4.6.5",
+        "weaviate-client==4.7.0-rc-3",
         "python-dotenv==1.0.0",
         "wasabi==1.1.2",
         "fastapi==0.111.1",

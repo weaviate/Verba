@@ -19,21 +19,21 @@ class Document:
         self.labels = labels
         self.source = source
         self.meta = meta
+        self.tokens: list[str] = []
         self.chunks: list[Chunk] = []
 
     @staticmethod
     def to_json(document) -> dict:
         """Convert the Document object to a JSON dict."""
         doc_dict = {
-            "text": document.text,
-            "type": document.type,
-            "name": document.name,
-            "path": document.path,
-            "link": document.link,
-            "timestamp": document.timestamp,
-            "reader": document.reader,
+            "title": document.title,
+            "content": document.content,
+            "extension": document.extension,
+            "fileSize": document.fileSize,
+            "labels": document.labels,
+            "source": document.source,
             "meta": document.meta,
-            "chunks": [chunk.to_dict() for chunk in document.chunks],
+            "tokens": document.tokens
         }
         return doc_dict
 
@@ -41,17 +41,13 @@ class Document:
     def from_json(doc_dict: dict):
         """Convert a JSON string to a Document object."""
         document = Document(
-            text=doc_dict.get("text", ""),
-            type=doc_dict.get("type", ""),
-            name=doc_dict.get("name", ""),
-            path=doc_dict.get("path", ""),
-            link=doc_dict.get("link", ""),
-            timestamp=doc_dict.get("timestamp", ""),
-            reader=doc_dict.get("reader", ""),
+            title=doc_dict.get("title", ""),
+            content=doc_dict.get("content", ""),
+            extension=doc_dict.get("extension", ""),
+            fileSize=doc_dict.get("fileSize", 0),
+            labels=doc_dict.get("labels", []),
+            source=doc_dict.get("source", ""),
             meta=doc_dict.get("meta", {}),
         )
-        # Assuming Chunk has a from_dict method
-        document.chunks = [
-            Chunk.from_dict(chunk_data) for chunk_data in doc_dict.get("chunks", [])
-        ]
+        document.tokens = doc_dict.get("tokens", [])
         return document

@@ -18,12 +18,6 @@ try:
 except Exception:
     msg.warn("tiktoken not installed, your base installation might be corrupted.")
 
-from goldenverba.components.schema.schema_generation import (
-    EMBEDDINGS,
-    VECTORIZERS,
-    strip_non_letters,
-)
-
 load_dotenv()
 
 
@@ -110,7 +104,6 @@ class Embedding(VerbaComponent):
     """
     def __init__(self):
         super().__init__()
-        self.model = ""
 
     async def vectorize(self, config: dict, content: list[str]) -> list[float]:
         """Embed verba documents and its chunks to Weaviate
@@ -142,164 +135,6 @@ class Embedder(VerbaComponent):
         @returns bool - Bool whether the embedding what successful.
         """
         raise NotImplementedError("embed method must be implemented by a subclass.")
-
-    def import_data(
-        self, documents: list[Document], client: Client, logging: list[dict]
-    ) -> bool:
-        """Import verba documents and its chunks to Weaviate
-        @parameter: documents : list[Document] - List of Verba documents
-        @parameter: client : Client - Weaviate Client
-        @parameter: batch_size : int - Batch Size of Input
-        @returns bool - Bool whether the embedding what successful.
-        """
-        try:
-            if self.vectorizer not in VECTORIZERS and self.vectorizer not in EMBEDDINGS:
-                msg.fail(f"Vectorizer of {self.vectorizer} not found")
-                raise Exception(f"Vectorizer of {self.vectorizer} not found")
-
-            for i, document in enumerate(documents):
-                batches = []
-                uuid = ""
-                temp_batch = []
-                token_counter = 0
-                for chunk in document.chunks:
-                    if token_counter + len(chunk.tokens) <= 4000:
-                        token_counter += len(chunk.tokens)
-                        temp_batch.append(chunk)
-                    else:
-                        batches.append(temp_batch.copy())
-                        token_counter = len(chunk.tokens)
-                        temp_batch = [chunk]
-                if len(temp_batch) > 0:
-                    batches.append(temp_batch.copy())
-                    token_counter = 0
-                    temp_batch = []
-
-                msg.info(
-                    f"({i+1}/{len(documents)}) Importing document {document.name} with {len(batches)} batches"
-                )
-
-                with client.batch as batch:
-                    batch.batch_size = 1
-                    properties = {
-                        "text": str(document.text),
-                        "doc_name": str(document.name),
-                        "doc_type": str(document.type),
-                        "doc_link": str(document.link),
-                        "chunk_count": len(document.chunks),
-                        "timestamp": str(document.timestamp),
-                    }
-
-                    class_name = "VERBA_Document_" + strip_non_letters(self.vectorizer)
-                    uuid = client.batch.add_data_object(properties, class_name)
-
-                    for chunk in document.chunks:
-                        chunk.set_uuid(uuid)
-
-                chunk_count = 0
-                for _batch_id, chunk_batch in tqdm(
-                    enumerate(batches), total=len(batches), desc="Importing batches"
-                ):
-                    with client.batch as batch:
-                        batch.batch_size = len(chunk_batch)
-                        for i, chunk in enumerate(chunk_batch):
-                            chunk_count += 1
-
-                            properties = {
-                                "text": chunk.text,
-                                "doc_name": str(document.name),
-                                "doc_uuid": chunk.doc_uuid,
-                                "doc_type": chunk.doc_type,
-                                "chunk_id": chunk.chunk_id,
-                            }
-                            class_name = "VERBA_Chunk_" + strip_non_letters(
-                                self.vectorizer
-                            )
-
-                            # Check if vector already exists
-                            if chunk.vector is None:
-                                try:
-                                    client.batch.add_data_object(properties, class_name)
-                                except Exception as e:
-                                    msg.fail(f"Error adding chunk to Weaviate: {e}")
-                            else:
-                                client.batch.add_data_object(
-                                    properties, class_name, vector=chunk.vector
-                                )
-
-                            wait_time_ms = int(
-                                os.getenv("WAIT_TIME_BETWEEN_INGESTION_QUERIES_MS", "0")
-                            )
-                            if wait_time_ms > 0:
-                                time.sleep(float(wait_time_ms) / 1000)
-
-                self.check_document_status(
-                    client,
-                    uuid,
-                    document.name,
-                    "VERBA_Document_" + strip_non_letters(self.vectorizer),
-                    "VERBA_Chunk_" + strip_non_letters(self.vectorizer),
-                    len(document.chunks),
-                    logging,
-                )
-            return logging
-        except Exception as e:
-            logging.append(
-                {"type": "ERROR", "message": f"Embedding not successful: {str(e)}"}
-            )
-            raise Exception(e)
-
-    def check_document_status(
-        self,
-        client: Client,
-        doc_uuid: str,
-        doc_name: str,
-        doc_class_name: str,
-        chunk_class_name: str,
-        chunk_count: int,
-        logging: list[dict],
-    ):
-        """Verifies that imported documents and its chunks exist in the database, if not, remove everything that was added and rollback
-        @parameter: client : Client - Weaviate Client
-        @parameter: doc_uuid : str - Document UUID
-        @parameter: doc_name : str - Document name
-        @parameter: doc_class_name : str - Class name of Document
-        @parameter: chunk_class_name : str - Class name of Chunks
-        @parameter: chunk_count : int - Number of expected chunks
-        @returns Optional[Exception] - Raises Exceptions if imported fail, will be catched by the manager.
-        """
-        document = client.data_object.get_by_id(
-            doc_uuid,
-            class_name=doc_class_name,
-        )
-
-        if document is not None:
-            results = (
-                client.query.get(
-                    class_name=chunk_class_name,
-                    properties=[
-                        "doc_name",
-                    ],
-                )
-                .with_where(
-                    {
-                        "path": ["doc_uuid"],
-                        "operator": "Equal",
-                        "valueText": doc_uuid,
-                    }
-                )
-                .with_limit(chunk_count + 1)
-                .do()
-            )
-
-            if len(results["data"]["Get"][chunk_class_name]) != chunk_count:
-                # Rollback if fails
-                self.remove_document(client, doc_name, doc_class_name, chunk_class_name)
-                raise Exception(
-                    f"Chunk mismatch for {doc_uuid} {len(results['data']['Get'][chunk_class_name])} != {chunk_count}"
-                )
-        else:
-            raise Exception(f"Document {doc_uuid} not found {document}")
 
     def remove_document(
         self, client: Client, doc_name: str, doc_class_name: str, chunk_class_name: str

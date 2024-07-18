@@ -1,13 +1,15 @@
 "use client";
 
 import React, { useState, useEffect, use } from "react";
-import { FileData, FileMap } from "./types";
+import { FileData, FileMap, statusTextMap, statusColorMap } from "./types";
 import { FaTrash } from "react-icons/fa";
 import { GoTriangleDown } from "react-icons/go";
 import { IoAddCircleSharp } from "react-icons/io5";
 import { CgDebug } from "react-icons/cg";
 
 import UserModalComponent from "../Navigation/UserModal";
+import { MdError } from "react-icons/md";
+import { FaCheckCircle } from "react-icons/fa";
 import { RAGConfig } from "../RAG/types";
 import { IoIosCheckmark } from "react-icons/io";
 import { MdModeEdit } from "react-icons/md";
@@ -164,12 +166,52 @@ const BasicSettingView: React.FC<BasicSettingViewProps> = ({
   if (selectedFileData) {
     return (
       <div className="flex flex-col justify-start gap-3 rounded-2xl p-1 w-full ">
+        {selectedFileData && fileMap[selectedFileData].status != "READY" && (
+          <div className="divider  text-text-alt-verba">Import Status</div>
+        )}
+
+        <div className="flex flex-col gap-3 text-text-verba">
+          {selectedFileData &&
+            Object.entries(fileMap[selectedFileData].status_report).map(
+              ([status, statusReport]) => (
+                <div className="flex">
+                  <p className="flex min-w-[8vw] gap-2 items-center text-text-verba">
+                    {statusReport.status === "DONE" && (
+                      <FaCheckCircle size={15} />
+                    )}
+                    {statusReport.status === "ERROR" && <MdError size={15} />}
+                    {statusTextMap[statusReport.status]}
+                  </p>
+                  <label
+                    className={`input flex items-center gap-2 w-full ${statusColorMap[statusReport.status]} bg-bg-verba`}
+                  >
+                    <input
+                      type="text"
+                      className="grow w-full"
+                      value={
+                        statusReport.took != 0
+                          ? statusReport.message +
+                            " (" +
+                            statusReport.took +
+                            "s)"
+                          : statusReport.message
+                      }
+                      disabled={true}
+                    />
+                  </label>
+                </div>
+              )
+            )}
+        </div>
+
+        <div className="divider text-text-alt-verba">File Settings</div>
+
         {/* Filename */}
         <div className="flex gap-2 justify-between items-center text-text-verba">
           {selectedFileData && fileMap[selectedFileData].isURL ? (
             <p className="flex min-w-[8vw]">URL</p>
           ) : (
-            <p className="flex min-w-[8vw]">Filename</p>
+            <p className="flex min-w-[8vw]">Title</p>
           )}
           <label className="input flex items-center gap-2 w-full bg-bg-verba">
             <input
@@ -257,7 +299,22 @@ const BasicSettingView: React.FC<BasicSettingViewProps> = ({
           </div>
         </div>
 
-        <div className="divider"></div>
+        {/* Overwrite */}
+        <div className="flex gap-2 items-center text-text-verba">
+          <p className="flex min-w-[8vw]">Overwrite</p>
+          <input
+            type="checkbox"
+            className="checkbox checkbox-md"
+            onChange={(e) =>
+              setOverwrite((e.target as HTMLInputElement).checked)
+            }
+            checked={
+              selectedFileData ? fileMap[selectedFileData].overwrite : false
+            }
+          />
+        </div>
+
+        <div className="divider  text-text-alt-verba">File Info</div>
 
         {/* Extension */}
         <div className="flex gap-2 justify-between items-center text-text-verba">
@@ -285,22 +342,7 @@ const BasicSettingView: React.FC<BasicSettingViewProps> = ({
           </label>
         </div>
 
-        {/* Overwrite */}
-        <div className="flex gap-2 items-center text-text-verba">
-          <p className="flex min-w-[8vw]">Overwrite</p>
-          <input
-            type="checkbox"
-            className="checkbox checkbox-md"
-            onChange={(e) =>
-              setOverwrite((e.target as HTMLInputElement).checked)
-            }
-            checked={
-              selectedFileData ? fileMap[selectedFileData].overwrite : false
-            }
-          />
-        </div>
-
-        <div className="divider"></div>
+        <div className="divider  text-text-alt-verba">Ingestion Pipeline</div>
 
         {/* Reader */}
         <div className="flex gap-2 justify-between items-center text-text-verba">

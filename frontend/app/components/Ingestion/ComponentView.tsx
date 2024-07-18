@@ -21,7 +21,7 @@ interface ComponentViewProps {
   selectedFileData: string | null;
   fileMap: FileMap;
   setFileMap: React.Dispatch<React.SetStateAction<FileMap>>;
-  component_name: "Chunker" | "Embedder";
+  component_name: "Chunker" | "Embedder" | "Reader";
 }
 
 const ComponentView: React.FC<ComponentViewProps> = ({
@@ -64,6 +64,24 @@ const ComponentView: React.FC<ComponentViewProps> = ({
     );
   }
 
+  function renderUploadComponents(rag_config: RAGConfig, filter_url: boolean) {
+    const filter = filter_url ? "URL" : "FILE";
+
+    return Object.entries(rag_config[component_name].components)
+      .filter(([key, component]) => component.type === filter)
+      .map(([key, component]) => (
+        <li
+          key={"FilteredDropdown_" + component.name}
+          onClick={() => {
+            changeComponent(component.name);
+            closeOnClick();
+          }}
+        >
+          <a>{component.name}</a>
+        </li>
+      ));
+  }
+
   function renderConfigOptions(rag_config: RAGConfig, configKey: string) {
     return rag_config[component_name].components[
       rag_config[component_name].selected
@@ -102,6 +120,7 @@ const ComponentView: React.FC<ComponentViewProps> = ({
   if (selectedFileData) {
     return (
       <div className="flex flex-col justify-start gap-3 rounded-2xl p-1 w-full ">
+        <div className="divider text-text-alt-verba">{component_name}</div>
         {/* Component */}
         <div className="flex gap-2 justify-between items-center text-text-verba">
           <p className="flex min-w-[8vw]">{component_name}</p>
@@ -120,7 +139,12 @@ const ComponentView: React.FC<ComponentViewProps> = ({
               tabIndex={0}
               className="dropdown-content menu bg-base-100 rounded-box z-[1] w-full p-2 shadow"
             >
-              {renderComponents(fileMap[selectedFileData].rag_config)}
+              {component_name != "Reader"
+                ? renderComponents(fileMap[selectedFileData].rag_config)
+                : renderUploadComponents(
+                    fileMap[selectedFileData].rag_config,
+                    fileMap[selectedFileData].isURL
+                  )}
             </ul>
           </div>
         </div>
@@ -134,8 +158,6 @@ const ComponentView: React.FC<ComponentViewProps> = ({
               ].description}
           </p>
         </div>
-
-        <div className="divider"></div>
 
         {selectedFileData &&
           Object.entries(

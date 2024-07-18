@@ -45,7 +45,7 @@ class OpenAIEmbedder(Embedding):
                 data = response.json()
                 if "data" in data:
                     if len(data["data"]) == len(content):
-                        return data["data"]
+                        return [embedding["embedding"] for embedding in data["data"]]
                     else:
                         raise Exception(f"Embedding length does not match number of content: {len(data['data'])}/{len(content)}")
                 else:

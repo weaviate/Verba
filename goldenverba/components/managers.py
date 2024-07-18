@@ -4,6 +4,8 @@ import re
 from weaviate.client import WeaviateClient
 from weaviate.auth import AuthApiKey
 from weaviate.classes.config import Property, DataType
+from weaviate.classes.query import Filter
+from weaviate.collections.classes.data import DataObject
 import os
 import asyncio
 import json
@@ -27,8 +29,6 @@ from goldenverba.components.reader.LabReader import GitLabReader
 from goldenverba.components.reader.UnstructuredAPI import UnstructuredReader
 
 from goldenverba.components.chunking.TokenChunker import TokenChunker
-from goldenverba.components.chunking.TokenHeimer import TokenHeimer
-
 from goldenverba.components.embedding.OpenAIEmbedder import OpenAIEmbedder
 from goldenverba.components.embedding.CohereEmbedder import CohereEmbedder
 from goldenverba.components.embedding.GoogleEmbedder import GoogleEmbedder
@@ -53,7 +53,7 @@ except Exception:
 ### Add new components here ###
 
 readers = [BasicReader(), GitHubReader(), GitLabReader(), UnstructuredReader()]
-chunkers = [TokenChunker(), TokenHeimer()]
+chunkers = [TokenChunker()]
 embedders = [OpenAIEmbedder(), SentenceTransformersEmbedder(), CohereEmbedder(), OllamaEmbedder(), GoogleEmbedder()]
 
 ### ----------------------- ###
@@ -71,7 +71,7 @@ class ReaderManager:
             if reader in self.readers:
                 config = fileConfig.rag_config["Reader"].components[reader]
                 document : Document = await self.readers[reader].load(fileConfig)
-                document.meta["Reader"] = json.dumps(config)
+                document.meta["Reader"] = config.model_dump_json()
                 elapsed_time = round(loop.time() - start_time, 2)
                 await logger.send_report(fileConfig.fileID, FileStatus.LOADING, f"Loaded {fileConfig.filename}", took=elapsed_time)
                 await logger.send_report(fileConfig.fileID, FileStatus.CHUNKING, "", took=0)
@@ -93,7 +93,7 @@ class ChunkerManager:
             if chunker in self.chunkers:
                 config = fileConfig.rag_config["Chunker"].components[chunker].config
                 chunked_document = await self.chunkers[chunker].chunk(config, document)
-                chunked_document.meta["Chunker"] = json.dumps(fileConfig.rag_config["Chunker"].components[chunker])
+                chunked_document.meta["Chunker"] = fileConfig.rag_config["Chunker"].components[chunker].model_dump_json()
                 elapsed_time = round(loop.time() - start_time, 2)
                 await logger.send_report(fileConfig.fileID, FileStatus.CHUNKING, f"Split {fileConfig.filename} into {len(document.chunks)} chunks", took=elapsed_time)
                 await logger.send_report(fileConfig.fileID, FileStatus.EMBEDDING, "", took=0)
@@ -127,9 +127,10 @@ class EmbeddingManager:
                 embeddings = await self.embedders[embedder].vectorize(config, content)
                 for vector, chunk in zip(embeddings,document.chunks):
                     chunk.vector = vector
-                document.meta["Embedder"] = json.dumps(fileConfig.rag_config["Embedder"].components[embedder])
+                document.meta["Embedder"] = fileConfig.rag_config["Embedder"].components[embedder].model_dump_json()
                 elapsed_time = round(loop.time() - start_time, 2)
                 await logger.send_report(fileConfig.fileID, FileStatus.EMBEDDING, f"Vectorized all chunks", took=elapsed_time)
+                await logger.send_report(fileConfig.fileID, FileStatus.INGESTING, "", took=0)
                 return document
             else:
                 raise Exception(f"{embedder} Embedder not found")
@@ -360,5 +361,68 @@ class WeaviateManager:
         config_collection = self.client.collections.get(self.config_collection_name)
         if config_collection.data.exists(uuid):
             config_collection.data.delete_by_id(uuid)
+
+    ### Import Handling
+            
+    async def import_document(self, document: Document, embedder: str):
+        if embedder not in self.embedding_table:
+            raise Exception(f"{embedder} not found in Embedding Table")
+        
+        document_collection = self.client.collections.get(self.document_collection_name)
+        embedder_collection = self.client.collections.get(self.embedding_table[embedder])
+
+        ### Import Document
+        document_obj = Document.to_json(document)
+        doc_uuid = document_collection.data.insert(document_obj)
+
+        chunk_ids = []
+
+        try:
+            ### Batch Import Of Chunks
+            with embedder_collection.batch.dynamic() as batch:
+                for chunk in document.chunks:
+                    chunk.doc_uuid = doc_uuid
+                    chunk_obj = Chunk.to_dict(chunk)
+                    chunk_ids.append(batch.add_object(properties=chunk_obj, vector=chunk.vector))
+
+            #chunk_response = await embedder_collection.data.insert_many([DataObject(properties=chunk.to_dict(), vector=chunk.vector) for chunk in document.chunks])
+
+        except Exception as e:
+            msg.warn(f"Import of Chunks failed: {str(e)}")
+
+        response = embedder_collection.aggregate.over_all(filters=Filter.by_property("doc_uuid").equal(doc_uuid), total_count=True)
+        if response.total_count != len(document.chunks):
+            document_collection.data.delete_by_id(doc_uuid)
+            for _id in chunk_ids:
+                embedder_collection.data.delete_by_id(_id)
+            raise Exception(f"Chunk Mismatch detected after importing: Imported:{response.total_count} | Existing: {len(document.chunks)}")
+
+    ### Document CRUD
+        
+    async def exist_document_name(self, name: str) -> str:
+        if len(self.client.collections.get(self.document_collection_name).query.fetch_objects(filters=Filter.by_property("title").equal(name)).objects) > 0:
+            return self.client.collections.get(self.document_collection_name).query.fetch_objects(filters=Filter.by_property("title").equal(name)).objects[0].uuid
+        else:
+            return None
+        
+    async def delete_document(self, uuid: str):
+        document_obj =  self.client.collections.get(self.document_collection_name).query.fetch_object_by_id(uuid)
+        embedding_config = json.loads(document_obj.properties.get("meta")["Embedder"])
+        embedder = embedding_config["config"]["Model"]["value"]
+
+        if embedder not in self.embedding_table:
+            raise Exception(f"{embedder} not found in Embedding Table")
+
+        self.client.collections.get(self.document_collection_name).data.delete_by_id(uuid)
+        for chunk in self.client.collections.get(self.embedding_table[embedder]).query.fetch_objects(filters=Filter.by_property("doc_uuid").equal(uuid)).objects:
+            self.client.collections.get(self.embedding_table[embedder]).data.delete_by_id(chunk.uuid)
+
+
+
+
+
+        
+
+
 
 

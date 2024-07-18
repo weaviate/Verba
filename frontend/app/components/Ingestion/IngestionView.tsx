@@ -114,6 +114,9 @@ const IngestionView: React.FC<IngestionViewProps> = ({
         );
         const newFileMap: FileMap = { ...prevFileMap };
         newFileData.status = "WAITING";
+        if (Object.entries(newFileData.status_report).length > 0) {
+          newFileData.status_report = {};
+        }
         newFileMap[fileID] = newFileData;
         return newFileMap;
       }
@@ -122,7 +125,10 @@ const IngestionView: React.FC<IngestionViewProps> = ({
   };
 
   const importSelected = () => {
-    if (selectedFileData && fileMap[selectedFileData].status === "READY") {
+    if (
+      selectedFileData &&
+      ["READY", "DONE", "ERROR"].includes(fileMap[selectedFileData].status)
+    ) {
       if (socket?.readyState === WebSocket.OPEN) {
         setInitialStatus(selectedFileData);
         socket.send(JSON.stringify(fileMap[selectedFileData]));
@@ -135,7 +141,7 @@ const IngestionView: React.FC<IngestionViewProps> = ({
 
   const importAll = () => {
     for (const fileID in fileMap) {
-      if (fileMap[fileID].status === "READY") {
+      if (["READY", "DONE", "ERROR"].includes(fileMap[fileID].status)) {
         if (socket?.readyState === WebSocket.OPEN) {
           setInitialStatus(fileID);
           socket.send(JSON.stringify(fileMap[fileID]));

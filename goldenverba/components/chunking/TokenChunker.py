@@ -47,6 +47,7 @@ class TokenChunker(Chunker):
             return document
 
         encoded_tokens = self.encoding.encode(document.content, disallowed_special=())
+        document.tokens = [self.encoding.decode([token]) for token in encoded_tokens]
 
         # If Split Size is higher than actual Token Count or if Split Size is Zero
         if (
@@ -58,8 +59,6 @@ class TokenChunker(Chunker):
                 chunk_id=0,
                 start=0,
                 end=len(encoded_tokens)-1,
-                tokens=encoded_tokens,
-                meta={}
             )
 
         if overlap >= units:
@@ -81,8 +80,6 @@ class TokenChunker(Chunker):
                 chunk_id=split_id_counter,
                 start=start_i,
                 end=end_i,
-                tokens=encoded_tokens,
-                meta={}
             )
 
             document.chunks.append(doc_chunk)

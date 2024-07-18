@@ -9,7 +9,6 @@ from wasabi import msg
 from weaviate.embedded import EmbeddedOptions
 import asyncio
 
-import goldenverba.components.schema.schema_generation as schema_manager
 from goldenverba.server.ImportLogger import LoggerManager
 
 from goldenverba.components.chunk import Chunk
@@ -62,15 +61,14 @@ class VerbaManager:
             loop = asyncio.get_running_loop()
             start_time = loop.time() 
 
-            # TODO Check for duplicate filename
-            # Check if document names exist in DB
-            # for document in loaded_documents:
-            #    if not self.check_if_document_exits(document):
-            #        filtered_documents.append(document)
-            #    else:
-            #        logger.send_message(f"{document.name} already exists.",2)
-
-            await logger.send_report(fileConfig.fileID, status=FileStatus.STARTING, message="Starting Import", took=0)
+            duplicate_uuid = await self.weaviate_manager.exist_document_name(fileConfig.fileID)
+            if duplicate_uuid is not None and not fileConfig.overwrite:
+                raise Exception(f"{fileConfig.fileID} already exists in Verba")
+            elif duplicate_uuid is not None and fileConfig.overwrite:
+                await self.weaviate_manager.delete_document(duplicate_uuid)
+                await logger.send_report(fileConfig.fileID, status=FileStatus.STARTING, message=f"Overwriting {fileConfig.fileID}", took=0)
+            else:
+                await logger.send_report(fileConfig.fileID, status=FileStatus.STARTING, message="Starting Import", took=0)
 
             load_task = asyncio.create_task(self.reader_manager.load(fileConfig.rag_config["Reader"].selected, fileConfig, logger))
             document = await load_task
@@ -78,13 +76,17 @@ class VerbaManager:
             chunk_task = asyncio.create_task(self.chunker_manager.chunk(fileConfig.rag_config["Chunker"].selected, fileConfig, document, logger))
             chunked_document = await chunk_task
 
-            embedding_task = asyncio.create_task(self.embedder_manager.vectorize(fileConfig.rag_config["Embedder"].selected, fileConfig, document, logger))
+            embedding_task = asyncio.create_task(self.embedder_manager.vectorize(fileConfig.rag_config["Embedder"].selected, fileConfig, chunked_document, logger))
             vectorized_document = await embedding_task
 
-            await logger.send_report(fileConfig.fileID, status=FileStatus.DONE, message=f"Successfully imported {fileConfig.filename} into Verba", took=round(loop.time() - start_time, 2))
+            ingesting_task = asyncio.create_task(self.weaviate_manager.import_document(vectorized_document,fileConfig.rag_config["Embedder"].components[fileConfig.rag_config["Embedder"].selected].config["Model"].value))
+            await ingesting_task
+
+            await logger.send_report(fileConfig.fileID, status=FileStatus.INGESTING, message=f"Imported {fileConfig.filename} and {len(vectorized_document.chunks)} chunks into Weaviate", took=round(loop.time() - start_time, 2))
+            await logger.send_report(fileConfig.fileID, status=FileStatus.DONE, message=f"Import for {fileConfig.filename} completed successfully", took=round(loop.time() - start_time, 2))
 
         except Exception as e:
-            await logger.send_report(fileConfig.fileID, status=FileStatus.ERROR, message=f"Error when importing {fileConfig.filename}: {str(e)}", took=0)
+            await logger.send_report(fileConfig.fileID, status=FileStatus.ERROR, message=f"Import for {fileConfig.filename} failed: {str(e)}", took=0)
             return 
 
     def create_config(self) -> dict:
