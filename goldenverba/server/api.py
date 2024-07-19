@@ -255,7 +255,10 @@ async def update_config(payload: ConfigPayload):
         )
 
     try:
-        manager.set_config(payload.config)
+        if manager.verify_config(payload.config, manager.create_config()):
+            manager.set_config(payload.config)
+        else:
+            msg.warn("Configuration sent by Frontend is corrupted")
     except Exception as e:
         msg.warn(f"Failed to set new Config {str(e)}")
 
@@ -341,30 +344,24 @@ async def suggestions(payload: QueryPayload):
 # Retrieve specific document based on UUID
 @app.post("/api/get_document")
 async def get_document(payload: GetDocumentPayload):
-    # TODO Standarize Document Creation
-    msg.info(f"Document ID received: {payload.document_id}")
-
     try:
-        document = manager.retrieve_document(payload.document_id)
-        document_properties = document.get("properties", {})
-        document_obj = {
-            "class": document.get("class", "No Class"),
-            "id": document.get("id", payload.document_id),
-            "chunks": document_properties.get("chunk_count", 0),
-            "link": document_properties.get("doc_link", ""),
-            "name": document_properties.get("doc_name", "No name"),
-            "type": document_properties.get("doc_type", "No type"),
-            "text": document_properties.get("text", "No text"),
-            "timestamp": document_properties.get("timestamp", ""),
-        }
-
-        msg.good(f"Succesfully retrieved document: {payload.document_id}")
-        return JSONResponse(
-            content={
-                "error": "",
-                "document": document_obj,
-            }
-        )
+        document = await manager.weaviate_manager.get_document(payload.uuid)
+        if document is not None:
+            msg.good(f"Succesfully retrieved document: {document['title']}")
+            return JSONResponse(
+                content={
+                    "error": "",
+                    "document": document,
+                }
+            )
+        else:
+            msg.warn(f"Could't retrieve document")
+            return JSONResponse(
+                content={
+                    "error": "Couldn't retrieve requested document",
+                    "document": None,
+                }
+            )            
     except Exception as e:
         msg.fail(f"Document retrieval failed: {str(e)}")
         return JSONResponse(

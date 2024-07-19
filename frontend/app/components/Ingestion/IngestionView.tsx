@@ -16,8 +16,9 @@ import { FileData } from "./types";
 interface IngestionViewProps {
   settingConfig: SettingsConfiguration;
   RAGConfig: RAGConfig | null;
-  setRAGConfig: (r_: RAGConfig | null) => void;
+  setRAGConfig: React.Dispatch<React.SetStateAction<RAGConfig | null>>;
   setReconnectMain: React.Dispatch<React.SetStateAction<boolean>>;
+  APIHost: string | null;
 }
 
 const IngestionView: React.FC<IngestionViewProps> = ({
@@ -25,6 +26,7 @@ const IngestionView: React.FC<IngestionViewProps> = ({
   RAGConfig,
   setRAGConfig,
   setReconnectMain,
+  APIHost,
 }) => {
   const [fileMap, setFileMap] = useState<FileMap>({});
   const [selectedFileData, setSelectedFileData] = useState<string | null>(null);
@@ -183,6 +185,9 @@ const IngestionView: React.FC<IngestionViewProps> = ({
           <ConfigurationView
             settingConfig={settingConfig}
             selectedFileData={selectedFileData}
+            RAGConfig={RAGConfig}
+            APIHost={APIHost}
+            setRAGConfig={setRAGConfig}
             fileMap={fileMap}
             setFileMap={setFileMap}
             setSelectedFileData={setSelectedFileData}

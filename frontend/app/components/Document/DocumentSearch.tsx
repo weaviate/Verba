@@ -77,7 +77,6 @@ const DocumentSearch: React.FC<DocumentSearchComponentProps> = ({
   const fetchAllDocuments = async (_userInput?: string) => {
     try {
       setIsFetching(true);
-      setSelectedDocument(null);
 
       const response = await fetch(APIHost + "/api/get_all_documents", {
         method: "POST",

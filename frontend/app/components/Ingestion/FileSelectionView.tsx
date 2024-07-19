@@ -108,6 +108,7 @@ const FileSelectionView: React.FC<FileSelectionViewProps> = ({
       }
 
       setFileMap(newFileMap);
+      setSelectedFileData(files[0].name);
 
       event.target.value = "";
     }
@@ -140,6 +141,7 @@ const FileSelectionView: React.FC<FileSelectionViewProps> = ({
       };
 
       setFileMap(newFileMap);
+      setSelectedFileData(fileID);
     }
   };
 

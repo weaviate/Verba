@@ -69,9 +69,9 @@ class ReaderManager:
             loop = asyncio.get_running_loop()
             start_time = loop.time() 
             if reader in self.readers:
-                config = fileConfig.rag_config["Reader"].components[reader]
-                document : Document = await self.readers[reader].load(fileConfig)
-                document.meta["Reader"] = config.model_dump_json()
+                config = fileConfig.rag_config["Reader"].components[reader].config
+                document : Document = await self.readers[reader].load(config, fileConfig)
+                document.meta["Reader"] = fileConfig.rag_config["Reader"].components[reader].model_dump_json()
                 elapsed_time = round(loop.time() - start_time, 2)
                 await logger.send_report(fileConfig.fileID, FileStatus.LOADING, f"Loaded {fileConfig.filename}", took=elapsed_time)
                 await logger.send_report(fileConfig.fileID, FileStatus.CHUNKING, "", took=0)
@@ -430,6 +430,17 @@ class WeaviateManager:
             response = document_collection.query.bm25(query=query, limit=pageSize, offset=offset)
 
         return [{"title":doc.properties["title"], "uuid":str(doc.uuid), "labels":doc.properties["labels"]} for doc in response.objects]
+    
+    async def get_document(self, uuid: str) -> list[dict]:
+        document_collection = self.client.collections.get(self.document_collection_name)
+
+        if document_collection.data.exists(uuid):
+            response = document_collection.query.fetch_object_by_id(uuid)
+            return response.properties
+        else:
+            return None
+
+       
 
 
 

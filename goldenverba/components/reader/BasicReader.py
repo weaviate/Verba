@@ -1,6 +1,5 @@
 import base64
 import json
-from datetime import datetime
 import io
 
 from wasabi import msg
@@ -8,8 +7,6 @@ from wasabi import msg
 from goldenverba.components.document import Document
 from goldenverba.components.interfaces import Reader
 from goldenverba.server.types import FileConfig
-
-from goldenverba.server.ImportLogger import LoggerManager
 
 try:
     from pypdf import PdfReader
@@ -33,8 +30,8 @@ class BasicReader(Reader):
         self.requires_library = ["pypdf", "docx"]
 
     async def load(
-        self, fileConfig: FileConfig
-    ) -> list[Document]:
+        self, config:dict, fileConfig: FileConfig
+    ) -> Document:
 
         document = None
     
@@ -46,7 +43,7 @@ class BasicReader(Reader):
             try:
                 fileContent = decoded_bytes.decode("utf-8")
             except Exception as e:
-                msg.warn(f"Failed to load {fileConfig.filename} : {str(e)}")
+                raise Exception(f"Failed to load {fileConfig.filename} : {str(e)}")
 
         elif fileConfig.extension == "json":
             try:
@@ -57,8 +54,8 @@ class BasicReader(Reader):
                 return document
 
             except Exception as e:
-                msg.warn(f"Failed to load {fileConfig.filename} : {str(e)}")
-
+                raise Exception(f"Failed to load {fileConfig.filename} : {str(e)}")
+            
         elif fileConfig.extension == "pdf":
             try:
                 pdf_bytes = io.BytesIO(base64.b64decode(fileConfig.content))
@@ -72,7 +69,7 @@ class BasicReader(Reader):
                 fileContent = full_text
 
             except Exception as e:
-                msg.warn(f"Failed to load {fileConfig.filename} : {str(e)}")
+                raise Exception(f"Failed to load {fileConfig.filename} : {str(e)}")
 
         elif fileConfig.extension == "docx":
             try:
@@ -87,7 +84,7 @@ class BasicReader(Reader):
                 fileContent = full_text
 
             except Exception as e:
-                msg.warn(f"Failed to load {fileConfig.filename} : {str(e)}")
+                raise Exception(f"Failed to load {fileConfig.filename} : {str(e)}")
         
         else:
             raise Exception(f"{fileConfig.filename} with extension {fileConfig.extension} not supported by BasicReader.")

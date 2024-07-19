@@ -73,7 +73,7 @@ class Reader(VerbaComponent):
         self.type = "FILE"  # "URL"
 
     async def load(
-        self, fileConfig: FileConfig
+        self, config: dict, fileConfig: FileConfig
     ) -> list[Document]:
         """Ingest data into Weaviate
         @parameter: fileConfig: FileConfig - FileConfiguration sent by the frontend
@@ -91,7 +91,7 @@ class Chunker(VerbaComponent):
         super().__init__()
         self.config = {}
 
-    async def chunk(self, fileConfig: FileConfig, document: Document):
+    async def chunk(self, config: dict, document: Document):
         """Chunk verba documents into chunks based on units and overlap.
         @parameter: fileConfig : FileConfig - FileConfiguration sent by the frontend
         @parameter: document : Document - Verba document to chunk

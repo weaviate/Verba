@@ -28,8 +28,12 @@ import ComponentView from "./ComponentView";
 interface ConfigurationViewProps {
   settingConfig: SettingsConfiguration;
   selectedFileData: string | null;
+  RAGConfig: RAGConfig | null;
+  setRAGConfig: React.Dispatch<React.SetStateAction<RAGConfig | null>>;
   setSelectedFileData: (f: string | null) => void;
   fileMap: FileMap;
+  APIHost: string | null;
+
   setFileMap: React.Dispatch<React.SetStateAction<FileMap>>;
 }
 
@@ -38,11 +42,80 @@ const ConfigurationView: React.FC<ConfigurationViewProps> = ({
   selectedFileData,
   fileMap,
   setFileMap,
+  RAGConfig,
+  setRAGConfig,
   setSelectedFileData,
+  APIHost,
 }) => {
   const [selectedSetting, setSelectedSetting] = useState<
     "Basic" | "Pipeline" | "Metadata"
   >("Basic");
+
+  const applyToAll = () => {
+    setFileMap((prevFileMap) => {
+      if (selectedFileData) {
+        const newRAGConfig: RAGConfig = JSON.parse(
+          JSON.stringify(prevFileMap[selectedFileData].rag_config)
+        );
+        const newFileMap: FileMap = { ...prevFileMap };
+
+        for (const fileID in prevFileMap) {
+          const newFileData: FileData = JSON.parse(
+            JSON.stringify(prevFileMap[fileID])
+          );
+          newFileData.rag_config = newRAGConfig;
+          newFileData.source = prevFileMap[selectedFileData].source;
+          newFileData.labels = prevFileMap[selectedFileData].labels;
+          newFileData.overwrite = prevFileMap[selectedFileData].overwrite;
+          newFileMap[fileID] = newFileData;
+        }
+        return newFileMap;
+      }
+      return prevFileMap;
+    });
+  };
+
+  const setAsDefault = async () => {
+    if (selectedFileData) {
+      setRAGConfig(fileMap[selectedFileData].rag_config);
+    }
+  };
+
+  const resetConfig = () => {
+    setFileMap((prevFileMap) => {
+      if (selectedFileData && RAGConfig) {
+        const newFileMap: FileMap = { ...prevFileMap };
+        const newFileData: FileData = JSON.parse(
+          JSON.stringify(prevFileMap[selectedFileData])
+        );
+        newFileData.rag_config = RAGConfig;
+        newFileMap[selectedFileData] = newFileData;
+        return newFileMap;
+      }
+      return prevFileMap;
+    });
+  };
+
+  const openApplyAllModal = () => {
+    const modal = document.getElementById("apply_setting_to_all");
+    if (modal instanceof HTMLDialogElement) {
+      modal.showModal();
+    }
+  };
+
+  const openResetModal = () => {
+    const modal = document.getElementById("reset_Setting");
+    if (modal instanceof HTMLDialogElement) {
+      modal.showModal();
+    }
+  };
+
+  const openDefaultModal = () => {
+    const modal = document.getElementById("set_default_settings");
+    if (modal instanceof HTMLDialogElement) {
+      modal.showModal();
+    }
+  };
 
   return (
     <div className="flex flex-col gap-2 w-full">
@@ -74,16 +147,6 @@ const ConfigurationView: React.FC<ConfigurationViewProps> = ({
           >
             <FaHammer size={15} />
             <p>Pipeline</p>
-          </button>
-
-          <button
-            onClick={() => {
-              setSelectedSetting("Metadata");
-            }}
-            className={`flex ${selectedSetting === "Metadata" ? "bg-primary-verba hover:bg-button-hover-verba" : "bg-button-verba hover:bg-button-hover-verba"} border-none btn text-text-verba gap-2`}
-          >
-            <MdOutlineDataset size={15} />
-            <p>Metadata</p>
           </button>
 
           <button
@@ -134,15 +197,24 @@ const ConfigurationView: React.FC<ConfigurationViewProps> = ({
       {/* Import Footer */}
       <div className="bg-bg-alt-verba rounded-2xl flex gap-2 p-6 items-center justify-end h-min w-full">
         <div className="flex gap-3 justify-end">
-          <button className="flex btn border-none text-text-verba bg-secondary-verba hover:bg-button-hover-verba gap-2">
+          <button
+            onClick={openApplyAllModal}
+            className="flex btn border-none text-text-verba bg-secondary-verba hover:bg-button-hover-verba gap-2"
+          >
             <VscSaveAll size={15} />
             <p>Apply to All</p>
           </button>
-          <button className="flex btn border-none text-text-verba bg-button-verba hover:bg-button-hover-verba gap-2">
+          <button
+            onClick={openDefaultModal}
+            className="flex btn border-none text-text-verba bg-button-verba hover:bg-button-hover-verba gap-2"
+          >
             <IoSettingsSharp size={15} />
             <p>Set as Default</p>
           </button>
-          <button className="flex btn border-none text-text-verba bg-button-verba hover:bg-warning-verba gap-2">
+          <button
+            onClick={openResetModal}
+            className="flex btn border-none text-text-verba bg-button-verba hover:bg-warning-verba gap-2"
+          >
             <MdCancel size={15} />
             <p>Reset</p>
           </button>
@@ -150,11 +222,28 @@ const ConfigurationView: React.FC<ConfigurationViewProps> = ({
       </div>
       <UserModalComponent
         modal_id={"apply_setting_to_all"}
-        title={"Set as Default"}
-        text={"Set current settings as Default and apply to all files?"}
-        triggerString="Save as Default"
+        title={"Apply Pipeline Settings"}
+        text={"Apply Pipeline Settings to all files?"}
+        triggerString="Apply"
         triggerValue={null}
-        triggerAccept={null}
+        triggerAccept={applyToAll}
+      />
+      <UserModalComponent
+        modal_id={"reset_Setting"}
+        title={"Reset Setting"}
+        text={"Reset pipeline settings of this file?"}
+        triggerString="Reset"
+        triggerValue={null}
+        triggerAccept={resetConfig}
+      />
+
+      <UserModalComponent
+        modal_id={"set_default_settings"}
+        title={"Set Default"}
+        text={"Set current pipeline settings as default for future files?"}
+        triggerString="Set"
+        triggerValue={null}
+        triggerAccept={setAsDefault}
       />
     </div>
   );

@@ -143,7 +143,7 @@ export default function Home() {
 
   useEffect(() => {
     importConfig();
-  }, [baseSetting, settingTemplate]);
+  }, [baseSetting, settingTemplate, RAGConfig]);
 
   useEffect(() => {
     if (baseSetting) {
@@ -266,6 +266,7 @@ export default function Home() {
               settingConfig={baseSetting[settingTemplate]}
               RAGConfig={RAGConfig}
               setRAGConfig={setRAGConfig}
+              APIHost={APIHost}
               setReconnectMain={setReconnect}
             />
           </div>

@@ -170,13 +170,80 @@ class VerbaManager:
     def load_config(self):
         """Check if a Configuration File exists in the database, if yes, check if corrupted. Returns a valid configuration file"""
         loaded_config = self.weaviate_manager.get_config(self.config_uuid)
+        new_config = self.create_config()
+
         if loaded_config is not None:
-            msg.info("Using Existing Configuration")
-            return loaded_config
+            if self.verify_config(loaded_config, new_config):
+                msg.info("Using Existing Configuration")
+                return loaded_config
+            else:
+                msg.info("Using New Configuration")
+                self.set_config(new_config)
+                return new_config
         else:
-            msg.info("Creating Configuration")
-            return self.create_config()
-        
+            msg.info("Using New Configuration")
+            return new_config
+    
+    def verify_config(self, a: dict, b: dict) -> bool:
+        # Check Settings ( RAG & Settings )
+        try:
+            if len(list(a.keys())) != len(list(b.keys())):
+                msg.fail(f"Config Validation Failed: {len(list(a.keys()))} != {len(list(b.keys()))}")
+                return False  
+
+            if "RAG" not in a or "RAG" not in b:
+                msg.fail(f"Config Validation Failed, RAG is missing: {list(a.keys())} != {list(b.keys())}")
+                return False
+            
+            if len(list(a["RAG"].keys())) != len(list(b["RAG"].keys())):
+                msg.fail(f"Config Validation Failed, RAG component count mismatch {len(list(a['RAG'].keys()))} != {len(list(b['RAG'].keys()))}")
+                return False  
+
+            for a_component_key, b_component_key in zip(a["RAG"], b["RAG"]):
+                if a_component_key != b_component_key:
+                    msg.fail(f"Config Validation Failed, component name mismatch: {a_component_key} != {b_component_key}")
+                    return False
+                
+                a_component = a["RAG"][a_component_key]["components"]
+                b_component = b["RAG"][b_component_key]["components"]
+
+                for a_rag_component_key, b_rag_component_key in zip(a_component,b_component):
+                    if a_rag_component_key != b_rag_component_key:
+                        msg.fail(f"Config Validation Failed, component name mismatch: {a_rag_component_key} != {b_rag_component_key}")
+                        return False
+                    a_rag_component = a_component[a_rag_component_key]
+                    b_rag_component = b_component[b_rag_component_key]
+
+                    a_config = a_rag_component["config"]
+                    b_config = b_rag_component["config"]
+
+                    if len(a_config) != len(b_config):
+                        msg.fail(f"Config Validation Failed, component config count mismatch: {len(a_config)} != {len(b_config)}")
+                        return False
+                    
+                    for a_config_key, b_config_key in zip(a_config, b_config):
+                        if a_config_key != b_config_key:
+                                msg.fail(f"Config Validation Failed, component name mismatch: {a_config_key} != {b_config_key}")
+                                return False
+                        
+                        a_setting = a_config[a_config_key]
+                        b_setting = b_config[b_config_key]
+
+                        if a_setting['description'] != b_setting['description']:
+                            msg.fail(f"Config Validation Failed, description mismatch: {a_setting['description']} != {b_setting['description']}")
+                            return False
+                        
+                        if a_setting['values'] != b_setting['values']:
+                            msg.fail(f"Config Validation Failed, values mismatch: {a_setting['values']} != {b_setting['values']}")
+                            return False
+
+            return True
+
+        except Exception as e:
+            msg.fail(f"Config Validation failed: {str(e)}")
+            return False
+            
+
     def reset_config(self):
         msg.info("Resetting Configuration")
         self.weaviate_manager.reset_config(self.config_uuid)

@@ -16,12 +16,11 @@ All notable changes to this project will be documented in this file.
 - Add multiple labels to documents
 - More configuration for readers, chunkers, and embedders
 - Improved Document Search UI
+- Add Config Validation
 - Added DocumentExplorer with
   - Content View
   - Chunk View
   - Vector View
-  - Graph View
-  - Metadata View
 
 ## [1.0.3]
 

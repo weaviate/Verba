@@ -9,7 +9,18 @@ export type DocumentChunk = {
 
 export type DocumentPayload = {
   error: string;
-  document: Document;
+  document: VerbaDocument;
+};
+
+export type VerbaDocument = {
+  title: string;
+  content: string;
+  extension: string;
+  fileSize: number;
+  labels: string[];
+  source: string;
+  meta: any;
+  tokens: string[];
 };
 
 export type DocumentsPreviewPayload = {
