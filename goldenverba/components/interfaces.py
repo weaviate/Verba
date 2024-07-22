@@ -75,12 +75,11 @@ class Reader(VerbaComponent):
     async def load(
         self, config: dict, fileConfig: FileConfig
     ) -> list[Document]:
-        """Ingest data into Weaviate
+        """Convert fileConfig into Verba Documents
         @parameter: fileConfig: FileConfig - FileConfiguration sent by the frontend
-        @returns Document - Verba document
+        @returns list[Document] - Verba documents
         """
         raise NotImplementedError("load method must be implemented by a subclass.")
-
 
 class Chunker(VerbaComponent):
     """

@@ -17,6 +17,7 @@ All notable changes to this project will be documented in this file.
 - More configuration for readers, chunkers, and embedders
 - Improved Document Search UI
 - Add Config Validation
+- Add HTML Reader
 - Added DocumentExplorer with
   - Content View
   - Chunk View

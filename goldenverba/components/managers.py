@@ -10,6 +10,10 @@ import os
 import asyncio
 import json
 
+from sklearn.decomposition import PCA
+
+import numpy as np
+
 from goldenverba.components.document import Document
 from goldenverba.components.chunk import Chunk
 from goldenverba.components.interfaces import (
@@ -27,6 +31,7 @@ from goldenverba.components.reader.BasicReader import BasicReader
 from goldenverba.components.reader.GitReader import GitHubReader
 from goldenverba.components.reader.LabReader import GitLabReader
 from goldenverba.components.reader.UnstructuredAPI import UnstructuredReader
+from goldenverba.components.reader.HTMLReader import HTMLReader
 
 from goldenverba.components.chunking.TokenChunker import TokenChunker
 from goldenverba.components.embedding.OpenAIEmbedder import OpenAIEmbedder
@@ -52,7 +57,7 @@ except Exception:
 
 ### Add new components here ###
 
-readers = [BasicReader(), GitHubReader(), GitLabReader(), UnstructuredReader()]
+readers = [BasicReader(), GitHubReader(), GitLabReader(), UnstructuredReader(), HTMLReader()]
 chunkers = [TokenChunker()]
 embedders = [OpenAIEmbedder(), SentenceTransformersEmbedder(), CohereEmbedder(), OllamaEmbedder(), GoogleEmbedder()]
 
@@ -70,12 +75,16 @@ class ReaderManager:
             start_time = loop.time() 
             if reader in self.readers:
                 config = fileConfig.rag_config["Reader"].components[reader].config
-                document : Document = await self.readers[reader].load(config, fileConfig)
-                document.meta["Reader"] = fileConfig.rag_config["Reader"].components[reader].model_dump_json()
+                documents : list[Document] = await self.readers[reader].load(config, fileConfig)
+                for document in documents:
+                    document.meta["Reader"] = fileConfig.rag_config["Reader"].components[reader].model_dump_json()
                 elapsed_time = round(loop.time() - start_time, 2)
-                await logger.send_report(fileConfig.fileID, FileStatus.LOADING, f"Loaded {fileConfig.filename}", took=elapsed_time)
+                if len(documents) == 1:
+                    await logger.send_report(fileConfig.fileID, FileStatus.LOADING, f"Loaded {fileConfig.filename}", took=elapsed_time)
+                else:
+                    await logger.send_report(fileConfig.fileID, FileStatus.LOADING, f"Loaded {fileConfig.filename} with {len(documents)} documents", took=elapsed_time)
                 await logger.send_report(fileConfig.fileID, FileStatus.CHUNKING, "", took=0)
-                return document
+                return documents
             else:
                 raise Exception(f"{reader} Reader not found")
 
@@ -86,18 +95,23 @@ class ChunkerManager:
     def __init__(self):
         self.chunkers: dict[str, Chunker] = { chunker.name : chunker for chunker in chunkers }
 
-    async def chunk(self, chunker: str, fileConfig: FileConfig, document: Document, logger: LoggerManager) -> Document:
+    async def chunk(self, chunker: str, fileConfig: FileConfig, documents: list[Document], logger: LoggerManager) -> list[Document]:
         try:
             loop = asyncio.get_running_loop()
             start_time = loop.time() 
             if chunker in self.chunkers:
                 config = fileConfig.rag_config["Chunker"].components[chunker].config
-                chunked_document = await self.chunkers[chunker].chunk(config, document)
-                chunked_document.meta["Chunker"] = fileConfig.rag_config["Chunker"].components[chunker].model_dump_json()
+                chunked_documents = await self.chunkers[chunker].chunk(config, documents)
+                for chunked_document in chunked_documents:
+                    chunked_document.meta["Chunker"] = fileConfig.rag_config["Chunker"].components[chunker].model_dump_json()
                 elapsed_time = round(loop.time() - start_time, 2)
-                await logger.send_report(fileConfig.fileID, FileStatus.CHUNKING, f"Split {fileConfig.filename} into {len(document.chunks)} chunks", took=elapsed_time)
+                if len(documents) == 1:
+                    await logger.send_report(fileConfig.fileID, FileStatus.CHUNKING, f"Split {fileConfig.filename} into {len(chunked_documents[0].chunks)} chunks", took=elapsed_time)
+                else:
+                    await logger.send_report(fileConfig.fileID, FileStatus.CHUNKING, f"Chunked all {len(chunked_documents)} documents with a total of {sum([len(document.chunks) for document in chunked_documents])} chunks", took=elapsed_time)
+
                 await logger.send_report(fileConfig.fileID, FileStatus.EMBEDDING, "", took=0)
-                return chunked_document
+                return chunked_documents
             else:
                 raise Exception(f"{chunker} Chunker not found")
         except Exception as e:
@@ -111,9 +125,9 @@ class EmbeddingManager:
         self,
         embedder: str,
         fileConfig: FileConfig,
-        document: Document,
+        documents: list[Document],
         logger: LoggerManager
-    ) -> Document:
+    ) -> list[Document]:
         """Vectorizes chunks
         @parameter: documents : Document - Verba document
         @returns Document - Document with vectorized chunks
@@ -123,15 +137,28 @@ class EmbeddingManager:
             start_time = loop.time() 
             if embedder in self.embedders:
                 config = fileConfig.rag_config["Embedder"].components[embedder].config
-                content = [chunk.content for chunk in document.chunks]
-                embeddings = await self.embedders[embedder].vectorize(config, content)
-                for vector, chunk in zip(embeddings,document.chunks):
-                    chunk.vector = vector
-                document.meta["Embedder"] = fileConfig.rag_config["Embedder"].components[embedder].model_dump_json()
+
+                for document in documents:
+                    content = [chunk.content for chunk in document.chunks]
+                    embeddings = await self.embedders[embedder].vectorize(config, content)
+
+                    if len(embeddings) >= 3:
+                        pca = PCA(n_components=3)
+                        generated_pca_embeddings = pca.fit_transform(embeddings)
+                        pca_embeddings = [pca_.tolist() for pca_ in generated_pca_embeddings]
+                    else:
+                        pca_embeddings = [embedding[0:3] for embedding in embeddings]
+
+                    for vector, chunk, pca_ in zip(embeddings,document.chunks, pca_embeddings):
+                        chunk.vector = vector
+                        chunk.pca = pca_
+
+                    document.meta["Embedder"] = fileConfig.rag_config["Embedder"].components[embedder].model_dump_json()
+
                 elapsed_time = round(loop.time() - start_time, 2)
                 await logger.send_report(fileConfig.fileID, FileStatus.EMBEDDING, f"Vectorized all chunks", took=elapsed_time)
                 await logger.send_report(fileConfig.fileID, FileStatus.INGESTING, "", took=0)
-                return document
+                return documents
             else:
                 raise Exception(f"{embedder} Embedder not found")
         except Exception as e:
@@ -400,7 +427,10 @@ class WeaviateManager:
     ### Document CRUD
         
     async def exist_document_name(self, name: str) -> str:
-        if len(self.client.collections.get(self.document_collection_name).query.fetch_objects(filters=Filter.by_property("title").equal(name)).objects) > 0:
+
+        if self.client.collections.get(self.document_collection_name).aggregate.over_all(total_count=True).total_count == 0:
+            return None
+        elif len(self.client.collections.get(self.document_collection_name).query.fetch_objects(filters=Filter.by_property("title").equal(name)).objects) > 0:
             return self.client.collections.get(self.document_collection_name).query.fetch_objects(filters=Filter.by_property("title").equal(name)).objects[0].uuid
         else:
             return None
@@ -424,6 +454,11 @@ class WeaviateManager:
         offset = pageSize * (page - 1)
         document_collection = self.client.collections.get(self.document_collection_name)
 
+        response = document_collection.aggregate.over_all(total_count=True)
+
+        if response.total_count == 0:
+            return []
+
         if query == "":
             response = document_collection.query.fetch_objects(limit=pageSize, offset=offset, sort=Sort.by_property("title", ascending=True))
         else:
@@ -439,6 +474,55 @@ class WeaviateManager:
             return response.properties
         else:
             return None
+
+    ### Chunks Retrieval
+        
+    async def get_chunks(self, uuid:str, page:int, pageSize:int) -> list[dict]:
+
+        offset = pageSize * (page - 1)
+
+        document = await self.get_document(uuid)
+        if document is None:
+            return document
+        
+        embedding_config = json.loads(document.get("meta")["Embedder"])
+        embedder = embedding_config["config"]["Model"]["value"]
+
+        if embedder not in self.embedding_table:
+            raise Exception(f"{embedder} not found in Embedding Table")
+        
+        embedder_collection = self.client.collections.get(self.embedding_table[embedder])
+        chunks = [obj.properties for obj in embedder_collection.query.fetch_objects(filters=Filter.by_property("doc_uuid").equal(uuid), limit=pageSize, offset=offset, sort=Sort.by_property("chunk_id", ascending=True)).objects]
+        for chunk in chunks:
+            chunk["doc_uuid"] = str(chunk["doc_uuid"])
+        return chunks
+    
+    async def get_vectors(self, uuid:str) -> list[dict]:
+
+        document = await self.get_document(uuid)
+        if document is None:
+            return document
+        
+        embedding_config = json.loads(document.get("meta")["Embedder"])
+        embedder = embedding_config["config"]["Model"]["value"]
+
+        if embedder not in self.embedding_table:
+            raise Exception(f"{embedder} not found in Embedding Table")
+        
+        embedder_collection = self.client.collections.get(self.embedding_table[embedder])
+
+        chunks = [obj.properties for obj in embedder_collection.query.fetch_objects(filters=Filter.by_property("doc_uuid").equal(uuid), limit=1000, sort=Sort.by_property("chunk_id", ascending=True)).objects]
+
+        vectors = []
+        for item in chunks:
+            if item["pca"] is not None:
+                vectors.append({"x":item["pca"][0]*100,"y":item["pca"][1]*100,"z":item["pca"][2]*100})
+        return vectors
+
+    
+        
+
+
 
        
 

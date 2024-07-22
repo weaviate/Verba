@@ -14,6 +14,7 @@ class Chunk:
         self.score = None
         self.doc_uuid = None
         self.is_response = False
+        self.pca = [0,0,0]
 
 
 
@@ -26,6 +27,7 @@ class Chunk:
             "end": self.end,
             "doc_uuid": self.doc_uuid,
             "is_response": self.is_response,
+            "pca": self.pca
         }
 
     @classmethod
@@ -37,4 +39,5 @@ class Chunk:
             start=data.get("start", 0),
             end=data.get("end", 0),
         )
+        chunk.pca = data.get("pca", [0,0,0]),
         return chunk

@@ -219,7 +219,10 @@ const DocumentSearch: React.FC<DocumentSearchComponentProps> = ({
         )}
         {documents &&
           documents.map((document, index) => (
-            <div className="flex justify-between items-center gap-2 rounded-2xl p-1 w-full">
+            <div
+              key={"Document" + index + document.title}
+              className="flex justify-between items-center gap-2 rounded-2xl p-1 w-full"
+            >
               <button
                 key={document.title + index}
                 onClick={() => setSelectedDocument(document.uuid)}

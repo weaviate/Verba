@@ -1,6 +1,5 @@
 import base64
 import os
-from datetime import datetime
 import io
 
 import requests
@@ -10,7 +9,6 @@ from goldenverba.components.document import Document
 from goldenverba.components.interfaces import Reader
 from goldenverba.server.types import FileConfig
 
-from goldenverba.server.ImportLogger import LoggerManager
 from goldenverba.components.types import InputConfig
 
 
@@ -95,7 +93,7 @@ class UnstructuredReader(Reader):
                 meta={}
             )
 
-            return document
+            return [document]
 
         except Exception as e:
             raise Exception(f"Failed to load {fileConfig.filename} : {str(e)}")

@@ -71,18 +71,30 @@ class VerbaManager:
                 await logger.send_report(fileConfig.fileID, status=FileStatus.STARTING, message="Starting Import", took=0)
 
             load_task = asyncio.create_task(self.reader_manager.load(fileConfig.rag_config["Reader"].selected, fileConfig, logger))
-            document = await load_task
+            documents = await load_task
 
-            chunk_task = asyncio.create_task(self.chunker_manager.chunk(fileConfig.rag_config["Chunker"].selected, fileConfig, document, logger))
-            chunked_document = await chunk_task
+            for document in documents:
+                duplicate_uuid = await self.weaviate_manager.exist_document_name(document.title)
+                if duplicate_uuid is not None and not fileConfig.overwrite:
+                    raise Exception(f"{document.title} already exists in Verba")
+                elif duplicate_uuid is not None and fileConfig.overwrite:
+                    await self.weaviate_manager.delete_document(duplicate_uuid)
 
-            embedding_task = asyncio.create_task(self.embedder_manager.vectorize(fileConfig.rag_config["Embedder"].selected, fileConfig, chunked_document, logger))
-            vectorized_document = await embedding_task
+            chunk_task = asyncio.create_task(self.chunker_manager.chunk(fileConfig.rag_config["Chunker"].selected, fileConfig, documents, logger))
+            chunked_documents = await chunk_task
 
-            ingesting_task = asyncio.create_task(self.weaviate_manager.import_document(vectorized_document,fileConfig.rag_config["Embedder"].components[fileConfig.rag_config["Embedder"].selected].config["Model"].value))
-            await ingesting_task
+            embedding_task = asyncio.create_task(self.embedder_manager.vectorize(fileConfig.rag_config["Embedder"].selected, fileConfig, chunked_documents, logger))
+            vectorized_documents = await embedding_task
 
-            await logger.send_report(fileConfig.fileID, status=FileStatus.INGESTING, message=f"Imported {fileConfig.filename} and {len(vectorized_document.chunks)} chunks into Weaviate", took=round(loop.time() - start_time, 2))
+            for document in vectorized_documents:
+                ingesting_task = asyncio.create_task(self.weaviate_manager.import_document(document,fileConfig.rag_config["Embedder"].components[fileConfig.rag_config["Embedder"].selected].config["Model"].value))
+                await ingesting_task
+
+            if len(vectorized_documents) > 1:
+                await logger.send_report(fileConfig.fileID, status=FileStatus.INGESTING, message=f"Imported {fileConfig.filename} and it's {len(vectorized_documents)} documents into Weaviate", took=round(loop.time() - start_time, 2))
+            else:
+                await logger.send_report(fileConfig.fileID, status=FileStatus.INGESTING, message=f"Imported {fileConfig.filename} and {len(vectorized_documents[0].chunks)} chunks into Weaviate", took=round(loop.time() - start_time, 2))
+            
             await logger.send_report(fileConfig.fileID, status=FileStatus.DONE, message=f"Import for {fileConfig.filename} completed successfully", took=round(loop.time() - start_time, 2))
 
         except Exception as e:
@@ -206,6 +218,10 @@ class VerbaManager:
                 
                 a_component = a["RAG"][a_component_key]["components"]
                 b_component = b["RAG"][b_component_key]["components"]
+
+                if len(a_component) != len(b_component):
+                    msg.fail(f"Config Validation Failed, {a_component_key} component count mismatch: {len(a_component)} != {len(b_component)}")
+                    return False
 
                 for a_rag_component_key, b_rag_component_key in zip(a_component,b_component):
                     if a_rag_component_key != b_rag_component_key:

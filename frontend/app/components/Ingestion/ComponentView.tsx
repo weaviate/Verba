@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, use } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { FileData, FileMap } from "./types";
 import { FaTrash } from "react-icons/fa";
 import { GoTriangleDown } from "react-icons/go";
@@ -30,23 +30,27 @@ const ComponentView: React.FC<ComponentViewProps> = ({
   setFileMap,
   component_name,
 }) => {
-  const updateConfig = (configKey: string, configValue: string | number) => {
-    setFileMap((prevFileMap) => {
-      if (selectedFileData) {
-        const newFileData: FileData = JSON.parse(
-          JSON.stringify(prevFileMap[selectedFileData])
-        );
-        const newFileMap: FileMap = { ...prevFileMap };
+  const updateConfig = useCallback(
+    (configKey: string, configValue: string | boolean) => {
+      setFileMap((prevFileMap) => {
+        if (selectedFileData) {
+          const newFileMap = { ...prevFileMap };
+          const selectedFile = newFileMap[selectedFileData];
+          const componentConfig =
+            selectedFile.rag_config[component_name].components[
+              selectedFile.rag_config[component_name].selected
+            ].config;
 
-        newFileMap[selectedFileData].rag_config[component_name].components[
-          newFileMap[selectedFileData].rag_config[component_name].selected
-        ].config[configKey].value = configValue;
-        newFileMap[selectedFileData] = newFileData;
-        return newFileMap;
-      }
-      return prevFileMap;
-    });
-  };
+          // Update the specific config value directly
+          componentConfig[configKey].value = configValue;
+
+          return newFileMap;
+        }
+        return prevFileMap;
+      });
+    },
+    [selectedFileData, component_name]
+  );
 
   function renderComponents(rag_config: RAGConfig) {
     return Object.entries(rag_config[component_name].components).map(
@@ -165,10 +169,10 @@ const ComponentView: React.FC<ComponentViewProps> = ({
               fileMap[selectedFileData].rag_config[component_name].selected
             ].config
           ).map(([configTitle, config]) => (
-            <div>
-              <div className="flex gap-2 justify-between items-center text-text-verba">
+            <div key={"Configuration" + configTitle + component_name}>
+              <div className="flex gap-3 justify-between items-center text-text-verba">
                 <p className="flex min-w-[8vw]">{configTitle}</p>
-                {config.type === "dropdown" ? (
+                {config.type === "dropdown" && (
                   <div className="dropdown dropdown-bottom flex justify-start items-center w-full">
                     <button
                       tabIndex={0}
@@ -188,7 +192,9 @@ const ComponentView: React.FC<ComponentViewProps> = ({
                       )}
                     </ul>
                   </div>
-                ) : (
+                )}
+
+                {typeof config.value != "boolean" && (
                   <label className="input flex items-center gap-2 w-full bg-bg-verba">
                     <input
                       type={config.type}
@@ -199,6 +205,20 @@ const ComponentView: React.FC<ComponentViewProps> = ({
                       }}
                     />
                   </label>
+                )}
+
+                {typeof config.value === "boolean" && (
+                  <input
+                    type="checkbox"
+                    className="checkbox checkbox-md"
+                    onChange={(e) =>
+                      updateConfig(
+                        configTitle,
+                        (e.target as HTMLInputElement).checked
+                      )
+                    }
+                    checked={config.value}
+                  />
                 )}
               </div>
               <div className="flex gap-2 items-center text-text-verba">

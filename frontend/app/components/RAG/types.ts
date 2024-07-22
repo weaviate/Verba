@@ -50,7 +50,7 @@ export type RAGComponentConfig = {
 
 export type ConfigSetting = {
   type: string;
-  value: string | number;
+  value: string | number | boolean;
   description: string;
   values: string[];
 };

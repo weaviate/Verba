@@ -146,7 +146,7 @@ const ConfigurationView: React.FC<ConfigurationViewProps> = ({
             className={`flex ${selectedSetting === "Pipeline" ? "bg-primary-verba hover:bg-button-hover-verba" : "bg-button-verba hover:bg-button-hover-verba"} border-none btn text-text-verba gap-2`}
           >
             <FaHammer size={15} />
-            <p>Pipeline</p>
+            <p>Config</p>
           </button>
 
           <button

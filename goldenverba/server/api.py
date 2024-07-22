@@ -24,6 +24,7 @@ from goldenverba.server.types import (
     SearchQueryPayload,
     ImportPayload,
     ImportStreamPayload,
+    ChunksPayload,
     FileConfig
 )
 
@@ -368,6 +369,46 @@ async def get_document(payload: GetDocumentPayload):
             content={
                 "error": str(e),
                 "document": None,
+            }
+        )
+    
+# Retrieve specific document based on UUID
+@app.post("/api/get_vectors")
+async def get_vectors(payload: GetDocumentPayload):
+    try:
+        vectors = await manager.weaviate_manager.get_vectors(payload.uuid)
+        return JSONResponse(
+            content={
+                "error": "",
+                "vectors": vectors,
+            }
+        )            
+    except Exception as e:
+        msg.fail(f"Vector retrieval failed: {str(e)}")
+        return JSONResponse(
+            content={
+                "error": str(e),
+                "vectors": [],
+            }
+        )
+    
+# Retrieve specific document based on UUID
+@app.post("/api/get_chunks")
+async def get_chunks(payload: ChunksPayload):
+    try:
+        chunks = await manager.weaviate_manager.get_chunks(payload.uuid, payload.page, payload.pageSize)
+        return JSONResponse(
+            content={
+                "error": "",
+                "chunks": chunks,
+            }
+        )            
+    except Exception as e:
+        msg.fail(f"Chunk retrieval failed: {str(e)}")
+        return JSONResponse(
+            content={
+                "error": str(e),
+                "chunks": None,
             }
         )
 

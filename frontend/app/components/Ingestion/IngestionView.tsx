@@ -65,10 +65,12 @@ const IngestionView: React.FC<IngestionViewProps> = ({
     localSocket.onerror = (error) => {
       console.error("Import WebSocket Error:", error);
       setSocketStatus("OFFLINE");
+      setSocketErrorStatus();
     };
 
     localSocket.onclose = (event) => {
       setSocketStatus("OFFLINE");
+      setSocketErrorStatus();
       if (event.wasClean) {
         console.log(
           `Import WebSocket connection closed cleanly, code=${event.code}, reason=${event.reason}`
@@ -90,6 +92,31 @@ const IngestionView: React.FC<IngestionViewProps> = ({
   const reconnectToVerba = () => {
     setReconnect((prevState) => !prevState);
     setReconnectMain((prevState) => !prevState);
+  };
+
+  const setSocketErrorStatus = () => {
+    setFileMap((prevFileMap) => {
+      if (fileMap) {
+        const newFileMap = { ...prevFileMap };
+        for (const fileMapKey in newFileMap) {
+          if (
+            newFileMap[fileMapKey].status != "DONE" &&
+            newFileMap[fileMapKey].status != "ERROR" &&
+            newFileMap[fileMapKey].status != "READY"
+          ) {
+            newFileMap[fileMapKey].status = "ERROR";
+            newFileMap[fileMapKey].status_report["ERROR"] = {
+              fileID: fileMapKey,
+              status: "ERROR",
+              message: "Connection was interrupted",
+              took: 0,
+            };
+          }
+        }
+        return newFileMap;
+      }
+      return prevFileMap;
+    });
   };
 
   const updateStatus = (data: StatusReport) => {
@@ -181,7 +208,7 @@ const IngestionView: React.FC<IngestionViewProps> = ({
       <div
         className={`${selectedFileData ? "lg:w-[55vw] w-full flex" : "hidden lg:flex lg:w-[55vw]"}`}
       >
-        {selectedFileData && socketStatus === "ONLINE" && (
+        {selectedFileData && (
           <ConfigurationView
             settingConfig={settingConfig}
             selectedFileData={selectedFileData}

@@ -40,14 +40,18 @@ class Document:
     @staticmethod
     def from_json(doc_dict: dict):
         """Convert a JSON string to a Document object."""
-        document = Document(
-            title=doc_dict.get("title", ""),
-            content=doc_dict.get("content", ""),
-            extension=doc_dict.get("extension", ""),
-            fileSize=doc_dict.get("fileSize", 0),
-            labels=doc_dict.get("labels", []),
-            source=doc_dict.get("source", ""),
-            meta=doc_dict.get("meta", {}),
-        )
-        document.tokens = doc_dict.get("tokens", [])
-        return document
+
+        if "title" in doc_dict and "content" in doc_dict and "extension" in doc_dict and "fileSize" in doc_dict and "labels" in doc_dict and "source" in doc_dict and "meta" in doc_dict:
+            document = Document(
+                title=doc_dict.get("title", ""),
+                content=doc_dict.get("content", ""),
+                extension=doc_dict.get("extension", ""),
+                fileSize=doc_dict.get("fileSize", 0),
+                labels=doc_dict.get("labels", []),
+                source=doc_dict.get("source", ""),
+                meta=doc_dict.get("meta", {}),
+            )
+            document.tokens = doc_dict.get("tokens", [])
+            return document
+        else:
+            return None

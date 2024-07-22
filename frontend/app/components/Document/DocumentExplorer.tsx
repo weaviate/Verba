@@ -13,6 +13,9 @@ import { FaTrash } from "react-icons/fa";
 import { FaInfoCircle } from "react-icons/fa";
 import { SlGraph } from "react-icons/sl";
 
+import VectorView from "./VectorView";
+import ChunkView from "./ChunkView";
+
 import InfoComponent from "../Navigation/InfoComponent";
 import { MdCancel } from "react-icons/md";
 import { MdOutlineRefresh } from "react-icons/md";
@@ -58,6 +61,11 @@ const DocumentExplorer: React.FC<DocumentExplorerProps> = ({
       setDocument(null);
     }
   }, [selectedDocument]);
+
+  const handleSourceClick = (url: string) => {
+    // Open a new tab with the specified URL
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
 
   const fetchSelectedDocument = async () => {
     try {
@@ -135,7 +143,7 @@ const DocumentExplorer: React.FC<DocumentExplorerProps> = ({
             className={`flex ${selectedSetting === "Vector Space" ? "bg-primary-verba hover:bg-button-hover-verba" : "bg-button-verba hover:bg-button-hover-verba"} border-none btn text-text-verba gap-2`}
           >
             <TbVectorTriangle size={15} />
-            <p>Vector Space</p>
+            <p>Vector</p>
           </button>
 
           <button
@@ -151,7 +159,7 @@ const DocumentExplorer: React.FC<DocumentExplorerProps> = ({
 
       {/* Document List */}
       <div className="bg-bg-alt-verba rounded-2xl flex flex-col p-6 h-full w-full overflow-y-auto overflow-x-hidden">
-        {isFetching && (
+        {isFetching && selectedSetting === "Content" && (
           <div className="flex items-center justify-center text-text-alt-verba gap-2 h-full">
             <span className="loading loading-spinner loading-sm"></span>
             <p>Loading Document</p>
@@ -161,22 +169,42 @@ const DocumentExplorer: React.FC<DocumentExplorerProps> = ({
         {selectedSetting === "Content" && (
           <ContentView document={document} settingConfig={settingConfig} />
         )}
+
+        {selectedSetting === "Chunks" && (
+          <ChunkView
+            selectedDocument={selectedDocument}
+            APIHost={APIHost}
+            settingConfig={settingConfig}
+          />
+        )}
+
+        {selectedSetting === "Vector Space" && (
+          <VectorView APIHost={APIHost} selectedDocument={selectedDocument} />
+        )}
       </div>
 
       {/* Import Footer */}
       <div className="bg-bg-alt-verba rounded-2xl flex gap-2 p-6 items-center justify-end h-min w-full">
         <div className="flex gap-3 justify-end">
-          <button className="flex btn border-none text-text-verba bg-button-verba hover:bg-button-hover-verba gap-2">
-            <FaInfoCircle size={15} />
-            <p>View Source</p>
-          </button>
-          <button className="flex btn border-none text-text-verba bg-button-verba hover:bg-button-hover-verba gap-2">
+          {selectedDocument && document && document.source && (
+            <button
+              onClick={() => {
+                handleSourceClick(document.source);
+              }}
+              className="flex btn border-none text-text-verba bg-button-verba hover:bg-button-hover-verba gap-2"
+            >
+              <FaInfoCircle size={15} />
+              <p>View Source</p>
+            </button>
+          )}
+          <button
+            onClick={() => {
+              setSelectedSetting("Metadata");
+            }}
+            className={`flex ${selectedSetting === "Metadata" ? "bg-primary-verba hover:bg-button-hover-verba" : "bg-button-verba hover:bg-button-hover-verba"} border-none btn text-text-verba gap-2`}
+          >
             <FaInfoCircle size={15} />
             <p>View Metadata</p>
-          </button>
-          <button className="flex btn border-none text-text-verba bg-button-verba hover:bg-warning-verba gap-2">
-            <MdCancel size={15} />
-            <p>Delete</p>
           </button>
         </div>
       </div>

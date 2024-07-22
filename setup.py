@@ -29,12 +29,14 @@ setup(
         "wasabi==1.1.2",
         "fastapi==0.111.1",
         "uvicorn[standard]==0.29.0",
+        "gunicorn==22.0.0",
         "click==8.1.7",
         "asyncio==3.4.3",
         "tiktoken==0.6.0",
         "requests==2.31.0",
         "pypdf==4.3.0",
         "python-docx==1.1.2",
+        "scikit-learn==1.5.1"
     ],
     extras_require={
         "dev": ["pytest", "wheel", "twine", "black>=23.7.0", "setuptools"],

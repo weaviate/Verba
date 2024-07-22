@@ -31,7 +31,7 @@ class BasicReader(Reader):
 
     async def load(
         self, config:dict, fileConfig: FileConfig
-    ) -> Document:
+    ) -> list[Document]:
 
         document = None
     
@@ -51,7 +51,12 @@ class BasicReader(Reader):
                 original_text = decoded_bytes.decode("utf-8")
                 json_obj = json.loads(original_text)
                 document = Document.from_json(json_obj)
-                return document
+
+                if document is not None:
+                    return [document]
+            
+                else:
+                    fileContent = original_text
 
             except Exception as e:
                 raise Exception(f"Failed to load {fileConfig.filename} : {str(e)}")
@@ -89,7 +94,6 @@ class BasicReader(Reader):
         else:
             raise Exception(f"{fileConfig.filename} with extension {fileConfig.extension} not supported by BasicReader.")
 
-
         document = Document(
             title=fileConfig.filename,
             content=fileContent,
@@ -100,5 +104,4 @@ class BasicReader(Reader):
             meta={}
         )
 
-
-        return document
+        return [document]

@@ -31,7 +31,7 @@ const FileComponent: React.FC<FileComponentProps> = ({
   selectedFileData,
   setSelectedFileData,
 }) => {
-  const [URLValue, setURLValue] = useState("");
+  const [URLValue, setURLValue] = useState("New Link");
   const [editURL, setEditURL] = useState(true);
 
   useEffect(() => {
@@ -169,60 +169,14 @@ const FileComponent: React.FC<FileComponentProps> = ({
         </div>
       )}
 
-      {/* If is not URL Component */}
-      {!fileMap[fileData.fileID].isURL && (
-        <button
-          onClick={() => {
-            setSelectedFileData(fileData.fileID);
-          }}
-          className={`flex ${selectedFileData && selectedFileData === fileMap[fileData.fileID].fileID ? "bg-secondary-verba hover:bg-button-hover-verba" : "bg-button-verba hover:bg-secondary-verba"}  w-full p-3 rounded-lg transition-colors duration-300 ease-in-out border-none`}
-        >
-          <p className="text-text-verba">{fileMap[fileData.fileID].filename}</p>
-        </button>
-      )}
-
-      {/* If is URL Component and edit mode */}
-      {fileMap[fileData.fileID].isURL && editURL && (
-        <div className="flex items-center justify-center gap-2 w-full">
-          <label className="input flex items-center gap-2 w-full bg-bg-verba">
-            <input
-              type="text"
-              className="grow w-full"
-              placeholder={
-                "Enter " +
-                fileMap[fileData.fileID].rag_config["Reader"].selected +
-                " URL here"
-              }
-              value={URLValue}
-              onChange={(e) => {
-                setURLValue(e.target.value);
-              }}
-            />
-          </label>
-        </div>
-      )}
-
-      {fileMap[fileData.fileID].isURL && !editURL && (
-        <button
-          onClick={() => {
-            setSelectedFileData(fileData.fileID);
-          }}
-          className={`flex ${selectedFileData && selectedFileData === fileMap[fileData.fileID].fileID ? "bg-secondary-verba hover:bg-button-hover-verba" : "bg-button-verba hover:bg-secondary-verba"}  w-full p-3 rounded-lg transition-colors duration-300 ease-in-out border-none`}
-        >
-          <p className="text-text-verba">{URLValue}</p>
-        </button>
-      )}
-
-      {fileMap[fileData.fileID].isURL && (
-        <div className="flex justify-end items-center">
-          <button
-            onClick={switchEditMode}
-            className="btn btn-square border-none bg-button-verba hover:bg-secondary-verba text-text-verba"
-          >
-            {editURL ? <IoIosCheckmark size={20} /> : <MdModeEdit size={15} />}
-          </button>
-        </div>
-      )}
+      <button
+        onClick={() => {
+          setSelectedFileData(fileData.fileID);
+        }}
+        className={`flex ${selectedFileData && selectedFileData === fileMap[fileData.fileID].fileID ? "bg-secondary-verba hover:bg-button-hover-verba" : "bg-button-verba hover:bg-secondary-verba"}  w-full p-3 rounded-lg transition-colors duration-300 ease-in-out border-none`}
+      >
+        <p className="text-text-verba">{fileMap[fileData.fileID].filename}</p>
+      </button>
 
       <div className="flex justify-end items-center">
         <button

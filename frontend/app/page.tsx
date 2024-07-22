@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import Navbar from "./components/Navigation/NavbarComponent";
 import SettingsComponent from "./components/Settings/SettingsComponent";
 import ChatComponent from "./components/Chat/ChatComponent";
@@ -39,10 +38,6 @@ export default function Home() {
   const [reconnect, setReconnect] = useState(false);
 
   const [APIHost, setAPIHost] = useState<string | null>(null);
-
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
 
   const fetchHost = async () => {
     try {
@@ -104,17 +99,6 @@ export default function Home() {
   useEffect(() => {
     fetchHost();
   }, [reconnect]);
-
-  useEffect(() => {
-    const viewParam = searchParams.get("view");
-    setCurrentPage(viewParam ? viewParam : "CHAT");
-  }, [searchParams]);
-
-  const handleViewChange = (view: string) => {
-    const newSearchParams = new URLSearchParams(searchParams.toString());
-    newSearchParams.set("view", view);
-    router.push(`${pathname}?${newSearchParams}`, undefined);
-  };
 
   const importConfig = async () => {
     if (!APIHost || !baseSetting) {
@@ -212,7 +196,7 @@ export default function Home() {
           <Navbar
             APIHost={APIHost}
             production={production}
-            handleViewChange={handleViewChange}
+            handleViewChange={setCurrentPage}
             title={
               baseSetting[settingTemplate].Customization.settings.title.text
             }

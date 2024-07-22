@@ -3,9 +3,6 @@
 import React, { useState } from "react";
 import { SettingsConfiguration } from "../Settings/types";
 import { DocumentChunk, DocumentPreview, VerbaDocument } from "./types";
-
-import DocumentComponent from "./DocumentComponent";
-import DocumentSearch from "./DocumentSearch";
 import ReactMarkdown from "react-markdown";
 import PulseLoader from "react-spinners/PulseLoader";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
@@ -13,10 +10,6 @@ import {
   oneDark,
   oneLight,
 } from "react-syntax-highlighter/dist/cjs/styles/prism";
-
-import { RAGConfig } from "../RAG/types";
-import DocumentExplorer from "./DocumentExplorer";
-import { render } from "react-dom";
 
 interface ContentViewProps {
   document: VerbaDocument | null;

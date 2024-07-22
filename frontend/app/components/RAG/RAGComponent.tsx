@@ -52,59 +52,6 @@ const RAGComponent: React.FC<RAGComponentProps> = ({
     setReconnect(true);
   }, []);
 
-  // Setup Import WebSocket and messages
-  useEffect(() => {
-    const socketHost = getImportWebSocketApiHost();
-    const localSocket = new WebSocket(socketHost);
-
-    localSocket.onopen = () => {
-      console.log("Import WebSocket connection opened to " + socketHost);
-      addToConsole("INFO", "Ready for data import");
-    };
-
-    localSocket.onmessage = (event) => {
-      let data;
-
-      const timestamp = new Date().toLocaleString();
-      console.log("AAAH I GOT MEESAGGGE at " + timestamp);
-
-      try {
-        data = JSON.parse(event.data);
-      } catch (e) {
-        console.error("Received data is not valid JSON:", event.data);
-        return;
-      }
-      if (data.type === "STOP") {
-        setIsFetching(false);
-      } else {
-        setConsoleLog((oldItems) => [...oldItems, data]);
-      }
-    };
-
-    localSocket.onerror = (error) => {
-      console.error("Import WebSocket Error:", error);
-    };
-
-    localSocket.onclose = (event) => {
-      if (event.wasClean) {
-        console.log(
-          `Import WebSocket connection closed cleanly, code=${event.code}, reason=${event.reason}`
-        );
-        addToConsole("INFO", "Connection closed");
-      } else {
-        console.error("WebSocket connection died");
-      }
-    };
-
-    setSocket(localSocket);
-
-    return () => {
-      if (localSocket.readyState !== WebSocket.CLOSED) {
-        localSocket.close();
-      }
-    };
-  }, [reconnect]);
-
   const saveSettings = () => {
     setRAGConfig(currentRAGSettings);
     if (buttonTitle === "Import") {

@@ -2,9 +2,6 @@
 
 import React, { useState } from "react";
 import { SettingsConfiguration } from "../Settings/types";
-import { DocumentChunk, DocumentPreview } from "./types";
-
-import DocumentComponent from "./DocumentComponent";
 import DocumentSearch from "./DocumentSearch";
 
 import { RAGConfig } from "../RAG/types";

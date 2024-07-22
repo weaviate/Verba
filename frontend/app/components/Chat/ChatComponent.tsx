@@ -6,7 +6,6 @@ import { SettingsConfiguration } from "../Settings/types";
 import { DocumentChunk } from "../Document/types";
 
 import ChunksComponent from "../Document/ChunksComponent";
-import DocumentComponent from "../Document/DocumentComponent";
 
 import { RAGConfig } from "../RAG/types";
 
@@ -86,15 +85,6 @@ const ChatComponent: React.FC<ChatComponentProps> = ({
             settingConfig={settingConfig}
             tooltip_text={document_interface_info}
             display_text="Document Viewer"
-          />
-          <DocumentComponent
-            production={production}
-            setSelectedChunk={setSelectedChunk}
-            selectedChunk={selectedChunk}
-            APIhost={APIHost}
-            settingConfig={settingConfig}
-            deletable={false}
-            selectedDocument={null}
           />
         </div>
       </div>

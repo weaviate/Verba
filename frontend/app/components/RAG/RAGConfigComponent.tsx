@@ -131,15 +131,7 @@ const RAGConfigComponent: React.FC<RAGConfigComponentProps> = ({
           )}
         </div>
 
-        <div className=" flex-col gap-4 grid grid-cols-1 lg:grid-cols-1">
-          {RAGConfig &&
-            RAGComponents.selected &&
-            Object.entries(
-              RAGComponents.components[RAGComponents.selected].config
-            ).map(([key, settingValue]) =>
-              renderSettingComponent(key, settingValue)
-            )}
-        </div>
+        <div className=" flex-col gap-4 grid grid-cols-1 lg:grid-cols-1"></div>
 
         {RAGComponents.selected &&
           RAGComponents.components[RAGComponents.selected].type ===

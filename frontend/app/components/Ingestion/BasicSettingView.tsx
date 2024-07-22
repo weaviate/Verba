@@ -37,15 +37,7 @@ const BasicSettingView: React.FC<BasicSettingViewProps> = ({
 
   useEffect(() => {
     if (selectedFileData) {
-      if (fileMap[selectedFileData].isURL) {
-        setFilename(
-          fileMap[selectedFileData].content
-            ? fileMap[selectedFileData].content
-            : ""
-        );
-      } else {
-        setFilename(fileMap[selectedFileData].filename);
-      }
+      setFilename(fileMap[selectedFileData].filename);
       setSource(fileMap[selectedFileData].source);
     }
   }, [fileMap, selectedFileData]);
@@ -55,12 +47,7 @@ const BasicSettingView: React.FC<BasicSettingViewProps> = ({
       const newFileData: FileData = JSON.parse(
         JSON.stringify(fileMap[selectedFileData])
       );
-
-      if (fileMap[selectedFileData].isURL) {
-        newFileData.content = filename;
-      } else {
-        newFileData.filename = filename;
-      }
+      newFileData.filename = filename;
       const newFileMap: FileMap = { ...fileMap };
       newFileMap[selectedFileData] = newFileData;
       setFileMap(newFileMap);
@@ -174,7 +161,7 @@ const BasicSettingView: React.FC<BasicSettingViewProps> = ({
           {selectedFileData &&
             Object.entries(fileMap[selectedFileData].status_report).map(
               ([status, statusReport]) => (
-                <div className="flex">
+                <div className="flex" key={"Status" + status}>
                   <p className="flex min-w-[8vw] gap-2 items-center text-text-verba">
                     {statusReport.status === "DONE" && (
                       <FaCheckCircle size={15} />
@@ -208,11 +195,7 @@ const BasicSettingView: React.FC<BasicSettingViewProps> = ({
 
         {/* Filename */}
         <div className="flex gap-2 justify-between items-center text-text-verba">
-          {selectedFileData && fileMap[selectedFileData].isURL ? (
-            <p className="flex min-w-[8vw]">URL</p>
-          ) : (
-            <p className="flex min-w-[8vw]">Title</p>
-          )}
+          <p className="flex min-w-[8vw]">Title</p>
           <label className="input flex items-center gap-2 w-full bg-bg-verba">
             <input
               type="text"

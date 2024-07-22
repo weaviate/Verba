@@ -24,6 +24,11 @@ class SearchQueryPayload(BaseModel):
     page: int
     pageSize: int
 
+class ChunksPayload(BaseModel):
+    uuid: str
+    page: int
+    pageSize: int
+
 
 class GetDocumentPayload(BaseModel):
     uuid: str
