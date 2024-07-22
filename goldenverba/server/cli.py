@@ -1,5 +1,6 @@
 import click
 import uvicorn
+import gunicorn
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -30,6 +31,7 @@ def start(port, host, prod):
     Run the FastAPI application.
     """
     uvicorn.run("goldenverba.server.api:app", host=host, port=port, reload=(not prod))
+    
 
 if __name__ == "__main__":
     cli()
