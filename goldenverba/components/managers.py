@@ -314,11 +314,14 @@ class WeaviateManager:
             )
             await self.client.connect()
         elif w_url is not None and w_key is None:
-            msg.info(f"Connecting to Weaviate Cluster {w_url} without Auth")
-            self.client = weaviate.use_async_with_weaviate_cloud(
-                cluster_url=w_url,
-            )
-            await self.client.connect()
+            if "localhost" in w_url:
+                msg.info(f"Connecting to Local Weaviate {w_url} without Auth")
+                self.client = weaviate.use_async_with_local()
+                await self.client.connect()
+            else:
+                msg.info(f"Connecting to Weaviate Cluster {w_url} without Auth")
+                self.client = weaviate.use_async_with_weaviate_cloud(cluster_url=w_url)
+                await self.client.connect()
 
     async def connect_to_docker(self):
         msg.info(f"Connecting to Weaviate Docker")
@@ -336,7 +339,7 @@ class WeaviateManager:
             weaviate_url = os.environ.get("WEAVIATE_URL_VERBA", None)
             weaviate_key = os.environ.get("WEAVIATE_API_KEY_VERBA", None)
 
-            if weaviate_url is not None and weaviate_key is not None:
+            if weaviate_url is not None:
                 await self.connect_to_cluster(weaviate_url, weaviate_key)
             else:
                 await self.connect_to_embedded()
