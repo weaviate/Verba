@@ -126,10 +126,6 @@ export default function Home() {
   };
 
   useEffect(() => {
-    importConfig();
-  }, [baseSetting, settingTemplate, RAGConfig]);
-
-  useEffect(() => {
     if (baseSetting) {
       document.documentElement.style.setProperty(
         "--primary-verba",
@@ -271,6 +267,7 @@ export default function Home() {
 
           {currentPage === "SETTINGS" && !production && (
             <SettingsComponent
+              importConfig={importConfig}
               settingTemplate={settingTemplate}
               setSettingTemplate={setSettingTemplate}
               baseSetting={baseSetting}

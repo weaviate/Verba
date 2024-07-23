@@ -179,7 +179,11 @@ const DocumentExplorer: React.FC<DocumentExplorerProps> = ({
         )}
 
         {selectedSetting === "Vector Space" && (
-          <VectorView APIHost={APIHost} selectedDocument={selectedDocument} />
+          <VectorView
+            APIHost={APIHost}
+            selectedDocument={selectedDocument}
+            settingConfig={settingConfig}
+          />
         )}
       </div>
 

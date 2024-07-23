@@ -30,7 +30,7 @@ import SettingButton from "./SettingsButton";
 interface SettingsComponentProps {
   settingTemplate: string;
   setSettingTemplate: (s: string) => void;
-
+  importConfig: () => void;
   baseSetting: Settings;
   setBaseSetting: (b: any) => void;
 }
@@ -40,6 +40,7 @@ const SettingsComponent: React.FC<SettingsComponentProps> = ({
   setSettingTemplate,
   baseSetting,
   setBaseSetting,
+  importConfig,
 }) => {
   const [setting, setSetting] = useState<"Customization" | "Chat" | "">(
     "Customization"
@@ -73,6 +74,7 @@ const SettingsComponent: React.FC<SettingsComponentProps> = ({
       // Return the updated copy
       return newConfig;
     });
+    importConfig();
   };
 
   const revertChanges = () => {

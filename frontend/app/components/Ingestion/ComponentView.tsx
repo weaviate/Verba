@@ -194,18 +194,19 @@ const ComponentView: React.FC<ComponentViewProps> = ({
                   </div>
                 )}
 
-                {typeof config.value != "boolean" && (
-                  <label className="input flex items-center gap-2 w-full bg-bg-verba">
-                    <input
-                      type={config.type}
-                      className="grow w-full"
-                      value={config.value}
-                      onChange={(e) => {
-                        updateConfig(configTitle, e.target.value);
-                      }}
-                    />
-                  </label>
-                )}
+                {typeof config.value != "boolean" &&
+                  config.type != "dropdown" && (
+                    <label className="input flex items-center gap-2 w-full bg-bg-verba">
+                      <input
+                        type={config.type}
+                        className="grow w-full"
+                        value={config.value}
+                        onChange={(e) => {
+                          updateConfig(configTitle, e.target.value);
+                        }}
+                      />
+                    </label>
+                  )}
 
                 {typeof config.value === "boolean" && (
                   <input

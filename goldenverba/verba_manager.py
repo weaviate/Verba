@@ -53,8 +53,14 @@ class VerbaManager:
         self.verify_installed_libraries()
         self.verify_variables()
 
-        self.weaviate_manager.connect()
-        self.weaviate_manager.verify_collections(self.environment_variables, self.installed_libraries)
+    async def connect(self):
+        await self.weaviate_manager.connect()
+        await self.weaviate_manager.verify_collections(self.environment_variables, self.installed_libraries)
+
+    async def disconnect(self):
+        await self.weaviate_manager.disconnect()
+
+    # Import
 
     async def import_document(self, fileConfig: FileConfig, logger: LoggerManager):
         try:
@@ -100,6 +106,8 @@ class VerbaManager:
         except Exception as e:
             await logger.send_report(fileConfig.fileID, status=FileStatus.ERROR, message=f"Import for {fileConfig.filename} failed: {str(e)}", took=0)
             return 
+
+    # Configuration
 
     def create_config(self) -> dict:
         """Creates the RAG Configuration and returns the full Verba Config with also Settings"""
@@ -175,13 +183,13 @@ class VerbaManager:
             "SETTING": setting_config,
         }
 
-    def set_config(self, config: dict):
+    async def set_config(self, config: dict):
         msg.info("Saving Configuration")
-        self.weaviate_manager.set_config(self.config_uuid, config)
+        await self.weaviate_manager.set_config(self.config_uuid, config)
 
-    def load_config(self):
+    async def load_config(self):
         """Check if a Configuration File exists in the database, if yes, check if corrupted. Returns a valid configuration file"""
-        loaded_config = self.weaviate_manager.get_config(self.config_uuid)
+        loaded_config = await self.weaviate_manager.get_config(self.config_uuid)
         new_config = self.create_config()
 
         if loaded_config is not None:
@@ -190,7 +198,7 @@ class VerbaManager:
                 return loaded_config
             else:
                 msg.info("Using New Configuration")
-                self.set_config(new_config)
+                await self.set_config(new_config)
                 return new_config
         else:
             msg.info("Using New Configuration")
@@ -259,10 +267,11 @@ class VerbaManager:
             msg.fail(f"Config Validation failed: {str(e)}")
             return False
             
-
     def reset_config(self):
         msg.info("Resetting Configuration")
         self.weaviate_manager.reset_config(self.config_uuid)
+
+    # Environment and Libraries
 
     def verify_installed_libraries(self) -> None:
         """
@@ -302,7 +311,8 @@ class VerbaManager:
                 self.environment_variables[env] = True
             else:
                 self.environment_variables[env] = False
-   
+
+
    ########
 
     def get_schemas(self) -> dict:
@@ -538,30 +548,6 @@ class VerbaManager:
             schema_manager.init_schemas(self.client, vectorizer, False, True)
 
         for embedding in schema_manager.EMBEDDINGS:
-            schema_manager.init_schemas(self.client, embedding, False, True)
-
-    def reset_documents(self):
-        # Check if all schemas exist for all possible vectorizers
-        for vectorizer in schema_manager.VECTORIZERS:
-            document_class_name = "VERBA_Document_" + schema_manager.strip_non_letters(
-                vectorizer
-            )
-            chunk_class_name = "VERBA_Chunk_" + schema_manager.strip_non_letters(
-                vectorizer
-            )
-            self.client.schema.delete_class(document_class_name)
-            self.client.schema.delete_class(chunk_class_name)
-            schema_manager.init_schemas(self.client, vectorizer, False, True)
-
-        for embedding in schema_manager.EMBEDDINGS:
-            document_class_name = "VERBA_Document_" + schema_manager.strip_non_letters(
-                embedding
-            )
-            chunk_class_name = "VERBA_Chunk_" + schema_manager.strip_non_letters(
-                embedding
-            )
-            self.client.schema.delete_class(document_class_name)
-            self.client.schema.delete_class(chunk_class_name)
             schema_manager.init_schemas(self.client, embedding, False, True)
 
     def reset_cache(self):

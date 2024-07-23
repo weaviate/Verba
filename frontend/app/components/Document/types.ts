@@ -19,7 +19,7 @@ export type ChunksPayload = {
 
 export type VectorsPayload = {
   error: string;
-  vectors: VerbaVector[];
+  payload: { embedder: string; vectors: VectorGroup[] };
 };
 
 export type VerbaDocument = {
@@ -60,6 +60,11 @@ export type FormattedDocument = {
   beginning: string;
   substring: string;
   ending: string;
+};
+
+export type VectorGroup = {
+  name: string;
+  vectors: VerbaVector[];
 };
 
 export type VerbaVector = {

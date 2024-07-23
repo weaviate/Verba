@@ -33,6 +33,10 @@ class ChunksPayload(BaseModel):
 class GetDocumentPayload(BaseModel):
     uuid: str
 
+class GetVectorPayload(BaseModel):
+    uuid: str
+    showAll: bool
+
 
 class ResetPayload(BaseModel):
     resetMode: str

@@ -22,6 +22,7 @@ All notable changes to this project will be documented in this file.
   - Content View
   - Chunk View
   - Vector View
+    - Visualize vectors of chunks of one or multiple documents
 
 ## [1.0.3]
 

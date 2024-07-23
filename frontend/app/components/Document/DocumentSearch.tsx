@@ -10,6 +10,7 @@ import PulseLoader from "react-spinners/PulseLoader";
 import { SettingsConfiguration } from "../Settings/types";
 import { IoIosRefresh } from "react-icons/io";
 import { FaTrash } from "react-icons/fa";
+import { FaFilter } from "react-icons/fa";
 
 import InfoComponent from "../Navigation/InfoComponent";
 import { MdCancel } from "react-icons/md";
@@ -17,6 +18,7 @@ import { MdOutlineRefresh } from "react-icons/md";
 
 import { FaDatabase } from "react-icons/fa";
 import UserModalComponent from "../Navigation/UserModal";
+import { closeOnClick } from "../Ingestion/util";
 
 import { RAGConfig } from "../RAG/types";
 import ComponentStatus from "../Status/ComponentStatus";
@@ -44,7 +46,7 @@ const DocumentSearch: React.FC<DocumentSearchComponentProps> = ({
   const pageSize = 20;
 
   const [requestTime, setRequestTime] = useState(0);
-  const [labels, setLabels] = useState<string[]>([]);
+  const [labels, setLabels] = useState<string[]>(["Documents", "Code", "Blog"]);
   const [selectedLabels, setSelectedLabels] = useState<string[]>([]);
   const [currentEmbedder, setCurrentEmbedder] = useState<string | null>(null);
   const [triggerSearch, setTriggerSearch] = useState(false);
@@ -122,7 +124,7 @@ const DocumentSearch: React.FC<DocumentSearchComponentProps> = ({
       setDocuments(null);
       setIsFetching(false);
     }
-  }, [page, triggerSearch]);
+  }, [page, triggerSearch, selectedLabels]);
 
   const handleSearch = () => {
     fetchAllDocuments(userInput);
@@ -157,6 +159,39 @@ const DocumentSearch: React.FC<DocumentSearchComponentProps> = ({
         setSelectedDocument(null);
       }
       fetchAllDocuments(userInput);
+    }
+  };
+
+  const deleteAllDocuments = async () => {
+    if (production) {
+      return;
+    }
+
+    setSelectedDocument(null);
+    setDocuments(null);
+
+    await fetch(APIHost + "/api/reset", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ resetMode: "DOCUMENTS" }),
+    });
+  };
+
+  const addLabel = (l: string) => {
+    setSelectedLabels((prev) => [...prev, l]);
+  };
+
+  const removeLabel = (l: string) => {
+    setSelectedLabels((prev) => prev.filter((label) => label !== l));
+  };
+
+  const triggerLabel = (l: string) => {
+    if (selectedLabels.includes(l)) {
+      removeLabel(l);
+    } else {
+      addLabel(l);
     }
   };
 
@@ -210,50 +245,68 @@ const DocumentSearch: React.FC<DocumentSearchComponentProps> = ({
       </div>
 
       {/* Document List */}
-      <div className="bg-bg-alt-verba rounded-2xl flex flex-col p-6 items-center h-full w-full overflow-auto">
+      <div className="bg-bg-alt-verba rounded-2xl flex flex-col p-6 gap-3 items-center h-full w-full overflow-auto">
+        <div className="grid grid-flow-col gap-2 justify-start items-start w-full">
+          {labels &&
+            labels.map((label, index) => (
+              <button
+                key={document.title + index + label}
+                onClick={() => {
+                  triggerLabel(label);
+                }}
+                className={`flex p-2 px-4 text-sm text-text-verba justify-center text-center items-center rounded-xl ${selectedLabels.includes(label) ? "bg-primary-verba hover:bg-button-hover-verba" : "bg-bg-verba hover:bg-primary-verba"} transition-colors duration-300 ease-in-out border-none`}
+              >
+                <p>{label}</p>
+              </button>
+            ))}
+        </div>
+
         {isFetching && (
           <div className="flex items-center justify-center gap-2">
             <span className="loading loading-spinner loading-sm"></span>
             <p className="text-text-alt-verba">Loading Documents</p>
           </div>
         )}
-        {documents &&
-          documents.map((document, index) => (
-            <div
-              key={"Document" + index + document.title}
-              className="flex justify-between items-center gap-2 rounded-2xl p-1 w-full"
-            >
-              <button
-                key={document.title + index}
-                onClick={() => setSelectedDocument(document.uuid)}
-                className={`flex ${selectedDocument && selectedDocument === document.uuid ? "bg-secondary-verba hover:bg-button-hover-verba" : "bg-button-verba hover:bg-secondary-verba"}  w-full p-3 rounded-lg transition-colors duration-300 ease-in-out border-none`}
+
+        <div className="flex flex-col w-full">
+          {documents &&
+            documents.map((document, index) => (
+              <div
+                key={"Document" + index + document.title}
+                className="flex justify-between items-center gap-2 rounded-2xl p-1 w-full"
               >
-                <p className="text-text-verba">{document.title}</p>
-              </button>
-              <div className="flex justify-end items-center">
                 <button
-                  onClick={() => {
-                    openDeleteModal("remove_document" + document.uuid);
-                  }}
-                  className="btn btn-square bg-button-verba border-none hover:bg-warning-verba text-text-verba"
+                  key={document.title + index}
+                  onClick={() => setSelectedDocument(document.uuid)}
+                  className={`flex ${selectedDocument && selectedDocument === document.uuid ? "bg-secondary-verba hover:bg-button-hover-verba" : "bg-button-verba hover:bg-secondary-verba"}  w-full p-3 rounded-lg transition-colors duration-300 ease-in-out border-none`}
                 >
-                  <FaTrash size={15} />
+                  <p className="text-text-verba">{document.title}</p>
                 </button>
+                <div className="flex justify-end items-center">
+                  <button
+                    onClick={() => {
+                      openDeleteModal("remove_document" + document.uuid);
+                    }}
+                    className="btn btn-square bg-button-verba border-none hover:bg-warning-verba text-text-verba"
+                  >
+                    <FaTrash size={15} />
+                  </button>
+                </div>
+                <UserModalComponent
+                  modal_id={"remove_document" + document.uuid}
+                  title={"Remove Document"}
+                  text={"Do you want to remove " + document.title + "?"}
+                  triggerString="Delete"
+                  triggerValue={document.uuid}
+                  triggerAccept={deleteDocument}
+                />
               </div>
-              <UserModalComponent
-                modal_id={"remove_document" + document.uuid}
-                title={"Remove Document"}
-                text={"Do you want to remove " + document.title + "?"}
-                triggerString="Delete"
-                triggerValue={document.uuid}
-                triggerAccept={deleteDocument}
-              />
-            </div>
-          ))}
+            ))}{" "}
+        </div>
       </div>
 
       <div className="bg-bg-alt-verba rounded-2xl flex gap-2 p-6 items-center justify-center h-min w-full">
-        <div className="flex gap-3 items-center justify-center">
+        <div className="flex gap-3 items-center justify-between w-full">
           <div className="join justify-center items-center text-text-verba">
             {page > 1 && (
               <button
@@ -275,8 +328,29 @@ const DocumentSearch: React.FC<DocumentSearchComponentProps> = ({
               </button>
             )}
           </div>
+
+          <button
+            onClick={() => {
+              const modal = document.getElementById("remove_all_documents");
+              if (modal instanceof HTMLDialogElement) {
+                modal.showModal();
+              }
+            }}
+            className={`flex bg-button-verba hover:bg-button-hover-verba border-none btn text-text-verba gap-2`}
+          >
+            <FaTrash size={15} />
+            <p>Delete all Documents</p>
+          </button>
         </div>
       </div>
+      <UserModalComponent
+        modal_id={"remove_all_documents"}
+        title={"Remove all Document?"}
+        text={"Do you want to all remove documents from Verba?"}
+        triggerString={"Remove All"}
+        triggerValue={null}
+        triggerAccept={deleteAllDocuments}
+      />
     </div>
   );
 };

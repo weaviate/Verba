@@ -1,6 +1,7 @@
 from fastapi import FastAPI, WebSocket, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
+from contextlib import asynccontextmanager
 from fastapi.staticfiles import StaticFiles
 import asyncio
 
@@ -23,6 +24,7 @@ from goldenverba.server.types import (
     GetDocumentPayload,
     SearchQueryPayload,
     ImportPayload,
+    GetVectorPayload,
     ImportStreamPayload,
     ChunksPayload,
     FileConfig
@@ -40,10 +42,18 @@ else:
     production = False
 
 manager = verba_manager.VerbaManager()
-#setup_managers(manager)
+
+### Lifespan
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await manager.connect()
+    yield
+    # Clean up the ML models and release the resources
+    await manager.disconnect()
 
 # FastAPI App
-app = FastAPI()
+app = FastAPI(lifespan=lifespan)
 
 origins = [
     "http://localhost:3000",
@@ -72,7 +82,6 @@ app.mount(
 # Serve the main page and other static files
 app.mount("/static", StaticFiles(directory=BASE_DIR / "frontend/out"), name="app")
 
-
 @app.get("/")
 @app.head("/")
 async def serve_frontend():
@@ -84,7 +93,7 @@ async def serve_frontend():
 @app.get("/api/health")
 async def health_check():
     try:
-        if manager.weaviate_manager.client.is_ready():
+        if await manager.weaviate_manager.client.is_ready():
             return JSONResponse(
                 content={"message": "Alive!", "production": production, "gtag": tag}
             )
@@ -155,7 +164,7 @@ async def get_status():
 @app.get("/api/config")
 async def retrieve_config():
     try:
-        config = manager.load_config()
+        config = await manager.load_config()
         return JSONResponse(status_code=200, content={"data": config, "error": ""})
 
     except Exception as e:
@@ -229,7 +238,7 @@ async def reset_verba(payload: ResetPayload):
         if payload.resetMode == "VERBA":
             manager.reset()
         elif payload.resetMode == "DOCUMENTS":
-            manager.reset_documents()
+            await manager.weaviate_manager.delete_all_documents()
         elif payload.resetMode == "CACHE":
             manager.reset_cache()
         elif payload.resetMode == "SUGGESTIONS":
@@ -237,7 +246,7 @@ async def reset_verba(payload: ResetPayload):
         elif payload.resetMode == "CONFIG":
             manager.reset_config()
 
-        msg.info(f"Resetting Verba ({payload.resetMode})")
+        msg.info(f"Resetting Verba in ({payload.resetMode}) mode")
 
     except Exception as e:
         msg.warn(f"Failed to reset Verba {str(e)}")
@@ -257,7 +266,7 @@ async def update_config(payload: ConfigPayload):
 
     try:
         if manager.verify_config(payload.config, manager.create_config()):
-            manager.set_config(payload.config)
+            await manager.set_config(payload.config)
         else:
             msg.warn("Configuration sent by Frontend is corrupted")
     except Exception as e:
@@ -374,13 +383,13 @@ async def get_document(payload: GetDocumentPayload):
     
 # Retrieve specific document based on UUID
 @app.post("/api/get_vectors")
-async def get_vectors(payload: GetDocumentPayload):
+async def get_vectors(payload: GetVectorPayload):
     try:
-        vectors = await manager.weaviate_manager.get_vectors(payload.uuid)
+        vectors = await manager.weaviate_manager.get_vectors(payload.uuid, payload.showAll)
         return JSONResponse(
             content={
                 "error": "",
-                "vectors": vectors,
+                "payload": vectors,
             }
         )            
     except Exception as e:
@@ -388,7 +397,7 @@ async def get_vectors(payload: GetDocumentPayload):
         return JSONResponse(
             content={
                 "error": str(e),
-                "vectors": [],
+                "payload": {"embedder":"None", "vectors":[]},
             }
         )
     
@@ -419,8 +428,8 @@ async def get_all_documents(payload: SearchQueryPayload):
     start_time = loop.time() 
 
     try:
-        retrieval_task = asyncio.create_task(manager.weaviate_manager.get_documents(payload.query, payload.pageSize, payload.page))
-        documents = await retrieval_task
+        documents = await manager.weaviate_manager.get_documents(payload.query, payload.pageSize, payload.page, payload.labels)
+        labels = await manager.weaviate_manager.get_labels()
 
         msg.good(
             f"Succesfully retrieved document: {len(documents)} documents"
@@ -428,7 +437,7 @@ async def get_all_documents(payload: SearchQueryPayload):
         return JSONResponse(
             content={
                 "documents": documents,
-                "label": [],
+                "labels": labels,
                 "error": "",
                 "took": round(loop.time() - start_time, 2),
             }

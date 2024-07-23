@@ -6,6 +6,7 @@ from weaviate.auth import AuthApiKey
 from weaviate.classes.config import Property, DataType
 from weaviate.classes.query import Filter, Sort
 from weaviate.collections.classes.data import DataObject
+from weaviate.classes.aggregate import GroupByAggregate
 import os
 import asyncio
 import json
@@ -62,6 +63,7 @@ chunkers = [TokenChunker()]
 embedders = [OpenAIEmbedder(), SentenceTransformersEmbedder(), CohereEmbedder(), OllamaEmbedder(), GoogleEmbedder()]
 
 ### ----------------------- ###
+
 
 class ReaderManager:
     def __init__(self):
@@ -303,91 +305,104 @@ class WeaviateManager:
 
     ### Connection Handling
 
-    def connect_to_cluster(self, w_url, w_key):
+    async def connect_to_cluster(self, w_url, w_key):
         if w_url is not None and w_key is not None:
             msg.info(f"Connecting to Weaviate Cluster {w_url} with Auth")
-            self.client = weaviate.connect_to_weaviate_cloud(
+            self.client = weaviate.use_async_with_weaviate_cloud(
                 cluster_url=w_url,
                 auth_credentials=AuthApiKey(w_key),
             )
+            await self.client.connect()
         elif w_url is not None and w_key is None:
             msg.info(f"Connecting to Weaviate Cluster {w_url} without Auth")
-            self.client = weaviate.connect_to_weaviate_cloud(
+            self.client = weaviate.use_async_with_weaviate_cloud(
                 cluster_url=w_url,
             )
+            await self.client.connect()
 
-    def connect_to_docker(self):
+    async def connect_to_docker(self):
         msg.info(f"Connecting to Weaviate Docker")
-        self.client = weaviate.connect_to_local()
+        self.client = weaviate.use_async_with_custom()
+        await self.client.connect()
 
-    def connect_to_embedded(self):
+    async def connect_to_embedded(self):
         msg.info(f"Connecting to Weaviate Embedded")
-        self.client = weaviate.connect_to_embedded()
+        #TODO Wait for update to do use_async_with_embedded
+        self.client = await weaviate.connect_to_embedded()
+        await self.client.connect()
 
-    def connect(self):
+    async def connect(self):
         try:
             weaviate_url = os.environ.get("WEAVIATE_URL_VERBA", None)
             weaviate_key = os.environ.get("WEAVIATE_API_KEY_VERBA", None)
 
             if weaviate_url is not None and weaviate_key is not None:
-                self.connect_to_cluster(weaviate_url, weaviate_key)
+                await self.connect_to_cluster(weaviate_url, weaviate_key)
             else:
-                self.connect_to_embedded()
+                await self.connect_to_embedded()
         
-            if self.client is not None and self.client.is_ready():
+            if self.client is not None and await self.client.is_ready():
                 msg.good("Succesfully Connected to Weaviate")
 
         except Exception as e:
             msg.fail(f"Couldn't connect to Weaviate, check your URL/API KEY: {str(e)}")
 
+    async def disconnect(self):
+        try:
+            await self.client.close()
+        except Exception as e:
+            msg.fail(f"Couldn't disconnect Weaviate: {str(e)}")
+
     ### Collection Handling
 
-    def verify_collection(self, collection_name: str):
-        if not self.client.collections.exists(collection_name):
+    async def verify_collection(self, collection_name: str):
+        if not await self.client.collections.exists(collection_name):
             msg.info(f"Collection: {collection_name} does not exist, creating new collection.")
-            self.client.collections.create(
+            await self.client.collections.create(
                 name=collection_name
             )
         else:
             document_collection = self.client.collections.get(collection_name)
-            response = document_collection.aggregate.over_all(total_count=True)
+            response = await document_collection.aggregate.over_all(total_count=True)
             if response.total_count > 0:
                 msg.info(f"Collection: {collection_name} exists with {response.total_count} objects stored")
 
-    def verify_embedding_collections(self, environment_variables, libraries):
+    async def verify_embedding_collections(self, environment_variables, libraries):
         for embedder in embedders:
             if embedder.check_available(environment_variables,libraries):
                 if "Model" in embedder.config:
                     for _embedder in embedder.config["Model"].values:
                         self.embedding_table[_embedder] = "VERBA_Embedding_"+re.sub(r"[^a-zA-Z0-9]", "_", _embedder)
-                        self.verify_collection(self.embedding_table[_embedder])
+                        await self.verify_collection(self.embedding_table[_embedder])
 
-    def verify_collections(self, environment_variables, libraries):
-        self.verify_collection(self.document_collection_name)
-        self.verify_collection(self.suggestion_collection_name)
-        self.verify_collection(self.config_collection_name)
-        self.verify_embedding_collections(environment_variables, libraries)
+    async def verify_collections(self, environment_variables, libraries):
+        await self.verify_collection(self.document_collection_name)
+        await self.verify_collection(self.suggestion_collection_name)
+        await self.verify_collection(self.config_collection_name)
+        await self.verify_embedding_collections(environment_variables, libraries)
 
     ### Configuration Handling
 
-    def get_config(self, uuid: str) -> dict:
+    async def get_config(self, uuid: str) -> dict:
         config_collection = self.client.collections.get(self.config_collection_name)
-        if config_collection.data.exists(uuid):
-            config = config_collection.query.fetch_object_by_id(uuid)
+        if await config_collection.data.exists(uuid):
+            config = await config_collection.query.fetch_object_by_id(uuid)
             return json.loads(config.properties["config"])
         else:
             return None
         
-    def set_config(self, uuid: str, config: dict):
+    async def set_config(self, uuid: str, config: dict):
         config_collection = self.client.collections.get(self.config_collection_name)
-        if config_collection.data.exists(uuid):
-            config_collection.data.delete_by_id(uuid)
-        config_collection.data.insert(properties={"config":json.dumps(config)}, uuid=uuid)
+        if await config_collection.data.exists(uuid):
+            if await config_collection.data.delete_by_id(uuid):
+                await config_collection.data.insert(properties={"config":json.dumps(config)}, uuid=uuid)
+        else:
+            await config_collection.data.insert(properties={"config":json.dumps(config)}, uuid=uuid)
 
-    def reset_config(self, uuid: str):
+    async def reset_config(self, uuid: str):
         config_collection = self.client.collections.get(self.config_collection_name)
-        if config_collection.data.exists(uuid):
-            config_collection.data.delete_by_id(uuid)
+        if await config_collection.data.exists(uuid):
+            await config_collection.data.delete_by_id(uuid)
 
     ### Import Handling
             
@@ -400,80 +415,117 @@ class WeaviateManager:
 
         ### Import Document
         document_obj = Document.to_json(document)
-        doc_uuid = document_collection.data.insert(document_obj)
+        doc_uuid = await document_collection.data.insert(document_obj)
 
         chunk_ids = []
 
         try:
             ### Batch Import Of Chunks
-            with embedder_collection.batch.dynamic() as batch:
-                for chunk in document.chunks:
-                    chunk.doc_uuid = doc_uuid
-                    chunk_obj = Chunk.to_dict(chunk)
-                    chunk_ids.append(batch.add_object(properties=chunk_obj, vector=chunk.vector))
+            #with embedder_collection.batch.dynamic() as batch:
+            #    for chunk in document.chunks:
+            #        chunk.doc_uuid = doc_uuid
+            #        chunk_obj = Chunk.to_dict(chunk)
+            #        chunk_ids.append(batch.add_object(properties=chunk_obj, vector=chunk.vector))
 
-            #chunk_response = await embedder_collection.data.insert_many([DataObject(properties=chunk.to_dict(), vector=chunk.vector) for chunk in document.chunks])
+            for chunk in document.chunks:
+                chunk.doc_uuid = doc_uuid
+
+            chunk_response = await embedder_collection.data.insert_many([DataObject(properties=chunk.to_dict(), vector=chunk.vector) for chunk in document.chunks])
+            chunk_ids = [chunk_response.uuids[uuid] for uuid in chunk_response.uuids]
+
+            if chunk_response.has_errors:
+                raise Exception(f"Failed to ingest chunks into Weaviate: {chunk_response.errors}")
 
         except Exception as e:
             msg.warn(f"Import of Chunks failed: {str(e)}")
 
-        response = embedder_collection.aggregate.over_all(filters=Filter.by_property("doc_uuid").equal(doc_uuid), total_count=True)
+        response = await embedder_collection.aggregate.over_all(filters=Filter.by_property("doc_uuid").equal(doc_uuid), total_count=True)
         if response.total_count != len(document.chunks):
-            document_collection.data.delete_by_id(doc_uuid)
+            await document_collection.data.delete_by_id(doc_uuid)
             for _id in chunk_ids:
-                embedder_collection.data.delete_by_id(_id)
+                await embedder_collection.data.delete_by_id(_id)
             raise Exception(f"Chunk Mismatch detected after importing: Imported:{response.total_count} | Existing: {len(document.chunks)}")
     
     ### Document CRUD
         
     async def exist_document_name(self, name: str) -> str:
 
-        if self.client.collections.get(self.document_collection_name).aggregate.over_all(total_count=True).total_count == 0:
-            return None
-        elif len(self.client.collections.get(self.document_collection_name).query.fetch_objects(filters=Filter.by_property("title").equal(name)).objects) > 0:
-            return self.client.collections.get(self.document_collection_name).query.fetch_objects(filters=Filter.by_property("title").equal(name)).objects[0].uuid
-        else:
-            return None
+        document_collection = self.client.collections.get(self.document_collection_name)
+        aggregation = await document_collection.aggregate.over_all(total_count=True)
         
+        if aggregation.total_count == 0:
+            return None
+        else:
+            documents = await document_collection.query.fetch_objects(filters=Filter.by_property("title").equal(name))
+            if len(documents.objects) > 0:
+                return documents.objects[0].uuid
+            
+        return None
+
     async def delete_document(self, uuid: str):
-        if not self.client.collections.get(self.document_collection_name).data.exists(uuid):
+
+        document_collection = self.client.collections.get(self.document_collection_name)
+
+        if not await document_collection.data.exists(uuid):
             return
 
-        document_obj =  self.client.collections.get(self.document_collection_name).query.fetch_object_by_id(uuid)
+        document_obj =  await document_collection.query.fetch_object_by_id(uuid)
         embedding_config = json.loads(document_obj.properties.get("meta")["Embedder"])
         embedder = embedding_config["config"]["Model"]["value"]
 
         if embedder not in self.embedding_table:
             raise Exception(f"{embedder} not found in Embedding Table")
 
-        self.client.collections.get(self.document_collection_name).data.delete_by_id(uuid)
-        for chunk in self.client.collections.get(self.embedding_table[embedder]).query.fetch_objects(filters=Filter.by_property("doc_uuid").equal(uuid)).objects:
-            self.client.collections.get(self.embedding_table[embedder]).data.delete_by_id(chunk.uuid)
+        if await document_collection.data.delete_by_id(uuid):
+            embedder_collection = self.client.collections.get(self.embedding_table[embedder])
+            await embedder_collection.data.delete_many(where=Filter.by_property("doc_uuid").equal(uuid))
 
-    async def get_documents(self, query: str, pageSize: int, page: int) -> list[dict]:
+    async def delete_all_documents(self):
+        document_collection = self.client.collections.get(self.document_collection_name)
+        async for item in document_collection.iterator():
+            await self.delete_document(item.uuid)
+
+
+    async def get_documents(self, query: str, pageSize: int, page: int, labels: list[str]) -> list[dict]:
         offset = pageSize * (page - 1)
         document_collection = self.client.collections.get(self.document_collection_name)
 
-        response = document_collection.aggregate.over_all(total_count=True)
+        if len(labels) > 0:
+            filter = Filter.by_property("labels").contains_all(labels)
+        else:
+            filter = None
+
+        response = await document_collection.aggregate.over_all(total_count=True, filters=filter)
+
 
         if response.total_count == 0:
             return []
 
         if query == "":
-            response = document_collection.query.fetch_objects(limit=pageSize, offset=offset, sort=Sort.by_property("title", ascending=True))
+            response = await document_collection.query.fetch_objects(limit=pageSize, offset=offset, sort=Sort.by_property("title", ascending=True), filters=filter)
         else:
-            response = document_collection.query.bm25(query=query, limit=pageSize, offset=offset)
+            response = await document_collection.query.bm25(query=query, limit=pageSize, offset=offset, filters=filter)
 
         return [{"title":doc.properties["title"], "uuid":str(doc.uuid), "labels":doc.properties["labels"]} for doc in response.objects]
     
     async def get_document(self, uuid: str) -> list[dict]:
         document_collection = self.client.collections.get(self.document_collection_name)
 
-        if document_collection.data.exists(uuid):
-            response = document_collection.query.fetch_object_by_id(uuid)
+        if await document_collection.data.exists(uuid):
+            response = await document_collection.query.fetch_object_by_id(uuid)
             return response.properties
         else:
             return None
+
+    ### Labels
+        
+    async def get_labels(self) -> list[str]:
+        document_collection = self.client.collections.get(self.document_collection_name)
+        aggregation = await document_collection.aggregate.over_all(group_by=GroupByAggregate(prop="labels"), total_count=True)
+        return [aggregation_group.grouped_by.value for aggregation_group in aggregation.groups]
+
+
+
 
     ### Chunks Retrieval
         
@@ -492,17 +544,15 @@ class WeaviateManager:
             raise Exception(f"{embedder} not found in Embedding Table")
         
         embedder_collection = self.client.collections.get(self.embedding_table[embedder])
-        chunks = [obj.properties for obj in embedder_collection.query.fetch_objects(filters=Filter.by_property("doc_uuid").equal(uuid), limit=pageSize, offset=offset, sort=Sort.by_property("chunk_id", ascending=True)).objects]
+        weaviate_chunks = await embedder_collection.query.fetch_objects(filters=Filter.by_property("doc_uuid").equal(uuid), limit=pageSize, offset=offset, sort=Sort.by_property("chunk_id", ascending=True))
+        chunks = [obj.properties for obj in weaviate_chunks.objects]
         for chunk in chunks:
             chunk["doc_uuid"] = str(chunk["doc_uuid"])
         return chunks
     
-    async def get_vectors(self, uuid:str) -> list[dict]:
+    async def get_vectors(self, uuid:str, showAll: bool ) -> dict:
 
-        document = await self.get_document(uuid)
-        if document is None:
-            return document
-        
+        document = await self.get_document(uuid)            
         embedding_config = json.loads(document.get("meta")["Embedder"])
         embedder = embedding_config["config"]["Model"]["value"]
 
@@ -511,13 +561,42 @@ class WeaviateManager:
         
         embedder_collection = self.client.collections.get(self.embedding_table[embedder])
 
-        chunks = [obj.properties for obj in embedder_collection.query.fetch_objects(filters=Filter.by_property("doc_uuid").equal(uuid), limit=1000, sort=Sort.by_property("chunk_id", ascending=True)).objects]
+        if not showAll:            
+            weaviate_chunks = await embedder_collection.query.fetch_objects(filters=Filter.by_property("doc_uuid").equal(uuid), limit=2000, sort=Sort.by_property("chunk_id", ascending=True))
+            chunks = [obj.properties for obj in weaviate_chunks.objects]
 
-        vectors = []
-        for item in chunks:
-            if item["pca"] is not None:
-                vectors.append({"x":item["pca"][0]*100,"y":item["pca"][1]*100,"z":item["pca"][2]*100})
-        return vectors
+            vectors = []
+            for item in chunks:
+                if item["pca"] is not None:
+                    vectors.append({"x":item["pca"][0],"y":item["pca"][1],"z":item["pca"][2]})
+            return {"embedder":embedder, "vectors":[{"name":document["title"], "vectors":vectors}]}
+        else:
+            vector_map = {}
+            vector_list = []
+            vector_ids = []
+            async for item in embedder_collection.iterator(include_vector=True):
+                doc_uuid = item.properties["doc_uuid"]
+                if doc_uuid not in vector_map:
+                    _document = await self.get_document(doc_uuid)  
+                    vector_map[doc_uuid] = {"name":_document["title"], "vectors":[]}
+                vector_list.append(item.vector["default"])
+                vector_ids.append(doc_uuid)
+
+            if len(vector_ids) > 3:
+                pca = PCA(n_components=3)
+                generated_pca_embeddings = pca.fit_transform(vector_list)
+                pca_embeddings = [pca_.tolist() for pca_ in generated_pca_embeddings]
+
+                for pca_embedding, _uuid in zip(pca_embeddings, vector_ids):
+                    vector_map[_uuid]["vectors"].append({"x":pca_embedding[0],"y":pca_embedding[1],"z":pca_embedding[2]})
+
+                return {"embedder":embedder, "vectors":[vector_map[_uuid] for _uuid in vector_map]}
+            else:
+                return {"embedder":embedder, "vectors":[]}
+
+
+
+
 
     
         
