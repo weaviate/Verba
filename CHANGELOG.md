@@ -18,11 +18,20 @@ All notable changes to this project will be documented in this file.
 - Improved Document Search UI
 - Add Config Validation
 - Add HTML Reader
+- Add Recursive Chunker
+- HTML Chunker
+- Markdown Chunker
+- Code Import
+- Code Chunking
+- Semantic Chunking
 - Added DocumentExplorer with
   - Content View
   - Chunk View
   - Vector View
     - Visualize vectors of chunks of one or multiple documents
+    - PCA
+    - t-SNE
+    - UMAP
 
 ## [1.0.3]
 
