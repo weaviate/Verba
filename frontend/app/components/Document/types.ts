@@ -36,10 +36,7 @@ export type VerbaDocument = {
 export type VerbaChunk = {
   content: string;
   chunk_id: number;
-  start: number;
-  end: number;
   doc_uuid: string;
-  is_response: boolean;
   pca: number[];
 };
 

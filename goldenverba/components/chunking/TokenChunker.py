@@ -1,6 +1,5 @@
 import contextlib
 
-from tqdm import tqdm
 from wasabi import msg
 
 with contextlib.suppress(Exception):
@@ -9,10 +8,8 @@ with contextlib.suppress(Exception):
 from goldenverba.components.chunk import Chunk
 from goldenverba.components.interfaces import Chunker
 from goldenverba.components.document import Document
-
-from goldenverba.server.types import FileConfig
-from goldenverba.server.ImportLogger import LoggerManager
 from goldenverba.components.types import InputConfig
+from goldenverba.components.interfaces import Embedding
 
 
 class TokenChunker(Chunker):
@@ -34,10 +31,10 @@ class TokenChunker(Chunker):
                 type="number",
                 value=50,
                 description="Choose how many Tokens should overlap between chunks", values=[]
-            ),
+            )
         }
 
-    async def chunk(self, config: dict, documents: list[Document]) -> list[Document]:
+    async def chunk(self, config: dict, documents: list[Document], embedder: Embedding, embedder_config: dict) -> list[Document]:
 
         units = int(config["Tokens"].value)
         overlap = int(config["Overlap"].value)
@@ -49,7 +46,6 @@ class TokenChunker(Chunker):
                 continue
 
             encoded_tokens = self.encoding.encode(document.content, disallowed_special=())
-            document.tokens = [self.encoding.decode([token]) for token in encoded_tokens]
 
             # If Split Size is higher than actual Token Count or if Split Size is Zero
             if (
@@ -59,8 +55,6 @@ class TokenChunker(Chunker):
                 doc_chunk = Chunk(
                     content=document.content,
                     chunk_id=0,
-                    start=0,
-                    end=len(encoded_tokens)-1,
                 )
 
             if overlap >= units:
@@ -80,8 +74,6 @@ class TokenChunker(Chunker):
                 doc_chunk = Chunk(
                     content=chunk_text,
                     chunk_id=split_id_counter,
-                    start=start_i,
-                    end=end_i,
                 )
 
                 document.chunks.append(doc_chunk)

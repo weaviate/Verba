@@ -1,15 +1,9 @@
 from goldenverba.components.document import Document
 from goldenverba.components.chunk import Chunk
-from goldenverba.components.types import InputConfig
 from goldenverba.server.types import FileConfig
 
-from goldenverba.server.ImportLogger import LoggerManager
-
-import os
-import time
 from dotenv import load_dotenv
 
-from tqdm import tqdm
 from wasabi import msg
 from weaviate import Client
 
@@ -81,21 +75,6 @@ class Reader(VerbaComponent):
         """
         raise NotImplementedError("load method must be implemented by a subclass.")
 
-class Chunker(VerbaComponent):
-    """
-    Interface for Verba Chunking.
-    """
-
-    def __init__(self):
-        super().__init__()
-        self.config = {}
-
-    async def chunk(self, config: dict, document: Document):
-        """Chunk verba documents into chunks based on units and overlap.
-        @parameter: fileConfig : FileConfig - FileConfiguration sent by the frontend
-        @parameter: document : Document - Verba document to chunk
-        """
-        raise NotImplementedError("chunk method must be implemented by a subclass.")
 
 class Embedding(VerbaComponent):
     """
@@ -111,6 +90,24 @@ class Embedding(VerbaComponent):
         @return: list[float] - List of embeddings
         """
         raise NotImplementedError("embed method must be implemented by a subclass.")
+
+class Chunker(VerbaComponent):
+    """
+    Interface for Verba Chunking.
+    """
+
+    def __init__(self):
+        super().__init__()
+        self.config = {}
+
+    async def chunk(self, config: dict, documents: list[Document], embedder: Embedding, embedder_config: dict) -> list[Document]:
+        """Split Verba documents into chunks.
+        @parameter: config : dict - Chunker Configuration
+        @parameter: documents : list[Document] - List of Verba documents to chunk
+        @parameter: embedder : Embedding - Selected Embedder if the Chunker requires vectorization
+        @return: list[Documents]
+        """
+        raise NotImplementedError("chunk method must be implemented by a subclass.")
 
 class Embedder(VerbaComponent):
     """

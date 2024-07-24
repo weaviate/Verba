@@ -86,7 +86,7 @@ class VerbaManager:
                 elif duplicate_uuid is not None and fileConfig.overwrite:
                     await self.weaviate_manager.delete_document(duplicate_uuid)
 
-            chunk_task = asyncio.create_task(self.chunker_manager.chunk(fileConfig.rag_config["Chunker"].selected, fileConfig, documents, logger))
+            chunk_task = asyncio.create_task(self.chunker_manager.chunk(fileConfig.rag_config["Chunker"].selected, fileConfig, documents, self.embedder_manager.embedders[fileConfig.rag_config["Embedder"].selected], logger))
             chunked_documents = await chunk_task
 
             embedding_task = asyncio.create_task(self.embedder_manager.vectorize(fileConfig.rag_config["Embedder"].selected, fileConfig, chunked_documents, logger))

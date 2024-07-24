@@ -34,7 +34,7 @@ class HTMLReader(Reader):
                         type="text", value="https://weaviate.io/", description="Enter the URL to scrape the HTML", values=[]
                     ),
                     "Convert To Markdown": InputConfig(
-                        type="bool", value=True, description="Should the HTML be converted into markdown?", values=[]
+                        type="bool", value=False, description="Should the HTML be converted into markdown?", values=[]
                     ),
                 }
 

@@ -19,7 +19,6 @@ class Document:
         self.labels = labels
         self.source = source
         self.meta = meta
-        self.tokens: list[str] = []
         self.chunks: list[Chunk] = []
 
     @staticmethod
@@ -33,7 +32,6 @@ class Document:
             "labels": document.labels,
             "source": document.source,
             "meta": document.meta,
-            "tokens": document.tokens
         }
         return doc_dict
 
@@ -51,7 +49,6 @@ class Document:
                 source=doc_dict.get("source", ""),
                 meta=doc_dict.get("meta", {}),
             )
-            document.tokens = doc_dict.get("tokens", [])
             return document
         else:
             return None

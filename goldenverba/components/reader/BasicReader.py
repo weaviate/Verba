@@ -26,7 +26,7 @@ class BasicReader(Reader):
     def __init__(self):
         super().__init__()
         self.name = "Default"
-        self.description = "Supports all text files (.txt, .md, .pdf, .docx, .json, .mdx)"
+        self.description = "Supports all text files (.txt, .md, .pdf, .docx, .json, .mdx) and code files (.py, .js, .ts, .tsx, etc.)"
         self.requires_library = ["pypdf", "docx"]
 
     async def load(
@@ -39,7 +39,7 @@ class BasicReader(Reader):
         decoded_bytes = base64.b64decode(fileConfig.content)
         fileContent = ""
 
-        if fileConfig.extension in ["txt", "md", "mdx"]:
+        if fileConfig.extension in ["txt", "md", "mdx", "py", "ts", "tsx", "js", "go", "css"]:
             try:
                 fileContent = decoded_bytes.decode("utf-8")
             except Exception as e:
@@ -50,11 +50,11 @@ class BasicReader(Reader):
                 decoded_bytes = base64.b64decode(fileConfig.content)
                 original_text = decoded_bytes.decode("utf-8")
                 json_obj = json.loads(original_text)
+
                 document = Document.from_json(json_obj)
 
                 if document is not None:
                     return [document]
-            
                 else:
                     fileContent = original_text
 

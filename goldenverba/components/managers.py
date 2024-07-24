@@ -35,6 +35,13 @@ from goldenverba.components.reader.UnstructuredAPI import UnstructuredReader
 from goldenverba.components.reader.HTMLReader import HTMLReader
 
 from goldenverba.components.chunking.TokenChunker import TokenChunker
+from goldenverba.components.chunking.RecursiveChunker import RecursiveChunker
+from goldenverba.components.chunking.HTMLChunker import HTMLChunker
+from goldenverba.components.chunking.MarkdownChunker import MarkdownChunker
+from goldenverba.components.chunking.CodeChunker import CodeChunker
+from goldenverba.components.chunking.JSONChunker import JSONChunker
+from goldenverba.components.chunking.SemanticChunker import SemanticChunker
+
 from goldenverba.components.embedding.OpenAIEmbedder import OpenAIEmbedder
 from goldenverba.components.embedding.CohereEmbedder import CohereEmbedder
 from goldenverba.components.embedding.GoogleEmbedder import GoogleEmbedder
@@ -59,7 +66,7 @@ except Exception:
 ### Add new components here ###
 
 readers = [BasicReader(), GitHubReader(), GitLabReader(), UnstructuredReader(), HTMLReader()]
-chunkers = [TokenChunker()]
+chunkers = [TokenChunker(), RecursiveChunker(), SemanticChunker(), HTMLChunker(), MarkdownChunker(), CodeChunker(), JSONChunker()]
 embedders = [OpenAIEmbedder(), SentenceTransformersEmbedder(), CohereEmbedder(), OllamaEmbedder(), GoogleEmbedder()]
 
 ### ----------------------- ###
@@ -97,13 +104,14 @@ class ChunkerManager:
     def __init__(self):
         self.chunkers: dict[str, Chunker] = { chunker.name : chunker for chunker in chunkers }
 
-    async def chunk(self, chunker: str, fileConfig: FileConfig, documents: list[Document], logger: LoggerManager) -> list[Document]:
+    async def chunk(self, chunker: str, fileConfig: FileConfig, documents: list[Document], embedder: Embedding, logger: LoggerManager) -> list[Document]:
         try:
             loop = asyncio.get_running_loop()
             start_time = loop.time() 
             if chunker in self.chunkers:
                 config = fileConfig.rag_config["Chunker"].components[chunker].config
-                chunked_documents = await self.chunkers[chunker].chunk(config, documents)
+                embedder_config = fileConfig.rag_config["Embedder"].components[embedder.name].config
+                chunked_documents = await self.chunkers[chunker].chunk(config=config, documents=documents, embedder=embedder, embedder_config=embedder_config)
                 for chunked_document in chunked_documents:
                     chunked_document.meta["Chunker"] = fileConfig.rag_config["Chunker"].components[chunker].model_dump_json()
                 elapsed_time = round(loop.time() - start_time, 2)
@@ -433,21 +441,24 @@ class WeaviateManager:
             for chunk in document.chunks:
                 chunk.doc_uuid = doc_uuid
 
-            chunk_response = await embedder_collection.data.insert_many([DataObject(properties=chunk.to_dict(), vector=chunk.vector) for chunk in document.chunks])
+            chunk_response = await embedder_collection.data.insert_many([DataObject(properties=chunk.to_json(), vector=chunk.vector) for chunk in document.chunks])
             chunk_ids = [chunk_response.uuids[uuid] for uuid in chunk_response.uuids]
 
             if chunk_response.has_errors:
                 raise Exception(f"Failed to ingest chunks into Weaviate: {chunk_response.errors}")
+            
+            if doc_uuid and chunk_response:
+                response = await embedder_collection.aggregate.over_all(filters=Filter.by_property("doc_uuid").equal(doc_uuid), total_count=True)
+                if response.total_count != len(document.chunks):
+                    await document_collection.data.delete_by_id(doc_uuid)
+                    for _id in chunk_ids:
+                        await embedder_collection.data.delete_by_id(_id)
+                    raise Exception(f"Chunk Mismatch detected after importing: Imported:{response.total_count} | Existing: {len(document.chunks)}")
 
         except Exception as e:
-            msg.warn(f"Import of Chunks failed: {str(e)}")
-
-        response = await embedder_collection.aggregate.over_all(filters=Filter.by_property("doc_uuid").equal(doc_uuid), total_count=True)
-        if response.total_count != len(document.chunks):
-            await document_collection.data.delete_by_id(doc_uuid)
-            for _id in chunk_ids:
-                await embedder_collection.data.delete_by_id(_id)
-            raise Exception(f"Chunk Mismatch detected after importing: Imported:{response.total_count} | Existing: {len(document.chunks)}")
+            if doc_uuid:
+                await self.delete_document(doc_uuid)
+            raise Exception(f"Chunk import failed with : {str(e)}")
     
     ### Document CRUD
         
@@ -565,7 +576,7 @@ class WeaviateManager:
         embedder_collection = self.client.collections.get(self.embedding_table[embedder])
 
         if not showAll:            
-            weaviate_chunks = await embedder_collection.query.fetch_objects(filters=Filter.by_property("doc_uuid").equal(uuid), limit=2000, sort=Sort.by_property("chunk_id", ascending=True))
+            weaviate_chunks = await embedder_collection.query.fetch_objects(filters=Filter.by_property("doc_uuid").equal(uuid), limit=5000, sort=Sort.by_property("chunk_id", ascending=True))
             chunks = [obj.properties for obj in weaviate_chunks.objects]
 
             vectors = []

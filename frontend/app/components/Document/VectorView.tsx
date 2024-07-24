@@ -158,6 +158,14 @@ const VectorView: React.FC<VectorViewProps> = ({
     return { min, max };
   }
 
+  const getVectorCount = () => {
+    let vector_count = 0;
+    for (const vector_group of vectors) {
+      vector_count += vector_group.vectors.length;
+    }
+    return vector_count;
+  };
+
   const fetchVectors = async () => {
     try {
       setIsFetching(true);
@@ -239,6 +247,10 @@ const VectorView: React.FC<VectorViewProps> = ({
             <div className="flex gap-1 items-center">
               <p className="text-text-alt-verba text-sm font-bold">Hover:</p>
               <p className="text-sm text-text-alt-verba">{hoverTitle}</p>
+            </div>
+            <div className="flex gap-1 items-center">
+              <p className="text-text-alt-verba text-sm font-bold">Vectors:</p>
+              <p className="text-sm text-text-alt-verba">{getVectorCount()}</p>
             </div>
           </div>
           <div className="flex gap-2 items-center min-w-[20vw]">

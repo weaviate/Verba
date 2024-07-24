@@ -17,6 +17,76 @@ import { statusTextMap } from "./types";
 
 import { closeOnClick } from "./util";
 
+const MultiInput: React.FC<{
+  values: string[];
+  config_title: string;
+  updateConfigValues: (config_title: string, config_values: string[]) => void;
+}> = ({ values, config_title, updateConfigValues }) => {
+  const [currentInput, setCurrentInput] = useState("");
+  const [currentValues, setCurrentValues] = useState(values);
+
+  useEffect(() => {
+    updateConfigValues(config_title, currentValues);
+  }, [currentValues]);
+
+  const addValue = (v: string) => {
+    if (!currentValues.includes(v)) {
+      setCurrentValues((prev) => [...prev, v]);
+      setCurrentInput("");
+    }
+  };
+
+  const removeValue = (v: string) => {
+    if (currentValues.includes(v)) {
+      setCurrentValues((prev) => prev.filter((label) => label !== v));
+    }
+  };
+
+  return (
+    <div className="flex flex-col w-full gap-2">
+      <div className="flex gap-2 justify-between">
+        <label className="input flex items-center gap-2 w-full bg-bg-verba">
+          <input
+            type="text"
+            className="grow w-full"
+            value={currentInput}
+            onChange={(e) => {
+              setCurrentInput(e.target.value);
+            }}
+          />
+        </label>
+        <button
+          onClick={() => {
+            addValue(currentInput);
+          }}
+          className="btn btn-square bg-button-verba border-none hover:bg-secondary-verba text-text-verba"
+        >
+          <IoAddCircleSharp size={15} />
+        </button>
+      </div>
+
+      <div className="grid grid-cols-5 gap-2">
+        {values.map((value, index) => (
+          <div
+            key={value + index}
+            className="flex bg-bg-verba max-w-[10vw] p-2 text-center text-sm text-text-verba justify-between items-center rounded-xl"
+          >
+            <p> {"< " + value + " >"}</p>
+            <button
+              onClick={() => {
+                removeValue(value);
+              }}
+              className="btn btn-sm btn-square bg-button-verba border-none hover:bg-warning-verba text-text-verba"
+            >
+              <FaTrash size={12} />
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 interface ComponentViewProps {
   selectedFileData: string | null;
   fileMap: FileMap;
@@ -43,6 +113,28 @@ const ComponentView: React.FC<ComponentViewProps> = ({
 
           // Update the specific config value directly
           componentConfig[configKey].value = configValue;
+
+          return newFileMap;
+        }
+        return prevFileMap;
+      });
+    },
+    [selectedFileData, component_name]
+  );
+
+  const updateConfigValues = useCallback(
+    (configKey: string, configValues: string[]) => {
+      setFileMap((prevFileMap) => {
+        if (selectedFileData) {
+          const newFileMap = { ...prevFileMap };
+          const selectedFile = newFileMap[selectedFileData];
+          const componentConfig =
+            selectedFile.rag_config[component_name].components[
+              selectedFile.rag_config[component_name].selected
+            ].config;
+
+          // Update the specific config value directly
+          componentConfig[configKey].values = configValues;
 
           return newFileMap;
         }
@@ -172,6 +264,8 @@ const ComponentView: React.FC<ComponentViewProps> = ({
             <div key={"Configuration" + configTitle + component_name}>
               <div className="flex gap-3 justify-between items-center text-text-verba">
                 <p className="flex min-w-[8vw]">{configTitle}</p>
+
+                {/* Dropdown */}
                 {config.type === "dropdown" && (
                   <div className="dropdown dropdown-bottom flex justify-start items-center w-full">
                     <button
@@ -184,7 +278,7 @@ const ComponentView: React.FC<ComponentViewProps> = ({
                     </button>
                     <ul
                       tabIndex={0}
-                      className="dropdown-content menu bg-base-100 rounded-box z-[1] w-full p-2 shadow"
+                      className="dropdown-content menu bg-base-100 h-[20vh] overflow-auto rounded-box z-[1] w-full p-2 shadow"
                     >
                       {renderConfigOptions(
                         fileMap[selectedFileData].rag_config,
@@ -194,8 +288,9 @@ const ComponentView: React.FC<ComponentViewProps> = ({
                   </div>
                 )}
 
+                {/* Text Input */}
                 {typeof config.value != "boolean" &&
-                  config.type != "dropdown" && (
+                  ["text", "number", "password"].includes(config.type) && (
                     <label className="input flex items-center gap-2 w-full bg-bg-verba">
                       <input
                         type={config.type}
@@ -208,6 +303,16 @@ const ComponentView: React.FC<ComponentViewProps> = ({
                     </label>
                   )}
 
+                {/* Multi Input */}
+                {typeof config.value != "boolean" && config.type == "multi" && (
+                  <MultiInput
+                    values={config.values}
+                    config_title={configTitle}
+                    updateConfigValues={updateConfigValues}
+                  />
+                )}
+
+                {/* Checkbox Input */}
                 {typeof config.value === "boolean" && (
                   <input
                     type="checkbox"
