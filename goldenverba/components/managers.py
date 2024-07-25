@@ -1,15 +1,16 @@
 from wasabi import msg
+
 import weaviate
-import re
 from weaviate.client import WeaviateClient
 from weaviate.auth import AuthApiKey
-from weaviate.classes.config import Property, DataType
 from weaviate.classes.query import Filter, Sort
 from weaviate.collections.classes.data import DataObject
 from weaviate.classes.aggregate import GroupByAggregate
+
 import os
 import asyncio
 import json
+import re
 
 from sklearn.decomposition import PCA
 
@@ -25,15 +26,18 @@ from goldenverba.components.interfaces import (
     Retriever,
     Generator,
 )
-from goldenverba.server.ImportLogger import LoggerManager
+from goldenverba.server.helpers import LoggerManager
 from goldenverba.server.types import FileConfig, FileStatus
 
+# Import Readers
 from goldenverba.components.reader.BasicReader import BasicReader
 from goldenverba.components.reader.GitReader import GitHubReader
 from goldenverba.components.reader.LabReader import GitLabReader
 from goldenverba.components.reader.UnstructuredAPI import UnstructuredReader
 from goldenverba.components.reader.HTMLReader import HTMLReader
+from goldenverba.components.reader.FirecrawlReader import FirecrawlReader
 
+# Import Chunkers
 from goldenverba.components.chunking.TokenChunker import TokenChunker
 from goldenverba.components.chunking.RecursiveChunker import RecursiveChunker
 from goldenverba.components.chunking.HTMLChunker import HTMLChunker
@@ -42,21 +46,22 @@ from goldenverba.components.chunking.CodeChunker import CodeChunker
 from goldenverba.components.chunking.JSONChunker import JSONChunker
 from goldenverba.components.chunking.SemanticChunker import SemanticChunker
 
+# Import Embedders
 from goldenverba.components.embedding.OpenAIEmbedder import OpenAIEmbedder
 from goldenverba.components.embedding.CohereEmbedder import CohereEmbedder
 from goldenverba.components.embedding.GoogleEmbedder import GoogleEmbedder
 from goldenverba.components.embedding.OllamaEmbedder import OllamaEmbedder
 from goldenverba.components.embedding.SentenceTransformersEmbedder import SentenceTransformersEmbedder
 
+# Import Retrievers
 from goldenverba.components.retriever.WindowRetriever import WindowRetriever
 
+# Import Generators
 from goldenverba.components.generation.GeminiGenerator import GeminiGenerator
 from goldenverba.components.generation.CohereGenerator import CohereGenerator
 from goldenverba.components.generation.GPT3Generator import GPT3Generator
 from goldenverba.components.generation.GPT4Generator import GPT4Generator
 from goldenverba.components.generation.OllamaGenerator import OllamaGenerator
-
-import time
 
 try:
     import tiktoken
@@ -65,7 +70,7 @@ except Exception:
 
 ### Add new components here ###
 
-readers = [BasicReader(), GitHubReader(), GitLabReader(), UnstructuredReader(), HTMLReader()]
+readers = [BasicReader(), HTMLReader(), GitHubReader(), GitLabReader(), UnstructuredReader(), FirecrawlReader()]
 chunkers = [TokenChunker(), RecursiveChunker(), SemanticChunker(), HTMLChunker(), MarkdownChunker(), CodeChunker(), JSONChunker()]
 embedders = [OpenAIEmbedder(), SentenceTransformersEmbedder(), CohereEmbedder(), OllamaEmbedder(), GoogleEmbedder()]
 
@@ -98,7 +103,7 @@ class ReaderManager:
                 raise Exception(f"{reader} Reader not found")
 
         except Exception as e:
-            raise e
+            raise Exception(f"Reader {reader} failed with: {str(e)}")
 
 class ChunkerManager:
     def __init__(self):

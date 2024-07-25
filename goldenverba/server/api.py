@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 from fastapi.staticfiles import StaticFiles
 import asyncio
 
-from goldenverba.server.ImportLogger import LoggerManager
+from goldenverba.server.helpers import LoggerManager, BatchManager
 
 import os
 from pathlib import Path
@@ -26,6 +26,7 @@ from goldenverba.server.types import (
     ImportPayload,
     GetVectorPayload,
     ImportStreamPayload,
+    DataBatchPayload,
     ChunksPayload,
     FileConfig
 )
@@ -213,12 +214,16 @@ async def websocket_import_files(websocket: WebSocket):
 
     await websocket.accept()
     logger = LoggerManager(websocket)
+    batcher = BatchManager()
 
     while True:
         try:
             data = await websocket.receive_text()
-            fileConfig = FileConfig.model_validate_json(data)
-            asyncio.create_task(manager.import_document(fileConfig, logger))
+            batch_data = DataBatchPayload.model_validate_json(data)
+            fileConfig = batcher.add_batch(batch_data)
+            if fileConfig is not None:
+                asyncio.create_task(manager.import_document(fileConfig, logger))
+
         except WebSocketDisconnect:
             msg.warn("Import WebSocket connection closed by client.")
             break

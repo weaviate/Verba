@@ -158,30 +158,52 @@ const IngestionView: React.FC<IngestionViewProps> = ({
       selectedFileData &&
       ["READY", "DONE", "ERROR"].includes(fileMap[selectedFileData].status)
     ) {
-      if (socket?.readyState === WebSocket.OPEN) {
-        setInitialStatus(selectedFileData);
-        socket.send(JSON.stringify(fileMap[selectedFileData]));
-      } else {
-        console.error("WebSocket is not open. ReadyState:", socket?.readyState);
-        setReconnect((prevState) => !prevState);
-      }
+      sendDataBatches(
+        JSON.stringify(fileMap[selectedFileData]),
+        selectedFileData
+      );
     }
   };
 
   const importAll = () => {
     for (const fileID in fileMap) {
       if (["READY", "DONE", "ERROR"].includes(fileMap[fileID].status)) {
-        if (socket?.readyState === WebSocket.OPEN) {
-          setInitialStatus(fileID);
-          socket.send(JSON.stringify(fileMap[fileID]));
-        } else {
-          console.error(
-            "WebSocket is not open. ReadyState:",
-            socket?.readyState
-          );
-          setReconnect((prevState) => !prevState);
-        }
+        sendDataBatches(JSON.stringify(fileMap[fileID]), fileID);
       }
+    }
+  };
+
+  const sendDataBatches = (data: string, fileID: string) => {
+    if (socket?.readyState === WebSocket.OPEN) {
+      setInitialStatus(fileID);
+      const chunkSize = 2000; // Define chunk size (in bytes)
+      const batches = [];
+      let offset = 0;
+
+      // Create the batches
+      while (offset < data.length) {
+        const chunk = data.slice(offset, offset + chunkSize);
+        batches.push(chunk);
+        offset += chunkSize;
+      }
+
+      const totalBatches = batches.length;
+
+      // Send the batches
+      batches.forEach((chunk, order) => {
+        socket.send(
+          JSON.stringify({
+            chunk: chunk,
+            isLastChunk: order === totalBatches - 1,
+            total: totalBatches,
+            order: order,
+            fileID: fileID,
+          })
+        );
+      });
+    } else {
+      console.error("WebSocket is not open. ReadyState:", socket?.readyState);
+      setReconnect((prevState) => !prevState);
     }
   };
 

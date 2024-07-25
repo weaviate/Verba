@@ -65,6 +65,7 @@ class Reader(VerbaComponent):
     def __init__(self):
         super().__init__()
         self.type = "FILE"  # "URL"
+        self.extension = ["txt", "md", "mdx", "py", "ts", "tsx", "js", "go", "css"]
 
     async def load(
         self, config: dict, fileConfig: FileConfig
@@ -105,6 +106,7 @@ class Chunker(VerbaComponent):
         @parameter: config : dict - Chunker Configuration
         @parameter: documents : list[Document] - List of Verba documents to chunk
         @parameter: embedder : Embedding - Selected Embedder if the Chunker requires vectorization
+        @parameter: embedder_config : dict - Embedder Configuration
         @return: list[Documents]
         """
         raise NotImplementedError("chunk method must be implemented by a subclass.")

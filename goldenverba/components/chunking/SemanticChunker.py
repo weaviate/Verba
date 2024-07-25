@@ -27,7 +27,7 @@ class SemanticChunker(Chunker):
         self.description = "Split documents based on semantic similarity based on Greg Kamradt's implementation"
         self.config = {
             "Breakpoint Percentile Threshold": InputConfig(
-                type="number", value=50, description="Percentile Threshold to split and create a chunk, the lower the more chunks you get", values=[]
+                type="number", value=55, description="Percentile Threshold to split and create a chunk, the lower the more chunks you get", values=[]
             ),
         }
 
@@ -44,9 +44,7 @@ class SemanticChunker(Chunker):
                 continue
 
             sentences = self.combine_sentences([{'sentence': x, 'index' : i} for i, x in enumerate(re.split(r'(?<=[.?!])\s+', document.content))])
-            print(f"Generated {len(sentences)} sentences")
             embeddings = await embedder.vectorize(embedder_config,[x['combined_sentence'] for x in sentences])
-            print(f"Generated embeddings")
             for i, sentence in enumerate(sentences):
                 sentence['combined_sentence_embedding'] = embeddings[i]
 
@@ -78,8 +76,6 @@ class SemanticChunker(Chunker):
             if start_index < len(sentences):
                 combined_text = ' '.join([d['sentence'] for d in sentences[start_index:]])
                 chunks.append(combined_text)
-
-            print(f"Generated {len(chunks)} chunks")
 
             for i, chunk in enumerate(chunks):
                 document.chunks.append(Chunk(

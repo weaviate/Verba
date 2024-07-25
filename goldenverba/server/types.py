@@ -41,6 +41,14 @@ class ResetPayload(BaseModel):
     resetMode: str
 
 
+class DataBatchPayload(BaseModel):
+    chunk: str
+    isLastChunk: bool
+    total: int
+    fileID: str
+    order: int
+
+
 class LoadPayload(BaseModel):
     reader: str
     chunker: str

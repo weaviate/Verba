@@ -20,80 +20,33 @@ except Exception:
 
 class BasicReader(Reader):
     """
-    The BasicReader reads .txt, .md, .mdx, .json, .pdf and .docx files.
+    The BasicReader reads text and code files
     """
 
     def __init__(self):
         super().__init__()
         self.name = "Default"
-        self.description = "Supports all text files (.txt, .md, .pdf, .docx, .json, .mdx) and code files (.py, .js, .ts, .tsx, etc.)"
+        self.description = "Supports all text and code files"
         self.requires_library = ["pypdf", "docx"]
 
     async def load(
         self, config:dict, fileConfig: FileConfig
     ) -> list[Document]:
 
-        document = None
-    
         msg.info(f"Loading in {fileConfig.filename}")
         decoded_bytes = base64.b64decode(fileConfig.content)
-        fileContent = ""
 
-        if fileConfig.extension in ["txt", "md", "mdx", "py", "ts", "tsx", "js", "go", "css"]:
-            try:
-                fileContent = decoded_bytes.decode("utf-8")
-            except Exception as e:
-                raise Exception(f"Failed to load {fileConfig.filename} : {str(e)}")
-
+        if fileConfig.extension in self.extension:
+            fileContent = self.load_text_file(decoded_bytes, fileConfig)
         elif fileConfig.extension == "json":
-            try:
-                decoded_bytes = base64.b64decode(fileConfig.content)
-                original_text = decoded_bytes.decode("utf-8")
-                json_obj = json.loads(original_text)
-
-                document = Document.from_json(json_obj)
-
-                if document is not None:
-                    return [document]
-                else:
-                    fileContent = original_text
-
-            except Exception as e:
-                raise Exception(f"Failed to load {fileConfig.filename} : {str(e)}")
-            
+            return self.load_json_file(decoded_bytes, fileConfig)
         elif fileConfig.extension == "pdf":
-            try:
-                pdf_bytes = io.BytesIO(base64.b64decode(fileConfig.content))
-
-                full_text = ""
-                reader = PdfReader(pdf_bytes)
-
-                for page in reader.pages:
-                    full_text += page.extract_text() + "\n\n"
-
-                fileContent = full_text
-
-            except Exception as e:
-                raise Exception(f"Failed to load {fileConfig.filename} : {str(e)}")
-
+            fileContent = self.load_pdf_file(decoded_bytes, fileConfig)
         elif fileConfig.extension == "docx":
-            try:
-                docx_bytes = io.BytesIO(base64.b64decode(fileConfig.content))
-
-                full_text = ""
-                reader = docx.Document(docx_bytes)
-
-                for paragraph in reader.paragraphs:
-                    full_text += paragraph.text + "\n"
-
-                fileContent = full_text
-
-            except Exception as e:
-                raise Exception(f"Failed to load {fileConfig.filename} : {str(e)}")
-        
+            fileContent = self.load_docx_file(decoded_bytes, fileConfig)
         else:
-            raise Exception(f"{fileConfig.filename} with extension {fileConfig.extension} not supported by BasicReader.")
-
+            raise Exception(f"{fileConfig.filename} with extension {fileConfig.extension} is not supported by BasicReader.")
+    
         document = Document(
             title=fileConfig.filename,
             content=fileContent,
@@ -105,3 +58,47 @@ class BasicReader(Reader):
         )
 
         return [document]
+    
+    def load_text_file(self, decoded_bytes: bytes, fileConfig: FileConfig) -> str:
+        try:
+            return decoded_bytes.decode("utf-8")
+        except Exception as e:
+            raise Exception(f"Failed to load {fileConfig.filename}: {str(e)}")
+
+    def load_json_file(self, decoded_bytes: bytes, fileConfig: FileConfig) -> list[Document]:
+        try:
+            original_text = decoded_bytes.decode("utf-8")
+            json_obj = json.loads(original_text)
+            document = Document.from_json(json_obj)
+            if document is not None:
+                return [document]
+            else:
+                return [Document(
+                    title=fileConfig.filename,
+                    content=original_text,
+                    extension=fileConfig.extension,
+                    labels=fileConfig.labels,
+                    source=fileConfig.source,
+                    fileSize=fileConfig.file_size,
+                    meta={}
+                )]
+        except Exception as e:
+            raise Exception(f"Failed to load {fileConfig.filename}: {str(e)}")
+
+    def load_pdf_file(self, decoded_bytes: bytes, fileConfig: FileConfig) -> str:
+        try:
+            pdf_bytes = io.BytesIO(decoded_bytes)
+            reader = PdfReader(pdf_bytes)
+            full_text = "\n\n".join(page.extract_text() for page in reader.pages)
+            return full_text
+        except Exception as e:
+            raise Exception(f"Failed to load {fileConfig.filename}: {str(e)}")
+
+    def load_docx_file(self, decoded_bytes: bytes, fileConfig: FileConfig) -> str:
+        try:
+            docx_bytes = io.BytesIO(decoded_bytes)
+            reader = docx.Document(docx_bytes)
+            full_text = "\n".join(paragraph.text for paragraph in reader.paragraphs)
+            return full_text
+        except Exception as e:
+            raise Exception(f"Failed to load {fileConfig.filename}: {str(e)}")

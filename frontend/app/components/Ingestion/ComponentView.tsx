@@ -65,13 +65,15 @@ const MultiInput: React.FC<{
         </button>
       </div>
 
-      <div className="grid grid-cols-5 gap-2">
+      <div className="grid grid-cols-3 gap-2">
         {values.map((value, index) => (
           <div
             key={value + index}
-            className="flex bg-bg-verba max-w-[10vw] p-2 text-center text-sm text-text-verba justify-between items-center rounded-xl"
+            className="flex bg-bg-verba w-full p-2 text-center text-sm text-text-verba justify-between items-center rounded-xl"
           >
-            <p> {"< " + value + " >"}</p>
+            <div className="flex w-full justify-center items-center">
+              <p> {value}</p>
+            </div>
             <button
               onClick={() => {
                 removeValue(value);
@@ -278,7 +280,7 @@ const ComponentView: React.FC<ComponentViewProps> = ({
                     </button>
                     <ul
                       tabIndex={0}
-                      className="dropdown-content menu bg-base-100 h-[20vh] overflow-auto rounded-box z-[1] w-full p-2 shadow"
+                      className="dropdown-content menu bg-base-100 max-h-[20vh] overflow-auto rounded-box z-[1] w-full p-2 shadow"
                     >
                       {renderConfigOptions(
                         fileMap[selectedFileData].rag_config,

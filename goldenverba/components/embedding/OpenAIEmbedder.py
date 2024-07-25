@@ -21,7 +21,7 @@ class OpenAIEmbedder(Embedding):
 
         self.config = {
             "Model": InputConfig(
-                type="dropdown", value="text-embedding-ada-002", description="Select an OpenAI Embedding Model", values=models
+                type="dropdown", value="text-embedding-3-small", description="Select an OpenAI Embedding Model", values=models
             ),
             "URL": InputConfig(
                 type="text",

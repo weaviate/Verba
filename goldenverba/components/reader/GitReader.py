@@ -1,6 +1,4 @@
-import base64
-import json
-import requests
+import aiohttp
 import os
 
 from wasabi import msg
@@ -47,98 +45,70 @@ class GitHubReader(Reader):
     ) -> list[Document]:
         
         documents = []
-
-        if config["GitHub Token"].value == "":
-            TOKEN = os.environ.get("GITHUB_TOKEN")
-            if TOKEN is None:
-                raise Exception(f"No GitHub Token detected")
-        else:
-            TOKEN = config["GitHub Token"].value
+        token = self.get_github_token(config)
 
         reader = BasicReader()
 
-        OWNER = config["Owner"].value
-        NAME = config["Name"].value
-        BRANCH = config["Branch"].value
-        PATH = config["Path"].value
+        owner = config["Owner"].value
+        name = config["Name"].value
+        branch = config["Branch"].value
+        path = config["Path"].value
+        fetch_url = f"https://api.github.com/repos/{owner}/{name}/git/trees/{branch}?recursive=1"
 
-        FETCH_URL = f"https://api.github.com/repos/{OWNER}/{NAME}/git/trees/{BRANCH}?recursive=1"
-
-        docs = await self.fetch_docs(FETCH_URL, PATH, TOKEN)
+        docs = await self.fetch_docs(fetch_url, path, token)
+        msg.info(f"Fetched {len(docs)} document paths from {fetch_url}")
 
         for _file in docs:
             try:
-                content, link, size, extension = self.download_file(OWNER, NAME, _file, BRANCH, TOKEN)
-                if len(content) > 0:
-                    newFileConfig = FileConfig(fileID=fileConfig.fileID, filename=_file, isURL=False, overwrite=fileConfig.overwrite, extension=extension, source=link, content=content, labels=fileConfig.labels, rag_config=fileConfig.rag_config, file_size=size, status=fileConfig.status, status_report=fileConfig.status_report)
-                    document = await reader.load(config, newFileConfig)
+                content, link, size, extension = await self.download_file(owner, name, _file, branch, token)
+                if content:
+                    new_file_config = FileConfig(
+                        fileID=fileConfig.fileID, filename=_file, isURL=False, overwrite=fileConfig.overwrite,
+                        extension=extension, source=link, content=content, labels=fileConfig.labels,
+                        rag_config=fileConfig.rag_config, file_size=size, status=fileConfig.status,
+                        status_report=fileConfig.status_report
+                    )
+                    document = await reader.load(config, new_file_config)
                     documents.append(document[0])
-                else:
-                    continue
-
             except Exception as e:
                 raise Exception(f"Couldn't load retrieve {_file}: {str(e)}")
 
         return documents
 
-    async def fetch_docs(self, URL: str, FOLDER: str, TOKEN: str) -> list:
-        """Fetch filenames from Github
-        @parameter path : str - Path to a GitHub repository
-        @returns list - List of document names.
-        """
-        try:
-            folder_path = FOLDER
-            url = URL
-            headers = {
-                "Authorization": f"token {TOKEN}",
-                "Accept": "application/vnd.github.v3+json",
-            }
-            response = requests.get(url, headers=headers)
-            response.raise_for_status()  # Raise an exception for HTTP errors
+    async def fetch_docs(self, url: str, folder: str, token: str, reader: Reader) -> list[str]:
+        """Fetch filenames from Github."""
+        headers = self.get_headers(token)
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, headers=headers) as response:
+                response.raise_for_status()
+                data = await response.json()
+                return [
+                    item["path"] for item in data["tree"]
+                    if item["path"].startswith(folder) and any(item["path"].endswith(ext) for ext in reader.extension)
+                ]
 
-            files = [
-                item["path"]
-                for item in response.json()["tree"]
-                if item["path"].startswith(folder_path)
-                and (
-                    item["path"].endswith(".md")
-                    or item["path"].endswith(".mdx")
-                    or item["path"].endswith(".txt")
-                    or item["path"].endswith(".json")
-                    or item["path"].endswith(".pdf")
-                    or item["path"].endswith(".docx")
-                )
-            ]
+    async def download_file(self, owner: str, name: str, path: str, branch: str, token: str) -> tuple[str, str, int, str]:
+        """Download files from Github based on filename."""
+        url = f"https://api.github.com/repos/{owner}/{name}/contents/{path}?ref={branch}"
+        headers = self.get_headers(token)
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, headers=headers) as response:
+                response.raise_for_status()
+                data = await response.json()
+                content_b64 = data["content"]
+                link = data["html_url"]
+                size = data["size"]
+                extension = os.path.splitext(path)[1][1:]
+                return content_b64, link, size, extension
 
-            return files
-        
-        except Exception as e:
-            raise Exception (f"Failed to fetch docs from GitHub: {str(e)}")
-
-    def download_file(self, OWNER: str, NAME: str, PATH: str, BRANCH: str, TOKEN: str) -> str:
-        """Download files from Github based on filename
-        @parameter OWNER: str - Owner of the GitHub repository
-        @parameter NAME: str - Name of the GitHub repository
-        @parameter PATH: str - Path of the file in the repo
-        @parameter BRANCH: str - Branch of the repository
-        @parameter TOKEN: str - GitHub token for authentication
-        @returns tuple: Content of the file (as a byte string), link to the file, size in bytes, and file extension.
-        """
-        try:
-            DOWNLOAD_URL = f"https://api.github.com/repos/{OWNER}/{NAME}/contents/{PATH}?ref={BRANCH}"
-            headers = {
-                "Authorization": f"token {TOKEN}",
-                "Accept": "application/vnd.github.v3+json",
-            }
-            response = requests.get(DOWNLOAD_URL, headers=headers)
-            response.raise_for_status()
-
-            content_b64 = response.json()["content"]
-            link = response.json()["html_url"]
-            size = response.json()["size"]
-            extension = os.path.splitext(PATH)[1][1:]
-
-        except Exception as e:
-            raise Exception(f"Couldn't download {DOWNLOAD_URL}: {str(e)}")
-
-        return (content_b64, link, size, extension)
+    def get_github_token(self, config: dict) -> str:
+        token = config["GitHub Token"].value or os.environ.get("GITHUB_TOKEN")
+        if not token:
+            raise Exception("No GitHub Token detected")
+        return token
+    
+    def get_headers(self, token: str) -> dict:
+        return {
+            "Authorization": f"token {token}",
+            "Accept": "application/vnd.github.v3+json",
+        }
