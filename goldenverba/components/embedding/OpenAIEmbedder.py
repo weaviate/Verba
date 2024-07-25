@@ -4,7 +4,6 @@ import requests
 import httpx
 
 from goldenverba.components.interfaces import Embedding
-from goldenverba.components.document import Document
 from goldenverba.components.types import InputConfig
 
 class OpenAIEmbedder(Embedding):

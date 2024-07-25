@@ -1,9 +1,4 @@
-from tqdm import tqdm
-from wasabi import msg
-from weaviate import Client
-
 from goldenverba.components.interfaces import Embedder
-from goldenverba.components.document import Document
 from goldenverba.components.types import InputConfig
 
 try:
@@ -23,13 +18,13 @@ class SentenceTransformersEmbedder(Embedder):
         self.description = "Embeds and retrieves objects using SentenceTransformer"
         self.config = {
             "Model": InputConfig(
-                type="dropdown", value="all-MiniLM-L6-v2", description="Select an HuggingFace Embedding Model", values=["all-MiniLM-L6-v2","mixedbread-ai/mxbai-embed-large-v1","all-mpnet-base-v2"]
+                type="dropdown", value="all-MiniLM-L6-v2", description="Select an HuggingFace Embedding Model", values=["all-MiniLM-L6-v2","mixedbread-ai/mxbai-embed-large-v1","all-mpnet-base-v2", "BAAI/bge-m3", "all-MiniLM-L12-v2", "paraphrase-MiniLM-L6-v2" ]
             ),
         }
 
     async def vectorize(self, config: dict, content: list[str]) -> list[float]:
         try:
-            model_name = config.get("Model", {"value": "all-MiniLM-L6-v2"}).value
+            model_name = config.get("Model").value
             model = SentenceTransformer(model_name)
             embeddings = model.encode(content).tolist()
             return embeddings

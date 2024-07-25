@@ -72,7 +72,7 @@ except Exception:
 
 readers = [BasicReader(), HTMLReader(), GitHubReader(), GitLabReader(), UnstructuredReader(), FirecrawlReader()]
 chunkers = [TokenChunker(), RecursiveChunker(), SemanticChunker(), HTMLChunker(), MarkdownChunker(), CodeChunker(), JSONChunker()]
-embedders = [OpenAIEmbedder(), SentenceTransformersEmbedder(), CohereEmbedder(), OllamaEmbedder(), GoogleEmbedder()]
+embedders = [OpenAIEmbedder(), SentenceTransformersEmbedder(),  OllamaEmbedder(), CohereEmbedder(), GoogleEmbedder()]
 
 ### ----------------------- ###
 
