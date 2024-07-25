@@ -9,7 +9,7 @@ from wasabi import msg
 from weaviate.embedded import EmbeddedOptions
 import asyncio
 
-from goldenverba.server.ImportLogger import LoggerManager
+from goldenverba.server.helpers import LoggerManager
 
 from goldenverba.components.chunk import Chunk
 from goldenverba.components.document import Document
@@ -76,8 +76,7 @@ class VerbaManager:
             else:
                 await logger.send_report(fileConfig.fileID, status=FileStatus.STARTING, message="Starting Import", took=0)
 
-            load_task = asyncio.create_task(self.reader_manager.load(fileConfig.rag_config["Reader"].selected, fileConfig, logger))
-            documents = await load_task
+            documents = await asyncio.create_task(self.reader_manager.load(fileConfig.rag_config["Reader"].selected, fileConfig, logger))
 
             for document in documents:
                 duplicate_uuid = await self.weaviate_manager.exist_document_name(document.title)
