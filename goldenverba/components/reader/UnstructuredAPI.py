@@ -1,5 +1,4 @@
 import base64
-import os
 import io
 
 import requests
@@ -8,6 +7,7 @@ from wasabi import msg
 from goldenverba.components.document import Document
 from goldenverba.components.interfaces import Reader
 from goldenverba.server.types import FileConfig
+from goldenverba.components.util import get_environment
 
 from goldenverba.components.types import InputConfig
 
@@ -19,10 +19,9 @@ class UnstructuredReader(Reader):
 
     def __init__(self):
         super().__init__()
-        self.file_types = [".pdf"]
         self.requires_env = ["UNSTRUCTURED_API_KEY"]
         self.name = "Unstructured"
-        self.description = "Uses the Unstructured API to import multiple file types such as plain text and documents (.pdf, .csv). Requires an Unstructured API Key"
+        self.description = "Uses the Unstructured API to import multiple file types such as plain text and documents"
         self.config = {
             "API Key": InputConfig(
                 type="password", value="", description="You can set your Unstructured API Key here, it will overwrite the environment variable: UNSTRUCTURED_API_KEY", values=[]
@@ -43,49 +42,36 @@ class UnstructuredReader(Reader):
         self, config: dict,  fileConfig: FileConfig
     ) -> list[Document]:
 
-        document = None
-
-        if config["API Key"].value == "":
-            API_KEY = os.environ.get("UNSTRUCTURED_API_KEY")
-            if API_KEY is None:
-                raise Exception(f"No Unstructured API Key detected")
-        else:
-            API_KEY = config["API Key"].value
-
-        API_URL = config["API URL"].value
-        STRATEGY = config["Strategy"].value
+        token = get_environment(config["API Key"].value, "UNSTRUCTURED_API_KEY", "No Unstructured API Key detected")
+        api_url = config["API URL"].value
+        strategy = config["Strategy"].value
 
         headers = {
             "accept": "application/json",
-            "unstructured-api-key": API_KEY,
+            "unstructured-api-key": token,
         }
 
         data = {
-            "strategy": STRATEGY,
+            "strategy": strategy,
         }
 
         msg.info(f"Loading in {fileConfig.filename}")
+
         file_bytes = io.BytesIO(base64.b64decode(fileConfig.content))
         file_data = {"files": (f"{fileConfig.filename}.{fileConfig.extension}", file_bytes)}
 
         try:
             response = requests.post(
-                API_URL, headers=headers, data=data, files=file_data
+                api_url, headers=headers, data=data, files=file_data
             )
             json_response = response.json()
             
             if "detail" in json_response:
                 raise Exception(f"Failed to read {fileConfig.filename} : {json_response['detail']}")
 
-            full_content = ""
-            for chunk in json_response:
-                if "text" in chunk:
-                    text = str(chunk["text"])
-                    full_content += text + " "
-
             document = Document(
                 title=fileConfig.filename,
-                content=full_content,
+                content="".join(chunk.get("text","") for chunk in json_response),
                 extension=fileConfig.extension,
                 labels=fileConfig.labels,
                 source=fileConfig.source,
@@ -96,4 +82,5 @@ class UnstructuredReader(Reader):
             return [document]
 
         except Exception as e:
-            raise Exception(f"Failed to load {fileConfig.filename} : {str(e)}")
+            raise Exception(f"Unstructed API failed to load {fileConfig.filename} : {str(e)}")
+    

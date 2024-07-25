@@ -7,6 +7,7 @@ from goldenverba.components.document import Document
 from goldenverba.components.interfaces import Reader
 from goldenverba.server.types import FileConfig
 from goldenverba.components.reader.BasicReader import BasicReader
+from goldenverba.components.util import get_environment
 
 from goldenverba.components.types import InputConfig
 
@@ -45,7 +46,7 @@ class GitHubReader(Reader):
     ) -> list[Document]:
         
         documents = []
-        token = self.get_github_token(config)
+        token = get_environment(config["GitHub Token"].value, "GITHUB_TOKEN", "No GitHub Token detected")
 
         reader = BasicReader()
 
@@ -55,7 +56,7 @@ class GitHubReader(Reader):
         path = config["Path"].value
         fetch_url = f"https://api.github.com/repos/{owner}/{name}/git/trees/{branch}?recursive=1"
 
-        docs = await self.fetch_docs(fetch_url, path, token)
+        docs = await self.fetch_docs(fetch_url, path, token, reader)
         msg.info(f"Fetched {len(docs)} document paths from {fetch_url}")
 
         for _file in docs:
@@ -100,12 +101,6 @@ class GitHubReader(Reader):
                 size = data["size"]
                 extension = os.path.splitext(path)[1][1:]
                 return content_b64, link, size, extension
-
-    def get_github_token(self, config: dict) -> str:
-        token = config["GitHub Token"].value or os.environ.get("GITHUB_TOKEN")
-        if not token:
-            raise Exception("No GitHub Token detected")
-        return token
     
     def get_headers(self, token: str) -> dict:
         return {

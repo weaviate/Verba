@@ -26,7 +26,7 @@ class BasicReader(Reader):
     def __init__(self):
         super().__init__()
         self.name = "Default"
-        self.description = "Supports all text and code files"
+        self.description = "Ingests all text and code files"
         self.requires_library = ["pypdf", "docx"]
 
     async def load(

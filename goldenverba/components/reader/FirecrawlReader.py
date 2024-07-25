@@ -1,7 +1,7 @@
 import base64
 import json
 import requests
-import os
+import aiohttp
 import asyncio
 
 from wasabi import msg
@@ -11,6 +11,7 @@ from goldenverba.components.document import Document
 from goldenverba.components.interfaces import Reader
 from goldenverba.server.types import FileConfig
 from goldenverba.components.reader.BasicReader import BasicReader
+from goldenverba.components.util import get_environment
 
 from goldenverba.components.types import InputConfig
 
@@ -44,19 +45,14 @@ class FirecrawlReader(Reader):
         
         reader = BasicReader()
 
-        URLs = config["URLs"].values
-        Mode = config["Mode"].value
-        JobID = config["JobID"].value
+        urls = config["URLs"].values
+        mode = config["Mode"].value
+        token = get_environment(config["Firecrawl API Key"].value,"FIRECRAWL_API_KEY","No Firecrawl API Key detected")
 
-        if config["Firecrawl API Key"].value == "":
-            TOKEN = os.environ.get("FIRECRAWL_API_KEY")
-            if TOKEN is None:
-                raise Exception(f"No Firecrawl API Key detected")
-        else:
-            TOKEN = config["Firecrawl API Key"].value
 
-        raw_documents = await self.firecrawl(Mode, URLs, TOKEN, JobID)
+        raw_documents = await self.firecrawl(mode, urls, token)
         documents = []
+
         for raw_document in raw_documents:
             content = raw_document[1].encode('utf-8')
             base64_content = base64.b64encode(content).decode('utf-8')
@@ -67,12 +63,17 @@ class FirecrawlReader(Reader):
 
         return documents
     
+    async def handle_response(self, response: aiohttp.ClientResponse) -> dict:
+        if response.status != 200:
+            text = await response.text()
+            raise Exception(f"Firecrawl Error: {response.status}, {text}")
+        return await response.json()
+    
 
-    async def firecrawl(self, mode: str, urls: list[str], token: str, _jobID: str) -> list[str]:
-         
+    async def firecrawl(self, mode: str, urls: list[str], token: str) -> list[tuple[str, str, str]]:
+
         crawl_url = "https://api.firecrawl.dev/v0/crawl"
         scrape_url = "https://api.firecrawl.dev/v0/scrape"
-
         documents = []
 
         headers = {
@@ -80,68 +81,53 @@ class FirecrawlReader(Reader):
             "Authorization": f"Bearer {token}"
         }
 
-        for _url in urls:
+        async with aiohttp.ClientSession() as session:
+            for url in urls:
+                request_data = {"url": url}
+                if mode == "Scrape":
+                    async with session.post(scrape_url, headers=headers, json=request_data) as response:
+                        response_data = await self.handle_response(response)
+                        if "data" in response_data and response_data.get("success", False):
+                            documents.append((
+                                response_data["data"]["metadata"]["title"],
+                                response_data["data"]["markdown"],
+                                url
+                            ))
+                else:
+                    documents.extend(await self.handle_crawl(session, crawl_url, headers, request_data))
 
-            request_data = {
-                "url":_url
-            }
-
-            if mode == "Scrape":
-                async with httpx.AsyncClient() as client:
-                    response = await client.post(scrape_url, headers=headers, content=json.dumps(request_data))
-                    if response.status_code == 200:
-                        data = response.json()
-                        if "data" in data and data.get("success", False):
-                            documents.append((data["data"]["metadata"]["title"],data["data"]["markdown"],_url))
-                        else:
-                            raise Exception(f"Firecrawl call was not successful: {data}")
-                    else:
-                        raise Exception(f"Error: {response.status_code}, {response.text}")
-            else:
-                try:
-
-                    loop = asyncio.get_running_loop()
-                    start_time = loop.time() 
-
-                    if _jobID != "":
-                        jobID = _jobID
-                        msg.info(f"Continuing Firecrawl Job {jobID}")
-                    else:
-                        response = requests.post(crawl_url, headers=headers, data=json.dumps(request_data))
-                        data = response.json()
-                        jobID = data["jobId", ""]
-                        msg.info(f"Creating Firecrawl Job {jobID}")
-
-                    if jobID != "":
-                        max_loop_retries = 60
-                        wait_time = 10
-
-                        for _ in range(max_loop_retries):
-                            msg.info(f"Checking Firecrawl Job Status for {jobID} (Try: {_}) ({round(loop.time() - start_time, 2)}s)")
-                            response = requests.get(f"{crawl_url}/status/{jobID}", headers=headers)
-                            if response.status_code == 200:
-                                data = response.json()
-                                status = data.get("status")
-                                msg.info(f"Firecrawl Job Status: {status}")
-                                files = data.get("data",[])
-                                if files is not None:
-                                    msg.info(f"{len(files)} Files scraped")
-                                if status == "completed":
-                                    msg.good(f"Firecrawl Job successful")
-                                    files = data.get("data",[])
-                                    for file in files:
-                                        documents.append((file["metadata"]["title"], file["markdown"], file["metadata"]["sourceURL"]))
-                                    break  # Exit loop when job is completed
-
-                                await asyncio.sleep(wait_time)
-                except Exception as e:
-                    raise Exception(f"Firecrawl Crawl failed with: {str(e)}")
-
-        if len(documents) == 0:
+        if not documents:
             raise Exception("Firecrawl was not able to load any documents, please check your API Key and settings")
 
         return documents
-
-
-
     
+    async def handle_crawl(self, session: aiohttp.ClientSession, crawl_url: str, headers: dict, request_data: dict) -> list[tuple[str, str, str]]:
+        documents = []
+        loop = asyncio.get_running_loop()
+        start_time = loop.time()
+
+        async with session.post(crawl_url, headers=headers, json=request_data) as response:
+            data = await self.handle_response(response)
+            job_id = data.get("jobId")
+            msg.info(f"Creating Firecrawl Job {job_id}")
+
+            if job_id:
+                max_retries = 60
+                wait_time = 10
+
+                for _ in range(max_retries):
+                    msg.info(f"Checking Firecrawl Job Status for {job_id} (Try: {_}) ({round(loop.time() - start_time, 2)}s)")
+                    async with session.get(f"{crawl_url}/status/{job_id}", headers=headers) as response:
+                        data = await self.handle_response(response)
+                        status = data.get("status")
+                        msg.info(f"Firecrawl Job Status: {status}")
+                        files = data.get("data", [])
+                        if files:
+                            msg.info(f"{len(files)} Files scraped")
+                        if status == "completed":
+                            msg.good("Firecrawl Job successful")
+                            documents.extend((file["metadata"]["title"], file["markdown"], file["metadata"]["sourceURL"]) for file in files)
+                            break
+                        await asyncio.sleep(wait_time)
+
+        return documents

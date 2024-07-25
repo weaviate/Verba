@@ -77,7 +77,7 @@ export const statusTextMap = {
   NER: "Extracting NER...",
   EXTRACTION: "Extraction REL...",
   SUMMARIZING: "Summarizing...",
-  WAITING: "Waiting...",
+  WAITING: "Uploading...",
 };
 
 export type FileMap = {

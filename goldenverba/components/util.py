@@ -1,4 +1,5 @@
 import numpy as np
+import os
 
 # Step 1: Standardize the data
 def standardize_data(X):
@@ -43,3 +44,10 @@ def pca(X, k):
     top_k_components = select_top_k_components(sorted_eigenvectors, k)
     X_pca = transform_data(X_standardized, top_k_components)
     return X_pca
+
+
+def get_environment(value: str, env: str, error_msg: str) -> str:
+    token = value or os.environ.get(env)
+    if not token:
+        raise Exception(error_msg)
+    return token
