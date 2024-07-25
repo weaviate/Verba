@@ -1,11 +1,8 @@
 import base64
-import json
-import requests
 import aiohttp
 import asyncio
 
 from wasabi import msg
-import httpx
 
 from goldenverba.components.document import Document
 from goldenverba.components.interfaces import Reader
@@ -16,9 +13,6 @@ from goldenverba.components.util import get_environment
 from goldenverba.components.types import InputConfig
 
 class FirecrawlReader(Reader):
-    """
-    The FirecrawlReader downloads files from Github and ingests them into Weaviate.
-    """
 
     def __init__(self):
         super().__init__()
