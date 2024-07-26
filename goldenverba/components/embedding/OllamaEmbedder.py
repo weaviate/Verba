@@ -11,7 +11,7 @@ class OllamaEmbedder(Embedder):
 
     def __init__(self):
         super().__init__()
-        self.name = "OllamaEmbedder"
+        self.name = "Ollama"
         self.description = "Vectorizes documents and queries using Ollama"
         self.url = os.getenv("OLLAMA_URL", "http://localhost:11434")
         models = self.get_models(self.url)
