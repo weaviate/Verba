@@ -20,7 +20,7 @@ class UnstructuredReader(Reader):
     def __init__(self):
         super().__init__()
         self.requires_env = ["UNSTRUCTURED_API_KEY"]
-        self.name = "Unstructured"
+        self.name = "Unstructured IO"
         self.description = "Uses the Unstructured API to import multiple file types such as plain text and documents"
         self.config = {
             "API Key": InputConfig(

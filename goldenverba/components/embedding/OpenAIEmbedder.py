@@ -16,6 +16,7 @@ class OpenAIEmbedder(Embedding):
         self.name = "OpenAI"
         self.description = "Vectorizes documents and queries using OpenAI"
 
+        self.url = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1")
         models = self.get_models(os.getenv("OPENAI_API_KEY", None))
 
         self.config = {
@@ -35,7 +36,6 @@ class OpenAIEmbedder(Embedding):
         }
 
     async def vectorize(self, config: dict, content: list[str]) -> list[float]:
-        url = config.get("URL", {"value": "https://api.openai.com/v1/embeddings"}).value
         model = config.get("Model", {"value": "text-embedding-ada-002"}).value
         API_KEY_CONFIG = config.get("API Key").value
 
@@ -55,7 +55,7 @@ class OpenAIEmbedder(Embedding):
                 "model": model
             }
             async with httpx.AsyncClient() as client:
-                response = await client.post(url, headers=headers, content=json.dumps(data))
+                response = await client.post(self.url+"/embeddings", headers=headers, content=json.dumps(data))
                 if response.status_code == 200:
                     data = response.json()
                     if "data" in data:
@@ -76,7 +76,7 @@ class OpenAIEmbedder(Embedding):
         headers = {
                 "Authorization": f"Bearer {token}"
             }    
-        response = requests.get("https://api.openai.com/v1/models", headers=headers)
+        response = requests.get(self.url+"/models", headers=headers)
         return [model["id"] for model in response.json()["data"] if "embedding" in model["id"]]
         
 

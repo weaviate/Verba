@@ -17,9 +17,24 @@ export type ChunksPayload = {
   chunks: VerbaChunk[];
 };
 
+export type ChunkPayload = {
+  error: string;
+  chunk: VerbaChunk;
+};
+
+export type ContentPayload = {
+  error: string;
+  content: string;
+  maxPage: number;
+};
+
 export type VectorsPayload = {
   error: string;
-  payload: { embedder: string; vectors: VectorGroup[] };
+  vector_groups: {
+    embedder: string;
+    groups: VectorGroup[];
+    dimensions: number;
+  };
 };
 
 export type VerbaDocument = {
@@ -61,7 +76,13 @@ export type FormattedDocument = {
 
 export type VectorGroup = {
   name: string;
-  vectors: VerbaVector[];
+  chunks: VectorChunk[];
+};
+
+export type VectorChunk = {
+  vector: VerbaVector;
+  chunk_id: string;
+  uuid: string;
 };
 
 export type VerbaVector = {

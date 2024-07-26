@@ -2,6 +2,7 @@ import os
 import ssl
 import time
 import importlib
+import math
 
 import weaviate
 from dotenv import load_dotenv, find_dotenv
@@ -310,6 +311,22 @@ class VerbaManager:
                 self.environment_variables[env] = True
             else:
                 self.environment_variables[env] = False
+
+    ###
+                
+    async def get_content(self, uuid: str, page: int):
+        batch_size = 5000
+
+        start_index = page * batch_size
+        end_index = start_index + batch_size
+
+        document = await self.weaviate_manager.get_document(uuid)
+        total_batches = math.ceil(len(document["content"]) / batch_size)
+
+        if start_index >= len(document["content"]):
+            return ("", total_batches)  # or handle as needed (e.g., return None or raise an error)
+        
+        return (document["content"][start_index:end_index], total_batches)
 
 
    ########

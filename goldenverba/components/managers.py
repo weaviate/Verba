@@ -72,7 +72,7 @@ except Exception:
 
 readers = [BasicReader(), HTMLReader(), GitHubReader(), GitLabReader(), UnstructuredReader(), FirecrawlReader()]
 chunkers = [TokenChunker(), RecursiveChunker(), SemanticChunker(), HTMLChunker(), MarkdownChunker(), CodeChunker(), JSONChunker()]
-embedders = [OpenAIEmbedder(), SentenceTransformersEmbedder(),  OllamaEmbedder(), CohereEmbedder(), GoogleEmbedder()]
+embedders = [OpenAIEmbedder(), SentenceTransformersEmbedder(),  OllamaEmbedder(), CohereEmbedder()]
 
 ### ----------------------- ###
 
@@ -543,10 +543,19 @@ class WeaviateManager:
         aggregation = await document_collection.aggregate.over_all(group_by=GroupByAggregate(prop="labels"), total_count=True)
         return [aggregation_group.grouped_by.value for aggregation_group in aggregation.groups]
 
-
-
-
     ### Chunks Retrieval
+
+    async def get_chunk(self, uuid: str, embedder: str) -> list[dict]:
+        if embedder not in self.embedding_table:
+            raise Exception(f"{embedder} not found in Embedding Table")
+        
+        embedder_collection = self.client.collections.get(self.embedding_table[embedder])
+        if await embedder_collection.data.exists(uuid):
+            response = await embedder_collection.query.fetch_object_by_id(uuid)
+            response.properties["doc_uuid"] = str(response.properties["doc_uuid"])
+            return response.properties
+        else:
+            return None
         
     async def get_chunks(self, uuid:str, page:int, pageSize:int) -> list[dict]:
 
@@ -580,38 +589,57 @@ class WeaviateManager:
         
         embedder_collection = self.client.collections.get(self.embedding_table[embedder])
 
-        if not showAll:            
-            weaviate_chunks = await embedder_collection.query.fetch_objects(filters=Filter.by_property("doc_uuid").equal(uuid), limit=5000, sort=Sort.by_property("chunk_id", ascending=True))
-            chunks = [obj.properties for obj in weaviate_chunks.objects]
-
-            vectors = []
-            for item in chunks:
-                if item["pca"] is not None:
-                    vectors.append({"x":item["pca"][0],"y":item["pca"][1],"z":item["pca"][2]})
-            return {"embedder":embedder, "vectors":[{"name":document["title"], "vectors":vectors}]}
+        if not showAll:
+            weaviate_chunks = await embedder_collection.query.fetch_objects(
+                filters=Filter.by_property("doc_uuid").equal(uuid),
+                limit=5000,
+                sort=Sort.by_property("chunk_id", ascending=True),
+                include_vector=True
+            )
+            dimensions = len(weaviate_chunks.objects[0].vector["default"])
+    
+            chunks = [
+                {"vector": {"x": pca[0], "y": pca[1], "z": pca[2]},
+                "uuid": str(item.uuid),
+                "chunk_id": item.properties["chunk_id"]}
+                for item in weaviate_chunks.objects
+                if (pca := item.properties["pca"]) is not None
+            ]
+            return {"embedder": embedder, "dimensions":dimensions, "groups": [{"name": document["title"], "chunks": chunks}]}
+        
+        # Generate PCA for all embeddings
         else:
             vector_map = {}
-            vector_list = []
-            vector_ids = []
+            vector_list, vector_ids, vector_chunk_uuids, vector_chunk_ids = [], [], [], []
+            dimensions = 0
+
             async for item in embedder_collection.iterator(include_vector=True):
                 doc_uuid = item.properties["doc_uuid"]
+                chunk_uuid = item.uuid
                 if doc_uuid not in vector_map:
-                    _document = await self.get_document(doc_uuid)  
-                    vector_map[doc_uuid] = {"name":_document["title"], "vectors":[]}
+                    _document = await self.get_document(doc_uuid)
+                    vector_map[doc_uuid] = {"name": _document["title"], "chunks": []}
                 vector_list.append(item.vector["default"])
+                dimensions = len(item.vector["default"])
                 vector_ids.append(doc_uuid)
+                vector_chunk_uuids.append(chunk_uuid)
+                vector_chunk_ids.append(item.properties["chunk_id"])
 
             if len(vector_ids) > 3:
                 pca = PCA(n_components=3)
                 generated_pca_embeddings = pca.fit_transform(vector_list)
                 pca_embeddings = [pca_.tolist() for pca_ in generated_pca_embeddings]
 
-                for pca_embedding, _uuid in zip(pca_embeddings, vector_ids):
-                    vector_map[_uuid]["vectors"].append({"x":pca_embedding[0],"y":pca_embedding[1],"z":pca_embedding[2]})
+                for pca_embedding, _uuid, _chunk_uuid, _chunk_id in zip(pca_embeddings, vector_ids, vector_chunk_uuids, vector_chunk_ids):
+                    vector_map[_uuid]["chunks"].append({
+                        "vector": {"x": pca_embedding[0], "y": pca_embedding[1], "z": pca_embedding[2]},
+                        "uuid": str(_chunk_uuid),
+                        "chunk_id": _chunk_id
+                    })
 
-                return {"embedder":embedder, "vectors":[vector_map[_uuid] for _uuid in vector_map]}
+                return {"embedder": embedder, "dimensions":dimensions,  "groups": list(vector_map.values())}
             else:
-                return {"embedder":embedder, "vectors":[]}
+                return {"embedder": embedder, "dimensions":dimensions, "groups": []}
 
 
 

@@ -22,7 +22,10 @@ from goldenverba.server.types import (
     QueryPayload,
     GeneratePayload,
     GetDocumentPayload,
+    GetComponentPayload,
+    GetContentPayload,
     SearchQueryPayload,
+    GetChunkPayload,
     ImportPayload,
     GetVectorPayload,
     ImportStreamPayload,
@@ -362,6 +365,7 @@ async def get_document(payload: GetDocumentPayload):
     try:
         document = await manager.weaviate_manager.get_document(payload.uuid)
         if document is not None:
+            document["content"] = ""
             msg.good(f"Succesfully retrieved document: {document['title']}")
             return JSONResponse(
                 content={
@@ -387,14 +391,36 @@ async def get_document(payload: GetDocumentPayload):
         )
     
 # Retrieve specific document based on UUID
-@app.post("/api/get_vectors")
-async def get_vectors(payload: GetVectorPayload):
+@app.post("/api/get_content")
+async def get_content(payload: GetContentPayload):
     try:
-        vectors = await manager.weaviate_manager.get_vectors(payload.uuid, payload.showAll)
+        content, maxPage = await manager.get_content(payload.uuid, payload.page-1)
+        msg.good(f"Succesfully retrieved content from {payload.uuid}")
         return JSONResponse(
             content={
                 "error": "",
-                "payload": vectors,
+                "content": content,
+                "maxPage": maxPage
+            }
+        )     
+    except Exception as e:
+        msg.fail(f"Document retrieval failed: {str(e)}")
+        return JSONResponse(
+            content={
+                "error": str(e),
+                "document": None,
+            }
+        )
+    
+# Retrieve specific document based on UUID
+@app.post("/api/get_vectors")
+async def get_vectors(payload: GetVectorPayload):
+    try:
+        vector_groups = await manager.weaviate_manager.get_vectors(payload.uuid, payload.showAll)
+        return JSONResponse(
+            content={
+                "error": "",
+                "vector_groups": vector_groups,
             }
         )            
     except Exception as e:
@@ -423,6 +449,26 @@ async def get_chunks(payload: ChunksPayload):
             content={
                 "error": str(e),
                 "chunks": None,
+            }
+        )
+    
+# Retrieve specific document based on UUID
+@app.post("/api/get_chunk")
+async def get_chunk(payload: GetChunkPayload):
+    try:
+        chunk = await manager.weaviate_manager.get_chunk(payload.uuid, payload.embedder)
+        return JSONResponse(
+            content={
+                "error": "",
+                "chunk": chunk,
+            }
+        )            
+    except Exception as e:
+        msg.fail(f"Chunk retrieval failed: {str(e)}")
+        return JSONResponse(
+            content={
+                "error": str(e),
+                "chunk": None,
             }
         )
 

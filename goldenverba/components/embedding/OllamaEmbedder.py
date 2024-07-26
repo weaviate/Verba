@@ -31,7 +31,6 @@ class OllamaEmbedder(Embedder):
                 response.raise_for_status()
                 data = await response.json()
                 embeddings = data.get("embeddings", [])
-                print(type(embeddings[0][0]), embeddings[0][0])
                 return embeddings
 
 

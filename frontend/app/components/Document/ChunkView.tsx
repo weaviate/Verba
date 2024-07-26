@@ -135,7 +135,7 @@ const ChunkView: React.FC<ChunkViewProps> = ({
       {chunks.map((chunk, index) => (
         <div
           key={"Chunk" + index}
-          className="bg-bg-alt-verba border-2 border-bg-bg-verba flex flex-col p-3 rounded-lg"
+          className="bg-bg-alt-verba flex flex-col p-3 rounded-lg"
         >
           <div className="flex flex-col justify-between">
             <div className="divider font-bold text-text-alt-verba">

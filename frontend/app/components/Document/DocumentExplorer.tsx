@@ -159,15 +159,13 @@ const DocumentExplorer: React.FC<DocumentExplorerProps> = ({
 
       {/* Document List */}
       <div className="bg-bg-alt-verba rounded-2xl flex flex-col p-6 h-full w-full overflow-y-auto overflow-x-hidden">
-        {isFetching && selectedSetting === "Content" && (
-          <div className="flex items-center justify-center text-text-alt-verba gap-2 h-full">
-            <span className="loading loading-spinner loading-sm"></span>
-            <p>Loading Document</p>
-          </div>
-        )}
-
         {selectedSetting === "Content" && (
-          <ContentView document={document} settingConfig={settingConfig} />
+          <ContentView
+            document={document}
+            settingConfig={settingConfig}
+            APIHost={APIHost}
+            selectedDocument={selectedDocument}
+          />
         )}
 
         {selectedSetting === "Chunks" && (

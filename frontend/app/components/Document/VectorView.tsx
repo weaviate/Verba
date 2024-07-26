@@ -4,13 +4,20 @@ import { extend } from "@react-three/fiber";
 import { OrbitControls, Float, PerspectiveCamera } from "@react-three/drei";
 import { AxesHelper, GridHelper } from "three";
 import * as THREE from "three";
+import { MdCancel } from "react-icons/md";
 import { GoTriangleDown } from "react-icons/go";
+import { Text, Billboard } from "@react-three/drei";
 
-import { VerbaVector } from "./types";
+import { VerbaChunk, VerbaVector } from "./types";
 
 import { SettingsConfiguration } from "../Settings/types";
 
-import { VerbaDocument, VectorsPayload, VectorGroup } from "./types";
+import {
+  VerbaDocument,
+  VectorsPayload,
+  VectorGroup,
+  ChunkPayload,
+} from "./types";
 
 import { colors } from "./util";
 
@@ -19,10 +26,15 @@ extend({ OrbitControls: OrbitControls });
 const Sphere: React.FC<{
   vector: VerbaVector;
   index: number;
+  selectedChunk: string | null;
+  setSelectedChunk: (c: string) => void;
+  chunk_uuid: string;
   color: string;
+  dynamicColor: boolean;
   setHoverTitle: (t: string) => void;
   documentTitle: string;
   multiplication: number;
+  chunk_id: string;
   showAll: boolean;
   minX: number;
   maxX: number;
@@ -37,7 +49,12 @@ const Sphere: React.FC<{
   setHoverTitle,
   documentTitle,
   multiplication,
+  dynamicColor,
+  chunk_id,
   showAll,
+  chunk_uuid,
+  setSelectedChunk,
+  selectedChunk,
   minX,
   maxX,
   minY,
@@ -75,9 +92,14 @@ const Sphere: React.FC<{
     return new THREE.Color(`rgb(${g},${b},${r})`);
   }
 
-  const sphereColor = showAll
+  const not_selected_color = !dynamicColor
     ? new THREE.Color(color)
     : vectorToColor(vector, minX, maxX, minY, maxY, minZ, maxZ);
+
+  const sphereColor =
+    selectedChunk === chunk_uuid ? "green" : not_selected_color;
+
+  const sphereRadius = selectedChunk === chunk_uuid ? 3 : 1;
 
   useFrame(() => {
     if (ref.current) {
@@ -99,17 +121,20 @@ const Sphere: React.FC<{
         position={[0, 0, 0]}
         onPointerEnter={() => {
           setHover(true);
-          setHoverTitle(documentTitle);
+          setHoverTitle(documentTitle + " | " + chunk_id);
+        }}
+        onClick={() => {
+          setSelectedChunk(chunk_uuid);
         }}
         onPointerLeave={() => {
           setHover(false);
         }}
       >
-        <sphereGeometry />
+        <sphereGeometry args={[sphereRadius, 32, 32]} />
         <meshBasicMaterial
-          color={sphereColor}
-          opacity={0.5}
-          transparent={true}
+          color={hover ? "blue" : sphereColor}
+          opacity={hover ? 1 : 0.5}
+          transparent={hover ? false : true}
         />
       </mesh>
     </Float>
@@ -132,8 +157,13 @@ const VectorView: React.FC<VectorViewProps> = ({
   const [vectors, setVectors] = useState<VectorGroup[]>([]);
   const [embedder, setEmbedder] = useState("");
   const [showAll, setShowAll] = useState(false);
+  const [dynamicColor, setDymanicColor] = useState(true);
   const [hoverTitle, setHoverTitle] = useState("");
   const [viewMultiplication, setViewMultiplication] = useState(200);
+  const [currentDimensions, setCurrentDimensions] = useState(0);
+
+  const [selectedChunk, setSelectedChunk] = useState<null | string>(null);
+  const [chunk, setChunk] = useState<VerbaChunk | null>(null);
 
   const [minX, setMinX] = useState(-1);
   const [maxX, setMaxX] = useState(1);
@@ -150,7 +180,15 @@ const VectorView: React.FC<VectorViewProps> = ({
     } else {
       setVectors([]);
     }
-  }, [selectedDocument, showAll]);
+  }, [showAll, selectedDocument]);
+
+  useEffect(() => {
+    if (selectedChunk) {
+      fetchChunk();
+    } else {
+      setChunk(null);
+    }
+  }, [selectedChunk]);
 
   function calculateMinMax(values: number[]): { min: number; max: number } {
     const min = Math.min(...values);
@@ -161,9 +199,38 @@ const VectorView: React.FC<VectorViewProps> = ({
   const getVectorCount = () => {
     let vector_count = 0;
     for (const vector_group of vectors) {
-      vector_count += vector_group.vectors.length;
+      vector_count += vector_group.chunks.length;
     }
     return vector_count;
+  };
+
+  const fetchChunk = async () => {
+    try {
+      const response = await fetch(APIHost + "/api/get_chunk", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          uuid: selectedChunk,
+          embedder: embedder,
+        }),
+      });
+
+      const data: ChunkPayload = await response.json();
+
+      if (data) {
+        if (data.error !== "") {
+          console.error(data.error);
+          setChunk(null);
+        } else {
+          setChunk(data.chunk);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to fetch document:", error);
+      setIsFetching(false);
+    }
   };
 
   const fetchVectors = async () => {
@@ -188,16 +255,24 @@ const VectorView: React.FC<VectorViewProps> = ({
           console.error(data.error);
           setIsFetching(false);
           setVectors([]);
+          setCurrentDimensions(0);
           setEmbedder("None");
         } else {
-          setVectors(data.payload.vectors);
-          setEmbedder(data.payload.embedder);
+          setVectors(data.vector_groups.groups);
+          setEmbedder(data.vector_groups.embedder);
+          setCurrentDimensions(data.vector_groups.dimensions);
           setIsFetching(false);
 
           if (!showAll) {
-            const xValues = data.payload.vectors[0].vectors.map((v) => v.x);
-            const yValues = data.payload.vectors[0].vectors.map((v) => v.y);
-            const zValues = data.payload.vectors[0].vectors.map((v) => v.z);
+            const xValues = data.vector_groups.groups[0].chunks.map(
+              (v) => v.vector.x
+            );
+            const yValues = data.vector_groups.groups[0].chunks.map(
+              (v) => v.vector.y
+            );
+            const zValues = data.vector_groups.groups[0].chunks.map(
+              (v) => v.vector.z
+            );
 
             const { min: _minX, max: _maxX } = calculateMinMax(xValues);
             setMinX(_minX);
@@ -231,7 +306,8 @@ const VectorView: React.FC<VectorViewProps> = ({
   return (
     <div className="flex flex-col gap-2 h-full w-full">
       <div className="flex justify-end w-full gap-2 items-center">
-        <div className="flex w-full justify-between">
+        <div className="flex w-full items-start justify-between">
+          {/* Left */}
           <div className="flex flex-col gap-2">
             <div className="flex gap-1 items-center">
               {isFetching && (
@@ -250,77 +326,136 @@ const VectorView: React.FC<VectorViewProps> = ({
             </div>
             <div className="flex gap-1 items-center">
               <p className="text-text-alt-verba text-sm font-bold">Vectors:</p>
-              <p className="text-sm text-text-alt-verba">{getVectorCount()}</p>
+              <p className="text-sm text-text-alt-verba">
+                {getVectorCount()} x {currentDimensions}
+              </p>
             </div>
           </div>
-          <div className="flex gap-2 items-center min-w-[20vw]">
-            <div className="flex gap-2 items-center min-w-[10vw]">
-              <p className="text-xs text-text-alt-verba">Show All Documents</p>
-              <input
-                type="checkbox"
-                className="toggle"
-                checked={showAll}
-                onChange={(e) => {
-                  setShowAll(e.target.checked);
-                }}
-              />
+
+          <div className="flex gap-10 items-center justify-between min-w-[20vw]">
+            <div className="flex flex-col gap-2 w-full">
+              <div className="flex gap-2 items-center justify-between">
+                <p className="text-xs text-text-alt-verba">
+                  Show All Documents
+                </p>
+                <input
+                  type="checkbox"
+                  className="toggle"
+                  checked={showAll}
+                  onChange={(e) => {
+                    setShowAll(e.target.checked);
+                  }}
+                />
+              </div>
+
+              <div className="flex gap-2 items-center justify-between">
+                <p className="text-xs text-text-alt-verba">Dynamic Coloring</p>
+                <input
+                  type="checkbox"
+                  className="toggle"
+                  checked={dynamicColor}
+                  onChange={(e) => {
+                    setDymanicColor(e.target.checked);
+                  }}
+                />
+              </div>
             </div>
 
-            <label className="input flex input-sm items-center gap-2 w-full bg-bg-verba">
-              <input
-                type="number"
-                className="grow w-full"
-                value={viewMultiplication}
-                onChange={(e) => {
-                  setViewMultiplication(Number(e.target.value));
-                }}
-              />
-            </label>
+            <div className="flex flex-col gap-2 w-full">
+              {/* Dropdown */}
+              <div className="dropdown dropdown-bottom flex w-full justify-start items-center">
+                <button
+                  tabIndex={0}
+                  role="button"
+                  className="btn btn-sm bg-button-verba hover:bg-button-hover-verba text-text-verba w-full flex justify-start border-none"
+                >
+                  <GoTriangleDown size={15} />
+                  <p>PCA</p>
+                </button>
+                <ul
+                  tabIndex={0}
+                  className="dropdown-content menu bg-base-100 rounded-box z-[1] w-full p-2 shadow"
+                ></ul>
+              </div>
+              {/* Zoom */}
+              <div className="flex items-center gap-2 w-full">
+                <p className="text-text-alt-verba text-sm">Zoom</p>
+                <input
+                  onChange={(e) => {
+                    setViewMultiplication(Number(e.target.value));
+                  }}
+                  type="range"
+                  min={0}
+                  max="1000"
+                  value={viewMultiplication}
+                  className="range range-xs grow w-full"
+                />
+              </div>
+            </div>
 
-            <div className="dropdown dropdown-bottom flex w-full justify-start items-center">
+            {chunk && (
               <button
-                tabIndex={0}
-                role="button"
-                className="btn btn-sm bg-button-verba hover:bg-button-hover-verba text-text-verba w-full flex justify-start border-none"
+                onClick={() => {
+                  setChunk(null);
+                  setSelectedChunk(null);
+                }}
+                className="flex btn btn-square border-none text-text-verba bg-button-verba hover:bg-warning-verba gap-2"
               >
-                <GoTriangleDown size={15} />
-                <p>PCA</p>
+                <MdCancel size={15} />
               </button>
-              <ul
-                tabIndex={0}
-                className="dropdown-content menu bg-base-100 rounded-box z-[1] w-full p-2 shadow"
-              ></ul>
-            </div>
+            )}
           </div>
         </div>
       </div>
-      <div className="flex flex-grow h-full w-full">
-        <Canvas>
-          <ambientLight intensity={0.5} />
-          <OrbitControls></OrbitControls>
-          <PerspectiveCamera makeDefault position={[0, 0, 0 + 150]} />
-          <axesHelper args={[50]} />
-          {vectors.map((vector_group, index) =>
-            vector_group.vectors.map((vector, v_index) => (
-              <Sphere
-                showAll={showAll}
-                multiplication={viewMultiplication}
-                key={"Sphere_" + v_index + vector_group.name}
-                vector={vector}
-                index={v_index}
-                color={selectColor(index)}
-                setHoverTitle={setHoverTitle}
-                documentTitle={vector_group.name}
-                minX={minX}
-                minY={minY}
-                minZ={minZ}
-                maxX={maxX}
-                maxY={maxY}
-                maxZ={maxZ}
-              />
-            ))
-          )}
-        </Canvas>
+
+      <div className="flex gap-5 h-[45vh] w-full">
+        <div
+          className={`flex flex-grow ${selectedChunk ? "w-2/3" : "w-full"} h-full`}
+        >
+          <Canvas>
+            <ambientLight intensity={0.5} />
+            <OrbitControls></OrbitControls>
+            <PerspectiveCamera makeDefault position={[0, 0, 0 + 150]} />
+            <axesHelper args={[50]} />
+            {vectors.map((vector_group, index) =>
+              vector_group.chunks.map((chunk, v_index) => (
+                <Sphere
+                  showAll={showAll}
+                  dynamicColor={dynamicColor}
+                  multiplication={viewMultiplication}
+                  key={"Sphere_" + v_index + vector_group.name}
+                  vector={chunk.vector}
+                  index={v_index}
+                  color={selectColor(index)}
+                  setHoverTitle={setHoverTitle}
+                  documentTitle={vector_group.name}
+                  chunk_id={chunk.chunk_id}
+                  setSelectedChunk={setSelectedChunk}
+                  selectedChunk={selectedChunk}
+                  chunk_uuid={chunk.uuid}
+                  minX={minX}
+                  minY={minY}
+                  minZ={minZ}
+                  maxX={maxX}
+                  maxY={maxY}
+                  maxZ={maxZ}
+                />
+              ))
+            )}
+          </Canvas>
+        </div>
+        {chunk && (
+          <div
+            className={`flex flex-grow ${selectedChunk ? "w-1/3" : "w-full"} overflow-auto`}
+          >
+            <div className="flex flex-col p-3 gap-2">
+              <p className="text-text-alt-verba fond-bold">
+                Chunk {chunk.chunk_id}
+              </p>
+              <p className="text-text-alt-verba text-sm">{chunk.content}</p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -132,6 +132,7 @@ const DocumentSearch: React.FC<DocumentSearchComponentProps> = ({
 
   const clearSearch = () => {
     setUserInput("");
+    setSelectedLabels([]);
     fetchAllDocuments("");
   };
 

@@ -1,7 +1,11 @@
-from weaviate import Client
+import os
+import requests
+import aiohttp
+import json
 
 from goldenverba.components.interfaces import Embedder
-from goldenverba.components.document import Document
+from goldenverba.components.types import InputConfig
+from goldenverba.components.util import get_environment
 
 
 class CohereEmbedder(Embedder):
@@ -11,23 +15,60 @@ class CohereEmbedder(Embedder):
 
     def __init__(self):
         super().__init__()
-        self.name = "CohereEmbedder"
-        self.requires_env = ["COHERE_API_KEY"]
+        self.name = "Cohere"
         self.description = (
-            "Embeds and retrieves objects using Cohere's embed-multilingual-v2.0 model"
+            "Vectorizes documents and queries using Cohere"
         )
-        self.vectorizer = "text2vec-cohere"
+        self.url = os.getenv("COHERE_BASE_URL", "https://api.cohere.com/v1")
+        models = self.get_models(os.getenv("COHERE_API_KEY", None))
+        self.config = {
+            "Model": InputConfig(
+                type="dropdown", value="embed-english-v3.0", description="Select a Cohere Embedding Model", values=models
+            ),
+            "API Key": InputConfig(
+                type="password",
+                value="",
+                description="You can set your Cohere API Key here or set it as environment variable `COHERE_API_KEY`", values=[]
+            ),
+        }
 
-    def embed(
-        self,
-        documents: list[Document],
-        client: Client,
-        logging: list[dict],
-    ) -> bool:
-        """Embed verba documents and its chunks to Weaviate
-        @parameter: documents : list[Document] - List of Verba documents
-        @parameter: client : Client - Weaviate Client
-        @parameter: batch_size : int - Batch Size of Input
-        @returns bool - Bool whether the embedding what successful.
-        """
-        return self.import_data(documents, client, logging)
+    async def vectorize(self, config: dict, content: list[str]) -> list[float]:
+        model = config.get("Model", "embed-english-v3.0").value
+        api_key = get_environment(config.get("API Key").value, "COHERE_API_KEY", "No Cohere API Key found")
+
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"bearer {api_key}"
+        }
+
+        # Function to split the content into chunks of up to 96 texts
+        def chunks(lst, n):
+            for i in range(0, len(lst), n):
+                yield lst[i:i + n]
+
+        all_embeddings = []
+
+        async with aiohttp.ClientSession() as session:
+            for chunk in chunks(content, 96):
+                data = {
+                    "texts": chunk,
+                    "model": model,
+                    "input_type": "search_document"
+                }
+                async with session.post(self.url + "/embed", data=json.dumps(data), headers=headers) as response:
+                    response.raise_for_status()
+                    response_data = await response.json()
+                    embeddings = response_data.get("embeddings", [])
+                    all_embeddings.extend(embeddings)
+        
+        return all_embeddings
+        
+
+    def get_models(self, token: str):
+        if token is None:
+            return ["embed-english-v3.0","embed-multilingual-v3.0","embed-english-light-v3.0","embed-multilingual-light-v3.0"]
+        headers = {
+                "Authorization": f"bearer {token}"
+            }    
+        response = requests.get(self.url+"/models", headers=headers)
+        return [model["name"] for model in response.json()["models"] if "embed" in model["endpoints"]]

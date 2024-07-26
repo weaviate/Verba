@@ -28,9 +28,16 @@ class ChunksPayload(BaseModel):
     page: int
     pageSize: int
 
-
 class GetDocumentPayload(BaseModel):
     uuid: str
+
+class GetChunkPayload(BaseModel):
+    uuid: str
+    embedder: str
+
+class GetContentPayload(BaseModel):
+    uuid: str
+    page: int
 
 class GetVectorPayload(BaseModel):
     uuid: str

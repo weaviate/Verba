@@ -219,9 +219,7 @@ export default function Home() {
             />
           </div>
 
-          <div
-            className={`${currentPage === "DOCUMENTS" && !production ? "" : "hidden"}`}
-          >
+          {currentPage === "DOCUMENTS" && !production && (
             <DocumentView
               RAGConfig={RAGConfig}
               production={production}
@@ -229,7 +227,7 @@ export default function Home() {
               settingConfig={baseSetting[settingTemplate]}
               APIHost={APIHost}
             />
-          </div>
+          )}
 
           {currentPage === "STATUS" && !production && (
             <StatusComponent
