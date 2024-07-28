@@ -319,40 +319,49 @@ class WeaviateManager:
     ### Connection Handling
 
     async def connect_to_cluster(self, w_url, w_key):
-        if w_url is not None and w_key is not None:
+        if w_url != "" and w_key != "":
             msg.info(f"Connecting to Weaviate Cluster {w_url} with Auth")
             self.client = weaviate.use_async_with_weaviate_cloud(
                 cluster_url=w_url,
                 auth_credentials=AuthApiKey(w_key),
             )
             await self.client.connect()
-        elif w_url is not None and w_key is None:
+        elif w_url !="" and w_key =="":
+            print(f"Connecting")
             if "localhost" in w_url:
                 msg.info(f"Connecting to Local Weaviate {w_url} without Auth")
                 self.client = weaviate.use_async_with_local()
                 await self.client.connect()
             else:
                 msg.info(f"Connecting to Weaviate Cluster {w_url} without Auth")
-                self.client = weaviate.use_async_with_weaviate_cloud(cluster_url=w_url)
+                self.client = weaviate.use_async_with_weaviate_cloud(cluster_url=w_url,
+                                                                     auth_credentials="")
                 await self.client.connect()
 
     async def connect_to_docker(self):
         msg.info(f"Connecting to Weaviate Docker")
-        self.client = weaviate.use_async_with_custom()
+        # ...which is running on http://weaviate:8080
+        self.client = weaviate.use_async_with_local(host="weaviate")
         await self.client.connect()
 
     async def connect_to_embedded(self):
         msg.info(f"Connecting to Weaviate Embedded")
         #TODO Wait for update to do use_async_with_embedded
-        self.client = await weaviate.connect_to_embedded()
+        self.client = await weaviate.use_async_with_embedded()
         await self.client.connect()
+
 
     async def connect(self):
         try:
-            weaviate_url = os.environ.get("WEAVIATE_URL_VERBA", None)
-            weaviate_key = os.environ.get("WEAVIATE_API_KEY_VERBA", None)
+            weaviate_url = os.environ.get("WEAVIATE_URL_VERBA", "")
+            weaviate_key = os.environ.get("WEAVIATE_API_KEY_VERBA", "")
+            msg.info(f"Found parameter {weaviate_url} with key {weaviate_key}")
 
-            if weaviate_url is not None:
+            # When you're running in a docker container, WEAVIATE_URL_VERBA
+            # is assigned to be http://weaviate:8080 in the dockerfile.
+            if "weaviate" in weaviate_url:
+                await self.connect_to_docker()
+            elif weaviate_url != "":
                 await self.connect_to_cluster(weaviate_url, weaviate_key)
             else:
                 await self.connect_to_embedded()
