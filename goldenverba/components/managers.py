@@ -3,7 +3,7 @@ from wasabi import msg
 import weaviate
 from weaviate.client import WeaviateClient
 from weaviate.auth import AuthApiKey
-from weaviate.classes.query import Filter, Sort
+from weaviate.classes.query import Filter, Sort, MetadataQuery
 from weaviate.collections.classes.data import DataObject
 from weaviate.classes.aggregate import GroupByAggregate
 
@@ -275,7 +275,6 @@ class WeaviateManager:
         async for item in document_collection.iterator():
             await self.delete_document(item.uuid)
 
-
     async def get_documents(self, query: str, pageSize: int, page: int, labels: list[str]) -> list[dict]:
         offset = pageSize * (page - 1)
         document_collection = self.client.collections.get(self.document_collection_name)
@@ -412,6 +411,28 @@ class WeaviateManager:
             else:
                 return {"embedder": embedder, "dimensions":dimensions, "groups": []}
 
+    async def hybrid_chunks(self, embedder:str, query: str, vector: list[float], limit_mode: str, limit: int):
+        if embedder not in self.embedding_table:
+            raise Exception(f"{embedder} not found in Embedding Table")
+        
+        embedder_collection = self.client.collections.get(self.embedding_table[embedder])
+        if limit_mode == "Autocut":
+            chunks = await embedder_collection.query.hybrid(query=query,vector=vector,auto_limit=limit, return_metadata=MetadataQuery(score=True, explain_score=False))
+        else:
+            chunks = await embedder_collection.query.hybrid(query=query,vector=vector,limit=limit, return_metadata=MetadataQuery(score=True, explain_score=False))
+
+        return chunks.objects
+
+    async def get_chunk_by_ids(self, embedder:str, doc_uuid: str, ids: list[int]):
+        if embedder not in self.embedding_table:
+            raise Exception(f"{embedder} not found in Embedding Table")
+        
+        embedder_collection = self.client.collections.get(self.embedding_table[embedder])
+        weaviate_chunks = await embedder_collection.query.fetch_objects(filters=(Filter.by_property("doc_uuid").equal(doc_uuid) & Filter.by_property("chunk_id").contains_any(ids) ))
+        return weaviate_chunks.objects
+
+
+
 class ReaderManager:
     def __init__(self):
         self.readers: dict[str, Reader] = { reader.name : reader for reader in readers }
@@ -513,6 +534,22 @@ class EmbeddingManager:
                 raise Exception(f"{embedder} Embedder not found")
         except Exception as e:
             raise e
+        
+    async def vectorize_query(
+        self,
+        embedder: str,
+        content: str,
+        rag_config: dict
+    ) -> list[float]:
+        try:
+            if embedder in self.embedders:
+                config = rag_config["Embedder"].components[embedder].config
+                embeddings = await self.embedders[embedder].vectorize(config, [content])
+                return embeddings[0]
+            else:
+                raise Exception(f"{embedder} Embedder not found")
+        except Exception as e:
+            raise e
 
 class RetrieverManager:
     def __init__(self):
@@ -527,13 +564,15 @@ class RetrieverManager:
         weaviate_manager: WeaviateManager,
     ):
         try:
-            if retriever in self.retrievers:
+            if retriever not in self.retrievers:
                 raise Exception(f"Retriever {retriever} not found")
             
+            embedder_model = rag_config["Embedder"].components[rag_config["Embedder"].selected].config["Model"].value
+            
             config = rag_config["Retriever"].components[retriever].config
-            documents = await self.retrievers[retriever].retrieve(query, vector, config, weaviate_manager)
-
-            return documents
+            documents, context = await self.retrievers[retriever].retrieve(query, vector, config, weaviate_manager, embedder_model)
+            return (documents, context)
+        
         except Exception as e:
             raise e
 

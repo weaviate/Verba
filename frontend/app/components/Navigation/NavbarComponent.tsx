@@ -136,16 +136,6 @@ const Navbar: React.FC<NavbarProps> = ({
           <NavbarButton
             hide={production}
             APIHost={APIHost}
-            Icon={IoBuildSharp}
-            iconSize={icon_size}
-            title="RAG Config"
-            currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
-            setPage="RAG"
-          />
-          <NavbarButton
-            hide={production}
-            APIHost={APIHost}
             Icon={IoSettingsSharp}
             iconSize={icon_size}
             title="App Settings"

@@ -60,13 +60,14 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       try {
         isFetching.current = true;
         setFetchingStatus("CHUNKS");
+        setMessages((prev) => [...prev, { type: "user", content: sendInput }]);
 
         const response = await fetch(APIHost + "/api/query", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ query: sendInput }),
+          body: JSON.stringify({ query: sendInput, rag_config: RAGConfig }),
         });
         const data: QueryPayload = await response.json();
 
@@ -78,7 +79,12 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           isFetching.current = false;
           setFetchingStatus("DONE");
         } else {
-          console.log("YIPI");
+          setMessages((prev) => [
+            ...prev,
+            { type: "retrieval", content: data.documents },
+          ]);
+          isFetching.current = false;
+          setFetchingStatus("DONE");
         }
       } catch (error) {
         console.error("Failed to fetch from API:", error);
@@ -89,8 +95,6 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         isFetching.current = false;
         setFetchingStatus("DONE");
       }
-
-      setMessages((prev) => [...prev, { type: "user", content: sendInput }]);
       setUserInput("");
     }
   };

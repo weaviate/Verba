@@ -293,12 +293,13 @@ async def query(payload: QueryPayload):
     msg.good(f"Received query: {payload.query}")
     try:
 
-        documents = await manager.retrieve_chunks()
+        documents, context = await manager.retrieve_chunks(payload.query, payload.rag_config)
 
         return JSONResponse(
             content={
                 "error": "",
-                "documents": [],
+                "documents": documents,
+                "context": context
             }
         )
     except Exception as e:
@@ -307,6 +308,7 @@ async def query(payload: QueryPayload):
             content={
                 "error": f"Query failed: {str(e)}",
                 "documents": [],
+                "context": ""
             }
         )
 

@@ -2,8 +2,7 @@ from pydantic import BaseModel
 from enum import Enum
 
 
-class QueryPayload(BaseModel):
-    query: str
+
 
 
 class ConversationItem(BaseModel):
@@ -143,6 +142,10 @@ class FileConfig(BaseModel):
 
 class ImportStreamPayload(BaseModel):
     fileMap: dict[str, FileConfig]
+
+class QueryPayload(BaseModel):
+    query: str
+    rag_config: dict[str, RAGComponentClass]
 
 
 

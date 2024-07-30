@@ -360,7 +360,7 @@ class Retriever(VerbaComponent):
 
     async def retrieve(
         self,
-        query: str, weaviate_manager, config:dict, rag_config:dict
+        query, vector, config, weaviate_manager, embedder
     ):
 
         raise NotImplementedError("retrieve method must be implemented by a subclass.")

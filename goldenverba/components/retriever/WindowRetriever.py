@@ -4,6 +4,7 @@ from wasabi import msg
 
 from goldenverba.components.chunk import Chunk
 from goldenverba.components.interfaces import Embedder, Retriever
+from goldenverba.components.types import InputConfig
 
 
 class WindowRetriever(Retriever):
@@ -16,79 +17,89 @@ class WindowRetriever(Retriever):
         self.description = "Retrieve relevant chunks from Weaviate"
         self.name = "Advanced"
 
-    def retrieve(
+        self.config = {
+                    "Search Mode": InputConfig(
+                        type="dropdown", value="Hybrid Search", description="Switch between search types.", values=["Hybrid Search","Vector Search", "Keyword Search (BM25)"]
+                    ),
+                    "Limit Mode": InputConfig(
+                        type="dropdown", value="Autocut", description="Method for limiting the results. Autocut decides automatically how many chunks to retrieve, while fixed sets a fixed limit.", values=["Autocut", "Fixed"]
+                    ),
+                    "Limit": InputConfig(
+                        type="number", value=1, description="Value for limiting the results. Value controls Autocut sensitivity and Fixed Size", values=[]
+                    ),
+                    "Window": InputConfig(
+                        type="number", value=1, description="Number of surrounding chunks of retrieved chunks to add to context", values=[]
+                    ),
+                    "Threshold": InputConfig(
+                        type="number", value=80, description="Threshold of chunk score to apply window technique (1-100)", values=[]
+                    )
+                }
+
+    async def retrieve(
         self,
-        query, weaviate_manager, config, rag_config
+        query, vector, config, weaviate_manager, embedder
     ):
-        chunk_class = embedder.get_chunk_class()
-        needs_vectorization = embedder.get_need_vectorization()
-        chunks = []
+       
+        search_mode = config["Search Mode"].value
+        limit_mode = config["Limit Mode"].value
+        limit = int(config["Limit"].value)
 
-        for query in queries:
-            query_results = (
-                client.query.get(
-                    class_name=chunk_class,
-                    properties=[
-                        "text",
-                        "doc_name",
-                        "chunk_id",
-                        "doc_uuid",
-                        "doc_type",
-                    ],
-                )
-                .with_additional(properties=["score"])
-                .with_autocut(1)
-            )
+        window = max(0,min(10, int(config["Window"].value)))
+        window_threshold = max(0,min(100, int(config["Threshold"].value)))
+        window_threshold /= 100
 
-            if needs_vectorization:
-                vector = embedder.vectorize_query(query)
-                query_results = query_results.with_hybrid(
-                    query=query,
-                    vector=vector,
-                    fusion_type=HybridFusion.RELATIVE_SCORE,
-                    properties=[
-                        "text",
-                    ],
-                ).do()
+        if search_mode == "Hybrid Search":
+            chunks = await weaviate_manager.hybrid_chunks(embedder, query, vector, limit_mode, limit)
+        # TODO Add other search methods
+            
+        # Group Chunks by document and sum score
+        doc_map = {}
+        scores = []
+        for chunk in chunks:
+            if chunk.properties["doc_uuid"] not in doc_map:
+                document = await weaviate_manager.get_document(chunk.properties["doc_uuid"])
+                doc_map[chunk.properties["doc_uuid"]] = {"title":document["title"], "chunks": [], "score": 0}
+            doc_map[chunk.properties["doc_uuid"]]["chunks"].append({"uuid":str(chunk.uuid), "score":chunk.metadata.score, "chunk_id":chunk.properties["chunk_id"], "content":chunk.properties["content"]})
+            doc_map[chunk.properties["doc_uuid"]]["score"] += chunk.metadata.score
+            scores.append(chunk.metadata.score)
 
-            else:
-                query_results = query_results.with_hybrid(
-                    query=query,
-                    fusion_type=HybridFusion.RELATIVE_SCORE,
-                    properties=[
-                        "text",
-                    ],
-                ).do()
+        min_score = min(scores)
+        max_score = max(scores)
 
-            if "errors" in query_results:
-                for error in query_results["errors"]:
-                    msg.fail(f"The query retriever result in the window retriever contains an error: ({str(error)})")
+        def normalize_value(value, max_value, min_value):
+            return (value - min_value) / (max_value - min_value)
+        
+        def generate_window_list(value, window):
 
-            query_result_by_chunk_class = query_results["data"]["Get"].get(chunk_class)
+            value = int(value)
+            window = int(window)
+            # Create a range of values around the given value, excluding the original value
+            return [i for i in range(value - window, value + window + 1) if i != value]
 
-            if query_result_by_chunk_class is not None:
-                try:
-                    iter(query_result_by_chunk_class)
-                    for chunk in query_result_by_chunk_class:
-                        chunk_obj = Chunk(
-                            chunk["text"],
-                            chunk["doc_name"],
-                            chunk["doc_type"],
-                            chunk["doc_uuid"],
-                            chunk["chunk_id"],
-                        )
-                        chunk_obj.set_score(chunk["_additional"]["score"])
-                        chunks.append(chunk_obj)
-                except TypeError:
-                    msg.fail(f"{chunk_class} is not iterable.")
-            else:
-                msg.info(f"No data found for {chunk_class}.")
+        documents = []
+        for doc in doc_map:
+            additional_chunk_ids = []
+            for chunk in doc_map[doc]["chunks"]:
+                if window_threshold <= normalize_value(float(chunk["score"]),float(max_score),float(min_score)):
+                    additional_chunk_ids += generate_window_list(chunk["chunk_id"], window)
+            unique_chunk_ids = set(additional_chunk_ids)
 
-        sorted_chunks = sorted(chunks, key=lambda x: x.score, reverse=True)
+            if len(unique_chunk_ids) > 0:
+                additional_chunks = await weaviate_manager.get_chunk_by_ids(embedder, doc, unique_chunk_ids)
+                for chunk in additional_chunks:
+                    doc_map[doc]["chunks"].append({"uuid":str(chunk.uuid), "score":0, "chunk_id":chunk.properties["chunk_id"], "content":chunk.properties["content"]})
 
-        context = self.combine_context(chunks, client, embedder)
+            _chunks = [{"uuid":str(chunk["uuid"]), "score":chunk["score"], "chunk_id":chunk["chunk_id"]} for chunk in doc_map[doc]["chunks"]]
+            _chunks_sorted = sorted(_chunks, key=lambda x: x["chunk_id"])
 
-        return sorted_chunks, context
+            documents.append({"title":doc_map[doc]["title"], "chunks":_chunks_sorted, "score":doc_map[doc]["score"], "uuid":str(doc)})
+        # TODO Context Generation
+                    
+        sorted_documents = sorted(documents, key=lambda x: x["score"], reverse=True)
+        print(sorted_documents)
+
+
+        return (sorted_documents, "Placeholder Context")
 
     def combine_context(
         self,

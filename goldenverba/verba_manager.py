@@ -150,7 +150,7 @@ class VerbaManager:
             "selected": list(embedders.values())[0].name,
         }
 
-        retrievers = self.retriever_manager.get_retrievers()
+        retrievers = self.retriever_manager.retrievers
         retrievers_config = {
             "components": {
                 retriever: retrievers[retriever].get_meta(
@@ -332,8 +332,13 @@ class VerbaManager:
 
     async def retrieve_chunks(self, query: str, rag_config: dict):
         retriever = rag_config["Retriever"].selected
-        documents = await self.retriever_manager.retrieve(retriever, query, self.weaviate_manager, rag_config)
-        return documents
+        embedder = rag_config["Embedder"].selected
+
+        vector = await self.embedder_manager.vectorize_query(embedder, query, rag_config)
+
+        documents, context = await self.retriever_manager.retrieve(retriever, query, vector, rag_config, self.weaviate_manager)
+
+        return (documents, context)
 
 
    ########
@@ -433,17 +438,6 @@ class VerbaManager:
             self.client.batch.add_data_object(properties, "VERBA_Suggestion")
 
         msg.info("Added query to suggestions")
-
-    def retrieve_chunks(self, queries: list[str]) -> list[Chunk]:
-        chunks, context = self.retriever_manager.retrieve(
-            queries,
-            self.client,
-            self.embedder_manager.embedders[self.embedder_manager.selected_embedder],
-            self.generator_manager.generators[
-                self.generator_manager.selected_generator
-            ],
-        )
-        return chunks, context
 
     def retrieve_all_document_types(self) -> list:
         """Aggreagtes and returns all document types from Weaviate
