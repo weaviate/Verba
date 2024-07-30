@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import ChatInterfaceComponent from "./ChatInterface";
+import ChatInterfaceComponent from "./ChatInterfaceOld";
 import { SettingsConfiguration } from "../Settings/types";
 import { DocumentChunk } from "../Document/types";
 

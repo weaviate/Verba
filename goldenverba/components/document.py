@@ -1,4 +1,5 @@
 from goldenverba.components.chunk import Chunk
+from spacy.tokens import Doc, Span
 
 
 class Document:
@@ -11,6 +12,7 @@ class Document:
         labels: list[str] = [],
         source: str = "",
         meta: dict = {},
+        spacy_doc: Doc = None,
     ):
         self.title = title
         self.content = content
@@ -20,6 +22,7 @@ class Document:
         self.source = source
         self.meta = meta
         self.chunks: list[Chunk] = []
+        self.spacy_doc = spacy_doc
 
     @staticmethod
     def to_json(document) -> dict:
@@ -32,11 +35,12 @@ class Document:
             "labels": document.labels,
             "source": document.source,
             "meta": document.meta,
+            "spacy_doc": document.spacy_doc.to_json()
         }
         return doc_dict
 
     @staticmethod
-    def from_json(doc_dict: dict):
+    def from_json(doc_dict: dict, nlp):
         """Convert a JSON string to a Document object."""
 
         if "title" in doc_dict and "content" in doc_dict and "extension" in doc_dict and "fileSize" in doc_dict and "labels" in doc_dict and "source" in doc_dict and "meta" in doc_dict:
@@ -48,6 +52,7 @@ class Document:
                 labels=doc_dict.get("labels", []),
                 source=doc_dict.get("source", ""),
                 meta=doc_dict.get("meta", {}),
+                spacy_doc=Doc(nlp.vocab).from_json(doc_dict.get("spacy_doc"))
             )
             return document
         else:

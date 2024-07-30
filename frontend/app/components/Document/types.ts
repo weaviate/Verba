@@ -45,7 +45,7 @@ export type VerbaDocument = {
   labels: string[];
   source: string;
   meta: any;
-  tokens: string[];
+  spacy_doc: string;
 };
 
 export type VerbaChunk = {
@@ -53,6 +53,9 @@ export type VerbaChunk = {
   chunk_id: number;
   doc_uuid: string;
   pca: number[];
+  umap: number[];
+  start_i: number;
+  end_i: number;
 };
 
 export type DocumentsPreviewPayload = {

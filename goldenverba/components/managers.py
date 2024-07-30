@@ -73,240 +73,11 @@ except Exception:
 readers = [BasicReader(), HTMLReader(), GitHubReader(), GitLabReader(), UnstructuredReader(), FirecrawlReader()]
 chunkers = [TokenChunker(), RecursiveChunker(), SemanticChunker(), HTMLChunker(), MarkdownChunker(), CodeChunker(), JSONChunker()]
 embedders = [OpenAIEmbedder(), SentenceTransformersEmbedder(),  OllamaEmbedder(), CohereEmbedder()]
+retrievers = [WindowRetriever()]
+
 
 ### ----------------------- ###
 
-
-class ReaderManager:
-    def __init__(self):
-        self.readers: dict[str, Reader] = { reader.name : reader for reader in readers }
-
-    async def load(
-        self, reader: str, fileConfig: FileConfig,  logger: LoggerManager
-    ) -> list[Document]:
-        try:
-            loop = asyncio.get_running_loop()
-            start_time = loop.time() 
-            if reader in self.readers:
-                config = fileConfig.rag_config["Reader"].components[reader].config
-                documents : list[Document] = await self.readers[reader].load(config, fileConfig)
-                for document in documents:
-                    document.meta["Reader"] = fileConfig.rag_config["Reader"].components[reader].model_dump_json()
-                elapsed_time = round(loop.time() - start_time, 2)
-                if len(documents) == 1:
-                    await logger.send_report(fileConfig.fileID, FileStatus.LOADING, f"Loaded {fileConfig.filename}", took=elapsed_time)
-                else:
-                    await logger.send_report(fileConfig.fileID, FileStatus.LOADING, f"Loaded {fileConfig.filename} with {len(documents)} documents", took=elapsed_time)
-                await logger.send_report(fileConfig.fileID, FileStatus.CHUNKING, "", took=0)
-                return documents
-            else:
-                raise Exception(f"{reader} Reader not found")
-
-        except Exception as e:
-            raise Exception(f"Reader {reader} failed with: {str(e)}")
-
-class ChunkerManager:
-    def __init__(self):
-        self.chunkers: dict[str, Chunker] = { chunker.name : chunker for chunker in chunkers }
-
-    async def chunk(self, chunker: str, fileConfig: FileConfig, documents: list[Document], embedder: Embedding, logger: LoggerManager) -> list[Document]:
-        try:
-            loop = asyncio.get_running_loop()
-            start_time = loop.time() 
-            if chunker in self.chunkers:
-                config = fileConfig.rag_config["Chunker"].components[chunker].config
-                embedder_config = fileConfig.rag_config["Embedder"].components[embedder.name].config
-                chunked_documents = await self.chunkers[chunker].chunk(config=config, documents=documents, embedder=embedder, embedder_config=embedder_config)
-                for chunked_document in chunked_documents:
-                    chunked_document.meta["Chunker"] = fileConfig.rag_config["Chunker"].components[chunker].model_dump_json()
-                elapsed_time = round(loop.time() - start_time, 2)
-                if len(documents) == 1:
-                    await logger.send_report(fileConfig.fileID, FileStatus.CHUNKING, f"Split {fileConfig.filename} into {len(chunked_documents[0].chunks)} chunks", took=elapsed_time)
-                else:
-                    await logger.send_report(fileConfig.fileID, FileStatus.CHUNKING, f"Chunked all {len(chunked_documents)} documents with a total of {sum([len(document.chunks) for document in chunked_documents])} chunks", took=elapsed_time)
-
-                await logger.send_report(fileConfig.fileID, FileStatus.EMBEDDING, "", took=0)
-                return chunked_documents
-            else:
-                raise Exception(f"{chunker} Chunker not found")
-        except Exception as e:
-            raise e
-
-class EmbeddingManager:
-    def __init__(self):
-        self.embedders: dict[str, Embedding] = { embedder.name : embedder for embedder in embedders }
-
-    async def vectorize(
-        self,
-        embedder: str,
-        fileConfig: FileConfig,
-        documents: list[Document],
-        logger: LoggerManager
-    ) -> list[Document]:
-        """Vectorizes chunks
-        @parameter: documents : Document - Verba document
-        @returns Document - Document with vectorized chunks
-        """
-        try:
-            loop = asyncio.get_running_loop()
-            start_time = loop.time() 
-            if embedder in self.embedders:
-                config = fileConfig.rag_config["Embedder"].components[embedder].config
-
-                for document in documents:
-                    content = [chunk.content for chunk in document.chunks]
-                    embeddings = await self.embedders[embedder].vectorize(config, content)
-
-                    if len(embeddings) >= 3:
-                        pca = PCA(n_components=3)
-                        generated_pca_embeddings = pca.fit_transform(embeddings)
-                        pca_embeddings = [pca_.tolist() for pca_ in generated_pca_embeddings]
-                    else:
-                        pca_embeddings = [embedding[0:3] for embedding in embeddings]
-
-                    for vector, chunk, pca_ in zip(embeddings,document.chunks, pca_embeddings):
-                        chunk.vector = vector
-                        chunk.pca = pca_
-
-                    document.meta["Embedder"] = fileConfig.rag_config["Embedder"].components[embedder].model_dump_json()
-
-                elapsed_time = round(loop.time() - start_time, 2)
-                await logger.send_report(fileConfig.fileID, FileStatus.EMBEDDING, f"Vectorized all chunks", took=elapsed_time)
-                await logger.send_report(fileConfig.fileID, FileStatus.INGESTING, "", took=0)
-                return documents
-            else:
-                raise Exception(f"{embedder} Embedder not found")
-        except Exception as e:
-            raise e
-
-class RetrieverManager:
-    def __init__(self):
-        self.retrievers: dict[str, Retriever] = {
-            "WindowRetriever": WindowRetriever(),
-        }
-        self.selected_retriever: str = "WindowRetriever"
-
-    def retrieve(
-        self,
-        queries: list[str],
-        client,
-        embedder: Embedder,
-        generator: Generator,
-    ) -> list[Chunk]:
-        """Ingest data into Weaviate
-        @parameter: queries : list[str] - List of queries
-        @parameter: client : Client - Weaviate client
-        @parameter: embedder : Embedder - Current selected Embedder
-        @returns list[Chunk] - List of retrieved chunks.
-        """
-        chunks, context = self.retrievers[self.selected_retriever].retrieve(
-            queries, client, embedder
-        )
-        managed_context = self.retrievers[self.selected_retriever].cutoff_text(
-            context, generator.context_window
-        )
-        return chunks, managed_context
-
-    def set_retriever(self, retriever: str) -> bool:
-        if retriever in self.retrievers:
-            msg.info(f"Setting RETRIEVER to {retriever}")
-            self.selected_retriever = retriever
-            return True
-        else:
-            msg.warn(f"Retriever {retriever} not found")
-            return False
-
-    def get_retrievers(self) -> dict[str, Retriever]:
-        return self.retrievers
-
-class GeneratorManager:
-    def __init__(self):
-        self.generators: dict[str, Generator] = {
-            "Gemini": GeminiGenerator(),
-            "GPT4-O": GPT4Generator(),
-            "GPT3": GPT3Generator(),
-            "Ollama": OllamaGenerator(),
-            "Command R+": CohereGenerator(),
-        }
-        self.selected_generator: str = "GPT3"
-
-    async def generate_stream(
-        self,
-        queries: list[str],
-        context: list[str],
-        conversation: dict = None,
-    ):
-        """Generate a stream of response dicts based on a list of queries and list of contexts, and includes conversational context
-        @parameter: queries : list[str] - List of queries
-        @parameter: context : list[str] - List of contexts
-        @parameter: conversation : dict - Conversational context
-        @returns Iterator[dict] - Token response generated by the Generator in this format {system:TOKEN, finish_reason:stop or empty}.
-        """
-        if conversation is None:
-            conversation = {}
-        async for result in self.generators[self.selected_generator].generate_stream(
-            queries,
-            context,
-            self.truncate_conversation_dicts(
-                conversation,
-                int(self.generators[self.selected_generator].context_window * 0.375),
-            ),
-        ):
-            yield result
-
-    def truncate_conversation_dicts(
-        self, conversation_dicts: list[dict[str, any]], max_tokens: int
-    ) -> list[dict[str, any]]:
-        """
-        Truncate a list of conversation dictionaries to fit within a specified maximum token limit.
-
-        @parameter conversation_dicts: List[Dict[str, any]] - A list of conversation dictionaries that may contain various keys, where 'content' key is present and contains text data.
-        @parameter max_tokens: int - The maximum number of tokens that the combined content of the truncated conversation dictionaries should not exceed.
-
-        @returns List[Dict[str, any]]: A list of conversation dictionaries that have been truncated so that their combined content respects the max_tokens limit. The list is returned in the original order of conversation with the most recent conversation being truncated last if necessary.
-
-        """
-        encoding = tiktoken.encoding_for_model("gpt-3.5-turbo")
-        accumulated_tokens = 0
-        truncated_conversation_dicts = []
-
-        # Start with the newest conversations
-        for item_dict in reversed(conversation_dicts):
-            item_tokens = encoding.encode(item_dict["content"], disallowed_special=())
-
-            # If adding the entire new item exceeds the max tokens
-            if accumulated_tokens + len(item_tokens) > max_tokens:
-                # Calculate how many tokens we can add from this item
-                remaining_space = max_tokens - accumulated_tokens
-                truncated_content = encoding.decode(item_tokens[:remaining_space])
-
-                # Create a new truncated item dictionary
-                truncated_item_dict = {
-                    "type": item_dict["type"],
-                    "content": truncated_content,
-                    "typewriter": item_dict["typewriter"],
-                }
-
-                truncated_conversation_dicts.append(truncated_item_dict)
-                break
-
-            truncated_conversation_dicts.append(item_dict)
-            accumulated_tokens += len(item_tokens)
-
-        # The list has been built in reverse order so we reverse it again
-        return list(reversed(truncated_conversation_dicts))
-
-    def set_generator(self, generator: str) -> bool:
-        if generator in self.generators:
-            msg.info(f"Setting GENERATOR to {generator}")
-            self.selected_generator = generator
-            return True
-        else:
-            msg.warn(f"Generator {generator} not found")
-            return False
-
-    def get_generators(self) -> dict[str, Generator]:
-        return self.generators
 
 class WeaviateManager:
     def __init__(self):
@@ -641,9 +412,221 @@ class WeaviateManager:
             else:
                 return {"embedder": embedder, "dimensions":dimensions, "groups": []}
 
+class ReaderManager:
+    def __init__(self):
+        self.readers: dict[str, Reader] = { reader.name : reader for reader in readers }
+
+    async def load(
+        self, reader: str, fileConfig: FileConfig,  logger: LoggerManager
+    ) -> list[Document]:
+        try:
+            loop = asyncio.get_running_loop()
+            start_time = loop.time() 
+            if reader in self.readers:
+                config = fileConfig.rag_config["Reader"].components[reader].config
+                documents : list[Document] = await self.readers[reader].load(config, fileConfig)
+                for document in documents:
+                    document.meta["Reader"] = fileConfig.rag_config["Reader"].components[reader].model_dump_json()
+                elapsed_time = round(loop.time() - start_time, 2)
+                if len(documents) == 1:
+                    await logger.send_report(fileConfig.fileID, FileStatus.LOADING, f"Loaded {fileConfig.filename}", took=elapsed_time)
+                else:
+                    await logger.send_report(fileConfig.fileID, FileStatus.LOADING, f"Loaded {fileConfig.filename} with {len(documents)} documents", took=elapsed_time)
+                await logger.send_report(fileConfig.fileID, FileStatus.CHUNKING, "", took=0)
+                return documents
+            else:
+                raise Exception(f"{reader} Reader not found")
+
+        except Exception as e:
+            raise Exception(f"Reader {reader} failed with: {str(e)}")
+
+class ChunkerManager:
+    def __init__(self):
+        self.chunkers: dict[str, Chunker] = { chunker.name : chunker for chunker in chunkers }
+
+    async def chunk(self, chunker: str, fileConfig: FileConfig, documents: list[Document], embedder: Embedding, logger: LoggerManager) -> list[Document]:
+        try:
+            loop = asyncio.get_running_loop()
+            start_time = loop.time() 
+            if chunker in self.chunkers:
+                config = fileConfig.rag_config["Chunker"].components[chunker].config
+                embedder_config = fileConfig.rag_config["Embedder"].components[embedder.name].config
+                chunked_documents = await self.chunkers[chunker].chunk(config=config, documents=documents, embedder=embedder, embedder_config=embedder_config)
+                for chunked_document in chunked_documents:
+                    chunked_document.meta["Chunker"] = fileConfig.rag_config["Chunker"].components[chunker].model_dump_json()
+                elapsed_time = round(loop.time() - start_time, 2)
+                if len(documents) == 1:
+                    await logger.send_report(fileConfig.fileID, FileStatus.CHUNKING, f"Split {fileConfig.filename} into {len(chunked_documents[0].chunks)} chunks", took=elapsed_time)
+                else:
+                    await logger.send_report(fileConfig.fileID, FileStatus.CHUNKING, f"Chunked all {len(chunked_documents)} documents with a total of {sum([len(document.chunks) for document in chunked_documents])} chunks", took=elapsed_time)
+
+                await logger.send_report(fileConfig.fileID, FileStatus.EMBEDDING, "", took=0)
+                return chunked_documents
+            else:
+                raise Exception(f"{chunker} Chunker not found")
+        except Exception as e:
+            raise e
+
+class EmbeddingManager:
+    def __init__(self):
+        self.embedders: dict[str, Embedding] = { embedder.name : embedder for embedder in embedders }
+
+    async def vectorize(
+        self,
+        embedder: str,
+        fileConfig: FileConfig,
+        documents: list[Document],
+        logger: LoggerManager
+    ) -> list[Document]:
+        """Vectorizes chunks
+        @parameter: documents : Document - Verba document
+        @returns Document - Document with vectorized chunks
+        """
+        try:
+            loop = asyncio.get_running_loop()
+            start_time = loop.time() 
+            if embedder in self.embedders:
+                config = fileConfig.rag_config["Embedder"].components[embedder].config
+
+                for document in documents:
+                    content = [chunk.content for chunk in document.chunks]
+                    embeddings = await self.embedders[embedder].vectorize(config, content)
+
+                    if len(embeddings) >= 3:
+                        pca = PCA(n_components=3)
+                        generated_pca_embeddings = pca.fit_transform(embeddings)
+                        pca_embeddings = [pca_.tolist() for pca_ in generated_pca_embeddings]
+                    else:
+                        pca_embeddings = [embedding[0:3] for embedding in embeddings]
+
+                    for vector, chunk, pca_ in zip(embeddings,document.chunks, pca_embeddings):
+                        chunk.vector = vector
+                        chunk.pca = pca_
+
+                    document.meta["Embedder"] = fileConfig.rag_config["Embedder"].components[embedder].model_dump_json()
+
+                elapsed_time = round(loop.time() - start_time, 2)
+                await logger.send_report(fileConfig.fileID, FileStatus.EMBEDDING, f"Vectorized all chunks", took=elapsed_time)
+                await logger.send_report(fileConfig.fileID, FileStatus.INGESTING, "", took=0)
+                return documents
+            else:
+                raise Exception(f"{embedder} Embedder not found")
+        except Exception as e:
+            raise e
+
+class RetrieverManager:
+    def __init__(self):
+        self.retrievers: dict[str, Retriever] = { retriever.name : retriever for retriever in retrievers }
+
+    async def retrieve(
+        self,
+        retriever: str,
+        query: str,
+        vector: list[float],
+        rag_config: dict,
+        weaviate_manager: WeaviateManager,
+    ):
+        try:
+            if retriever in self.retrievers:
+                raise Exception(f"Retriever {retriever} not found")
+            
+            config = rag_config["Retriever"].components[retriever].config
+            documents = await self.retrievers[retriever].retrieve(query, vector, config, weaviate_manager)
+
+            return documents
+        except Exception as e:
+            raise e
 
 
 
+class GeneratorManager:
+    def __init__(self):
+        self.generators: dict[str, Generator] = {
+            "Gemini": GeminiGenerator(),
+            "GPT4-O": GPT4Generator(),
+            "GPT3": GPT3Generator(),
+            "Ollama": OllamaGenerator(),
+            "Command R+": CohereGenerator(),
+        }
+        self.selected_generator: str = "GPT3"
+
+    async def generate_stream(
+        self,
+        queries: list[str],
+        context: list[str],
+        conversation: dict = None,
+    ):
+        """Generate a stream of response dicts based on a list of queries and list of contexts, and includes conversational context
+        @parameter: queries : list[str] - List of queries
+        @parameter: context : list[str] - List of contexts
+        @parameter: conversation : dict - Conversational context
+        @returns Iterator[dict] - Token response generated by the Generator in this format {system:TOKEN, finish_reason:stop or empty}.
+        """
+        if conversation is None:
+            conversation = {}
+        async for result in self.generators[self.selected_generator].generate_stream(
+            queries,
+            context,
+            self.truncate_conversation_dicts(
+                conversation,
+                int(self.generators[self.selected_generator].context_window * 0.375),
+            ),
+        ):
+            yield result
+
+    def truncate_conversation_dicts(
+        self, conversation_dicts: list[dict[str, any]], max_tokens: int
+    ) -> list[dict[str, any]]:
+        """
+        Truncate a list of conversation dictionaries to fit within a specified maximum token limit.
+
+        @parameter conversation_dicts: List[Dict[str, any]] - A list of conversation dictionaries that may contain various keys, where 'content' key is present and contains text data.
+        @parameter max_tokens: int - The maximum number of tokens that the combined content of the truncated conversation dictionaries should not exceed.
+
+        @returns List[Dict[str, any]]: A list of conversation dictionaries that have been truncated so that their combined content respects the max_tokens limit. The list is returned in the original order of conversation with the most recent conversation being truncated last if necessary.
+
+        """
+        encoding = tiktoken.encoding_for_model("gpt-3.5-turbo")
+        accumulated_tokens = 0
+        truncated_conversation_dicts = []
+
+        # Start with the newest conversations
+        for item_dict in reversed(conversation_dicts):
+            item_tokens = encoding.encode(item_dict["content"], disallowed_special=())
+
+            # If adding the entire new item exceeds the max tokens
+            if accumulated_tokens + len(item_tokens) > max_tokens:
+                # Calculate how many tokens we can add from this item
+                remaining_space = max_tokens - accumulated_tokens
+                truncated_content = encoding.decode(item_tokens[:remaining_space])
+
+                # Create a new truncated item dictionary
+                truncated_item_dict = {
+                    "type": item_dict["type"],
+                    "content": truncated_content,
+                    "typewriter": item_dict["typewriter"],
+                }
+
+                truncated_conversation_dicts.append(truncated_item_dict)
+                break
+
+            truncated_conversation_dicts.append(item_dict)
+            accumulated_tokens += len(item_tokens)
+
+        # The list has been built in reverse order so we reverse it again
+        return list(reversed(truncated_conversation_dicts))
+
+    def set_generator(self, generator: str) -> bool:
+        if generator in self.generators:
+            msg.info(f"Setting GENERATOR to {generator}")
+            self.selected_generator = generator
+            return True
+        else:
+            msg.warn(f"Generator {generator} not found")
+            return False
+
+    def get_generators(self) -> dict[str, Generator]:
+        return self.generators
 
     
         

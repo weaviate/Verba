@@ -33,20 +33,18 @@ class GitHubReader(Reader):
                     ),
                     "Path": InputConfig(
                         type="text", value="data", description="Enter the path or leave it empty to import all", values=[]
-                    ),
-                    "GitHub Token": InputConfig(
-                        type="password",
-                        value="",
-                        description="You can set your GitHub Token here if you haven't set it up as environment variable `GITHUB_TOKEN`", values=[]
-                    ),
+                    )
                 }
-
+        
+        if os.getenv("GITHUB_TOKEN") is None:
+            self.config["GitHub Token"] = InputConfig(type="password",value="",description="You can set your GitHub Token here if you haven't set it up as environment variable `GITHUB_TOKEN`", values=[]),
+    
     async def load(
         self, config:dict, fileConfig: FileConfig
     ) -> list[Document]:
         
         documents = []
-        token = get_environment(config["GitHub Token"].value, "GITHUB_TOKEN", "No GitHub Token detected")
+        token = get_environment(config,"GitHub Token", "GITHUB_TOKEN", "No GitHub Token detected")
 
         reader = BasicReader()
 

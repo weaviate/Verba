@@ -34,7 +34,7 @@ class CohereEmbedder(Embedder):
 
     async def vectorize(self, config: dict, content: list[str]) -> list[float]:
         model = config.get("Model", "embed-english-v3.0").value
-        api_key = get_environment(config.get("API Key").value, "COHERE_API_KEY", "No Cohere API Key found")
+        api_key = get_environment(config, "API Key", "COHERE_API_KEY", "No Cohere API Key found")
 
         headers = {
             "Content-Type": "application/json",

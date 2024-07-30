@@ -1,8 +1,5 @@
-import json
-from datetime import datetime
 import requests
 import os
-import re
 import urllib
 
 from wasabi import msg
@@ -10,6 +7,7 @@ from wasabi import msg
 from goldenverba.components.document import Document
 from goldenverba.components.interfaces import Reader
 from goldenverba.server.types import FileConfig
+from goldenverba.components.util import get_environment
 
 from goldenverba.components.reader.BasicReader import BasicReader
 
@@ -36,24 +34,20 @@ class GitLabReader(Reader):
                     "Path": InputConfig(
                         type="text", value="data", description="Enter the path or leave it empty to import all", values=[]
                     ),
-                    "GitLab Token": InputConfig(
-                        type="password",
-                        value="",
-                        description="You can set your GitLab Token here if you haven't set it up as environment variable `GITLAB_TOKEN`", values=[]
-                    ),
                 }
+        
+        if os.getenv("GITLAB_TOKEN") is None:
+            self.config["GitLab Token"] = InputConfig(type="password",value="",description="You can set your GitLab Token here if you haven't set it up as environment variable `GITLAB_TOKEN`", values=[]),
+    
+        
+        
     async def load(
         self, config:dict, fileConfig: FileConfig
     ) -> list[Document]:
         
         documents = []
 
-        if config["GitLab Token"].value == "":
-            TOKEN = os.environ.get("GITLAB_TOKEN")
-            if TOKEN is None:
-                raise Exception(f"No GitLab Token detected")
-        else:
-            TOKEN = config["GitLab Token"].value
+        TOKEN = get_environment(config,"GitLab Token", "GITLAB_TOKEN", "No GitLab Token detected")
 
         reader = BasicReader()
 

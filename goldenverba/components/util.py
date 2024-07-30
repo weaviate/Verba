@@ -46,8 +46,11 @@ def pca(X, k):
     return X_pca
 
 
-def get_environment(value: str, env: str, error_msg: str) -> str:
-    token = value or os.environ.get(env)
+def get_environment(config, value: str, env: str, error_msg: str) -> str:
+    if value in config:
+        token = config[value].value
+    else:
+        token = os.environ.get(env)
     if not token:
         raise Exception(error_msg)
     return token

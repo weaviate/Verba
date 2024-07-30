@@ -291,53 +291,22 @@ async def update_config(payload: ConfigPayload):
 @app.post("/api/query")
 async def query(payload: QueryPayload):
     msg.good(f"Received query: {payload.query}")
-    start_time = time.time()  # Start timing
     try:
-        chunks, context = manager.retrieve_chunks([payload.query])
 
-        retrieved_chunks = [
-            {
-                "text": chunk.text,
-                "doc_name": chunk.doc_name,
-                "chunk_id": chunk.chunk_id,
-                "doc_uuid": chunk.doc_uuid,
-                "doc_type": chunk.doc_type,
-                "score": chunk.score,
-            }
-            for chunk in chunks
-        ]
-
-        elapsed_time = round(time.time() - start_time, 2)  # Calculate elapsed time
-        msg.good(f"Succesfully processed query: {payload.query} in {elapsed_time}s")
-
-        if len(chunks) == 0:
-            return JSONResponse(
-                content={
-                    "chunks": [],
-                    "took": 0,
-                    "context": "",
-                    "error": "No Chunks Available",
-                }
-            )
+        documents = await manager.retrieve_chunks()
 
         return JSONResponse(
             content={
                 "error": "",
-                "chunks": retrieved_chunks,
-                "context": context,
-                "took": elapsed_time,
+                "documents": [],
             }
         )
-
     except Exception as e:
         msg.warn(f"Query failed: {str(e)}")
         return JSONResponse(
-            status_code=500,
             content={
-                    "chunks": [],
-                    "took": 0,
-                    "context": "",
-                    "error": f"Something went wrong: {str(e)}",
+                "error": f"Query failed: {str(e)}",
+                "documents": [],
             }
         )
 

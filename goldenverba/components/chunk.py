@@ -1,14 +1,20 @@
+from spacy.tokens import Doc, Span
+
 class Chunk:
     def __init__(
         self,
         content: str = "",
         chunk_id: str = "",
+        start_i: int = 0,
+        end_i: int = 0,
     ):
         self.content = content
         self.chunk_id = chunk_id
         self.vector = None
         self.doc_uuid = None
         self.pca = [0,0,0]
+        self.start_i = start_i
+        self.end_i = end_i
 
     def to_json(self) -> dict:
         """Convert the Chunk object to a dictionary."""
@@ -16,7 +22,9 @@ class Chunk:
             "content": self.content,
             "chunk_id": self.chunk_id,
             "doc_uuid": self.doc_uuid,
-            "pca": self.pca
+            "pca": self.pca,
+            "start_i":self.start_i,
+            "end_i":self.end_i
         }
 
     @classmethod
@@ -24,8 +32,9 @@ class Chunk:
         """Construct a Chunk object from a dictionary."""
         chunk = cls(
             content=data.get("content", ""),
-            chunk_id=data.get("chunk_id", 0)
+            chunk_id=data.get("chunk_id", 0),
+            start_i=data.get("start_i",0),
+            end_i=data.get("end_i",0),
         )
         chunk.doc_uuid = data.get("doc_uuid", ""),
-        chunk.pca = data.get("pca", [0,0,0]),
         return chunk

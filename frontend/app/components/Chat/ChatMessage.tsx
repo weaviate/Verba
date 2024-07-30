@@ -13,13 +13,11 @@ import { SettingsConfiguration } from "../Settings/types";
 
 interface ChatMessageProps {
   message: Message;
-  handleCopyToBillboard: (m: string) => void;
   settingConfig: SettingsConfiguration;
 }
 
 const ChatMessage: React.FC<ChatMessageProps> = ({
   message,
-  handleCopyToBillboard,
   settingConfig,
 }) => {
   return (
@@ -27,7 +25,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
       className={`flex items-end gap-2 ${message.type === "user" ? "justify-end" : "justify-start"}`}
     >
       <div
-        className={`flex flex-col items-start p-4 rounded-xl animate-press-in shadow-md sm:text-sm md:text-base ${message.type === "user" ? "bg-primary-verba" : "bg-bg-verba"}`}
+        className={`flex flex-col items-start p-5 rounded-full animate-press-in sm:text-sm md:text-base ${message.type === "user" ? "bg-bg-verba" : "bg-bg-verba"}`}
       >
         {message.cached && <FaDatabase size={12} className="text-text-verba" />}
         {message.type === "system" ? (
@@ -66,7 +64,6 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
       <div className="flex flex-col items-center justify-center">
         {message.type === "system" && (
           <button
-            onClick={() => handleCopyToBillboard(message.content)}
             className={`btn border-none shadow-none flex gap-1 bg-bg-alt-verba hover:bg-secondary-verba hover:text-text-verba text-text-alt-verba`}
           >
             <p className="text-xs">Copy</p>

@@ -14,6 +14,11 @@ except Exception:
     msg.warn("pypdf not installed, your base installation might be corrupted.")
 
 try:
+    import spacy
+except Exception:
+    msg.warn("spacy not installed, your base installation might be corrupted.")
+
+try:
     import docx
 except Exception:
     msg.warn("python-docx not installed, your base installation might be corrupted.")
@@ -27,7 +32,12 @@ class BasicReader(Reader):
         super().__init__()
         self.name = "Default"
         self.description = "Ingests all text and code files"
-        self.requires_library = ["pypdf", "docx"]
+        self.requires_library = ["pypdf", "docx", "spacy"]
+
+        self.nlp = spacy.blank("en")
+        config = {"punct_chars": None}
+        self.nlp.add_pipe("sentencizer", config=config)
+        
 
     async def load(
         self, config:dict, fileConfig: FileConfig
@@ -46,6 +56,8 @@ class BasicReader(Reader):
             fileContent = self.load_docx_file(decoded_bytes, fileConfig)
         else:
             raise Exception(f"{fileConfig.filename} with extension {fileConfig.extension} is not supported by BasicReader.")
+        
+        doc = self.nlp(fileContent)
     
         document = Document(
             title=fileConfig.filename,
@@ -54,6 +66,7 @@ class BasicReader(Reader):
             labels=fileConfig.labels,
             source=fileConfig.source,
             fileSize=fileConfig.file_size,
+            spacy_doc = doc,
             meta={}
         )
 

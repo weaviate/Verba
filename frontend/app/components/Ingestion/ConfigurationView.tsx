@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, use } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import InfoComponent from "../Navigation/InfoComponent";
 import { SettingsConfiguration } from "../Settings/types";
 import { IoMdAddCircle } from "react-icons/io";
@@ -117,6 +117,55 @@ const ConfigurationView: React.FC<ConfigurationViewProps> = ({
     }
   };
 
+  const updateConfig = useCallback(
+    (
+      component_n: string,
+      configTitle: string,
+      value: string | boolean | string[]
+    ) => {
+      setFileMap((prevFileMap) => {
+        if (selectedFileData) {
+          const newFileMap = { ...prevFileMap };
+          const selectedFile = newFileMap[selectedFileData];
+          const componentConfig =
+            selectedFile.rag_config[component_n].components[
+              selectedFile.rag_config[component_n].selected
+            ].config;
+
+          // Update the specific config value directly
+          if (typeof value === "string" || typeof value === "boolean") {
+            componentConfig[configTitle].value = value;
+          } else {
+            componentConfig[configTitle].values = value;
+          }
+
+          return newFileMap;
+        }
+        return prevFileMap;
+      });
+    },
+    [selectedFileData]
+  );
+
+  const selectComponent = (component_n: string, selected_component: string) => {
+    setFileMap((prevFileMap) => {
+      if (selectedFileData) {
+        const newFileData: FileData = JSON.parse(
+          JSON.stringify(prevFileMap[selectedFileData])
+        );
+        const newRAGConfig: RAGConfig = JSON.parse(
+          JSON.stringify(prevFileMap[selectedFileData].rag_config)
+        );
+        newRAGConfig[component_n].selected = selected_component;
+        newFileData.rag_config = newRAGConfig;
+        const newFileMap: FileMap = { ...prevFileMap };
+        newFileMap[selectedFileData] = newFileData;
+        return newFileMap;
+      }
+      return prevFileMap;
+    });
+  };
+
   return (
     <div className="flex flex-col gap-2 w-full">
       {/* FileSelection Header */}
@@ -170,25 +219,25 @@ const ConfigurationView: React.FC<ConfigurationViewProps> = ({
             setFileMap={setFileMap}
           />
         )}
-        {selectedSetting === "Pipeline" && (
+        {selectedSetting === "Pipeline" && selectedFileData && (
           <div className="flex flex-col gap-10 w-full">
             <ComponentView
-              selectedFileData={selectedFileData}
-              fileMap={fileMap}
-              setFileMap={setFileMap}
+              RAGConfig={fileMap[selectedFileData].rag_config}
               component_name="Reader"
+              selectComponent={selectComponent}
+              updateConfig={updateConfig}
             />
             <ComponentView
-              selectedFileData={selectedFileData}
-              fileMap={fileMap}
-              setFileMap={setFileMap}
+              RAGConfig={fileMap[selectedFileData].rag_config}
               component_name="Chunker"
+              selectComponent={selectComponent}
+              updateConfig={updateConfig}
             />
             <ComponentView
-              selectedFileData={selectedFileData}
-              fileMap={fileMap}
-              setFileMap={setFileMap}
+              RAGConfig={fileMap[selectedFileData].rag_config}
               component_name="Embedder"
+              selectComponent={selectComponent}
+              updateConfig={updateConfig}
             />
           </div>
         )}

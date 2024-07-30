@@ -367,6 +367,7 @@ const VectorView: React.FC<VectorViewProps> = ({
                 <button
                   tabIndex={0}
                   role="button"
+                  disabled={true}
                   className="btn btn-sm bg-button-verba hover:bg-button-hover-verba text-text-verba w-full flex justify-start border-none"
                 >
                   <GoTriangleDown size={15} />

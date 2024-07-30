@@ -46,7 +46,7 @@ const DocumentSearch: React.FC<DocumentSearchComponentProps> = ({
   const pageSize = 20;
 
   const [requestTime, setRequestTime] = useState(0);
-  const [labels, setLabels] = useState<string[]>(["Documents", "Code", "Blog"]);
+  const [labels, setLabels] = useState<string[]>([]);
   const [selectedLabels, setSelectedLabels] = useState<string[]>([]);
   const [currentEmbedder, setCurrentEmbedder] = useState<string | null>(null);
   const [triggerSearch, setTriggerSearch] = useState(false);

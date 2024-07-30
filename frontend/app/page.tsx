@@ -16,6 +16,8 @@ import { GoogleAnalytics } from "@next/third-parties/google";
 import { fonts, FontKey } from "./info";
 import PulseLoader from "react-spinners/PulseLoader";
 
+import ChatView from "./components/Chat/ChatView";
+
 export default function Home() {
   // Page States
   const [currentPage, setCurrentPage] = useState("CHAT");
@@ -210,12 +212,13 @@ export default function Home() {
           <div
             className={`${currentPage === "CHAT" && !production ? "" : "hidden"}`}
           >
-            <ChatComponent
+            <ChatView
+              RAGConfig={RAGConfig}
+              setRAGConfig={setRAGConfig}
               production={production}
+              setCurrentPage={setCurrentPage}
               settingConfig={baseSetting[settingTemplate]}
               APIHost={APIHost}
-              RAGConfig={RAGConfig}
-              setCurrentPage={setCurrentPage}
             />
           </div>
 

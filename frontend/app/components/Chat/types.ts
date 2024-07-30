@@ -1,17 +1,27 @@
 import { DocumentChunk } from "../Document/types";
 
 export interface Message {
-  type: "user" | "system";
+  type: "user" | "system" | "error";
   content: string;
   cached?: boolean;
   distance?: string;
 }
 
 export type QueryPayload = {
-  chunks: DocumentChunk[];
-  context: string;
   error: string;
-  took: number;
+  documents: DocumentScore[];
+};
+
+export type DocumentScore = {
+  title: string;
+  uuid: string;
+  score: number;
+  chunks: ChunkScore[];
+};
+
+export type ChunkScore = {
+  uuid: string;
+  score: number;
 };
 
 export type Segment =

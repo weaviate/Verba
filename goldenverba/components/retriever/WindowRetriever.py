@@ -13,21 +13,13 @@ class WindowRetriever(Retriever):
 
     def __init__(self):
         super().__init__()
-        self.description = "Retrieve relevant chunks and their surrounding context using Semantic and Keyword Search (Hybrid)"
-        self.name = "WindowRetriever"
+        self.description = "Retrieve relevant chunks from Weaviate"
+        self.name = "Advanced"
 
     def retrieve(
         self,
-        queries: list[str],
-        client: Client,
-        embedder: Embedder,
-    ) -> list[Chunk]:
-        """Ingest data into Weaviate
-        @parameter: queries : list[str] - List of queries
-        @parameter: client : Client - Weaviate client
-        @parameter: embedder : Embedder - Current selected Embedder
-        @returns list[Chunk] - List of retrieved chunks.
-        """
+        query, weaviate_manager, config, rag_config
+    ):
         chunk_class = embedder.get_chunk_class()
         needs_vectorization = embedder.get_need_vectorization()
         chunks = []

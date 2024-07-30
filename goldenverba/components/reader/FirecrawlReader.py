@@ -1,6 +1,7 @@
 import base64
 import aiohttp
 import asyncio
+import os
 
 from wasabi import msg
 
@@ -20,11 +21,6 @@ class FirecrawlReader(Reader):
         self.type = "URL"
         self.description = "Use Firecrawl to scrape websites and ingest them into Verba"
         self.config = {
-                    "Firecrawl API Key": InputConfig(
-                        type="password",
-                        value="",
-                        description="You can set your Firecrawl API Key or set it as environment variable `FIRECRAWL_API_KEY`", values=[]
-                    ),
                     "Mode": InputConfig(
                         type="dropdown", value="Scrape", description="Switch between scraping and crawling. Note that crawling can take some time.", values=["Crawl","Scrape"]
                     ),
@@ -32,6 +28,9 @@ class FirecrawlReader(Reader):
                         type="multi", value="", description="Add URLs to retrieve data from", values=[]
                     )
                 }
+        
+        if os.getenv("FIRECRAWL_API_KEY") is None:
+            self.config["Firecrawl API Key"] = InputConfig(type="password",value="",description="You can set your Firecrawl API Key or set it as environment variable `FIRECRAWL_API_KEY`", values=[]),
 
     async def load(
         self, config:dict, fileConfig: FileConfig
@@ -41,7 +40,7 @@ class FirecrawlReader(Reader):
 
         urls = config["URLs"].values
         mode = config["Mode"].value
-        token = get_environment(config["Firecrawl API Key"].value,"FIRECRAWL_API_KEY","No Firecrawl API Key detected")
+        token = get_environment(config, "Firecrawl API Key","FIRECRAWL_API_KEY","No Firecrawl API Key detected")
 
 
         raw_documents = await self.firecrawl(mode, urls, token)
