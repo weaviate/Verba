@@ -54,7 +54,7 @@ class WindowRetriever(Retriever):
             
         # Group Chunks by document and sum score
         doc_map = {}
-        scores = []
+        scores = [0]
         for chunk in chunks:
             if chunk.properties["doc_uuid"] not in doc_map:
                 document = await weaviate_manager.get_document(chunk.properties["doc_uuid"])
@@ -89,15 +89,13 @@ class WindowRetriever(Retriever):
                 for chunk in additional_chunks:
                     doc_map[doc]["chunks"].append({"uuid":str(chunk.uuid), "score":0, "chunk_id":chunk.properties["chunk_id"], "content":chunk.properties["content"]})
 
-            _chunks = [{"uuid":str(chunk["uuid"]), "score":chunk["score"], "chunk_id":chunk["chunk_id"]} for chunk in doc_map[doc]["chunks"]]
+            _chunks = [{"uuid":str(chunk["uuid"]), "score":chunk["score"], "chunk_id":chunk["chunk_id"], "embedder":embedder} for chunk in doc_map[doc]["chunks"]]
             _chunks_sorted = sorted(_chunks, key=lambda x: x["chunk_id"])
 
             documents.append({"title":doc_map[doc]["title"], "chunks":_chunks_sorted, "score":doc_map[doc]["score"], "uuid":str(doc)})
         # TODO Context Generation
                     
         sorted_documents = sorted(documents, key=lambda x: x["score"], reverse=True)
-        print(sorted_documents)
-
 
         return (sorted_documents, "Placeholder Context")
 

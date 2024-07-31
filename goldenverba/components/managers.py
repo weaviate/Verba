@@ -342,6 +342,7 @@ class WeaviateManager:
             raise Exception(f"{embedder} not found in Embedding Table")
         
         embedder_collection = self.client.collections.get(self.embedding_table[embedder])
+
         weaviate_chunks = await embedder_collection.query.fetch_objects(filters=Filter.by_property("doc_uuid").equal(uuid), limit=pageSize, offset=offset, sort=Sort.by_property("chunk_id", ascending=True))
         chunks = [obj.properties for obj in weaviate_chunks.objects]
         for chunk in chunks:
@@ -430,6 +431,16 @@ class WeaviateManager:
         embedder_collection = self.client.collections.get(self.embedding_table[embedder])
         weaviate_chunks = await embedder_collection.query.fetch_objects(filters=(Filter.by_property("doc_uuid").equal(doc_uuid) & Filter.by_property("chunk_id").contains_any(ids) ))
         return weaviate_chunks.objects
+
+    ### Metadata Retrieval
+
+    async def get_datacount(self, embedder: str) -> int:
+        if embedder not in self.embedding_table:
+            raise Exception(f"{embedder} not found in Embedding Table")
+        embedder_collection = self.client.collections.get(self.embedding_table[embedder])
+        response = await embedder_collection.aggregate.over_all(group_by=GroupByAggregate(prop="doc_uuid"), total_count=True)
+        return len(response.groups)
+
 
 
 
@@ -568,7 +579,6 @@ class RetrieverManager:
                 raise Exception(f"Retriever {retriever} not found")
             
             embedder_model = rag_config["Embedder"].components[rag_config["Embedder"].selected].config["Model"].value
-            
             config = rag_config["Retriever"].components[retriever].config
             documents, context = await self.retrievers[retriever].retrieve(query, vector, config, weaviate_manager, embedder_model)
             return (documents, context)

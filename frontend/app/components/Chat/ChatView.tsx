@@ -5,6 +5,9 @@ import { SettingsConfiguration } from "../Settings/types";
 import { RAGConfig } from "../RAG/types";
 import ChatInterface from "./ChatInterface";
 
+import DocumentExplorer from "../Document/DocumentExplorer";
+import { ChunkScore } from "./types";
+
 interface ChatViewProps {
   settingConfig: SettingsConfiguration;
   APIHost: string | null;
@@ -23,6 +26,11 @@ const ChatView: React.FC<ChatViewProps> = ({
   setRAGConfig,
 }) => {
   const [selectedDocument, setSelectedDocument] = useState<string | null>(null);
+  const [selectedChunkScore, setSelectedChunkScore] = useState<ChunkScore[]>(
+    []
+  );
+
+  const _RAGConfig = { ...RAGConfig };
 
   return (
     <div className="flex justify-center gap-3 h-[80vh] ">
@@ -34,13 +42,25 @@ const ChatView: React.FC<ChatViewProps> = ({
           setRAGConfig={setRAGConfig}
           APIHost={APIHost}
           settingConfig={settingConfig}
-          RAGConfig={RAGConfig}
+          RAGConfig={_RAGConfig}
+          selectedDocument={selectedDocument}
+          setSelectedDocument={setSelectedDocument}
+          setSelectedChunkScore={setSelectedChunkScore}
         />{" "}
       </div>
 
       <div
         className={`${selectedDocument ? "lg:w-[55vw] w-full flex" : "hidden lg:flex lg:w-[55vw]"}`}
-      ></div>
+      >
+        <DocumentExplorer
+          production={production}
+          APIHost={APIHost}
+          setSelectedDocument={setSelectedDocument}
+          settingConfig={settingConfig}
+          selectedDocument={selectedDocument}
+          chunkScores={selectedChunkScore}
+        />
+      </div>
     </div>
   );
 };

@@ -3,6 +3,10 @@ import ssl
 import time
 import importlib
 import math
+import json
+
+from spacy.tokens import Doc
+import spacy
 
 import weaviate
 from dotenv import load_dotenv, find_dotenv
@@ -14,7 +18,7 @@ from goldenverba.server.helpers import LoggerManager
 
 from goldenverba.components.chunk import Chunk
 from goldenverba.components.document import Document
-from goldenverba.server.types import ImportStreamPayload, FileConfig,FileStatus
+from goldenverba.server.types import ImportStreamPayload, FileConfig,FileStatus, ChunkScore
 
 from goldenverba.components.interfaces import (
     VerbaComponent,
@@ -314,19 +318,53 @@ class VerbaManager:
 
     # Document Content Retrieval
                 
-    async def get_content(self, uuid: str, page: int):
-        batch_size = 5000
-
-        start_index = page * batch_size
-        end_index = start_index + batch_size
+    async def get_content(self, uuid: str, page: int, chunkScores: list[ChunkScore]):
 
         document = await self.weaviate_manager.get_document(uuid)
-        total_batches = math.ceil(len(document["content"]) / batch_size)
 
-        if start_index >= len(document["content"]):
-            return ("", total_batches)  # or handle as needed (e.g., return None or raise an error)
-        
-        return (document["content"][start_index:end_index], total_batches)
+        nlp = spacy.blank("en")
+        config = {"punct_chars": None}
+        nlp.add_pipe("sentencizer", config=config)
+
+        doc = nlp(document["content"])
+
+        batch_size = 2000
+
+        content_pieces = []
+
+        if len(chunkScores) > 0:
+            if page > len(chunkScores):
+                page = 0
+
+            total_batches = len(chunkScores)
+            chunk = await self.weaviate_manager.get_chunk(chunkScores[page].uuid, chunkScores[page].embedder)
+
+            start_index = int(chunk["start_i"])
+            end_index = int(chunk["end_i"])
+
+            before_start_index = max(start_index-(batch_size/2),0)
+            before_end_index = max(start_index-1,0)
+
+            after_start_index = min(end_index+1,len(doc))
+            after_end_index = min(end_index+(batch_size/2),len(doc))
+
+            content_pieces.append({"content":doc[before_start_index:before_end_index].text, "chunk_id": 0, "score": 0, "type": "text"})
+            content_pieces.append({"content":doc[start_index:end_index].text, "chunk_id": chunkScores[page].chunk_id, "score": chunkScores[page].score, "type": "extract"})
+            content_pieces.append({"content":doc[after_start_index:after_end_index].text, "chunk_id": 0, "score": 0, "type": "text"})
+
+
+        else:
+            start_index = page * batch_size
+            end_index = start_index + batch_size
+
+            total_batches = math.ceil(len(doc) / batch_size)
+
+            if start_index >= len(doc):
+                return ("", total_batches)  # or handle as needed (e.g., return None or raise an error)
+            
+            content_pieces.append({"content":doc[start_index:end_index].text, "chunk_id": 0, "score": 0, "type": "text"})
+            
+        return (content_pieces, total_batches)
 
     # Retrieval Augmented Generation
 

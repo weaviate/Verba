@@ -35,7 +35,6 @@ class Document:
             "labels": document.labels,
             "source": document.source,
             "meta": document.meta,
-            "spacy_doc": document.spacy_doc.to_json()
         }
         return doc_dict
 
@@ -52,7 +51,6 @@ class Document:
                 labels=doc_dict.get("labels", []),
                 source=doc_dict.get("source", ""),
                 meta=doc_dict.get("meta", {}),
-                spacy_doc=Doc(nlp.vocab).from_json(doc_dict.get("spacy_doc"))
             )
             return document
         else:

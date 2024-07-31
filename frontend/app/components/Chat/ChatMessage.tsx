@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Message } from "./types";
+import { ChunkScore, Message } from "./types";
 import ReactMarkdown from "react-markdown";
 import { FaDatabase } from "react-icons/fa";
 import { BiError } from "react-icons/bi";
@@ -15,12 +15,22 @@ import { SettingsConfiguration } from "../Settings/types";
 
 interface ChatMessageProps {
   message: Message;
+  message_index: number;
   settingConfig: SettingsConfiguration;
+  selectedDocument: string | null;
+  setSelectedDocument: (s: string | null) => void;
+  setSelectedDocumentScore: (s: string | null) => void;
+  setSelectedChunkScore: (s: ChunkScore[]) => void;
 }
 
 const ChatMessage: React.FC<ChatMessageProps> = ({
   message,
   settingConfig,
+  selectedDocument,
+  setSelectedDocument,
+  message_index,
+  setSelectedDocumentScore,
+  setSelectedChunkScore,
 }) => {
   const colorTable = {
     user: "bg-bg-verba",
@@ -35,7 +45,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
         className={`flex items-end gap-2 ${message.type === "user" ? "justify-end" : "justify-start"}`}
       >
         <div
-          className={`flex flex-col items-start p-5 rounded-full animate-press-in sm:text-sm md:text-base ${colorTable[message.type]}`}
+          className={`flex flex-col items-start p-5 rounded-3xl animate-press-in sm:text-sm md:text-base ${colorTable[message.type]}`}
         >
           {message.cached && (
             <FaDatabase size={12} className="text-text-verba" />
@@ -74,9 +84,9 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
             <div className="whitespace-pre-wrap">{message.content}</div>
           )}
           {message.type === "error" && (
-            <div className="whitespace-pre-wrap flex items-center gap-2 text-text-verba">
+            <div className="whitespace-pre-wrap flex items-center gap-2 text-sm text-text-verba">
               <BiError size={15} />
-              <p>Unexpected Error: {message.content}</p>
+              <p>{message.content}</p>
             </div>
           )}
         </div>
@@ -93,18 +103,25 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
     );
   } else {
     return (
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-3 gap-3 w-full">
         {message.content.map((document, index) => (
-          <div
+          <button
+            onClick={() => {
+              setSelectedDocument(document.uuid);
+              setSelectedDocumentScore(
+                document.uuid + document.score + document.chunks.length
+              );
+              setSelectedChunkScore(document.chunks);
+            }}
             key={"Retrieval" + document.title + index}
-            className="bg-bg-verba p-3 rounded-full items-center justify-center flex gap-3"
+            className={`flex ${selectedDocument && selectedDocument === document.uuid + document.score + document.chunks.length ? "bg-secondary-verba hover:bg-button-hover-verba" : "bg-button-verba hover:bg-secondary-verba"} rounded-3xl p-3 items-center justify-center flex gap-2 transition-colors duration-300 ease-in-out border-none`}
           >
-            <p className="text-xs">{document.title}</p>
+            <p className="text-xs flex">{document.title}</p>
             <div className="flex gap-1 items-center text-text-verba">
-              <IoNewspaper size={15} />
-              <p>{document.chunks.length}</p>
+              <IoNewspaper size={12} />
+              <p className="text-sm">{document.chunks.length}</p>
             </div>
-          </div>
+          </button>
         ))}
       </div>
     );

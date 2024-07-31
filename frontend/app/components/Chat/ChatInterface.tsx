@@ -12,8 +12,9 @@ import { IoChatbubbleSharp } from "react-icons/io5";
 import { FaHammer } from "react-icons/fa";
 import { MdOutlineRefresh } from "react-icons/md";
 import { IoIosSend } from "react-icons/io";
+import { BiError } from "react-icons/bi";
 
-import { QueryPayload } from "./types";
+import { QueryPayload, DataCountPayload, ChunkScore } from "./types";
 
 import ChatConfig from "./ChatConfig";
 import ChatMessage from "./ChatMessage";
@@ -27,7 +28,10 @@ interface ChatInterfaceProps {
   APIHost: string | null;
   settingConfig: SettingsConfiguration;
   RAGConfig: RAGConfig | null;
+  selectedDocument: string | null;
+  setSelectedDocument: (s: string | null) => void;
   setRAGConfig: React.Dispatch<React.SetStateAction<RAGConfig | null>>;
+  setSelectedChunkScore: (c: ChunkScore[]) => void;
 }
 
 const ChatInterface: React.FC<ChatInterfaceProps> = ({
@@ -35,6 +39,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   settingConfig,
   RAGConfig,
   setRAGConfig,
+  selectedDocument,
+  setSelectedDocument,
+  setSelectedChunkScore,
 }) => {
   const [selectedSetting, setSelectedSetting] = useState("Chat");
 
@@ -47,8 +54,20 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const lastMessageRef = useRef<null | HTMLDivElement>(null);
   const [socket, setSocket] = useState<WebSocket | null>(null);
 
+  const [selectedDocumentScore, setSelectedDocumentScore] = useState<
+    string | null
+  >(null);
+
+  const [currentDatacount, setCurrentDatacount] = useState(0);
+
   const [userInput, setUserInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
+
+  const currentEmbeddingModel = RAGConfig
+    ? RAGConfig["Embedder"].components[RAGConfig["Embedder"].selected].config[
+        "Model"
+      ].value
+    : "No Embedding Model";
 
   const sendUserMessage = async () => {
     if (isFetching.current || APIHost === null) {
@@ -56,6 +75,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     }
 
     const sendInput = userInput;
+    setUserInput("");
+
     if (sendInput.trim()) {
       try {
         isFetching.current = true;
@@ -83,6 +104,16 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
             ...prev,
             { type: "retrieval", content: data.documents },
           ]);
+          if (data.documents.length > 0) {
+            setSelectedDocument(data.documents[0].uuid);
+            setSelectedDocumentScore(
+              data.documents[0].uuid +
+                data.documents[0].score +
+                data.documents[0].chunks.length
+            );
+            setSelectedChunkScore(data.documents[0].chunks);
+          }
+
           isFetching.current = false;
           setFetchingStatus("DONE");
         }
@@ -95,7 +126,6 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         isFetching.current = false;
         setFetchingStatus("DONE");
       }
-      setUserInput("");
     }
   };
 
@@ -106,11 +136,42 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     }
   };
 
+  const retrieveDatacount = async () => {
+    try {
+      const embedding_model = RAGConfig
+        ? RAGConfig["Embedder"].components[RAGConfig["Embedder"].selected]
+            .config["Model"].value
+        : "No Embedding Model";
+      const response = await fetch(APIHost + "/api/get_datacount", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ embedding_model: embedding_model }),
+      });
+      const data: DataCountPayload = await response.json();
+
+      if (data) {
+        setCurrentDatacount(data.datacount);
+      }
+    } catch (error) {
+      console.error("Failed to fetch from API:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (RAGConfig) {
+      retrieveDatacount();
+    } else {
+      setCurrentDatacount(0);
+    }
+  }, [currentEmbeddingModel]);
+
   return (
     <div className="flex flex-col gap-2 w-full">
       {/* Header */}
       <div className="bg-bg-alt-verba rounded-2xl flex gap-2 p-6 items-center justify-between h-min w-full">
-        <div className="flex gap-2 justify-start ">
+        <div className="flex gap-2 justify-start items-center">
           <InfoComponent
             settingConfig={settingConfig}
             tooltip_text="Use the Chat interface to interact with your data and to perform Retrieval Augmented Generation (RAG)"
@@ -144,12 +205,26 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         <div
           className={`flex flex-col gap-3 ${selectedSetting === "Chat" ? "flex flex-col gap-3 " : "hidden"}`}
         >
+          <div className="flex w-full justify-start items-center text-text-alt-verba gap-2">
+            {currentDatacount === 0 && <BiError size={15} />}
+            {currentDatacount === 0 && (
+              <p className="text-text-alt-verba text-sm items-center flex">{`${currentDatacount} documents embedded by ${currentEmbeddingModel}`}</p>
+            )}
+          </div>
           {messages.map((message, index) => (
             <div
               key={"Message_" + index}
               className={`${message.type === "user" ? "text-right" : ""}`}
             >
-              <ChatMessage message={message} settingConfig={settingConfig} />
+              <ChatMessage
+                message={message}
+                message_index={index}
+                settingConfig={settingConfig}
+                selectedDocument={selectedDocumentScore}
+                setSelectedDocumentScore={setSelectedDocumentScore}
+                setSelectedDocument={setSelectedDocument}
+                setSelectedChunkScore={setSelectedChunkScore}
+              />
             </div>
           ))}
           {isFetching.current && (
@@ -177,7 +252,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           <input
             type="text"
             className="grow w-full"
-            placeholder="Ask Verba..."
+            placeholder={
+              currentDatacount > 0
+                ? `Chatting with ${currentDatacount} documents...`
+                : `No documents detected...`
+            }
             onKeyDown={handleKeyDown}
             value={userInput}
             onChange={(e) => {
@@ -198,6 +277,12 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
         <button
           type="button"
+          onClick={() => {
+            setMessages([]);
+            setSelectedDocument(null);
+            setSelectedChunkScore([]);
+            setSelectedDocumentScore(null);
+          }}
           className="btn btn-square border-none bg-button-verba hover:bg-button-hover-verba"
         >
           <MdOutlineRefresh size={18} />

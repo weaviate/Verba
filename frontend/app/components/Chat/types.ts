@@ -13,6 +13,10 @@ export type QueryPayload = {
   context: string;
 };
 
+export type DataCountPayload = {
+  datacount: number;
+};
+
 export type DocumentScore = {
   title: string;
   uuid: string;
@@ -24,6 +28,7 @@ export type ChunkScore = {
   uuid: string;
   chunk_id: number;
   score: number;
+  embedder: string;
 };
 
 export type Segment =

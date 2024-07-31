@@ -22,6 +22,7 @@ from goldenverba.server.types import (
     QueryPayload,
     GeneratePayload,
     GetDocumentPayload,
+    DatacountPayload,
     GetComponentPayload,
     GetContentPayload,
     SearchQueryPayload,
@@ -361,11 +362,28 @@ async def get_document(payload: GetDocumentPayload):
             }
         )
     
+@app.post("/api/get_datacount")
+async def get_document(payload: DatacountPayload):
+    try:
+        datacount = await manager.weaviate_manager.get_datacount(payload.embedding_model)
+        return JSONResponse(
+            content={
+                "datacount": datacount,
+            }
+        )      
+    except Exception as e:
+        msg.fail(f"Document Count retrieval failed: {str(e)}")
+        return JSONResponse(
+            content={
+                "datacount": 0,
+            }
+        )   
+    
 # Retrieve specific document based on UUID
 @app.post("/api/get_content")
 async def get_content(payload: GetContentPayload):
     try:
-        content, maxPage = await manager.get_content(payload.uuid, payload.page-1)
+        content, maxPage = await manager.get_content(payload.uuid, payload.page-1, payload.chunkScores)
         msg.good(f"Succesfully retrieved content from {payload.uuid}")
         return JSONResponse(
             content={

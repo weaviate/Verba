@@ -28,6 +28,7 @@ import { FaDatabase } from "react-icons/fa";
 import UserModalComponent from "../Navigation/UserModal";
 
 import { RAGConfig } from "../RAG/types";
+import { ChunkScore } from "../Chat/types";
 import ComponentStatus from "../Status/ComponentStatus";
 
 import { VerbaDocument, DocumentPayload } from "./types";
@@ -38,6 +39,7 @@ interface DocumentExplorerProps {
   setSelectedDocument: (c: string | null) => void;
   settingConfig: SettingsConfiguration;
   production: boolean;
+  chunkScores?: ChunkScore[];
 }
 
 const DocumentExplorer: React.FC<DocumentExplorerProps> = ({
@@ -46,6 +48,7 @@ const DocumentExplorer: React.FC<DocumentExplorerProps> = ({
   settingConfig,
   setSelectedDocument,
   production,
+  chunkScores,
 }) => {
   const [selectedSetting, setSelectedSetting] = useState<
     "Content" | "Chunks" | "Metadata" | "Config" | "Vector Space" | "Graph"
@@ -165,6 +168,7 @@ const DocumentExplorer: React.FC<DocumentExplorerProps> = ({
             settingConfig={settingConfig}
             APIHost={APIHost}
             selectedDocument={selectedDocument}
+            chunkScores={chunkScores}
           />
         )}
 

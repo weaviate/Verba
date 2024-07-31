@@ -24,8 +24,15 @@ export type ChunkPayload = {
 
 export type ContentPayload = {
   error: string;
-  content: string;
+  content: ContentSnippet[];
   maxPage: number;
+};
+
+export type ContentSnippet = {
+  content: string;
+  chunk_id: number;
+  score: number;
+  type: "text" | "extract";
 };
 
 export type VectorsPayload = {
@@ -45,7 +52,6 @@ export type VerbaDocument = {
   labels: string[];
   source: string;
   meta: any;
-  spacy_doc: string;
 };
 
 export type VerbaChunk = {

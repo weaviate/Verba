@@ -34,10 +34,6 @@ class GetChunkPayload(BaseModel):
     uuid: str
     embedder: str
 
-class GetContentPayload(BaseModel):
-    uuid: str
-    page: int
-
 class GetVectorPayload(BaseModel):
     uuid: str
     showAll: bool
@@ -146,6 +142,20 @@ class ImportStreamPayload(BaseModel):
 class QueryPayload(BaseModel):
     query: str
     rag_config: dict[str, RAGComponentClass]
+
+class DatacountPayload(BaseModel):
+    embedding_model: str
+
+class ChunkScore(BaseModel):
+    uuid: str
+    score: float
+    chunk_id: int
+    embedder: str
+
+class GetContentPayload(BaseModel):
+    uuid: str
+    page: int
+    chunkScores: list[ChunkScore]
 
 
 
