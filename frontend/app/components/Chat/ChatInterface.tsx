@@ -88,7 +88,10 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ query: sendInput, rag_config: RAGConfig }),
+          body: JSON.stringify({
+            query: sendInput,
+            config: { RAG: RAGConfig, SETTING: settingConfig },
+          }),
         });
         const data: QueryPayload = await response.json();
 

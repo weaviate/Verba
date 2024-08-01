@@ -32,7 +32,7 @@ from goldenverba.server.types import (
     ImportStreamPayload,
     DataBatchPayload,
     ChunksPayload,
-    FileConfig
+    FileConfig,
 )
 
 load_dotenv()
@@ -50,12 +50,14 @@ manager = verba_manager.VerbaManager()
 
 ### Lifespan
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await manager.connect()
     yield
     # Clean up the ML models and release the resources
     await manager.disconnect()
+
 
 # FastAPI App
 app = FastAPI(lifespan=lifespan)
@@ -87,12 +89,15 @@ app.mount(
 # Serve the main page and other static files
 app.mount("/static", StaticFiles(directory=BASE_DIR / "frontend/out"), name="app")
 
+
 @app.get("/")
 @app.head("/")
 async def serve_frontend():
     return FileResponse(os.path.join(BASE_DIR, "frontend/out/index.html"))
 
+
 ### GET
+
 
 # Define health check endpoint
 @app.get("/api/health")
@@ -121,6 +126,7 @@ async def health_check():
             },
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
         )
+
 
 # Get Status meta data
 @app.get("/api/get_status")
@@ -165,6 +171,7 @@ async def get_status():
         msg.fail(f"Status retrieval failed: {str(e)}")
         return JSONResponse(content=data)
 
+
 # Get Configuration
 @app.get("/api/config")
 async def retrieve_config():
@@ -182,7 +189,9 @@ async def retrieve_config():
             },
         )
 
+
 ### WEBSOCKETS
+
 
 @app.websocket("/ws/generate_stream")
 async def websocket_generate_stream(websocket: WebSocket):
@@ -213,6 +222,7 @@ async def websocket_generate_stream(websocket: WebSocket):
             )
         msg.good("Succesfully streamed answer")
 
+
 @app.websocket("/ws/import_files")
 async def websocket_import_files(websocket: WebSocket):
 
@@ -238,6 +248,7 @@ async def websocket_import_files(websocket: WebSocket):
 
 ### POST
 
+
 @app.post("/api/reset")
 async def reset_verba(payload: ResetPayload):
     if production:
@@ -261,6 +272,7 @@ async def reset_verba(payload: ResetPayload):
         msg.warn(f"Failed to reset Verba {str(e)}")
 
     return JSONResponse(status_code=200, content={})
+
 
 @app.post("/api/set_config")
 async def update_config(payload: ConfigPayload):
@@ -288,30 +300,27 @@ async def update_config(payload: ConfigPayload):
         }
     )
 
+
 # Receive query and return chunks and query answer
 @app.post("/api/query")
 async def query(payload: QueryPayload):
     msg.good(f"Received query: {payload.query}")
     try:
 
-        documents, context = await manager.retrieve_chunks(payload.query, payload.rag_config)
+        documents, context = await manager.retrieve_chunks(
+            payload.query, payload.config.RAG
+        )
+        await manager.set_config(payload.config.model_dump())
 
         return JSONResponse(
-            content={
-                "error": "",
-                "documents": documents,
-                "context": context
-            }
+            content={"error": "", "documents": documents, "context": context}
         )
     except Exception as e:
         msg.warn(f"Query failed: {str(e)}")
         return JSONResponse(
-            content={
-                "error": f"Query failed: {str(e)}",
-                "documents": [],
-                "context": ""
-            }
+            content={"error": f"Query failed: {str(e)}", "documents": [], "context": ""}
         )
+
 
 # Retrieve auto complete suggestions based on user input
 @app.post("/api/suggestions")
@@ -330,6 +339,7 @@ async def suggestions(payload: QueryPayload):
                 "suggestions": [],
             }
         )
+
 
 # Retrieve specific document based on UUID
 @app.post("/api/get_document")
@@ -352,7 +362,7 @@ async def get_document(payload: GetDocumentPayload):
                     "error": "Couldn't retrieve requested document",
                     "document": None,
                 }
-            )            
+            )
     except Exception as e:
         msg.fail(f"Document retrieval failed: {str(e)}")
         return JSONResponse(
@@ -361,37 +371,39 @@ async def get_document(payload: GetDocumentPayload):
                 "document": None,
             }
         )
-    
+
+
 @app.post("/api/get_datacount")
 async def get_document(payload: DatacountPayload):
     try:
-        datacount = await manager.weaviate_manager.get_datacount(payload.embedding_model)
+        datacount = await manager.weaviate_manager.get_datacount(
+            payload.embedding_model
+        )
         return JSONResponse(
             content={
                 "datacount": datacount,
             }
-        )      
+        )
     except Exception as e:
         msg.fail(f"Document Count retrieval failed: {str(e)}")
         return JSONResponse(
             content={
                 "datacount": 0,
             }
-        )   
-    
+        )
+
+
 # Retrieve specific document based on UUID
 @app.post("/api/get_content")
 async def get_content(payload: GetContentPayload):
     try:
-        content, maxPage = await manager.get_content(payload.uuid, payload.page-1, payload.chunkScores)
+        content, maxPage = await manager.get_content(
+            payload.uuid, payload.page - 1, payload.chunkScores
+        )
         msg.good(f"Succesfully retrieved content from {payload.uuid}")
         return JSONResponse(
-            content={
-                "error": "",
-                "content": content,
-                "maxPage": maxPage
-            }
-        )     
+            content={"error": "", "content": content, "maxPage": maxPage}
+        )
     except Exception as e:
         msg.fail(f"Document retrieval failed: {str(e)}")
         return JSONResponse(
@@ -400,38 +412,44 @@ async def get_content(payload: GetContentPayload):
                 "document": None,
             }
         )
-    
+
+
 # Retrieve specific document based on UUID
 @app.post("/api/get_vectors")
 async def get_vectors(payload: GetVectorPayload):
     try:
-        vector_groups = await manager.weaviate_manager.get_vectors(payload.uuid, payload.showAll)
+        vector_groups = await manager.weaviate_manager.get_vectors(
+            payload.uuid, payload.showAll
+        )
         return JSONResponse(
             content={
                 "error": "",
                 "vector_groups": vector_groups,
             }
-        )            
+        )
     except Exception as e:
         msg.fail(f"Vector retrieval failed: {str(e)}")
         return JSONResponse(
             content={
                 "error": str(e),
-                "payload": {"embedder":"None", "vectors":[]},
+                "payload": {"embedder": "None", "vectors": []},
             }
         )
-    
+
+
 # Retrieve specific document based on UUID
 @app.post("/api/get_chunks")
 async def get_chunks(payload: ChunksPayload):
     try:
-        chunks = await manager.weaviate_manager.get_chunks(payload.uuid, payload.page, payload.pageSize)
+        chunks = await manager.weaviate_manager.get_chunks(
+            payload.uuid, payload.page, payload.pageSize
+        )
         return JSONResponse(
             content={
                 "error": "",
                 "chunks": chunks,
             }
-        )            
+        )
     except Exception as e:
         msg.fail(f"Chunk retrieval failed: {str(e)}")
         return JSONResponse(
@@ -440,7 +458,8 @@ async def get_chunks(payload: ChunksPayload):
                 "chunks": None,
             }
         )
-    
+
+
 # Retrieve specific document based on UUID
 @app.post("/api/get_chunk")
 async def get_chunk(payload: GetChunkPayload):
@@ -451,7 +470,7 @@ async def get_chunk(payload: GetChunkPayload):
                 "error": "",
                 "chunk": chunk,
             }
-        )            
+        )
     except Exception as e:
         msg.fail(f"Chunk retrieval failed: {str(e)}")
         return JSONResponse(
@@ -461,19 +480,20 @@ async def get_chunk(payload: GetChunkPayload):
             }
         )
 
+
 ## Retrieve and search documents imported to Weaviate
 @app.post("/api/get_all_documents")
 async def get_all_documents(payload: SearchQueryPayload):
     loop = asyncio.get_running_loop()
-    start_time = loop.time() 
+    start_time = loop.time()
 
     try:
-        documents = await manager.weaviate_manager.get_documents(payload.query, payload.pageSize, payload.page, payload.labels)
+        documents = await manager.weaviate_manager.get_documents(
+            payload.query, payload.pageSize, payload.page, payload.labels
+        )
         labels = await manager.weaviate_manager.get_labels()
 
-        msg.good(
-            f"Succesfully retrieved document: {len(documents)} documents"
-        )
+        msg.good(f"Succesfully retrieved document: {len(documents)} documents")
         return JSONResponse(
             content={
                 "documents": documents,
@@ -492,6 +512,7 @@ async def get_all_documents(payload: SearchQueryPayload):
                 "took": 0,
             }
         )
+
 
 # Delete specific document based on UUID
 @app.post("/api/delete_document")

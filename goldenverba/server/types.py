@@ -2,9 +2,6 @@ from pydantic import BaseModel
 from enum import Enum
 
 
-
-
-
 class ConversationItem(BaseModel):
     type: str
     content: str
@@ -22,17 +19,21 @@ class SearchQueryPayload(BaseModel):
     page: int
     pageSize: int
 
+
 class ChunksPayload(BaseModel):
     uuid: str
     page: int
     pageSize: int
 
+
 class GetDocumentPayload(BaseModel):
     uuid: str
+
 
 class GetChunkPayload(BaseModel):
     uuid: str
     embedder: str
+
 
 class GetVectorPayload(BaseModel):
     uuid: str
@@ -66,7 +67,8 @@ class LoadPayload(BaseModel):
 class ImportPayload(BaseModel):
     data: list
     textValues: list[str]
-    config: dict    
+    config: dict
+
 
 class ConfigPayload(BaseModel):
     config: dict
@@ -81,9 +83,9 @@ class SetComponentPayload(BaseModel):
     selected_component: str
 
 
-
 # Import
-    
+
+
 class FileStatus(str, Enum):
     READY = "READY"
     STARTING = "STARTING"
@@ -97,11 +99,13 @@ class FileStatus(str, Enum):
     DONE = "DONE"
     ERROR = "ERROR"
 
+
 class ConfigSetting(BaseModel):
     type: str
     value: str | int
     description: str
     values: list[str]
+
 
 class RAGComponentConfig(BaseModel):
     name: str
@@ -112,15 +116,18 @@ class RAGComponentConfig(BaseModel):
     type: str
     available: bool
 
+
 class RAGComponentClass(BaseModel):
     selected: str
     components: dict[str, RAGComponentConfig]
+
 
 class StatusReport(BaseModel):
     fileID: str
     status: str
     message: str
     took: float
+
 
 class FileConfig(BaseModel):
     fileID: str
@@ -136,15 +143,24 @@ class FileConfig(BaseModel):
     status: FileStatus
     status_report: dict
 
+
 class ImportStreamPayload(BaseModel):
     fileMap: dict[str, FileConfig]
 
+
+class VerbaConfig(BaseModel):
+    RAG: dict[str, RAGComponentClass]
+    SETTING: dict
+
+
 class QueryPayload(BaseModel):
     query: str
-    rag_config: dict[str, RAGComponentClass]
+    config: VerbaConfig
+
 
 class DatacountPayload(BaseModel):
     embedding_model: str
+
 
 class ChunkScore(BaseModel):
     uuid: str
@@ -152,11 +168,8 @@ class ChunkScore(BaseModel):
     chunk_id: int
     embedder: str
 
+
 class GetContentPayload(BaseModel):
     uuid: str
     page: int
     chunkScores: list[ChunkScore]
-
-
-
-

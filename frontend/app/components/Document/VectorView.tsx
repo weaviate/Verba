@@ -21,6 +21,8 @@ import {
 
 import { colors } from "./util";
 
+import { ChunkScore } from "../Chat/types";
+
 extend({ OrbitControls: OrbitControls });
 
 const Sphere: React.FC<{
@@ -42,6 +44,7 @@ const Sphere: React.FC<{
   maxY: number;
   minZ: number;
   maxZ: number;
+  chunkScores?: ChunkScore[];
 }> = ({
   vector,
   index,
@@ -61,6 +64,7 @@ const Sphere: React.FC<{
   maxY,
   minZ,
   maxZ,
+  chunkScores,
 }) => {
   const ref = useRef<THREE.Mesh>(null!);
   const [hover, setHover] = useState(false);
@@ -96,10 +100,20 @@ const Sphere: React.FC<{
     ? new THREE.Color(color)
     : vectorToColor(vector, minX, maxX, minY, maxY, minZ, maxZ);
 
-  const sphereColor =
-    selectedChunk === chunk_uuid ? "green" : not_selected_color;
+  const isHighlighted = chunkScores?.some((score) => score.uuid === chunk_uuid);
+  const sphereColor = isHighlighted
+    ? new THREE.Color("yellow")
+    : selectedChunk === chunk_uuid
+      ? "green"
+      : not_selected_color;
 
-  const sphereRadius = selectedChunk === chunk_uuid ? 3 : 1;
+  const sphereRadius = isHighlighted
+    ? 3
+    : selectedChunk === chunk_uuid
+      ? 1.5
+      : 1;
+
+  const sphereOpacity = isHighlighted ? 1 : hover ? 1 : 0.5;
 
   useFrame(() => {
     if (ref.current) {
@@ -133,8 +147,8 @@ const Sphere: React.FC<{
         <sphereGeometry args={[sphereRadius, 32, 32]} />
         <meshBasicMaterial
           color={hover ? "blue" : sphereColor}
-          opacity={hover ? 1 : 0.5}
-          transparent={hover ? false : true}
+          opacity={sphereOpacity}
+          transparent={!hover}
         />
       </mesh>
     </Float>
@@ -145,12 +159,14 @@ interface VectorViewProps {
   APIHost: string | null;
   selectedDocument: string | null;
   settingConfig: SettingsConfiguration;
+  chunkScores?: ChunkScore[];
 }
 
 const VectorView: React.FC<VectorViewProps> = ({
   APIHost,
   selectedDocument,
   settingConfig,
+  chunkScores,
 }) => {
   const refs = useRef<(THREE.Mesh | null)[]>([]);
   const [isFetching, setIsFetching] = useState(false);
@@ -440,6 +456,7 @@ const VectorView: React.FC<VectorViewProps> = ({
                   maxX={maxX}
                   maxY={maxY}
                   maxZ={maxZ}
+                  chunkScores={chunkScores}
                 />
               ))
             )}

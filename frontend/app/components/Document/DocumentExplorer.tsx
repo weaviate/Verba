@@ -185,6 +185,7 @@ const DocumentExplorer: React.FC<DocumentExplorerProps> = ({
             APIHost={APIHost}
             selectedDocument={selectedDocument}
             settingConfig={settingConfig}
+            chunkScores={chunkScores}
           />
         )}
       </div>

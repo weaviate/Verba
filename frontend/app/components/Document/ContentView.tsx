@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { SettingsConfiguration } from "../Settings/types";
 import { HiSparkles } from "react-icons/hi2";
 import { IoNewspaper } from "react-icons/io5";
-import { FaArrowAltCircleRight } from "react-icons/fa";
+import { FaArrowAltCircleRight, FaArrowAltCircleLeft } from "react-icons/fa";
 import {
   DocumentChunk,
   DocumentPreview,
@@ -185,21 +185,8 @@ const ContentView: React.FC<ContentViewProps> = ({
               {contentSnippet.score > 0 && (
                 <div className="flex gap-2 items-center p-3 bg-primary-verba rounded-full w-fit">
                   <HiSparkles size={12} />
-                  <p className="text-xs flex text-text-verba">
-                    Highest Relevancy
-                  </p>
+                  <p className="text-xs flex text-text-verba">High Relevancy</p>
                 </div>
-              )}
-            </div>
-            <div className="flex gap-2">
-              {chunkScores && chunkScores.length > 1 && (
-                <button
-                  onClick={nextPage}
-                  className="flex gap-2 items-center p-3 bg-button-verba hover:bg-button-hover-verba rounded-full w-fit"
-                >
-                  <FaArrowAltCircleRight size={12} />
-                  <p className="text-xs flex text-text-verba">Next Chunk</p>
-                </button>
               )}
             </div>
           </div>
@@ -237,59 +224,71 @@ const ContentView: React.FC<ContentViewProps> = ({
   };
 
   return (
-    <div className="relative flex flex-col gap-2 text-start items-start justify-start">
-      {/* Header */}
-      <div className="flex gap-4 w-full justify-between">
-        <div className="flex gap-4 items-center ">
-          {isFetching && (
-            <div className="flex items-center justify-center text-text-alt-verba gap-2 h-full">
-              <span className="loading loading-spinner loading-sm"></span>
+    <div className="flex flex-col h-full">
+      {document && (
+        <div className="bg-bg-alt-verba flex flex-col rounded-lg overflow-hidden h-full">
+          {/* Header */}
+          <div className="p-3 bg-bg-alt-verba">
+            <div className="flex gap-4 w-full justify-between">
+              <div className="flex gap-4 items-center">
+                {isFetching && (
+                  <div className="flex items-center justify-center text-text-alt-verba gap-2">
+                    <span className="loading loading-spinner loading-sm"></span>
+                  </div>
+                )}
+                <p className="text-lg font-bold">{document.title}</p>
+              </div>
+              <div className="gap-2 grid grid-cols-3">
+                {Object.entries(document.labels).map(([key, label]) => (
+                  <div
+                    key={document.title + key + label}
+                    className="flex bg-bg-verba min-w-[8vw] p-2 text-sm text-text-verba justify-center text-center items-center rounded-xl"
+                  >
+                    <p>{label}</p>
+                  </div>
+                ))}
+              </div>
             </div>
-          )}
-          <p className="text-lg font-bold">{document.title}</p>
-        </div>
-        <div className="gap-2 grid grid-cols-3">
-          {Object.entries(document.labels).map(([key, label]) => (
-            <div
-              key={document.title + key + label}
-              className="flex bg-bg-verba min-w-[8vw] p-2 text-sm text-text-verba justify-center text-center items-center rounded-xl"
-            >
-              <p>{label}</p>
+          </div>
+
+          {/* Content div */}
+          <div className="flex-grow overflow-hidden p-3">
+            <div className="overflow-y-auto h-full">
+              {content.map((contentSnippet, index) =>
+                renderText(contentSnippet)
+              )}
             </div>
-          ))}
-        </div>
-      </div>
+          </div>
 
-      <div className="divider"></div>
+          {/* Navigation div */}
 
-      <div className="flex flex-col gap-4 justify-between">
-        {/* Text */}
-        <div className="flex gap-2 overflow-aut flex-col">
-          {content.map((contentSnippet, index) => renderText(contentSnippet))}
-        </div>
-
-        <div className="flex flex-col gap-2 items-center  p-4 rounded-lg">
-          <div className="join justify-center w-full items-center text-text-verba">
+          <div className="flex justify-center gap-2 p-3 bg-bg-alt-verba">
             <button
               onClick={previousPage}
-              className="join-item btn btn-sqare border-none bg-button-verba hover:bg-secondary-verba"
+              className="flex gap-2 items-center p-3 bg-button-verba hover:bg-button-hover-verba rounded-full w-fit"
             >
-              «
+              <FaArrowAltCircleLeft size={12} />
+              <p className="text-xs flex text-text-verba">
+                Previous {chunkScores ? "Chunk" : "Page"}
+              </p>
             </button>
-
-            <button className="join-item btn border-none bg-button-verba hover:bg-secondary-verba">
-              {chunkScores ? "Chunk " : "Page "}
-              {page}
-            </button>
+            <div className="flex items-center">
+              <p className="text-xs text-text-verba">
+                {chunkScores ? "Chunk " : "Page "} {page}
+              </p>
+            </div>
             <button
               onClick={nextPage}
-              className="join-item btn btn-square border-none bg-button-verba hover:bg-secondary-verba"
+              className="flex gap-2 items-center p-3 bg-button-verba hover:bg-button-hover-verba rounded-full w-fit"
             >
-              »
+              <FaArrowAltCircleRight size={12} />
+              <p className="text-xs flex text-text-verba">
+                Next {chunkScores ? "Chunk" : "Page"}
+              </p>
             </button>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
