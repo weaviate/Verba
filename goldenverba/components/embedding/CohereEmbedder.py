@@ -20,7 +20,7 @@ class CohereEmbedder(Embedder):
             "Vectorizes documents and queries using Cohere"
         )
         self.url = os.getenv("COHERE_BASE_URL", "https://api.cohere.com/v1")
-        models = self.get_models(os.getenv("COHERE_API_KEY", None))
+        models = self.get_models(os.getenv("COHERE_API_KEY", ""))
         self.config = {
             "Model": InputConfig(
                 type="dropdown", value="embed-english-v3.0", description="Select a Cohere Embedding Model", values=models
@@ -65,7 +65,7 @@ class CohereEmbedder(Embedder):
         
 
     def get_models(self, token: str):
-        if token is None:
+        if token == "":
             return ["embed-english-v3.0","embed-multilingual-v3.0","embed-english-light-v3.0","embed-multilingual-light-v3.0"]
         headers = {
                 "Authorization": f"bearer {token}"
