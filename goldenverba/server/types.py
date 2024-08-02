@@ -7,12 +7,6 @@ class ConversationItem(BaseModel):
     content: str
 
 
-class GeneratePayload(BaseModel):
-    query: str
-    context: str
-    conversation: list[ConversationItem]
-
-
 class SearchQueryPayload(BaseModel):
     query: str
     labels: list[str]
@@ -70,10 +64,6 @@ class ImportPayload(BaseModel):
     config: dict
 
 
-class ConfigPayload(BaseModel):
-    config: dict
-
-
 class GetComponentPayload(BaseModel):
     component: str
 
@@ -88,6 +78,7 @@ class SetComponentPayload(BaseModel):
 
 class FileStatus(str, Enum):
     READY = "READY"
+    CREATE_NEW = "CREATE_NEW"
     STARTING = "STARTING"
     LOADING = "LOADING"
     CHUNKING = "CHUNKING"
@@ -127,6 +118,12 @@ class StatusReport(BaseModel):
     status: str
     message: str
     took: float
+
+
+class CreateNewDocument(BaseModel):
+    new_file_id: str
+    filename: str
+    original_file_id: str
 
 
 class FileConfig(BaseModel):
@@ -173,3 +170,14 @@ class GetContentPayload(BaseModel):
     uuid: str
     page: int
     chunkScores: list[ChunkScore]
+
+
+class GeneratePayload(BaseModel):
+    query: str
+    context: str
+    conversation: list[ConversationItem]
+    rag_config: dict[str, RAGComponentClass]
+
+
+class ConfigPayload(BaseModel):
+    config: VerbaConfig

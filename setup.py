@@ -39,7 +39,8 @@ setup(
         "scikit-learn==1.5.1",
         "langchain-text-splitters==0.2.2",
         "spacy==3.7.5",
-	    "aiohttp==3.9.5"
+        "aiohttp==3.9.5",
+        "aiofiles==24.1.0",
     ],
     extras_require={
         "dev": ["pytest", "wheel", "twine", "black>=23.7.0", "setuptools"],
@@ -48,6 +49,6 @@ setup(
         ],
         "google": [
             "vertexai==1.46.0",
-        ]
+        ],
     },
 )

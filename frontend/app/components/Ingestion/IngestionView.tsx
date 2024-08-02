@@ -6,7 +6,7 @@ import FileSelectionView from "./FileSelectionView";
 import ConfigurationView from "./ConfigurationView";
 import { SettingsConfiguration } from "../Settings/types";
 
-import { FileMap, StatusReport } from "./types";
+import { FileMap, StatusReport, CreateNewDocument } from "./types";
 import { RAGConfig } from "../RAG/types";
 
 import { getImportWebSocketApiHost } from "../RAG/util";
@@ -54,8 +54,21 @@ const IngestionView: React.FC<IngestionViewProps> = ({
     localSocket.onmessage = (event) => {
       setSocketStatus("ONLINE");
       try {
-        const data: StatusReport = JSON.parse(event.data);
-        updateStatus(data);
+        const data: StatusReport | CreateNewDocument = JSON.parse(event.data);
+        if ("new_file_id" in data) {
+          setFileMap((prevFileMap) => {
+            const newFileMap: FileMap = { ...prevFileMap };
+            newFileMap[data.new_file_id] = {
+              ...newFileMap[data.original_file_id],
+              fileID: data.new_file_id,
+              filename: data.filename,
+              block: true,
+            };
+            return newFileMap;
+          });
+        } else {
+          updateStatus(data);
+        }
       } catch (e) {
         console.error("Received data is not valid JSON:", event.data);
         return;
@@ -156,7 +169,8 @@ const IngestionView: React.FC<IngestionViewProps> = ({
   const importSelected = () => {
     if (
       selectedFileData &&
-      ["READY", "DONE", "ERROR"].includes(fileMap[selectedFileData].status)
+      ["READY", "DONE", "ERROR"].includes(fileMap[selectedFileData].status) &&
+      !fileMap[selectedFileData].block
     ) {
       sendDataBatches(
         JSON.stringify(fileMap[selectedFileData]),
@@ -167,7 +181,10 @@ const IngestionView: React.FC<IngestionViewProps> = ({
 
   const importAll = () => {
     for (const fileID in fileMap) {
-      if (["READY", "DONE", "ERROR"].includes(fileMap[fileID].status)) {
+      if (
+        ["READY", "DONE", "ERROR"].includes(fileMap[fileID].status) &&
+        !fileMap[fileID].block
+      ) {
         sendDataBatches(JSON.stringify(fileMap[fileID]), fileID);
       }
     }

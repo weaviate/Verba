@@ -20,13 +20,14 @@ import { closeOnClick } from "./util";
 export const MultiInput: React.FC<{
   component_name: string;
   values: string[];
+  blocked: boolean | undefined;
   config_title: string;
   updateConfig: (
     component_n: string,
     configTitle: string,
     value: string | boolean | string[]
   ) => void;
-}> = ({ values, config_title, updateConfig, component_name }) => {
+}> = ({ values, config_title, updateConfig, component_name, blocked }) => {
   const [currentInput, setCurrentInput] = useState("");
   const [currentValues, setCurrentValues] = useState(values);
 
@@ -54,6 +55,7 @@ export const MultiInput: React.FC<{
           <input
             type="text"
             className="grow w-full"
+            disabled={blocked}
             value={currentInput}
             onChange={(e) => {
               setCurrentInput(e.target.value);
@@ -64,6 +66,7 @@ export const MultiInput: React.FC<{
           onClick={() => {
             addValue(currentInput);
           }}
+          disabled={blocked}
           className="btn btn-square bg-button-verba border-none hover:bg-secondary-verba text-text-verba"
         >
           <IoAddCircleSharp size={15} />
@@ -80,6 +83,7 @@ export const MultiInput: React.FC<{
               <p> {value}</p>
             </div>
             <button
+              disabled={blocked}
               onClick={() => {
                 removeValue(value);
               }}
@@ -96,6 +100,7 @@ export const MultiInput: React.FC<{
 
 interface ComponentViewProps {
   RAGConfig: RAGConfig;
+  blocked: boolean | undefined;
   component_name: "Chunker" | "Embedder" | "Reader" | "Generator" | "Retriever";
   selectComponent: (component_n: string, selected_component: string) => void;
   updateConfig: (
@@ -110,6 +115,7 @@ const ComponentView: React.FC<ComponentViewProps> = ({
   component_name,
   selectComponent,
   updateConfig,
+  blocked,
 }) => {
   function renderComponents(rag_config: RAGConfig) {
     return Object.entries(rag_config[component_name].components).map(
@@ -117,8 +123,10 @@ const ComponentView: React.FC<ComponentViewProps> = ({
         <li
           key={"ComponentDropdown_" + component.name}
           onClick={() => {
-            selectComponent(component_name, component.name);
-            closeOnClick();
+            if (!blocked) {
+              selectComponent(component_name, component.name);
+              closeOnClick();
+            }
           }}
         >
           <a>{component.name}</a>
@@ -133,8 +141,10 @@ const ComponentView: React.FC<ComponentViewProps> = ({
       <li
         key={"ConfigValue" + configValue}
         onClick={() => {
-          updateConfig(component_name, configKey, configValue);
-          closeOnClick();
+          if (!blocked) {
+            updateConfig(component_name, configKey, configValue);
+            closeOnClick();
+          }
         }}
       >
         <a>{configValue}</a>
@@ -152,6 +162,7 @@ const ComponentView: React.FC<ComponentViewProps> = ({
           <button
             tabIndex={0}
             role="button"
+            disabled={blocked}
             className="btn bg-button-verba hover:bg-button-hover-verba text-text-verba w-full flex justify-start border-none"
           >
             <GoTriangleDown size={15} />
@@ -191,6 +202,7 @@ const ComponentView: React.FC<ComponentViewProps> = ({
                 <button
                   tabIndex={0}
                   role="button"
+                  disabled={blocked}
                   className="btn bg-button-verba hover:bg-button-hover-verba text-text-verba w-full flex justify-start border-none"
                 >
                   <GoTriangleDown size={15} />
@@ -214,7 +226,13 @@ const ComponentView: React.FC<ComponentViewProps> = ({
                     className="grow w-full"
                     value={config.value}
                     onChange={(e) => {
-                      updateConfig(component_name, configTitle, e.target.value);
+                      if (!blocked) {
+                        updateConfig(
+                          component_name,
+                          configTitle,
+                          e.target.value
+                        );
+                      }
                     }}
                   />
                 </label>
@@ -227,6 +245,7 @@ const ComponentView: React.FC<ComponentViewProps> = ({
                 values={config.values}
                 config_title={configTitle}
                 updateConfig={updateConfig}
+                blocked={blocked}
               />
             )}
 
@@ -235,13 +254,15 @@ const ComponentView: React.FC<ComponentViewProps> = ({
               <input
                 type="checkbox"
                 className="checkbox checkbox-md"
-                onChange={(e) =>
-                  updateConfig(
-                    component_name,
-                    configTitle,
-                    (e.target as HTMLInputElement).checked
-                  )
-                }
+                onChange={(e) => {
+                  if (!blocked) {
+                    updateConfig(
+                      component_name,
+                      configTitle,
+                      (e.target as HTMLInputElement).checked
+                    );
+                  }
+                }}
                 checked={config.value}
               />
             )}

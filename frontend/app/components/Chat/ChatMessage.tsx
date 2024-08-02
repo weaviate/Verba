@@ -34,7 +34,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
 }) => {
   const colorTable = {
     user: "bg-bg-verba",
-    system: "bg-bg-verba",
+    system: "bg-bg-alt-verba",
     error: "bg-warning-verba",
     retrieval: "bg-bg-verba",
   };
@@ -88,15 +88,6 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
               <BiError size={15} />
               <p>{message.content}</p>
             </div>
-          )}
-        </div>
-        <div className="flex flex-col items-center justify-center">
-          {message.type === "system" && (
-            <button
-              className={`btn border-none shadow-none flex gap- bg-bg-alt-verba hover:bg-secondary-verba hover:text-text-verba text-text-alt-verba`}
-            >
-              <p className="text-xs">Copy</p>
-            </button>
           )}
         </div>
       </div>

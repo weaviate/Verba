@@ -21,6 +21,7 @@ interface BasicSettingViewProps {
   setSelectedFileData: (f: string | null) => void;
   fileMap: FileMap;
   setFileMap: (f: FileMap) => void;
+  blocked: boolean | undefined;
 }
 
 const BasicSettingView: React.FC<BasicSettingViewProps> = ({
@@ -28,6 +29,7 @@ const BasicSettingView: React.FC<BasicSettingViewProps> = ({
   setSelectedFileData,
   fileMap,
   setFileMap,
+  blocked,
 }) => {
   const [filename, setFilename] = useState("");
   const [source, setSource] = useState("");
@@ -141,6 +143,7 @@ const BasicSettingView: React.FC<BasicSettingViewProps> = ({
           onClick={() => {
             removeLabel(label);
           }}
+          disabled={blocked}
           className="btn btn-sm btn-square bg-button-verba border-none hover:bg-warning-verba text-text-verba"
         >
           {" "}
@@ -204,11 +207,12 @@ const BasicSettingView: React.FC<BasicSettingViewProps> = ({
               onChange={(e) => {
                 setFilename(e.target.value);
               }}
-              disabled={!editFilename}
+              disabled={!editFilename || blocked}
             />
           </label>
           <button
             onClick={switchEditMode}
+            disabled={blocked}
             className="btn btn-square bg-button-verba border-none hover:bg-secondary-verba text-text-verba"
           >
             {editFilename ? (
@@ -230,11 +234,12 @@ const BasicSettingView: React.FC<BasicSettingViewProps> = ({
               onChange={(e) => {
                 setSource(e.target.value);
               }}
-              disabled={!editSource}
+              disabled={!editSource || blocked}
             />
           </label>
           <button
             onClick={switchSourceEditMode}
+            disabled={blocked}
             className="btn btn-square bg-button-verba border-none hover:bg-secondary-verba text-text-verba"
           >
             {editSource ? (
@@ -256,12 +261,14 @@ const BasicSettingView: React.FC<BasicSettingViewProps> = ({
               onChange={(e) => {
                 setLabel(e.target.value);
               }}
+              disabled={blocked}
             />
           </label>
           <button
             onClick={() => {
               addLabel(label);
             }}
+            disabled={blocked}
             className="btn btn-square bg-button-verba border-none hover:bg-secondary-verba text-text-verba"
           >
             <IoAddCircleSharp size={15} />
@@ -294,6 +301,7 @@ const BasicSettingView: React.FC<BasicSettingViewProps> = ({
             checked={
               selectedFileData ? fileMap[selectedFileData].overwrite : false
             }
+            disabled={blocked}
           />
         </div>
 

@@ -186,7 +186,7 @@ class WindowRetriever(Retriever):
         for document in documents:
             context += f"Document Title: {document['title']}\n"
             for chunk in document["chunks"]:
-                context += f"Chunk: {chunk['chunk_id']}\n"
+                context += f"Chunk: {int(chunk['chunk_id'])+1}\n"
                 if chunk["score"] > 0:
                     context += f"High Relevancy: {chunk['score']}\n"
                 context += f"{chunk['content']}\n"

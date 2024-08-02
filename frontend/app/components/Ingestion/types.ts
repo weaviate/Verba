@@ -10,6 +10,7 @@ export type FileData = {
   content: string;
   labels: string[];
   file_size: number;
+  block?: boolean;
   status_report: StatusReportMap;
   status:
     | "READY"
@@ -48,6 +49,12 @@ export type StatusReport = {
     | "ERROR";
   message: string;
   took: number;
+};
+
+export type CreateNewDocument = {
+  new_file_id: string;
+  filename: string;
+  original_file_id: string;
 };
 
 export const statusColorMap = {

@@ -77,7 +77,34 @@ const ConfigurationView: React.FC<ConfigurationViewProps> = ({
 
   const setAsDefault = async () => {
     if (selectedFileData) {
-      setRAGConfig(fileMap[selectedFileData].rag_config);
+      const newConfig = {
+        RAG: fileMap[selectedFileData].rag_config,
+        SETTING: settingConfig,
+      };
+
+      try {
+        const response = await fetch(APIHost + "/api/set_config", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ config: newConfig }),
+        });
+
+        const data = await response.json();
+
+        if (data.status === "200") {
+          // Update local state if the API call was successful
+          setRAGConfig(fileMap[selectedFileData].rag_config);
+          // You might want to show a success message to the user
+          console.log(data.status_msg);
+        } else {
+          // Handle error
+          console.error("Failed to set config:", data.status_msg);
+        }
+      } catch (error) {
+        console.error("Error setting config:", error);
+      }
     }
   };
 
@@ -217,6 +244,11 @@ const ConfigurationView: React.FC<ConfigurationViewProps> = ({
             setSelectedFileData={setSelectedFileData}
             fileMap={fileMap}
             setFileMap={setFileMap}
+            blocked={
+              selectedFileData
+                ? fileMap[selectedFileData].block ?? false
+                : undefined
+            }
           />
         )}
         {selectedSetting === "Pipeline" && selectedFileData && (
@@ -226,18 +258,21 @@ const ConfigurationView: React.FC<ConfigurationViewProps> = ({
               component_name="Reader"
               selectComponent={selectComponent}
               updateConfig={updateConfig}
+              blocked={fileMap[selectedFileData].block}
             />
             <ComponentView
               RAGConfig={fileMap[selectedFileData].rag_config}
               component_name="Chunker"
               selectComponent={selectComponent}
               updateConfig={updateConfig}
+              blocked={fileMap[selectedFileData].block}
             />
             <ComponentView
               RAGConfig={fileMap[selectedFileData].rag_config}
               component_name="Embedder"
               selectComponent={selectComponent}
               updateConfig={updateConfig}
+              blocked={fileMap[selectedFileData].block}
             />
           </div>
         )}

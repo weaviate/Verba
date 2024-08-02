@@ -204,7 +204,7 @@ async def websocket_generate_stream(websocket: WebSocket):
             msg.good(f"Received generate stream call for {payload.query}")
             full_text = ""
             async for chunk in manager.generate_stream_answer(
-                [payload.query], [payload.context], payload.conversation
+                payload.rag_config, payload.query, payload.context, payload.conversation
             ):
                 full_text += chunk["message"]
                 if chunk["finish_reason"] == "stop":
@@ -285,9 +285,11 @@ async def update_config(payload: ConfigPayload):
             }
         )
 
+    config = payload.model_dump()["config"]
+
     try:
-        if manager.verify_config(payload.config, manager.create_config()):
-            await manager.set_config(payload.config)
+        if manager.verify_config(config, manager.create_config()):
+            await manager.set_config(config)
         else:
             msg.warn("Configuration sent by Frontend is corrupted")
     except Exception as e:

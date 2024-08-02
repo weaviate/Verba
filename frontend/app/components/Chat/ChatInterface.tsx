@@ -14,6 +14,8 @@ import { MdOutlineRefresh } from "react-icons/md";
 import { IoIosSend } from "react-icons/io";
 import { BiError } from "react-icons/bi";
 
+import { getWebSocketApiHost } from "./util";
+
 import { QueryPayload, DataCountPayload, ChunkScore } from "./types";
 
 import ChatConfig from "./ChatConfig";
@@ -53,6 +55,10 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const [previewText, setPreviewText] = useState("");
   const lastMessageRef = useRef<null | HTMLDivElement>(null);
   const [socket, setSocket] = useState<WebSocket | null>(null);
+  const [socketOnline, setSocketOnline] = useState(false);
+  const [reconnect, setReconnect] = useState(false);
+
+  const [context, setContext] = useState("");
 
   const [selectedDocumentScore, setSelectedDocumentScore] = useState<
     string | null
@@ -115,10 +121,17 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                 data.documents[0].chunks.length
             );
             setSelectedChunkScore(data.documents[0].chunks);
-          }
 
-          isFetching.current = false;
-          setFetchingStatus("DONE");
+            {
+              /* Send WebSocket Message to generate answer based on context */
+            }
+
+            if (data.context) {
+              streamResponses(sendInput, data.context);
+              setContext(data.context);
+              setFetchingStatus("RESPONSE");
+            }
+          }
         }
       } catch (error) {
         console.error("Failed to fetch from API:", error);
@@ -129,6 +142,27 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         isFetching.current = false;
         setFetchingStatus("DONE");
       }
+    }
+  };
+
+  const streamResponses = (query?: string, context?: string) => {
+    if (socket?.readyState === WebSocket.OPEN) {
+      const filteredMessages = messages
+        .filter((msg) => msg.type === "user" || msg.type === "system")
+        .map((msg) => ({
+          type: msg.type,
+          content: msg.content,
+        }));
+
+      const data = JSON.stringify({
+        query: query,
+        context: context,
+        conversation: filteredMessages,
+        rag_config: RAGConfig,
+      });
+      socket.send(data);
+    } else {
+      console.error("WebSocket is not open. ReadyState:", socket?.readyState);
     }
   };
 
@@ -162,6 +196,14 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     }
   };
 
+  const reconnectToVerba = () => {
+    setReconnect((prevState) => !prevState);
+  };
+
+  useEffect(() => {
+    setReconnect(true);
+  }, []);
+
   useEffect(() => {
     if (RAGConfig) {
       retrieveDatacount();
@@ -169,6 +211,87 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       setCurrentDatacount(0);
     }
   }, [currentEmbeddingModel]);
+
+  // Setup WebSocket and messages to /ws/generate_stream
+  useEffect(() => {
+    const socketHost = getWebSocketApiHost();
+    const localSocket = new WebSocket(socketHost);
+
+    localSocket.onopen = () => {
+      console.log("WebSocket connection opened to " + socketHost);
+      setSocketOnline(true);
+    };
+
+    localSocket.onmessage = (event) => {
+      let data;
+
+      if (!isFetching.current) {
+        setPreviewText("");
+        return;
+      }
+
+      try {
+        data = JSON.parse(event.data);
+      } catch (e) {
+        console.error("Received data is not valid JSON:", event.data);
+        return; // Exit early if data isn't valid JSON
+      }
+      const newMessageContent = data.message;
+      setPreviewText((prev) => prev + newMessageContent);
+
+      if (data.finish_reason === "stop") {
+        isFetching.current = false;
+        setFetchingStatus("DONE");
+        const full_text = data.full_text;
+        if (data.cached) {
+          const distance = data.distance;
+          setMessages((prev) => [
+            ...prev,
+            {
+              type: "system",
+              content: full_text,
+              cached: true,
+              distance: distance,
+            },
+          ]);
+        } else {
+          setMessages((prev) => [
+            ...prev,
+            { type: "system", content: full_text },
+          ]);
+        }
+        setPreviewText("");
+      }
+    };
+
+    localSocket.onerror = (error) => {
+      console.error("WebSocket Error:", error);
+      setSocketOnline(false);
+      isFetching.current = false;
+      setFetchingStatus("DONE");
+    };
+
+    localSocket.onclose = (event) => {
+      if (event.wasClean) {
+        console.log(
+          `WebSocket connection closed cleanly, code=${event.code}, reason=${event.reason}`
+        );
+      } else {
+        console.error("WebSocket connection died");
+      }
+      setSocketOnline(false);
+      isFetching.current = false;
+      setFetchingStatus("DONE");
+    };
+
+    setSocket(localSocket);
+
+    return () => {
+      if (localSocket.readyState !== WebSocket.CLOSED) {
+        localSocket.close();
+      }
+    };
+  }, [reconnect]);
 
   return (
     <div className="flex flex-col gap-2 w-full">
@@ -230,6 +353,17 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
               />
             </div>
           ))}
+          {previewText && (
+            <ChatMessage
+              message={{ type: "system", content: previewText, cached: false }}
+              message_index={-1}
+              settingConfig={settingConfig}
+              selectedDocument={selectedDocumentScore}
+              setSelectedDocumentScore={setSelectedDocumentScore}
+              setSelectedDocument={setSelectedDocument}
+              setSelectedChunkScore={setSelectedChunkScore}
+            />
+          )}
           {isFetching.current && (
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-3">
@@ -251,45 +385,59 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       </div>
 
       <div className="bg-bg-alt-verba rounded-2xl flex gap-2 p-6 items-center justify-end h-min w-full">
-        <label className="input flex items-center gap-2 w-full bg-bg-verba">
-          <input
-            type="text"
-            className="grow w-full"
-            placeholder={
-              currentDatacount > 0
-                ? `Chatting with ${currentDatacount} documents...`
-                : `No documents detected...`
-            }
-            onKeyDown={handleKeyDown}
-            value={userInput}
-            onChange={(e) => {
-              setUserInput(e.target.value);
-            }}
-          />
-        </label>
+        {socketOnline ? (
+          <div className="flex gap-2 items-center justify-end w-full">
+            <label className="input flex items-center gap-2 w-full bg-bg-verba">
+              <input
+                type="text"
+                className="grow w-full"
+                placeholder={
+                  currentDatacount > 0
+                    ? `Chatting with ${currentDatacount} documents...`
+                    : `No documents detected...`
+                }
+                onKeyDown={handleKeyDown}
+                value={userInput}
+                onChange={(e) => {
+                  setUserInput(e.target.value);
+                }}
+              />
+            </label>
 
-        <button
-          type="button"
-          onClick={(e) => {
-            sendUserMessage();
-          }}
-          className="btn btn-square border-none bg-primary-verba hover:bg-button-hover-verba"
-        >
-          <IoIosSend size={15} />
-        </button>
+            <button
+              type="button"
+              onClick={(e) => {
+                sendUserMessage();
+              }}
+              className="btn btn-square border-none bg-primary-verba hover:bg-button-hover-verba"
+            >
+              <IoIosSend size={15} />
+            </button>
 
-        <button
-          type="button"
-          onClick={() => {
-            setMessages([]);
-            setSelectedDocument(null);
-            setSelectedChunkScore([]);
-            setSelectedDocumentScore(null);
-          }}
-          className="btn btn-square border-none bg-button-verba hover:bg-button-hover-verba"
-        >
-          <MdOutlineRefresh size={18} />
-        </button>
+            <button
+              type="button"
+              onClick={() => {
+                setMessages([]);
+                setSelectedDocument(null);
+                setSelectedChunkScore([]);
+                setSelectedDocumentScore(null);
+              }}
+              className="btn btn-square border-none bg-button-verba hover:bg-button-hover-verba"
+            >
+              <MdOutlineRefresh size={18} />
+            </button>
+          </div>
+        ) : (
+          <div className="flex gap-2 items-center justify-end w-full">
+            <button
+              onClick={reconnectToVerba}
+              className="flex btn border-none text-text-verba bg-button-verba hover:bg-button-hover-verba gap-2"
+            >
+              <TbPlugConnected size={15} />
+              <p>Reconnect to Verba</p>
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
