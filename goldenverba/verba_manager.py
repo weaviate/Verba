@@ -131,8 +131,19 @@ class VerbaManager:
                     message=f"Imported {fileConfig.filename} and {len(documents[0].chunks)} chunks into Weaviate",
                     took=round(loop.time() - start_time, 2),
                 )
+            elif (
+                successful_tasks == 0
+                and len(results) == 1
+                and isinstance(results[0], Exception)
+            ):
+                msg.fail(
+                    f"No documents imported {successful_tasks} of {len(results)} succesful tasks"
+                )
+                raise results[0]
             else:
-                raise Exception("No documents imported")
+                raise Exception(
+                    f"No documents imported {successful_tasks} of {len(results)} succesful tasks"
+                )
 
             await logger.send_report(
                 fileConfig.fileID,
@@ -173,9 +184,9 @@ class VerbaManager:
             duplicate_uuid = await self.weaviate_manager.exist_document_name(
                 document.title
             )
-            if duplicate_uuid is not None and not fileConfig.overwrite:
+            if duplicate_uuid is not None and not currentFileConfig.overwrite:
                 raise Exception(f"{document.title} already exists in Verba")
-            elif duplicate_uuid is not None and fileConfig.overwrite:
+            elif duplicate_uuid is not None and currentFileConfig.overwrite:
                 await self.weaviate_manager.delete_document(duplicate_uuid)
 
             chunk_task = asyncio.create_task(
@@ -505,9 +516,17 @@ class VerbaManager:
     # Document Content Retrieval
 
     async def get_content(self, uuid: str, page: int, chunkScores: list[ChunkScore]):
+        start_time = asyncio.get_event_loop().time()
 
-        document = await self.weaviate_manager.get_document(uuid)
+        # Time document retrieval
+        doc_retrieval_start = asyncio.get_event_loop().time()
+        document = await self.weaviate_manager.get_document(
+            uuid, properties=["content"]
+        )
+        doc_retrieval_time = asyncio.get_event_loop().time() - doc_retrieval_start
 
+        # Time NLP processing
+        nlp_start = asyncio.get_event_loop().time()
         nlp = spacy.blank("en")
         config = {"punct_chars": None}
         nlp.add_pipe("sentencizer", config=config)
@@ -525,6 +544,13 @@ class VerbaManager:
             doc = Doc.from_docs(docs)
         else:
             doc = nlp(document["content"])
+        nlp_time = asyncio.get_event_loop().time() - nlp_start
+
+        total_time = asyncio.get_event_loop().time() - start_time
+
+        print(f"Document retrieval time: {doc_retrieval_time:.4f} seconds")
+        print(f"NLP processing time: {nlp_time:.4f} seconds")
+        print(f"Total time: {total_time:.4f} seconds")
 
         batch_size = 2000
         content_pieces = []

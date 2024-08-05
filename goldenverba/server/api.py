@@ -347,7 +347,9 @@ async def suggestions(payload: QueryPayload):
 @app.post("/api/get_document")
 async def get_document(payload: GetDocumentPayload):
     try:
-        document = await manager.weaviate_manager.get_document(payload.uuid)
+        document = await manager.weaviate_manager.get_document(
+            payload.uuid, properties=[]
+        )
         if document is not None:
             document["content"] = ""
             msg.good(f"Succesfully retrieved document: {document['title']}")

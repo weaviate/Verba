@@ -1,6 +1,7 @@
 import aiohttp
 import os
 import urllib
+import base64
 
 from wasabi import msg
 
@@ -32,16 +33,16 @@ class GitReader(Reader):
                 description="Select the Git platform",
                 values=["GitHub", "GitLab"],
             ),
-            "Owner/Project ID": InputConfig(
+            "Owner": InputConfig(
                 type="text",
                 value="",
-                description="Enter the repo owner (GitHub) or project ID (GitLab)",
+                description="Enter the repo owner (GitHub) or group/user (GitLab)",
                 values=[],
             ),
             "Name": InputConfig(
                 type="text",
                 value="",
-                description="Enter the repo name (GitHub only)",
+                description="Enter the repo name",
                 values=[],
             ),
             "Branch": InputConfig(
@@ -74,18 +75,20 @@ class GitReader(Reader):
         reader = BasicReader()
 
         if platform == "GitHub":
-            owner = config["Owner/Project ID"].value
+            owner = config["Owner"].value
             name = config["Name"].value
             branch = config["Branch"].value
             path = config["Path"].value
             fetch_url = f"https://api.github.com/repos/{owner}/{name}/git/trees/{branch}?recursive=1"
             docs = await self.fetch_docs_github(fetch_url, path, token, reader)
         else:  # GitLab
-            project_id = urllib.parse.quote(config["Owner/Project ID"].value, safe="")
+            owner = config["Owner"].value
+            name = config["Name"].value
+            project_id = urllib.parse.quote(f"{owner}/{name}", safe="")
             branch = config["Branch"].value
             path = config["Path"].value
             fetch_url = f"https://gitlab.com/api/v4/projects/{project_id}/repository/tree?ref={branch}&path={path}&per_page=100"
-            docs = await self.fetch_docs_gitlab(fetch_url, token)
+            docs = await self.fetch_docs_gitlab(fetch_url, token, reader)
 
         msg.info(f"Fetched {len(docs)} document paths from {fetch_url}")
 
@@ -97,7 +100,7 @@ class GitReader(Reader):
                     )
                 else:
                     content, link, size, extension = await self.download_file_gitlab(
-                        project_id, _file, branch, token
+                        owner, name, _file, branch, token
                     )
 
                 if content:
@@ -143,7 +146,7 @@ class GitReader(Reader):
                     and any(item["path"].endswith(ext) for ext in reader.extension)
                 ]
 
-    async def fetch_docs_gitlab(self, url: str, token: str) -> list:
+    async def fetch_docs_gitlab(self, url: str, token: str, reader: Reader) -> list:
         headers = self.get_headers(token, "GitLab")
         async with aiohttp.ClientSession() as session:
             async with session.get(url, headers=headers) as response:
@@ -153,10 +156,7 @@ class GitReader(Reader):
                     item["path"]
                     for item in data
                     if item["type"] == "blob"
-                    and any(
-                        item["path"].endswith(ext)
-                        for ext in [".md", ".mdx", ".txt", ".json", ".pdf", ".docx"]
-                    )
+                    and any(item["path"].endswith(ext) for ext in reader.extension)
                 ]
 
     async def download_file_github(
@@ -177,19 +177,27 @@ class GitReader(Reader):
                 return content_b64, link, size, extension
 
     async def download_file_gitlab(
-        self, project_id: str, file_path: str, branch: str, token: str
+        self, owner: str, name: str, file_path: str, branch: str, token: str
     ) -> tuple[str, str, int, str]:
-        encoded_file_path = urllib.parse.quote(file_path, safe="")
-        url = f"https://gitlab.com/api/v4/projects/{project_id}/repository/files/{encoded_file_path}/raw?ref={branch}"
-        headers = self.get_headers(token, "GitLab")
+        project_id = urllib.parse.quote(f"{owner}/{name}", safe="")
+        url = f"https://gitlab.com/api/v4/projects/{project_id}/repository/files/{urllib.parse.quote(file_path, safe='')}/raw?ref={branch}"
+        headers = {"PRIVATE-TOKEN": token}
+
         async with aiohttp.ClientSession() as session:
             async with session.get(url, headers=headers) as response:
-                response.raise_for_status()
-                content = await response.text()
-                link = f"https://gitlab.com/{project_id}/-/blob/{branch}/{file_path}"
-                size = len(content)
-                extension = os.path.splitext(file_path)[1][1:]
-                return content, link, size, extension
+                if response.status == 200:
+                    content = await response.read()
+                    content_b64 = base64.b64encode(content).decode("utf-8")
+                    size = len(content)
+                    extension = os.path.splitext(file_path)[1][1:]
+                    link = (
+                        f"https://gitlab.com/{owner}/{name}/-/blob/{branch}/{file_path}"
+                    )
+                    return content_b64, link, size, extension
+                else:
+                    raise Exception(
+                        f"Failed to download file: {response.status} {await response.text()}"
+                    )
 
     def get_headers(self, token: str, platform: str) -> dict:
         if platform == "GitHub":

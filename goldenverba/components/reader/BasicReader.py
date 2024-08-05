@@ -45,6 +45,29 @@ class BasicReader(Reader):
             ".html",
             ".css",
             ".md",
+            ".mdx",
+            ".json",
+            ".pdf",
+            ".docx",
+            ".pptx",
+            ".xlsx",
+            ".csv",
+            ".ts",
+            ".tsx",
+            ".vue",
+            ".svelte",
+            ".astro",
+            ".php",
+            ".rb",
+            ".go",
+            ".rs",
+            ".swift",
+            ".kt",
+            ".java",
+            ".c",
+            ".cpp",
+            ".h",
+            ".hpp",
         ]  # Add supported text extensions
 
         # Initialize spaCy model if available
@@ -56,20 +79,20 @@ class BasicReader(Reader):
         """
         Load and process a file based on its extension.
         """
-        msg.info(f"Loading {fileConfig.filename}")
+        msg.info(f"Loading {fileConfig.filename} ({fileConfig.extension.lower()})")
         decoded_bytes = base64.b64decode(fileConfig.content)
 
         try:
-            if fileConfig.extension.lower() in [
-                ext.lstrip(".") for ext in self.extension
-            ]:
-                file_content = await self.load_text_file(decoded_bytes)
-            elif fileConfig.extension.lower() == "json":
+            if fileConfig.extension.lower() == "json":
                 return await self.load_json_file(decoded_bytes, fileConfig)
             elif fileConfig.extension.lower() == "pdf":
                 file_content = await self.load_pdf_file(decoded_bytes)
             elif fileConfig.extension.lower() == "docx":
                 file_content = await self.load_docx_file(decoded_bytes)
+            elif fileConfig.extension.lower() in [
+                ext.lstrip(".") for ext in self.extension
+            ]:
+                file_content = await self.load_text_file(decoded_bytes)
             else:
                 try:
                     file_content = await self.load_text_file(decoded_bytes)

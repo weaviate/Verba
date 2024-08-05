@@ -364,11 +364,16 @@ class WeaviateManager:
             for doc in response.objects
         ]
 
-    async def get_document(self, uuid: str) -> list[dict]:
+    async def get_document(self, uuid: str, properties: list[str] = []) -> list[dict]:
         document_collection = self.client.collections.get(self.document_collection_name)
 
         if await document_collection.data.exists(uuid):
-            response = await document_collection.query.fetch_object_by_id(uuid)
+            if len(properties) > 0:
+                response = await document_collection.query.fetch_object_by_id(
+                    uuid, return_properties=properties
+                )
+            else:
+                response = await document_collection.query.fetch_object_by_id(uuid)
             return response.properties
         else:
             return None
@@ -405,9 +410,9 @@ class WeaviateManager:
 
         offset = pageSize * (page - 1)
 
-        document = await self.get_document(uuid)
+        document = await self.get_document(uuid, properties=[])
         if document is None:
-            return document
+            return []
 
         embedding_config = json.loads(document.get("meta")["Embedder"])
         embedder = embedding_config["config"]["Model"]["value"]
@@ -432,7 +437,7 @@ class WeaviateManager:
 
     async def get_vectors(self, uuid: str, showAll: bool) -> dict:
 
-        document = await self.get_document(uuid)
+        document = await self.get_document(uuid, properties=[])
         embedding_config = json.loads(document.get("meta")["Embedder"])
         embedder = embedding_config["config"]["Model"]["value"]
 
@@ -482,7 +487,7 @@ class WeaviateManager:
                 doc_uuid = item.properties["doc_uuid"]
                 chunk_uuid = item.uuid
                 if doc_uuid not in vector_map:
-                    _document = await self.get_document(doc_uuid)
+                    _document = await self.get_document(doc_uuid, properties=[])
                     vector_map[doc_uuid] = {"name": _document["title"], "chunks": []}
                 vector_list.append(item.vector["default"])
                 dimensions = len(item.vector["default"])
@@ -690,7 +695,7 @@ class EmbeddingManager:
         self.embedders: dict[str, Embedding] = {
             embedder.name: embedder for embedder in embedders
         }
-        self.max_batch_size = 500
+        self.max_batch_size = 200
 
     async def vectorize(
         self,
@@ -754,13 +759,37 @@ class EmbeddingManager:
         self, embedder: str, config: dict, content: list[str]
     ) -> list[list[float]]:
         """Vectorize content in batches"""
-        batches = [
-            content[i : i + self.max_batch_size]
-            for i in range(0, len(content), self.max_batch_size)
-        ]
-        tasks = [self.embedders[embedder].vectorize(config, batch) for batch in batches]
-        results = await asyncio.gather(*tasks)
-        return [item for sublist in results for item in sublist]
+        try:
+            batches = [
+                content[i : i + self.max_batch_size]
+                for i in range(0, len(content), self.max_batch_size)
+            ]
+            msg.info(f"Vectorizing {len(content)} chunks in {len(batches)} batches")
+            tasks = [
+                self.embedders[embedder].vectorize(config, batch) for batch in batches
+            ]
+            results = await asyncio.gather(*tasks, return_exceptions=True)
+
+            # Check if all tasks were successful
+            errors = [r for r in results if isinstance(r, Exception)]
+            if errors:
+                error_messages = [str(e) for e in errors]
+                raise Exception(
+                    f"Vectorization failed for some batches: {', '.join(error_messages)}"
+                )
+
+            # Flatten the results
+            flattened_results = [item for sublist in results for item in sublist]
+
+            # Verify the number of vectors matches the input content
+            if len(flattened_results) != len(content):
+                raise Exception(
+                    f"Mismatch in vectorization results: expected {len(content)} vectors, got {len(flattened_results)}"
+                )
+
+            return flattened_results
+        except Exception as e:
+            raise Exception(f"Batch vectorization failed: {str(e)}")
 
     async def vectorize_query(
         self, embedder: str, content: str, rag_config: dict

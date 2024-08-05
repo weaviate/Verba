@@ -254,9 +254,10 @@ const ContentView: React.FC<ContentViewProps> = ({
           {/* Content div */}
           <div className="flex-grow overflow-hidden p-3">
             <div className="overflow-y-auto h-full">
-              {content.map((contentSnippet, index) =>
-                renderText(contentSnippet)
-              )}
+              {content &&
+                content.map((contentSnippet, index) =>
+                  renderText(contentSnippet)
+                )}
             </div>
           </div>
 

@@ -46,7 +46,6 @@ export type VectorsPayload = {
 
 export type VerbaDocument = {
   title: string;
-  content: string;
   extension: string;
   fileSize: number;
   labels: string[];

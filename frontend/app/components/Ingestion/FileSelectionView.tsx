@@ -9,6 +9,7 @@ import { FaFileImport } from "react-icons/fa";
 import { MdCancel } from "react-icons/md";
 import { GoFileDirectoryFill } from "react-icons/go";
 import { TbPlugConnected } from "react-icons/tb";
+import { IoMdArrowDropdown } from "react-icons/io";
 
 import { closeOnClick } from "./util";
 
@@ -76,16 +77,30 @@ const FileSelectionView: React.FC<FileSelectionViewProps> = ({
     });
   };
 
+  const [selectedFileReader, setSelectedFileReader] = useState<string | null>(
+    null
+  );
+  const [selectedDirReader, setSelectedDirReader] = useState<string | null>(
+    null
+  );
+
   const handleUploadFiles = async (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
+    isDirectory: boolean
   ) => {
     if (event.target.files && RAGConfig) {
       const files = event.target.files;
       const newFileMap: FileMap = { ...fileMap };
+      const selectedReader = isDirectory
+        ? selectedDirReader
+        : selectedFileReader;
 
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         const newRAGConfig: RAGConfig = JSON.parse(JSON.stringify(RAGConfig));
+        if (selectedReader) {
+          newRAGConfig["Reader"].selected = selectedReader;
+        }
         const filename = file.name;
         const fileID = file.name;
         const extension = file.name.split(".").pop() || "";
@@ -194,32 +209,78 @@ const FileSelectionView: React.FC<FileSelectionViewProps> = ({
           />
         </div>
         <div className="flex gap-3 justify-end">
-          <button
-            onClick={() => document.getElementById("files_upload")?.click()}
-            className="flex border-none btn text-text-verba bg-button-verba hover:bg-button-hover-verba gap-2"
-          >
-            <IoMdAddCircle size={15} />
-            <p>Add Files</p>
-          </button>
+          <div className="dropdown dropdown-bottom">
+            <button
+              tabIndex={0}
+              className="flex btn border-none text-text-verba bg-button-verba hover:bg-button-hover-verba gap-2"
+            >
+              <IoMdAddCircle size={15} />
+              <p>Add Files</p>
+              <IoMdArrowDropdown size={15} />
+            </button>
+            <ul
+              tabIndex={0}
+              className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
+            >
+              {RAGConfig &&
+                Object.entries(RAGConfig["Reader"].components)
+                  .filter(([key, component]) => component.type !== "URL")
+                  .map(([key, component]) => (
+                    <li
+                      key={"File_" + component.name + key}
+                      onClick={() => {
+                        setSelectedFileReader(component.name);
+                        document.getElementById("files_upload")?.click();
+                        closeOnClick();
+                      }}
+                    >
+                      <a>{component.name}</a>
+                    </li>
+                  ))}
+            </ul>
+          </div>
           <input
             id={"files_upload"}
             type="file"
-            onChange={handleUploadFiles}
+            onChange={(e) => handleUploadFiles(e, false)}
             className="hidden"
             multiple
           />
-          <button
-            onClick={() => document.getElementById("dir_upload")?.click()}
-            className="flex btn border-none text-text-verba bg-button-verba hover:bg-button-hover-verba gap-2"
-          >
-            <GoFileDirectoryFill size={15} />
-            <p>Add Directory</p>
-          </button>
+          <div className="dropdown dropdown-bottom">
+            <button
+              tabIndex={0}
+              className="flex btn border-none text-text-verba bg-button-verba hover:bg-button-hover-verba gap-2"
+            >
+              <GoFileDirectoryFill size={15} />
+              <p>Add Directory</p>
+              <IoMdArrowDropdown size={15} />
+            </button>
+            <ul
+              tabIndex={0}
+              className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
+            >
+              {RAGConfig &&
+                Object.entries(RAGConfig["Reader"].components)
+                  .filter(([key, component]) => component.type !== "URL")
+                  .map(([key, component]) => (
+                    <li
+                      key={"Dir_" + component.name + key}
+                      onClick={() => {
+                        setSelectedDirReader(component.name);
+                        document.getElementById("dir_upload")?.click();
+                        closeOnClick();
+                      }}
+                    >
+                      <a>{component.name}</a>
+                    </li>
+                  ))}
+            </ul>
+          </div>
           <input
             id={"dir_upload"}
             type="file"
             ref={ref}
-            onChange={handleUploadFiles}
+            onChange={(e) => handleUploadFiles(e, true)}
             className="hidden"
             multiple
           />
@@ -230,6 +291,7 @@ const FileSelectionView: React.FC<FileSelectionViewProps> = ({
             >
               <IoMdAddCircle size={15} />
               <p>Add URL</p>
+              <IoMdArrowDropdown size={15} />
             </button>
             <ul
               tabIndex={0}
