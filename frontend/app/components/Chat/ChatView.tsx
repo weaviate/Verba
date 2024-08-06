@@ -15,6 +15,7 @@ interface ChatViewProps {
   RAGConfig: RAGConfig | null;
   production: boolean;
   setRAGConfig: React.Dispatch<React.SetStateAction<RAGConfig | null>>;
+  currentPage: string;
 }
 
 const ChatView: React.FC<ChatViewProps> = ({
@@ -24,6 +25,7 @@ const ChatView: React.FC<ChatViewProps> = ({
   RAGConfig,
   production,
   setRAGConfig,
+  currentPage,
 }) => {
   const [selectedDocument, setSelectedDocument] = useState<string | null>(null);
   const [selectedChunkScore, setSelectedChunkScore] = useState<ChunkScore[]>(
@@ -46,6 +48,7 @@ const ChatView: React.FC<ChatViewProps> = ({
           selectedDocument={selectedDocument}
           setSelectedDocument={setSelectedDocument}
           setSelectedChunkScore={setSelectedChunkScore}
+          currentPage={currentPage}
         />{" "}
       </div>
 

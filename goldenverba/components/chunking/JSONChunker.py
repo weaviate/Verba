@@ -5,8 +5,8 @@ import json
 
 with contextlib.suppress(Exception):
     from langchain_text_splitters import (
-    RecursiveJsonSplitter,
-)
+        RecursiveJsonSplitter,
+    )
 
 from goldenverba.components.chunk import Chunk
 from goldenverba.components.interfaces import Chunker
@@ -27,15 +27,23 @@ class JSONChunker(Chunker):
         self.description = "Split json files using LangChain"
         self.config = {
             "Chunk Size": InputConfig(
-                type="number", value=500, description="Choose how many characters per chunks", values=[]
+                type="number",
+                value=500,
+                description="Choose how many characters per chunks",
+                values=[],
             ),
         }
 
-    async def chunk(self, config: dict, documents: list[Document], embedder: Embedding, embedder_config: dict) -> list[Document]:
+    async def chunk(
+        self,
+        config: dict,
+        documents: list[Document],
+        embedder: Embedding,
+        embedder_config: dict,
+    ) -> list[Document]:
 
-        units = int(config["Chunk Size"].value)   
+        units = int(config["Chunk Size"].value)
 
-        
         text_splitter = RecursiveJsonSplitter(max_chunk_size=units)
 
         for document in documents:
@@ -48,9 +56,14 @@ class JSONChunker(Chunker):
 
             for i, chunk in enumerate(text_splitter.split_text(json_obj)):
 
-                document.chunks.append(Chunk(
-                    content=chunk,
-                    chunk_id=i,
-                ))
+                document.chunks.append(
+                    Chunk(
+                        content=chunk,
+                        chunk_id=i,
+                        start_i=0,
+                        end_i=0,
+                        content_without_overlap=chunk,
+                    )
+                )
 
         return documents

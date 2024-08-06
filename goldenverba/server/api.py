@@ -348,7 +348,8 @@ async def suggestions(payload: QueryPayload):
 async def get_document(payload: GetDocumentPayload):
     try:
         document = await manager.weaviate_manager.get_document(
-            payload.uuid, properties=[]
+            payload.uuid,
+            properties=["title", "extension", "fileSize", "labels", "source", "meta"],
         )
         if document is not None:
             document["content"] = ""
@@ -422,9 +423,12 @@ async def get_content(payload: GetContentPayload):
 @app.post("/api/get_vectors")
 async def get_vectors(payload: GetVectorPayload):
     try:
+        start_time = asyncio.get_event_loop().time()
         vector_groups = await manager.weaviate_manager.get_vectors(
             payload.uuid, payload.showAll
         )
+        elapsed_time = asyncio.get_event_loop().time() - start_time
+        msg.info(f"Vector retrieval took {elapsed_time:.4f} seconds")
         return JSONResponse(
             content={
                 "error": "",
@@ -493,7 +497,11 @@ async def get_all_documents(payload: SearchQueryPayload):
 
     try:
         documents = await manager.weaviate_manager.get_documents(
-            payload.query, payload.pageSize, payload.page, payload.labels
+            payload.query,
+            payload.pageSize,
+            payload.page,
+            payload.labels,
+            properties=["title", "extension", "fileSize", "labels", "source", "meta"],
         )
         labels = await manager.weaviate_manager.get_labels()
 

@@ -38,6 +38,7 @@ from goldenverba.components.reader.FirecrawlReader import FirecrawlReader
 
 # Import Chunkers
 from goldenverba.components.chunking.TokenChunker import TokenChunker
+from goldenverba.components.chunking.SentenceChunker import SentenceChunker
 from goldenverba.components.chunking.RecursiveChunker import RecursiveChunker
 from goldenverba.components.chunking.HTMLChunker import HTMLChunker
 from goldenverba.components.chunking.MarkdownChunker import MarkdownChunker
@@ -81,6 +82,7 @@ readers = [
 ]
 chunkers = [
     TokenChunker(),
+    SentenceChunker(),
     RecursiveChunker(),
     SemanticChunker(),
     HTMLChunker(),
@@ -306,7 +308,7 @@ class WeaviateManager:
             return
 
         document_obj = await document_collection.query.fetch_object_by_id(uuid)
-        embedding_config = json.loads(document_obj.properties.get("meta")["Embedder"])
+        embedding_config = json.loads(document_obj.properties.get("meta"))["Embedder"]
         embedder = embedding_config["config"]["Model"]["value"]
 
         if embedder not in self.embedding_table:
@@ -326,7 +328,12 @@ class WeaviateManager:
             await self.delete_document(item.uuid)
 
     async def get_documents(
-        self, query: str, pageSize: int, page: int, labels: list[str]
+        self,
+        query: str,
+        pageSize: int,
+        page: int,
+        labels: list[str],
+        properties: list[str] = None,
     ) -> list[dict]:
         offset = pageSize * (page - 1)
         document_collection = self.client.collections.get(self.document_collection_name)
@@ -347,12 +354,17 @@ class WeaviateManager:
             response = await document_collection.query.fetch_objects(
                 limit=pageSize,
                 offset=offset,
+                return_properties=properties,
                 sort=Sort.by_property("title", ascending=True),
                 filters=filter,
             )
         else:
             response = await document_collection.query.bm25(
-                query=query, limit=pageSize, offset=offset, filters=filter
+                query=query,
+                limit=pageSize,
+                offset=offset,
+                filters=filter,
+                return_properties=properties,
             )
 
         return [
@@ -364,16 +376,13 @@ class WeaviateManager:
             for doc in response.objects
         ]
 
-    async def get_document(self, uuid: str, properties: list[str] = []) -> list[dict]:
+    async def get_document(self, uuid: str, properties: list[str] = None) -> list[dict]:
         document_collection = self.client.collections.get(self.document_collection_name)
 
         if await document_collection.data.exists(uuid):
-            if len(properties) > 0:
-                response = await document_collection.query.fetch_object_by_id(
-                    uuid, return_properties=properties
-                )
-            else:
-                response = await document_collection.query.fetch_object_by_id(uuid)
+            response = await document_collection.query.fetch_object_by_id(
+                uuid, return_properties=properties
+            )
             return response.properties
         else:
             return None
@@ -410,11 +419,11 @@ class WeaviateManager:
 
         offset = pageSize * (page - 1)
 
-        document = await self.get_document(uuid, properties=[])
+        document = await self.get_document(uuid, properties=["meta"])
         if document is None:
             return []
 
-        embedding_config = json.loads(document.get("meta")["Embedder"])
+        embedding_config = json.loads(document.get("meta"))["Embedder"]
         embedder = embedding_config["config"]["Model"]["value"]
 
         if embedder not in self.embedding_table:
@@ -437,8 +446,8 @@ class WeaviateManager:
 
     async def get_vectors(self, uuid: str, showAll: bool) -> dict:
 
-        document = await self.get_document(uuid, properties=[])
-        embedding_config = json.loads(document.get("meta")["Embedder"])
+        document = await self.get_document(uuid, properties=["meta", "title"])
+        embedding_config = json.loads(document.get("meta"))["Embedder"]
         embedder = embedding_config["config"]["Model"]["value"]
 
         if embedder not in self.embedding_table:
@@ -449,13 +458,43 @@ class WeaviateManager:
         )
 
         if not showAll:
-            weaviate_chunks = await embedder_collection.query.fetch_objects(
-                filters=Filter.by_property("doc_uuid").equal(uuid),
-                limit=5000,
-                sort=Sort.by_property("chunk_id", ascending=True),
-                include_vector=True,
-            )
-            dimensions = len(weaviate_chunks.objects[0].vector["default"])
+            start_time = asyncio.get_event_loop().time()
+
+            batch_size = 250
+            all_chunks = []
+            offset = 0
+            total_time = 0
+            call_count = 0
+
+            while True:
+                call_start_time = asyncio.get_event_loop().time()
+                weaviate_chunks = await embedder_collection.query.fetch_objects(
+                    filters=Filter.by_property("doc_uuid").equal(uuid),
+                    limit=batch_size,
+                    offset=offset,
+                    return_properties=["chunk_id", "pca"],
+                    include_vector=True,
+                )
+                call_end_time = asyncio.get_event_loop().time()
+                call_duration = call_end_time - call_start_time
+                total_time += call_duration
+                call_count += 1
+
+                print(f"Call {call_count} took {call_duration:.4f} seconds")
+
+                all_chunks.extend(weaviate_chunks.objects)
+
+                if len(weaviate_chunks.objects) < batch_size:
+                    break
+
+                offset += batch_size
+
+            elapsed_time = asyncio.get_event_loop().time() - start_time
+            average_call_time = total_time / call_count if call_count > 0 else 0
+            print(f"Retrieving weaviate_chunks took {elapsed_time:.4f} seconds")
+            print(f"Average call time: {average_call_time:.4f} seconds")
+
+            dimensions = len(all_chunks[0].vector["default"])
 
             chunks = [
                 {
@@ -463,7 +502,7 @@ class WeaviateManager:
                     "uuid": str(item.uuid),
                     "chunk_id": item.properties["chunk_id"],
                 }
-                for item in weaviate_chunks.objects
+                for item in all_chunks
                 if (pca := item.properties["pca"]) is not None
             ]
             return {
@@ -487,7 +526,7 @@ class WeaviateManager:
                 doc_uuid = item.properties["doc_uuid"]
                 chunk_uuid = item.uuid
                 if doc_uuid not in vector_map:
-                    _document = await self.get_document(doc_uuid, properties=[])
+                    _document = await self.get_document(doc_uuid)
                     vector_map[doc_uuid] = {"name": _document["title"], "chunks": []}
                 vector_list.append(item.vector["default"])
                 dimensions = len(item.vector["default"])
@@ -565,7 +604,8 @@ class WeaviateManager:
             filters=(
                 Filter.by_property("doc_uuid").equal(doc_uuid)
                 & Filter.by_property("chunk_id").contains_any(ids)
-            )
+            ),
+            sort=Sort.by_property("chunk_id", ascending=True),
         )
         return weaviate_chunks.objects
 
@@ -581,6 +621,22 @@ class WeaviateManager:
             group_by=GroupByAggregate(prop="doc_uuid"), total_count=True
         )
         return len(response.groups)
+
+    async def get_chunk_count(self, embedder: str, doc_uuid: str) -> int:
+        if embedder not in self.embedding_table:
+            raise Exception(f"{embedder} not found in Embedding Table")
+        embedder_collection = self.client.collections.get(
+            self.embedding_table[embedder]
+        )
+        response = await embedder_collection.aggregate.over_all(
+            filters=Filter.by_property("doc_uuid").equal(doc_uuid),
+            group_by=GroupByAggregate(prop="doc_uuid"),
+            total_count=True,
+        )
+        if response.groups:
+            return response.groups[0].total_count
+        else:
+            return 0
 
 
 class ReaderManager:
@@ -600,9 +656,7 @@ class ReaderManager:
                 )
                 for document in documents:
                     document.meta["Reader"] = (
-                        fileConfig.rag_config["Reader"]
-                        .components[reader]
-                        .model_dump_json()
+                        fileConfig.rag_config["Reader"].components[reader].model_dump()
                     )
                 elapsed_time = round(loop.time() - start_time, 2)
                 if len(documents) == 1:
@@ -662,7 +716,7 @@ class ChunkerManager:
                     chunked_document.meta["Chunker"] = (
                         fileConfig.rag_config["Chunker"]
                         .components[chunker]
-                        .model_dump_json()
+                        .model_dump()
                     )
                 elapsed_time = round(loop.time() - start_time, 2)
                 if len(documents) == 1:
@@ -736,7 +790,7 @@ class EmbeddingManager:
                     document.meta["Embedder"] = (
                         fileConfig.rag_config["Embedder"]
                         .components[embedder]
-                        .model_dump_json()
+                        .model_dump()
                     )
 
                 elapsed_time = round(loop.time() - start_time, 2)

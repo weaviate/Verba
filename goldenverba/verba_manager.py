@@ -516,6 +516,140 @@ class VerbaManager:
     # Document Content Retrieval
 
     async def get_content(self, uuid: str, page: int, chunkScores: list[ChunkScore]):
+        chunks_per_page = 10
+        content_pieces = []
+        total_batches = 0
+
+        # Return Chunks with surrounding context
+        if len(chunkScores) > 0:
+            if page > len(chunkScores):
+                page = 0
+
+            total_batches = len(chunkScores)
+            chunk = await self.weaviate_manager.get_chunk(
+                chunkScores[page].uuid, chunkScores[page].embedder
+            )
+
+            before_ids = [
+                i
+                for i in range(
+                    max(0, chunkScores[page].chunk_id - int(chunks_per_page / 2)),
+                    chunkScores[page].chunk_id,
+                )
+            ]
+            if before_ids:
+                chunks_before_chunk = await self.weaviate_manager.get_chunk_by_ids(
+                    chunkScores[page].embedder,
+                    uuid,
+                    ids=[
+                        i
+                        for i in range(
+                            max(
+                                0, chunkScores[page].chunk_id - int(chunks_per_page / 2)
+                            ),
+                            chunkScores[page].chunk_id,
+                        )
+                    ],
+                )
+                before_content = "".join(
+                    [chunk.properties["content_without_overlap"] for chunk in chunks_before_chunk]
+                )
+            else:
+                before_content = ""
+
+            after_ids = [
+                i
+                for i in range(
+                    chunkScores[page].chunk_id + 1,
+                    chunkScores[page].chunk_id + int(chunks_per_page / 2),
+                )
+            ]
+            if after_ids:
+                chunks_after_chunk = await self.weaviate_manager.get_chunk_by_ids(
+                    chunkScores[page].embedder,
+                    uuid,
+                    ids=[
+                        i
+                        for i in range(
+                            chunkScores[page].chunk_id + 1,
+                            chunkScores[page].chunk_id + int(chunks_per_page / 2),
+                        )
+                    ],
+                )
+                after_content = "".join(
+                    [
+                        chunk.properties["content_without_overlap"]
+                        for chunk in chunks_after_chunk
+                    ]
+                )
+            else:
+                after_content = ""
+
+            content_pieces.append(
+                {
+                    "content": before_content,
+                    "chunk_id": 0,
+                    "score": 0,
+                    "type": "text",
+                }
+            )
+            content_pieces.append(
+                {
+                    "content": chunk["content_without_overlap"],
+                    "chunk_id": chunkScores[page].chunk_id,
+                    "score": chunkScores[page].score,
+                    "type": "extract",
+                }
+            )
+            content_pieces.append(
+                {
+                    "content": after_content,
+                    "chunk_id": 0,
+                    "score": 0,
+                    "type": "text",
+                }
+            )
+
+        # Return Content based on Page
+        else:
+            document = await self.weaviate_manager.get_document(
+                uuid, properties=["meta"]
+            )
+            config = json.loads(document["meta"])
+            embedder = config["Embedder"]["config"]["Model"]["value"]
+            request_chunk_ids = [
+                i
+                for i in range(
+                    chunks_per_page * (page + 1) - chunks_per_page,
+                    chunks_per_page * (page + 1),
+                )
+            ]
+
+            chunks = await self.weaviate_manager.get_chunk_by_ids(
+                embedder, uuid, request_chunk_ids
+            )
+
+            total_chunks = await self.weaviate_manager.get_chunk_count(embedder, uuid)
+            total_batches = int(math.ceil(total_chunks / chunks_per_page))
+
+            content = "".join(
+                [chunk.properties["content_without_overlap"] for chunk in chunks]
+            )
+
+            content_pieces.append(
+                {
+                    "content": content,
+                    "chunk_id": 0,
+                    "score": 0,
+                    "type": "text",
+                }
+            )
+
+        return (content_pieces, total_batches)
+
+    async def get_content_old(
+        self, uuid: str, page: int, chunkScores: list[ChunkScore]
+    ):
         start_time = asyncio.get_event_loop().time()
 
         # Time document retrieval

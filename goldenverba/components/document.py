@@ -2,6 +2,7 @@ from goldenverba.server.types import FileConfig
 from goldenverba.components.chunk import Chunk
 from spacy.tokens import Doc
 from spacy.language import Language
+import json
 
 
 class Document:
@@ -36,7 +37,7 @@ class Document:
             "fileSize": document.fileSize,
             "labels": document.labels,
             "source": document.source,
-            "meta": document.meta,
+            "meta": json.dumps(document.meta),
         }
         return doc_dict
 

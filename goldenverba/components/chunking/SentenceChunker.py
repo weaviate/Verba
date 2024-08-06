@@ -12,26 +12,26 @@ from goldenverba.components.types import InputConfig
 from goldenverba.components.interfaces import Embedding
 
 
-class TokenChunker(Chunker):
+class SentenceChunker(Chunker):
     """
-    TokenChunker for Verba built with spacy.
+    SentenceChunker for Verba built with spacy.
     """
 
     def __init__(self):
         super().__init__()
-        self.name = "Token"
+        self.name = "Sentence"
         self.description = "Splits documents based on word tokens"
         self.config = {
-            "Tokens": InputConfig(
+            "Sentences": InputConfig(
                 type="number",
-                value=250,
-                description="Choose how many Token per chunks",
+                value=5,
+                description="Choose how many Sentences per chunks",
                 values=[],
             ),
             "Overlap": InputConfig(
                 type="number",
-                value=50,
-                description="Choose how many Tokens should overlap between chunks",
+                value=1,
+                description="Choose how many Sentences should overlap between chunks",
                 values=[],
             ),
         }
@@ -44,7 +44,7 @@ class TokenChunker(Chunker):
         embedder_config: dict,
     ) -> list[Document]:
 
-        units = int(config["Tokens"].value)
+        units = int(config["Sentences"].value)
         overlap = int(config["Overlap"].value)
 
         for document in documents:
@@ -55,8 +55,10 @@ class TokenChunker(Chunker):
             if len(document.chunks) > 0:
                 continue
 
+            sentences = [sent.text for sent in doc.sents]
+
             # If Split Size is higher than actual Token Count or if Split Size is Zero
-            if units > len(doc) or units == 0:
+            if units > len(sentences) or units == 0:
                 document.chunks.append(
                     Chunk(
                         content=document.content,
@@ -69,19 +71,19 @@ class TokenChunker(Chunker):
 
             if overlap >= units:
                 msg.warn(
-                    f"Overlap value is greater than unit (Units {config['Tokens'].value}/ Overlap {config['Overlap'].value})"
+                    f"Overlap value is greater than unit (Units {config['Sentences'].value}/ Overlap {config['Overlap'].value})"
                 )
                 overlap = units - 1
 
             i = 0
             split_id_counter = 0
-            while i < len(doc):
+            while i < len(sentences):
                 start_i = i
-                end_i = min(i + units, len(doc))
+                end_i = min(i + units, len(sentences))
                 overlap_start = max(0, end_i - overlap)
 
-                chunk_text = doc[start_i:end_i].text
-                chunk_text_without_overlap = doc[start_i:overlap_start].text
+                chunk_text = "".join(sentences[start_i:end_i])
+                chunk_text_without_overlap = "".join(sentences[start_i:overlap_start])
 
                 doc_chunk = Chunk(
                     content=chunk_text,

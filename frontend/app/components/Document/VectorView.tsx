@@ -1,12 +1,25 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  useMemo,
+  useCallback,
+} from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { extend } from "@react-three/fiber";
-import { OrbitControls, Float, PerspectiveCamera } from "@react-three/drei";
+import {
+  OrbitControls,
+  Float,
+  PerspectiveCamera,
+  Stats,
+} from "@react-three/drei";
 import { AxesHelper, GridHelper } from "three";
 import * as THREE from "three";
 import { MdCancel } from "react-icons/md";
 import { GoTriangleDown } from "react-icons/go";
 import { Text, Billboard } from "@react-three/drei";
+
+import { vectorToColor } from "./util";
 
 import { VerbaChunk, VerbaVector } from "./types";
 
@@ -27,17 +40,15 @@ extend({ OrbitControls: OrbitControls });
 
 const Sphere: React.FC<{
   vector: VerbaVector;
-  index: number;
-  selectedChunk: string | null;
-  setSelectedChunk: (c: string) => void;
-  chunk_uuid: string;
   color: string;
-  dynamicColor: boolean;
-  setHoverTitle: (t: string) => void;
+  setHoverTitle: React.MutableRefObject<(t: string | null) => void>;
   documentTitle: string;
   multiplication: number;
+  dynamicColor: boolean;
   chunk_id: string;
-  showAll: boolean;
+  chunk_uuid: string;
+  setSelectedChunk: (c: string) => void;
+  selectedChunk: string | null;
   minX: number;
   maxX: number;
   minY: number;
@@ -47,14 +58,12 @@ const Sphere: React.FC<{
   chunkScores?: ChunkScore[];
 }> = ({
   vector,
-  index,
   color,
   setHoverTitle,
   documentTitle,
   multiplication,
   dynamicColor,
   chunk_id,
-  showAll,
   chunk_uuid,
   setSelectedChunk,
   selectedChunk,
@@ -67,53 +76,54 @@ const Sphere: React.FC<{
   chunkScores,
 }) => {
   const ref = useRef<THREE.Mesh>(null!);
-  const [hover, setHover] = useState(false);
+  const hoverRef = useRef(false);
 
-  function normalize(value: number, min: number, max: number): number {
-    if (max === min) return 0; // Avoid division by zero
-    return (value - min) / (max - min);
-  }
+  const isHighlighted = useMemo(
+    () => chunkScores?.some((score) => score.uuid === chunk_uuid),
+    [chunkScores, chunk_uuid]
+  );
 
-  function vectorToColor(
-    vector: VerbaVector,
-    minX: number,
-    maxX: number,
-    minY: number,
-    maxY: number,
-    minZ: number,
-    maxZ: number
-  ): THREE.Color {
-    // Normalize vector components to be within the range of 0 to 1 based on min and max
-    const normalizedX = normalize(vector.x, minX, maxX);
-    const normalizedY = normalize(vector.y, minY, maxY);
-    const normalizedZ = normalize(vector.z, minZ, maxZ);
-
-    // Scale normalized values to 0-255
-    const r = Math.floor(normalizedZ * 255); // Red from Z axis
-    const g = Math.floor(normalizedX * 255); // Green from X axis
-    const b = Math.floor(normalizedY * 255); // Blue from Y axis
-
-    return new THREE.Color(`rgb(${g},${b},${r})`);
-  }
-
-  const not_selected_color = !dynamicColor
-    ? new THREE.Color(color)
-    : vectorToColor(vector, minX, maxX, minY, maxY, minZ, maxZ);
-
-  const isHighlighted = chunkScores?.some((score) => score.uuid === chunk_uuid);
-  const sphereColor = isHighlighted
-    ? new THREE.Color("yellow")
-    : selectedChunk === chunk_uuid
-      ? "green"
-      : not_selected_color;
+  const sphereColor = useMemo(() => {
+    if (isHighlighted) return new THREE.Color("yellow");
+    if (selectedChunk === chunk_uuid) return new THREE.Color("green");
+    return dynamicColor
+      ? vectorToColor(vector, minX, maxX, minY, maxY, minZ, maxZ)
+      : new THREE.Color(color);
+  }, [
+    isHighlighted,
+    selectedChunk,
+    chunk_uuid,
+    dynamicColor,
+    color,
+    vector,
+    minX,
+    maxX,
+    minY,
+    maxY,
+    minZ,
+    maxZ,
+  ]);
 
   const sphereRadius = isHighlighted
     ? 3
     : selectedChunk === chunk_uuid
       ? 1.5
       : 1;
+  const sphereOpacity = isHighlighted ? 1 : hoverRef.current ? 1 : 0.5;
 
-  const sphereOpacity = isHighlighted ? 1 : hover ? 1 : 0.5;
+  const handlePointerEnter = useCallback(() => {
+    hoverRef.current = true;
+    setHoverTitle.current(`${documentTitle} | ${chunk_id}`);
+  }, [documentTitle, chunk_id, setHoverTitle]);
+
+  const handlePointerLeave = useCallback(() => {
+    hoverRef.current = false;
+    setHoverTitle.current(null);
+  }, [setHoverTitle]);
+
+  const handleClick = useCallback(() => {
+    setSelectedChunk(chunk_uuid);
+  }, [chunk_uuid, setSelectedChunk]);
 
   useFrame(() => {
     if (ref.current) {
@@ -125,6 +135,12 @@ const Sphere: React.FC<{
         ),
         0.02
       );
+
+      // Update material color based on hover state
+      const material = ref.current.material as THREE.MeshBasicMaterial;
+      material.color.set(hoverRef.current ? "blue" : sphereColor);
+      material.opacity = hoverRef.current ? 1 : sphereOpacity;
+      material.transparent = !hoverRef.current;
     }
   });
 
@@ -133,22 +149,15 @@ const Sphere: React.FC<{
       <mesh
         ref={ref}
         position={[0, 0, 0]}
-        onPointerEnter={() => {
-          setHover(true);
-          setHoverTitle(documentTitle + " | " + chunk_id);
-        }}
-        onClick={() => {
-          setSelectedChunk(chunk_uuid);
-        }}
-        onPointerLeave={() => {
-          setHover(false);
-        }}
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave}
+        onClick={handleClick}
       >
         <sphereGeometry args={[sphereRadius, 32, 32]} />
         <meshBasicMaterial
-          color={hover ? "blue" : sphereColor}
+          color={sphereColor}
           opacity={sphereOpacity}
-          transparent={!hover}
+          transparent={true}
         />
       </mesh>
     </Float>
@@ -174,7 +183,10 @@ const VectorView: React.FC<VectorViewProps> = ({
   const [embedder, setEmbedder] = useState("");
   const [showAll, setShowAll] = useState(false);
   const [dynamicColor, setDymanicColor] = useState(true);
-  const [hoverTitle, setHoverTitle] = useState("");
+  const [hoverTitleState, setHoverTitleState] = useState<string | null>(null);
+  const hoverTitleRef = useRef<(t: string | null) => void>((t) =>
+    setHoverTitleState(t)
+  );
   const [viewMultiplication, setViewMultiplication] = useState(200);
   const [currentDimensions, setCurrentDimensions] = useState(0);
 
@@ -338,7 +350,7 @@ const VectorView: React.FC<VectorViewProps> = ({
             </div>
             <div className="flex gap-1 items-center">
               <p className="text-text-alt-verba text-sm font-bold">Hover:</p>
-              <p className="text-sm text-text-alt-verba">{hoverTitle}</p>
+              <p className="text-sm text-text-alt-verba">{hoverTitleState}</p>
             </div>
             <div className="flex gap-1 items-center">
               <p className="text-text-alt-verba text-sm font-bold">Vectors:</p>
@@ -430,21 +442,19 @@ const VectorView: React.FC<VectorViewProps> = ({
           className={`flex flex-grow ${selectedChunk ? "w-2/3" : "w-full"} h-full`}
         >
           <Canvas>
-            <ambientLight intensity={0.5} />
+            <ambientLight intensity={1} />
             <OrbitControls></OrbitControls>
             <PerspectiveCamera makeDefault position={[0, 0, 0 + 150]} />
             <axesHelper args={[50]} />
             {vectors.map((vector_group, index) =>
               vector_group.chunks.map((chunk, v_index) => (
                 <Sphere
-                  showAll={showAll}
                   dynamicColor={dynamicColor}
                   multiplication={viewMultiplication}
                   key={"Sphere_" + v_index + vector_group.name}
                   vector={chunk.vector}
-                  index={v_index}
                   color={selectColor(index)}
-                  setHoverTitle={setHoverTitle}
+                  setHoverTitle={hoverTitleRef}
                   documentTitle={vector_group.name}
                   chunk_id={chunk.chunk_id}
                   setSelectedChunk={setSelectedChunk}

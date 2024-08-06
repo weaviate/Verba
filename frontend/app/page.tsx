@@ -219,6 +219,7 @@ export default function Home() {
               setCurrentPage={setCurrentPage}
               settingConfig={baseSetting[settingTemplate]}
               APIHost={APIHost}
+              currentPage={currentPage}
             />
           </div>
 

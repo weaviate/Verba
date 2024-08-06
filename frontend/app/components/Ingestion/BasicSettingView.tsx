@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, use } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { FileData, FileMap, statusTextMap, statusColorMap } from "./types";
 import { FaTrash } from "react-icons/fa";
 import { GoTriangleDown } from "react-icons/go";
@@ -34,8 +34,6 @@ const BasicSettingView: React.FC<BasicSettingViewProps> = ({
   const [filename, setFilename] = useState("");
   const [source, setSource] = useState("");
   const [label, setLabel] = useState("");
-  const [editFilename, setEditFilename] = useState(false);
-  const [editSource, setEditSource] = useState(false);
 
   useEffect(() => {
     if (selectedFileData) {
@@ -44,31 +42,38 @@ const BasicSettingView: React.FC<BasicSettingViewProps> = ({
     }
   }, [fileMap, selectedFileData]);
 
-  const switchEditMode = () => {
-    if (editFilename && selectedFileData) {
-      const newFileData: FileData = JSON.parse(
-        JSON.stringify(fileMap[selectedFileData])
-      );
-      newFileData.filename = filename;
-      const newFileMap: FileMap = { ...fileMap };
-      newFileMap[selectedFileData] = newFileData;
-      setFileMap(newFileMap);
-    }
-    setEditFilename((prevState) => !prevState);
-  };
+  const updateFileMap = useCallback(
+    (key: "filename" | "source", value: string) => {
+      if (selectedFileData) {
+        const newFileData: FileData = JSON.parse(
+          JSON.stringify(fileMap[selectedFileData])
+        );
+        newFileData[key] = value;
+        const newFileMap: FileMap = { ...fileMap };
+        newFileMap[selectedFileData] = newFileData;
+        setFileMap(newFileMap);
+      }
+    },
+    [selectedFileData, fileMap, setFileMap]
+  );
 
-  const switchSourceEditMode = () => {
-    if (editSource && selectedFileData) {
-      const newFileData: FileData = JSON.parse(
-        JSON.stringify(fileMap[selectedFileData])
-      );
-      newFileData.source = source;
-      const newFileMap: FileMap = { ...fileMap };
-      newFileMap[selectedFileData] = newFileData;
-      setFileMap(newFileMap);
-    }
-    setEditSource((prevState) => !prevState);
-  };
+  const handleFilenameChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const newFilename = e.target.value;
+      setFilename(newFilename);
+      updateFileMap("filename", newFilename);
+    },
+    [updateFileMap]
+  );
+
+  const handleSourceChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const newSource = e.target.value;
+      setSource(newSource);
+      updateFileMap("source", newSource);
+    },
+    [updateFileMap]
+  );
 
   const openDebugModal = () => {
     const modal = document.getElementById("File_Debug_Modal");
@@ -204,23 +209,10 @@ const BasicSettingView: React.FC<BasicSettingViewProps> = ({
               type="text"
               className="grow w-full"
               value={filename}
-              onChange={(e) => {
-                setFilename(e.target.value);
-              }}
-              disabled={!editFilename || blocked}
+              onChange={handleFilenameChange}
+              disabled={blocked}
             />
           </label>
-          <button
-            onClick={switchEditMode}
-            disabled={blocked}
-            className="btn btn-square bg-button-verba border-none hover:bg-secondary-verba text-text-verba"
-          >
-            {editFilename ? (
-              <IoIosCheckmark size={20} />
-            ) : (
-              <MdModeEdit size={15} />
-            )}
-          </button>
         </div>
 
         {/* Source */}
@@ -231,23 +223,10 @@ const BasicSettingView: React.FC<BasicSettingViewProps> = ({
               type="text"
               className="grow w-full"
               value={source}
-              onChange={(e) => {
-                setSource(e.target.value);
-              }}
-              disabled={!editSource || blocked}
+              onChange={handleSourceChange}
+              disabled={blocked}
             />
           </label>
-          <button
-            onClick={switchSourceEditMode}
-            disabled={blocked}
-            className="btn btn-square bg-button-verba border-none hover:bg-secondary-verba text-text-verba"
-          >
-            {editSource ? (
-              <IoIosCheckmark size={20} />
-            ) : (
-              <MdModeEdit size={15} />
-            )}
-          </button>
         </div>
 
         {/* Labels */}

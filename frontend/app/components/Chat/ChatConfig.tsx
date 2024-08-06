@@ -66,18 +66,21 @@ const ChatConfig: React.FC<ChatConfigProps> = ({ RAGConfig, setRAGConfig }) => {
           component_name="Embedder"
           selectComponent={selectComponent}
           updateConfig={updateConfig}
+          blocked={false}
         />
         <ComponentView
           RAGConfig={RAGConfig}
           component_name="Generator"
           selectComponent={selectComponent}
           updateConfig={updateConfig}
+          blocked={false}
         />
         <ComponentView
           RAGConfig={RAGConfig}
           component_name="Retriever"
           selectComponent={selectComponent}
           updateConfig={updateConfig}
+          blocked={false}
         />
       </div>
     );

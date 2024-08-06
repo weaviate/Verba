@@ -1,4 +1,6 @@
 import { FormattedDocument } from "./types";
+import { VerbaVector } from "./types";
+import * as THREE from "three";
 
 export function splitDocument(
   fullText: string,
@@ -95,3 +97,30 @@ export const colors = [
   "rebeccapurple", // High contrast with turquoise
   "lightgoldenrodyellow", // High contrast with rebeccapurple
 ];
+
+export function normalize(value: number, min: number, max: number): number {
+  if (max === min) return 0; // Avoid division by zero
+  return (value - min) / (max - min);
+}
+
+export function vectorToColor(
+  vector: VerbaVector,
+  minX: number,
+  maxX: number,
+  minY: number,
+  maxY: number,
+  minZ: number,
+  maxZ: number
+): THREE.Color {
+  // Normalize vector components to be within the range of 0 to 1 based on min and max
+  const normalizedX = normalize(vector.x, minX, maxX);
+  const normalizedY = normalize(vector.y, minY, maxY);
+  const normalizedZ = normalize(vector.z, minZ, maxZ);
+
+  // Scale normalized values to 0-255
+  const r = Math.floor(normalizedZ * 255); // Red from Z axis
+  const g = Math.floor(normalizedX * 255); // Green from X axis
+  const b = Math.floor(normalizedY * 255); // Blue from Y axis
+
+  return new THREE.Color(`rgb(${g},${b},${r})`);
+}

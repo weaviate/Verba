@@ -34,6 +34,7 @@ interface ChatInterfaceProps {
   setSelectedDocument: (s: string | null) => void;
   setRAGConfig: React.Dispatch<React.SetStateAction<RAGConfig | null>>;
   setSelectedChunkScore: (c: ChunkScore[]) => void;
+  currentPage: string;
 }
 
 const ChatInterface: React.FC<ChatInterfaceProps> = ({
@@ -44,6 +45,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   selectedDocument,
   setSelectedDocument,
   setSelectedChunkScore,
+  currentPage,
 }) => {
   const [selectedSetting, setSelectedSetting] = useState("Chat");
 
@@ -210,7 +212,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     } else {
       setCurrentDatacount(0);
     }
-  }, [currentEmbeddingModel]);
+  }, [currentEmbeddingModel, currentPage]);
 
   // Setup WebSocket and messages to /ws/generate_stream
   useEffect(() => {
