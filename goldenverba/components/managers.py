@@ -51,6 +51,7 @@ from goldenverba.components.embedding.OpenAIEmbedder import OpenAIEmbedder
 from goldenverba.components.embedding.CohereEmbedder import CohereEmbedder
 from goldenverba.components.embedding.GoogleEmbedder import GoogleEmbedder
 from goldenverba.components.embedding.OllamaEmbedder import OllamaEmbedder
+from goldenverba.components.embedding.VoyageAIEmbedder import VoyageAIEmbedder
 from goldenverba.components.embedding.SentenceTransformersEmbedder import (
     SentenceTransformersEmbedder,
 )
@@ -61,8 +62,7 @@ from goldenverba.components.retriever.WindowRetriever import WindowRetriever
 # Import Generators
 from goldenverba.components.generation.GeminiGenerator import GeminiGenerator
 from goldenverba.components.generation.CohereGenerator import CohereGenerator
-from goldenverba.components.generation.GPT3Generator import GPT3Generator
-from goldenverba.components.generation.GPT4Generator import GPT4Generator
+from goldenverba.components.generation.AnthrophicGenerator import AnthropicGenerator
 from goldenverba.components.generation.OllamaGenerator import OllamaGenerator
 from goldenverba.components.generation.OpenAIGenerator import OpenAIGenerator
 
@@ -91,13 +91,19 @@ chunkers = [
     JSONChunker(),
 ]
 embedders = [
-    OpenAIEmbedder(),
     SentenceTransformersEmbedder(),
     OllamaEmbedder(),
+    VoyageAIEmbedder(),
     CohereEmbedder(),
+    OpenAIEmbedder(),
 ]
 retrievers = [WindowRetriever()]
-generators = [OpenAIGenerator()]
+generators = [
+    OllamaGenerator(),
+    OpenAIGenerator(),
+    AnthropicGenerator(),
+    CohereGenerator(),
+]
 
 
 ### ----------------------- ###
@@ -749,7 +755,6 @@ class EmbeddingManager:
         self.embedders: dict[str, Embedding] = {
             embedder.name: embedder for embedder in embedders
         }
-        self.max_batch_size = 200
 
     async def vectorize(
         self,
@@ -815,8 +820,8 @@ class EmbeddingManager:
         """Vectorize content in batches"""
         try:
             batches = [
-                content[i : i + self.max_batch_size]
-                for i in range(0, len(content), self.max_batch_size)
+                content[i : i + self.embedders[embedder].max_batch_size]
+                for i in range(0, len(content), self.embedders[embedder].max_batch_size)
             ]
             msg.info(f"Vectorizing {len(content)} chunks in {len(batches)} batches")
             tasks = [

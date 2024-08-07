@@ -59,8 +59,6 @@ class SemanticChunker(Chunker):
 
         for document in documents:
 
-            print(f"Using {embedder.name}")
-
             # Skip if document already contains chunks
             if len(document.chunks) > 0:
                 continue
@@ -72,9 +70,14 @@ class SemanticChunker(Chunker):
             ]
             sentences = self.combine_sentences(sentences)
 
+            msg.info(f"Generated {len(sentences)} sentences")
+
             embeddings = await embedder.vectorize(
                 embedder_config, [x["combined_sentence"] for x in sentences]
             )
+
+            msg.info(f"Generated {len(embeddings)} embeddings")
+
             for i, sentence in enumerate(sentences):
                 sentence["combined_sentence_embedding"] = embeddings[i]
 

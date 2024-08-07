@@ -250,21 +250,25 @@ const ComponentView: React.FC<ComponentViewProps> = ({
             )}
 
             {/* Checkbox Input */}
-            {typeof config.value === "boolean" && (
-              <input
-                type="checkbox"
-                className="checkbox checkbox-md"
-                onChange={(e) => {
-                  if (!blocked) {
-                    updateConfig(
-                      component_name,
-                      configTitle,
-                      (e.target as HTMLInputElement).checked
-                    );
+            {config.type == "bool" && (
+              <div className="flex justify-center items-center w-full">
+                <input
+                  type="checkbox"
+                  className="checkbox checkbox-md"
+                  onChange={(e) => {
+                    if (!blocked) {
+                      updateConfig(
+                        component_name,
+                        configTitle,
+                        (e.target as HTMLInputElement).checked
+                      );
+                    }
+                  }}
+                  checked={
+                    typeof config.value === "boolean" ? config.value : false
                   }
-                }}
-                checked={config.value}
-              />
+                />
+              </div>
             )}
           </div>
           <div className="flex gap-2 items-center text-text-verba">

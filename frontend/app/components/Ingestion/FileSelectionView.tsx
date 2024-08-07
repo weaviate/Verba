@@ -102,7 +102,15 @@ const FileSelectionView: React.FC<FileSelectionViewProps> = ({
           newRAGConfig["Reader"].selected = selectedReader;
         }
         const filename = file.name;
-        const fileID = file.name;
+        let fileID = file.name;
+
+        // Check if the fileID already exists in the map
+        if (fileID in newFileMap) {
+          // If it exists, append a timestamp to make it unique
+          const timestamp = Date.now();
+          fileID = `${fileID}_${timestamp}`;
+        }
+
         const extension = file.name.split(".").pop() || "";
         const fileContent = await readFileContent(file);
 
@@ -123,7 +131,7 @@ const FileSelectionView: React.FC<FileSelectionViewProps> = ({
       }
 
       setFileMap(newFileMap);
-      setSelectedFileData(files[0].name);
+      setSelectedFileData(Object.keys(newFileMap)[0]);
 
       event.target.value = "";
     }

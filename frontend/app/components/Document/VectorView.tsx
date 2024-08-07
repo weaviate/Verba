@@ -355,7 +355,7 @@ const VectorView: React.FC<VectorViewProps> = ({
             <div className="flex gap-1 items-center">
               <p className="text-text-alt-verba text-sm font-bold">Vectors:</p>
               <p className="text-sm text-text-alt-verba">
-                {getVectorCount()} x {currentDimensions}
+                {vectors.length} x {getVectorCount()} x {currentDimensions}
               </p>
             </div>
           </div>

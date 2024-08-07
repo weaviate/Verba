@@ -17,7 +17,7 @@ class WindowRetriever(Retriever):
                 type="dropdown",
                 value="Hybrid Search",
                 description="Switch between search types.",
-                values=["Hybrid Search", "Vector Search", "Keyword Search (BM25)"],
+                values=["Hybrid Search"],
             ),
             "Limit Mode": InputConfig(
                 type="dropdown",
@@ -25,13 +25,13 @@ class WindowRetriever(Retriever):
                 description="Method for limiting the results. Autocut decides automatically how many chunks to retrieve, while fixed sets a fixed limit.",
                 values=["Autocut", "Fixed"],
             ),
-            "Limit": InputConfig(
+            "Limit/Sensitivity": InputConfig(
                 type="number",
                 value=1,
                 description="Value for limiting the results. Value controls Autocut sensitivity and Fixed Size",
                 values=[],
             ),
-            "Window": InputConfig(
+            "Chunk Window": InputConfig(
                 type="number",
                 value=1,
                 description="Number of surrounding chunks of retrieved chunks to add to context",
@@ -49,9 +49,9 @@ class WindowRetriever(Retriever):
 
         search_mode = config["Search Mode"].value
         limit_mode = config["Limit Mode"].value
-        limit = int(config["Limit"].value)
+        limit = int(config["Limit/Sensitivity"].value)
 
-        window = max(0, min(10, int(config["Window"].value)))
+        window = max(0, min(10, int(config["Chunk Window"].value)))
         window_threshold = max(0, min(100, int(config["Threshold"].value)))
         window_threshold /= 100
 
@@ -188,7 +188,7 @@ class WindowRetriever(Retriever):
             for chunk in document["chunks"]:
                 context += f"Chunk: {int(chunk['chunk_id'])+1}\n"
                 if chunk["score"] > 0:
-                    context += f"High Relevancy: {chunk['score']}\n"
+                    context += f"High Relevancy: {chunk['score']:.2f}\n"
                 context += f"{chunk['content']}\n"
             context += "\n\n"
 

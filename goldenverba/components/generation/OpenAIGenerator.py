@@ -22,14 +22,12 @@ class OpenAIGenerator(Generator):
 
         models = ["gpt-4o", "gpt-3.5-turbo"]
 
-        self.config = {
-            "Model": InputConfig(
-                type="dropdown",
-                value="gpt-4o",
-                description="Select an OpenAI Embedding Model",
-                values=models,
-            )
-        }
+        self.config["Model"] = InputConfig(
+            type="dropdown",
+            value=models[0],
+            description="Select an OpenAI Embedding Model",
+            values=models,
+        )
 
         if os.getenv("OPENAI_API_KEY") is None:
             self.config["API Key"] = InputConfig(
@@ -53,6 +51,7 @@ class OpenAIGenerator(Generator):
         context: str,
         conversation: list[dict] = [],
     ):
+        system_message = config.get("System Message").value
         model = config.get("Model", {"value": "gpt-3.5-turbo"}).value
         openai_key = get_environment(
             config, "API Key", "OPENAI_API_KEY", "No OpenAI API Key found"
@@ -61,7 +60,7 @@ class OpenAIGenerator(Generator):
             config, "URL", "OPENAI_BASE_URL", "https://api.openai.com/v1"
         )
 
-        messages = self.prepare_messages(query, context, conversation)
+        messages = self.prepare_messages(query, context, conversation, system_message)
 
         headers = {
             "Content-Type": "application/json",
@@ -99,12 +98,12 @@ class OpenAIGenerator(Generator):
                             }
 
     def prepare_messages(
-        self, query: str, context: str, conversation: dict[str, str]
-    ) -> dict[str, str]:
+        self, query: str, context: str, conversation: list[dict], system_message: str
+    ) -> list[dict]:
         messages = [
             {
                 "role": "system",
-                "content": self.system_message,
+                "content": system_message,
             }
         ]
 

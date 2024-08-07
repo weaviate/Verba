@@ -1,20 +1,20 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Navbar from "./components/Navigation/NavbarComponent";
 import SettingsComponent from "./components/Settings/SettingsComponent";
-import ChatComponent from "./components/Chat/ChatComponent";
 import DocumentView from "./components/Document/DocumentView";
 import StatusComponent from "./components/Status/StatusComponent";
 import { Settings, BaseSettings } from "./components/Settings/types";
 import RAGComponent from "./components/RAG/RAGComponent";
-import { HealthPayload } from "./components/Status/types";
-import { RAGConfig, RAGResponse } from "./components/RAG/types";
-import { detectHost } from "./api";
+import { RAGConfig } from "./components/RAG/types";
+import { detectHost, fetchConfig, fetchHealth } from "./api";
 import IngestionView from "./components/Ingestion/IngestionView";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { fonts, FontKey } from "./info";
 import PulseLoader from "react-spinners/PulseLoader";
+
+import LoginView from "./components/Login/LoginView";
 
 import ChatView from "./components/Chat/ChatView";
 
@@ -27,7 +27,7 @@ export default function Home() {
 
   // Settings
   const [settingTemplate, setSettingTemplate] = useState("Default");
-  const [baseSetting, setBaseSetting] = useState<Settings | null>(null);
+  const [baseSetting, setBaseSetting] = useState<Settings>(BaseSettings);
 
   const fontKey = baseSetting
     ? (baseSetting[settingTemplate].Customization.settings.font
@@ -41,66 +41,57 @@ export default function Home() {
 
   const [APIHost, setAPIHost] = useState<string | null>(null);
 
-  const fetchHost = async () => {
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const initialFetch = useCallback(async () => {
     try {
       const host = await detectHost();
       setAPIHost(host);
-      if (host) {
-        try {
-          const health_response = await fetch(host + "/api/health", {
-            method: "GET",
-          });
 
-          const health_data: HealthPayload = await health_response.json();
+      const [health_data, config_data] = await Promise.all([
+        fetchHealth(),
+        fetchConfig(),
+      ]);
 
-          if (health_data) {
-            setProduction(health_data.production);
-            setGtag(health_data.gtag);
-          } else {
-            console.warn("Could not retrieve health data");
-          }
-
-          const response = await fetch(host + "/api/config", {
-            method: "GET",
-          });
-          const data: RAGResponse = await response.json();
-
-          if (data) {
-            if (data.error) {
-              console.error(data.error);
-            }
-
-            if (data.data.RAG) {
-              setRAGConfig(data.data.RAG);
-            }
-            if (data.data.SETTING.themes) {
-              setBaseSetting(data.data.SETTING.themes);
-              setSettingTemplate(data.data.SETTING.selectedTheme);
-            } else {
-              setBaseSetting(BaseSettings);
-              setSettingTemplate("Default");
-            }
-          } else {
-            console.warn("Configuration could not be retrieved");
-          }
-        } catch (error) {
-          console.error("Failed to fetch configuration:", error);
-          setRAGConfig(null);
-        }
+      if (health_data) {
+        setProduction(health_data.production);
+        setGtag(health_data.gtag);
+      } else {
+        console.warn("Could not retrieve health data");
       }
-    } catch (error) {
-      console.error("Error detecting host:", error);
-      setAPIHost(null); // Optionally handle the error by setting the state to an empty string or a specific error message
-    }
-  };
 
-  useEffect(() => {
-    setReconnect(true);
+      if (config_data) {
+        if (config_data.error) {
+          console.error(config_data.error);
+        }
+        if (config_data.data.RAG) {
+          setRAGConfig(config_data.data.RAG);
+        }
+        if (config_data.data.SETTING.themes) {
+          setBaseSetting(config_data.data.SETTING.themes);
+          setSettingTemplate(config_data.data.SETTING.selectedTheme);
+        } else {
+          setBaseSetting(BaseSettings);
+          setSettingTemplate("Default");
+        }
+      } else {
+        console.warn("Configuration could not be retrieved");
+      }
+
+      // After all fetches are complete, set isLoaded to true
+      setIsLoaded(true);
+    } catch (error) {
+      console.error("Error during initial fetch:", error);
+      setAPIHost(null);
+      // Even if there's an error, we should still set isLoaded to true
+      setIsLoaded(true);
+    }
   }, []);
 
   useEffect(() => {
-    fetchHost();
-  }, [reconnect]);
+    initialFetch();
+  }, [initialFetch, reconnect]);
 
   const importConfig = async () => {
     if (!APIHost || !baseSetting) {
@@ -127,56 +118,30 @@ export default function Home() {
     }
   };
 
-  useEffect(() => {
+  const updateCSSVariables = useCallback(() => {
     if (baseSetting) {
-      document.documentElement.style.setProperty(
-        "--primary-verba",
-        baseSetting[settingTemplate].Customization.settings.primary_color.color
-      );
-      document.documentElement.style.setProperty(
-        "--secondary-verba",
-        baseSetting[settingTemplate].Customization.settings.secondary_color
-          .color
-      );
-      document.documentElement.style.setProperty(
-        "--warning-verba",
-        baseSetting[settingTemplate].Customization.settings.warning_color.color
-      );
-      document.documentElement.style.setProperty(
-        "--bg-verba",
-        baseSetting[settingTemplate].Customization.settings.bg_color.color
-      );
-      document.documentElement.style.setProperty(
-        "--bg-alt-verba",
-        baseSetting[settingTemplate].Customization.settings.bg_alt_color.color
-      );
-      document.documentElement.style.setProperty(
-        "--text-verba",
-        baseSetting[settingTemplate].Customization.settings.text_color.color
-      );
-      document.documentElement.style.setProperty(
-        "--text-alt-verba",
-        baseSetting[settingTemplate].Customization.settings.text_alt_color.color
-      );
-      document.documentElement.style.setProperty(
-        "--button-verba",
-        baseSetting[settingTemplate].Customization.settings.button_color.color
-      );
-      document.documentElement.style.setProperty(
-        "--button-hover-verba",
-        baseSetting[settingTemplate].Customization.settings.button_hover_color
-          .color
-      );
-      document.documentElement.style.setProperty(
-        "--bg-console-verba",
-        baseSetting[settingTemplate].Customization.settings.bg_console.color
-      );
-      document.documentElement.style.setProperty(
-        "--text-console-verba",
-        baseSetting[settingTemplate].Customization.settings.text_console.color
-      );
+      const settings = baseSetting[settingTemplate].Customization.settings;
+      const cssVars = {
+        "--primary-verba": settings.primary_color.color,
+        "--secondary-verba": settings.secondary_color.color,
+        "--warning-verba": settings.warning_color.color,
+        "--bg-verba": settings.bg_color.color,
+        "--bg-alt-verba": settings.bg_alt_color.color,
+        "--text-verba": settings.text_color.color,
+        "--text-alt-verba": settings.text_alt_color.color,
+        "--button-verba": settings.button_color.color,
+        "--button-hover-verba": settings.button_hover_color.color,
+        "--bg-console-verba": settings.bg_console.color,
+        "--text-console-verba": settings.text_console.color,
+      };
+
+      Object.entries(cssVars).forEach(([key, value]) => {
+        document.documentElement.style.setProperty(key, value);
+      });
     }
   }, [baseSetting, settingTemplate]);
+
+  useEffect(updateCSSVariables, [updateCSSVariables]);
 
   return (
     <main
@@ -189,101 +154,117 @@ export default function Home() {
     >
       {gtag !== "" && <GoogleAnalytics gaId={gtag} />}
 
-      {baseSetting ? (
-        <div>
-          <Navbar
-            APIHost={APIHost}
-            production={production}
-            handleViewChange={setCurrentPage}
-            title={
-              baseSetting[settingTemplate].Customization.settings.title.text
-            }
-            subtitle={
-              baseSetting[settingTemplate].Customization.settings.subtitle.text
-            }
-            imageSrc={
-              baseSetting[settingTemplate].Customization.settings.image.src
-            }
-            version="v2.0.0"
-            currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
-          />
-
-          <div
-            className={`${currentPage === "CHAT" && !production ? "" : "hidden"}`}
-          >
-            <ChatView
-              RAGConfig={RAGConfig}
-              setRAGConfig={setRAGConfig}
-              production={production}
-              setCurrentPage={setCurrentPage}
-              settingConfig={baseSetting[settingTemplate]}
-              APIHost={APIHost}
-              currentPage={currentPage}
-            />
-          </div>
-
-          {currentPage === "DOCUMENTS" && !production && (
-            <DocumentView
-              RAGConfig={RAGConfig}
-              production={production}
-              setCurrentPage={setCurrentPage}
-              settingConfig={baseSetting[settingTemplate]}
-              APIHost={APIHost}
-            />
-          )}
-
-          {currentPage === "STATUS" && !production && (
-            <StatusComponent
-              fetchHost={fetchHost}
-              settingConfig={baseSetting[settingTemplate]}
-              APIHost={APIHost}
-            />
-          )}
-
-          <div
-            className={`${currentPage === "ADD" && !production ? "" : "hidden"}`}
-          >
-            <IngestionView
-              settingConfig={baseSetting[settingTemplate]}
-              RAGConfig={RAGConfig}
-              setRAGConfig={setRAGConfig}
-              APIHost={APIHost}
-              setReconnectMain={setReconnect}
-            />
-          </div>
-
-          {currentPage === "RAG" && !production && (
-            <RAGComponent
-              baseSetting={baseSetting}
-              settingTemplate={settingTemplate}
-              buttonTitle="Save"
-              settingConfig={baseSetting[settingTemplate]}
-              APIHost={APIHost}
-              RAGConfig={RAGConfig}
-              setRAGConfig={setRAGConfig}
-              setCurrentPage={setCurrentPage}
-              showComponents={["Embedder", "Retriever", "Generator"]}
-            />
-          )}
-
-          {currentPage === "SETTINGS" && !production && (
-            <SettingsComponent
-              importConfig={importConfig}
-              settingTemplate={settingTemplate}
-              setSettingTemplate={setSettingTemplate}
-              baseSetting={baseSetting}
-              setBaseSetting={setBaseSetting}
-            />
-          )}
-        </div>
-      ) : (
-        <div className="flex items-center justify-center h-screen gap-2">
-          <PulseLoader loading={true} size={12} speedMultiplier={0.75} />
-          <p>Loading Verba</p>
-        </div>
+      {isLoggedIn && (
+        <LoginView
+          color={
+            baseSetting[settingTemplate].Customization.settings.bg_color.color
+          }
+        />
       )}
-      <footer className="footer footer-center p-4 mt-8 bg-bg-verba text-text-alt-verba">
+
+      <div
+        className={`transition-opacity duration-1000 delay-300 ${isLoaded ? "opacity-100" : "opacity-0"}`}
+      >
+        {baseSetting && isLoaded ? (
+          <div>
+            <Navbar
+              APIHost={APIHost}
+              production={production}
+              handleViewChange={setCurrentPage}
+              title={
+                baseSetting[settingTemplate].Customization.settings.title.text
+              }
+              subtitle={
+                baseSetting[settingTemplate].Customization.settings.subtitle
+                  .text
+              }
+              imageSrc={
+                baseSetting[settingTemplate].Customization.settings.image.src
+              }
+              version="v2.0.0"
+              currentPage={currentPage}
+              setCurrentPage={setCurrentPage}
+            />
+
+            <div
+              className={`${currentPage === "CHAT" && !production ? "" : "hidden"}`}
+            >
+              <ChatView
+                RAGConfig={RAGConfig}
+                setRAGConfig={setRAGConfig}
+                production={production}
+                setCurrentPage={setCurrentPage}
+                settingConfig={baseSetting[settingTemplate]}
+                APIHost={APIHost}
+                currentPage={currentPage}
+              />
+            </div>
+
+            {currentPage === "DOCUMENTS" && !production && (
+              <DocumentView
+                RAGConfig={RAGConfig}
+                production={production}
+                setCurrentPage={setCurrentPage}
+                settingConfig={baseSetting[settingTemplate]}
+                APIHost={APIHost}
+              />
+            )}
+
+            {currentPage === "STATUS" && !production && (
+              <StatusComponent
+                fetchHost={() => {}}
+                settingConfig={baseSetting[settingTemplate]}
+                APIHost={APIHost}
+              />
+            )}
+
+            <div
+              className={`${currentPage === "ADD" && !production ? "" : "hidden"}`}
+            >
+              <IngestionView
+                settingConfig={baseSetting[settingTemplate]}
+                RAGConfig={RAGConfig}
+                setRAGConfig={setRAGConfig}
+                APIHost={APIHost}
+                setReconnectMain={setReconnect}
+              />
+            </div>
+
+            {currentPage === "RAG" && !production && (
+              <RAGComponent
+                baseSetting={baseSetting}
+                settingTemplate={settingTemplate}
+                buttonTitle="Save"
+                settingConfig={baseSetting[settingTemplate]}
+                APIHost={APIHost}
+                RAGConfig={RAGConfig}
+                setRAGConfig={setRAGConfig}
+                setCurrentPage={setCurrentPage}
+                showComponents={["Embedder", "Retriever", "Generator"]}
+              />
+            )}
+
+            {currentPage === "SETTINGS" && !production && (
+              <SettingsComponent
+                importConfig={importConfig}
+                settingTemplate={settingTemplate}
+                setSettingTemplate={setSettingTemplate}
+                baseSetting={baseSetting}
+                setBaseSetting={setBaseSetting}
+              />
+            )}
+          </div>
+        ) : (
+          <div className="flex items-center justify-center h-screen gap-2">
+            <PulseLoader loading={true} size={12} speedMultiplier={0.75} />
+            <p>Loading Verba</p>
+          </div>
+        )}
+      </div>
+
+      <footer
+        className={`footer footer-center p-4 mt-8 bg-bg-verba text-text-alt-verba transition-opacity duration-1000 delay-300 ${isLoaded ? "opacity-100" : "opacity-0"}`}
+      >
         <aside>
           <p>Build with ♥ and Weaviate © 2024</p>
         </aside>

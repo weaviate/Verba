@@ -173,9 +173,16 @@ const FileComponent: React.FC<FileComponentProps> = ({
         onClick={() => {
           setSelectedFileData(fileData.fileID);
         }}
-        className={`flex ${selectedFileData && selectedFileData === fileMap[fileData.fileID].fileID ? "bg-secondary-verba hover:bg-button-hover-verba" : "bg-button-verba hover:bg-secondary-verba"}  w-full p-3 rounded-lg transition-colors duration-300 ease-in-out border-none`}
+        className={`flex ${
+          selectedFileData &&
+          selectedFileData === fileMap[fileData.fileID].fileID
+            ? "bg-secondary-verba hover:bg-button-hover-verba"
+            : "bg-button-verba hover:bg-secondary-verba"
+        } w-full p-3 rounded-lg transition-colors duration-300 ease-in-out border-none overflow-hidden`}
       >
-        <p className="text-text-verba">{fileMap[fileData.fileID].filename}</p>
+        <p className="text-text-verba truncate">
+          {fileMap[fileData.fileID].filename}
+        </p>
       </button>
 
       <div className="flex justify-end items-center">
