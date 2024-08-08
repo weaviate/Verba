@@ -22,6 +22,7 @@ from goldenverba.server.types import (
     QueryPayload,
     GeneratePayload,
     GetDocumentPayload,
+    ConnectPayload,
     DatacountPayload,
     GetComponentPayload,
     GetContentPayload,
@@ -53,7 +54,6 @@ manager = verba_manager.VerbaManager()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await manager.connect()
     yield
     # Clean up the ML models and release the resources
     await manager.disconnect()
@@ -102,30 +102,15 @@ async def serve_frontend():
 # Define health check endpoint
 @app.get("/api/health")
 async def health_check():
-    try:
-        if await manager.weaviate_manager.client.is_ready():
-            return JSONResponse(
-                content={"message": "Alive!", "production": production, "gtag": tag}
-            )
-        else:
-            return JSONResponse(
-                content={
-                    "message": "Weaviate Database Not Ready",
-                    "production": production,
-                    "gtag": tag,
-                },
-                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            )
-    except Exception as e:
-        msg.fail(f"Healthcheck failed with {str(e)}")
-        return JSONResponse(
-            content={
-                "message": f"Healthcheck failed with {str(e)}",
-                "production": production,
-                "gtag": tag,
-            },
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-        )
+
+    return JSONResponse(
+        content={
+            "message": "Alive!",
+            "production": production,
+            "gtag": tag,
+            "deployments": await manager.get_deployments(),
+        }
+    )
 
 
 # Get Status meta data
@@ -247,6 +232,41 @@ async def websocket_import_files(websocket: WebSocket):
 
 
 ### POST
+@app.post("/api/connect")
+async def connect_to_verba(payload: ConnectPayload):
+    try:
+        client_ready = await manager.connect(
+            payload.deployment, payload.weaviateURL, payload.weaviateAPIKey
+        )
+        if client_ready:
+            config = await manager.load_config()
+            return JSONResponse(
+                status_code=200,
+                content={
+                    "connected": True,
+                    "error": "",
+                    "config": config,
+                },
+            )
+        else:
+            return JSONResponse(
+                status_code=200,
+                content={
+                    "connected": False,
+                    "error": "Couldn't connect to Weaviate",
+                    "config": config,
+                },
+            )
+    except Exception as e:
+        msg.fail(f"Failed to connect to Weaviate {str(e)}")
+        return JSONResponse(
+            status_code=200,
+            content={
+                "connected": False,
+                "error": f"Failed to connect to Weaviate {str(e)}",
+                "config": {},
+            },
+        )
 
 
 @app.post("/api/reset")

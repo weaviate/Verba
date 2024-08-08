@@ -139,36 +139,51 @@ class WeaviateManager:
 
     async def connect_to_docker(self):
         msg.info(f"Connecting to Weaviate Docker")
-        self.client = weaviate.use_async_with_custom()
+        self.client = weaviate.use_async_with_local()
         await self.client.connect()
 
     async def connect_to_embedded(self):
         msg.info(f"Connecting to Weaviate Embedded")
-        # TODO Wait for update to do use_async_with_embedded
-        self.client = await weaviate.connect_to_embedded()
+        self.client = weaviate.use_async_with_embedded()
         await self.client.connect()
 
-    async def connect(self):
+    async def connect(self, deployment: str, weaviateURL: str, weaviateAPIKey: str):
         try:
-            weaviate_url = os.environ.get("WEAVIATE_URL_VERBA", None)
-            weaviate_key = os.environ.get("WEAVIATE_API_KEY_VERBA", None)
 
-            if weaviate_url is not None:
-                await self.connect_to_cluster(weaviate_url, weaviate_key)
-            else:
-                await self.connect_to_embedded()
+            disconnected = await self.disconnect()
 
-            if self.client is not None and await self.client.is_ready():
-                msg.good("Succesfully Connected to Weaviate")
+            if disconnected:
+                if os.environ.get("WEAVIATE_URL_VERBA"):
+                    weaviateURL = os.environ.get("WEAVIATE_URL_VERBA")
+
+                if os.environ.get("WEAVIATE_API_KEY_VERBA"):
+                    weaviateAPIKey = os.environ.get("WEAVIATE_API_KEY_VERBA")
+
+                if deployment == "Weaviate":
+                    await self.connect_to_cluster(weaviateURL, weaviateAPIKey)
+                elif deployment == "Docker":
+                    await self.connect_to_docker()
+                elif deployment == "Local":
+                    await self.connect_to_embedded()
+
+                if self.client is not None and await self.client.is_ready():
+                    msg.good("Succesfully Connected to Weaviate")
+                    return True
+                else:
+                    return False
 
         except Exception as e:
             msg.fail(f"Couldn't connect to Weaviate, check your URL/API KEY: {str(e)}")
+            return False
 
     async def disconnect(self):
         try:
-            await self.client.close()
+            if self.client:
+                await self.client.close()
+            return True
         except Exception as e:
             msg.fail(f"Couldn't disconnect Weaviate: {str(e)}")
+            return False
 
     ### Collection Handling
 
@@ -201,6 +216,7 @@ class WeaviateManager:
         await self.verify_collection(self.suggestion_collection_name)
         await self.verify_collection(self.config_collection_name)
         await self.verify_embedding_collections(environment_variables, libraries)
+        return True
 
     ### Configuration Handling
 

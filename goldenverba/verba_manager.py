@@ -66,14 +66,34 @@ class VerbaManager:
         self.verify_installed_libraries()
         self.verify_variables()
 
-    async def connect(self):
-        await self.weaviate_manager.connect()
-        await self.weaviate_manager.verify_collections(
-            self.environment_variables, self.installed_libraries
+    async def connect(self, deployment: str, weaviateURL: str, weaviateAPIKey: str):
+        client_ready = await self.weaviate_manager.connect(
+            deployment, weaviateURL, weaviateAPIKey
         )
+
+        if client_ready:
+            initialized = await self.weaviate_manager.verify_collections(
+                self.environment_variables, self.installed_libraries
+            )
+            return initialized
+        else:
+            return False
 
     async def disconnect(self):
         await self.weaviate_manager.disconnect()
+
+    async def get_deployments(self):
+        deployments = {
+            "WEAVIATE_URL_VERBA": (
+                os.getenv("WEAVIATE_URL_VERBA")
+                if os.getenv("WEAVIATE_URL_VERBA")
+                else False
+            ),
+            "WEAVIATE_API_KEY_VERBA": (
+                True if os.getenv("WEAVIATE_API_KEY_VERBA") else False
+            ),
+        }
+        return deployments
 
     # Import
 
@@ -552,7 +572,10 @@ class VerbaManager:
                     ],
                 )
                 before_content = "".join(
-                    [chunk.properties["content_without_overlap"] for chunk in chunks_before_chunk]
+                    [
+                        chunk.properties["content_without_overlap"]
+                        for chunk in chunks_before_chunk
+                    ]
                 )
             else:
                 before_content = ""

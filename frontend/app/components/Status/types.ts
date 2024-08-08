@@ -10,6 +10,10 @@ export type HealthPayload = {
   message: string;
   production: boolean;
   gtag: string;
+  deployments: {
+    WEAVIATE_URL_VERBA: string;
+    WEAVIATE_API_KEY_VERBA: boolean;
+  };
 };
 
 export type Status = {

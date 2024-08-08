@@ -1,5 +1,4 @@
-import { HealthPayload } from "./components/Status/types";
-import { RAGResponse } from "./components/RAG/types";
+import { ConnectPayload, HealthPayload, ConfigResponse } from "./api_types";
 
 const checkUrl = async (url: string): Promise<boolean> => {
   try {
@@ -49,5 +48,26 @@ export const fetchData = async <T>(endpoint: string): Promise<T | null> => {
 export const fetchHealth = (): Promise<HealthPayload | null> =>
   fetchData<HealthPayload>("/api/health");
 
-export const fetchConfig = (): Promise<RAGResponse | null> =>
-  fetchData<RAGResponse>("/api/config");
+export const fetchConfig = (): Promise<ConfigResponse | null> =>
+  fetchData<ConfigResponse>("/api/config");
+
+export const connectToVerba = async (
+  deployment: string,
+  url: string,
+  apiKey: string
+): Promise<ConnectPayload | null> => {
+  const host = await detectHost();
+  const response = await fetch(`${host}/api/connect`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      deployment: deployment,
+      weaviateURL: url,
+      weaviateAPIKey: apiKey,
+    }),
+  });
+  const data = await response.json();
+  return data;
+};

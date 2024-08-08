@@ -38,6 +38,12 @@ class ResetPayload(BaseModel):
     resetMode: str
 
 
+class ConnectPayload(BaseModel):
+    deployment: str
+    weaviateURL: str
+    weaviateAPIKey: str
+
+
 class DataBatchPayload(BaseModel):
     chunk: str
     isLastChunk: bool

@@ -42,50 +42,33 @@ export default function Home() {
   const [APIHost, setAPIHost] = useState<string | null>(null);
 
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isHealthy, setIsHealthy] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const [deployments, setDeployments] = useState<{
+    WEAVIATE_URL_VERBA: string;
+    WEAVIATE_API_KEY_VERBA: boolean;
+  }>({ WEAVIATE_URL_VERBA: "", WEAVIATE_API_KEY_VERBA: false });
 
   const initialFetch = useCallback(async () => {
     try {
       const host = await detectHost();
       setAPIHost(host);
 
-      const [health_data, config_data] = await Promise.all([
-        fetchHealth(),
-        fetchConfig(),
-      ]);
+      const [health_data] = await Promise.all([fetchHealth()]);
 
       if (health_data) {
         setProduction(health_data.production);
         setGtag(health_data.gtag);
+        setIsHealthy(true);
+        setDeployments(health_data.deployments);
       } else {
         console.warn("Could not retrieve health data");
+        setIsHealthy(false);
       }
-
-      if (config_data) {
-        if (config_data.error) {
-          console.error(config_data.error);
-        }
-        if (config_data.data.RAG) {
-          setRAGConfig(config_data.data.RAG);
-        }
-        if (config_data.data.SETTING.themes) {
-          setBaseSetting(config_data.data.SETTING.themes);
-          setSettingTemplate(config_data.data.SETTING.selectedTheme);
-        } else {
-          setBaseSetting(BaseSettings);
-          setSettingTemplate("Default");
-        }
-      } else {
-        console.warn("Configuration could not be retrieved");
-      }
-
-      // After all fetches are complete, set isLoaded to true
-      setIsLoaded(true);
     } catch (error) {
       console.error("Error during initial fetch:", error);
       setAPIHost(null);
-      // Even if there's an error, we should still set isLoaded to true
-      setIsLoaded(true);
     }
   }, []);
 
@@ -145,7 +128,7 @@ export default function Home() {
 
   return (
     <main
-      className={`min-h-screen p-5 bg-bg-verba text-text-verba ${fontClassName}`}
+      className={`min-h-screen bg-bg-verba text-text-verba ${fontClassName}`}
       data-theme={
         baseSetting
           ? baseSetting[settingTemplate].Customization.settings.theme
@@ -154,121 +137,134 @@ export default function Home() {
     >
       {gtag !== "" && <GoogleAnalytics gaId={gtag} />}
 
-      {isLoggedIn && (
+      {!isLoggedIn && isHealthy && (
         <LoginView
-          color={
-            baseSetting[settingTemplate].Customization.settings.bg_color.color
-          }
+          deployments={deployments}
+          setIsLoggedIn={setIsLoggedIn}
+          setRAGConfig={setRAGConfig}
+          setBaseSetting={setBaseSetting}
+          setSettingTemplate={setSettingTemplate}
+          setIsLoaded={setIsLoaded}
         />
       )}
 
-      <div
-        className={`transition-opacity duration-1000 delay-300 ${isLoaded ? "opacity-100" : "opacity-0"}`}
-      >
-        {baseSetting && isLoaded ? (
-          <div>
-            <Navbar
-              APIHost={APIHost}
-              production={production}
-              handleViewChange={setCurrentPage}
-              title={
-                baseSetting[settingTemplate].Customization.settings.title.text
-              }
-              subtitle={
-                baseSetting[settingTemplate].Customization.settings.subtitle
-                  .text
-              }
-              imageSrc={
-                baseSetting[settingTemplate].Customization.settings.image.src
-              }
-              version="v2.0.0"
-              currentPage={currentPage}
-              setCurrentPage={setCurrentPage}
-            />
+      {isLoggedIn && isHealthy && isLoaded && (
+        <div className="flex flex-col gap-2 p-5">
+          <div
+            className={`transition-all duration-1500 delay-500 ${
+              isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+            }`}
+          >
+            {baseSetting && isLoaded && (
+              <div>
+                <Navbar
+                  APIHost={APIHost}
+                  production={production}
+                  handleViewChange={setCurrentPage}
+                  title={
+                    baseSetting[settingTemplate].Customization.settings.title
+                      .text
+                  }
+                  subtitle={
+                    baseSetting[settingTemplate].Customization.settings.subtitle
+                      .text
+                  }
+                  imageSrc={
+                    baseSetting[settingTemplate].Customization.settings.image
+                      .src
+                  }
+                  version="v2.0.0"
+                  currentPage={currentPage}
+                  setCurrentPage={setCurrentPage}
+                />
 
-            <div
-              className={`${currentPage === "CHAT" && !production ? "" : "hidden"}`}
-            >
-              <ChatView
-                RAGConfig={RAGConfig}
-                setRAGConfig={setRAGConfig}
-                production={production}
-                setCurrentPage={setCurrentPage}
-                settingConfig={baseSetting[settingTemplate]}
-                APIHost={APIHost}
-                currentPage={currentPage}
-              />
-            </div>
+                <div
+                  className={`${
+                    currentPage === "CHAT" && !production ? "" : "hidden"
+                  }`}
+                >
+                  <ChatView
+                    RAGConfig={RAGConfig}
+                    setRAGConfig={setRAGConfig}
+                    production={production}
+                    setCurrentPage={setCurrentPage}
+                    settingConfig={baseSetting[settingTemplate]}
+                    APIHost={APIHost}
+                    currentPage={currentPage}
+                  />
+                </div>
 
-            {currentPage === "DOCUMENTS" && !production && (
-              <DocumentView
-                RAGConfig={RAGConfig}
-                production={production}
-                setCurrentPage={setCurrentPage}
-                settingConfig={baseSetting[settingTemplate]}
-                APIHost={APIHost}
-              />
-            )}
+                {currentPage === "DOCUMENTS" && !production && (
+                  <DocumentView
+                    RAGConfig={RAGConfig}
+                    production={production}
+                    setCurrentPage={setCurrentPage}
+                    settingConfig={baseSetting[settingTemplate]}
+                    APIHost={APIHost}
+                  />
+                )}
 
-            {currentPage === "STATUS" && !production && (
-              <StatusComponent
-                fetchHost={() => {}}
-                settingConfig={baseSetting[settingTemplate]}
-                APIHost={APIHost}
-              />
-            )}
+                {currentPage === "STATUS" && !production && (
+                  <StatusComponent
+                    fetchHost={() => {}}
+                    settingConfig={baseSetting[settingTemplate]}
+                    APIHost={APIHost}
+                  />
+                )}
 
-            <div
-              className={`${currentPage === "ADD" && !production ? "" : "hidden"}`}
-            >
-              <IngestionView
-                settingConfig={baseSetting[settingTemplate]}
-                RAGConfig={RAGConfig}
-                setRAGConfig={setRAGConfig}
-                APIHost={APIHost}
-                setReconnectMain={setReconnect}
-              />
-            </div>
+                <div
+                  className={`${
+                    currentPage === "ADD" && !production ? "" : "hidden"
+                  }`}
+                >
+                  <IngestionView
+                    settingConfig={baseSetting[settingTemplate]}
+                    RAGConfig={RAGConfig}
+                    setRAGConfig={setRAGConfig}
+                    APIHost={APIHost}
+                    setReconnectMain={setReconnect}
+                  />
+                </div>
 
-            {currentPage === "RAG" && !production && (
-              <RAGComponent
-                baseSetting={baseSetting}
-                settingTemplate={settingTemplate}
-                buttonTitle="Save"
-                settingConfig={baseSetting[settingTemplate]}
-                APIHost={APIHost}
-                RAGConfig={RAGConfig}
-                setRAGConfig={setRAGConfig}
-                setCurrentPage={setCurrentPage}
-                showComponents={["Embedder", "Retriever", "Generator"]}
-              />
-            )}
+                {currentPage === "RAG" && !production && (
+                  <RAGComponent
+                    baseSetting={baseSetting}
+                    settingTemplate={settingTemplate}
+                    buttonTitle="Save"
+                    settingConfig={baseSetting[settingTemplate]}
+                    APIHost={APIHost}
+                    RAGConfig={RAGConfig}
+                    setRAGConfig={setRAGConfig}
+                    setCurrentPage={setCurrentPage}
+                    showComponents={["Embedder", "Retriever", "Generator"]}
+                  />
+                )}
 
-            {currentPage === "SETTINGS" && !production && (
-              <SettingsComponent
-                importConfig={importConfig}
-                settingTemplate={settingTemplate}
-                setSettingTemplate={setSettingTemplate}
-                baseSetting={baseSetting}
-                setBaseSetting={setBaseSetting}
-              />
+                {currentPage === "SETTINGS" && !production && (
+                  <SettingsComponent
+                    importConfig={importConfig}
+                    settingTemplate={settingTemplate}
+                    setSettingTemplate={setSettingTemplate}
+                    baseSetting={baseSetting}
+                    setBaseSetting={setBaseSetting}
+                  />
+                )}
+              </div>
             )}
           </div>
-        ) : (
-          <div className="flex items-center justify-center h-screen gap-2">
-            <PulseLoader loading={true} size={12} speedMultiplier={0.75} />
-            <p>Loading Verba</p>
-          </div>
-        )}
-      </div>
 
-      <footer
-        className={`footer footer-center p-4 mt-8 bg-bg-verba text-text-alt-verba transition-opacity duration-1000 delay-300 ${isLoaded ? "opacity-100" : "opacity-0"}`}
-      >
-        <aside>
-          <p>Build with ♥ and Weaviate © 2024</p>
-        </aside>
-      </footer>
+          <footer
+            className={`footer footer-center p-4 mt-8 bg-bg-verba text-text-alt-verba transition-all duration-1500 delay-1000 ${
+              isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+            }`}
+          >
+            <aside>
+              <p>Build with ♥ and Weaviate © 2024</p>
+            </aside>
+          </footer>
+        </div>
+      )}
+
       <img
         referrerPolicy="no-referrer-when-downgrade"
         src="https://static.scarf.sh/a.png?x-pxid=ec666e70-aee5-4e87-bc62-0935afae63ac"

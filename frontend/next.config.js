@@ -8,4 +8,13 @@ if (process.env.NODE_ENV === 'production') {
     nextConfig.assetPrefix = '/static';
 }
 
-module.exports = nextConfig;
+module.exports = {
+  webpack: (config) => {
+    config.module.rules.push({
+      test: /\.glsl$/,
+      use: ['raw-loader'],
+    });
+
+    return config;
+  },
+};
