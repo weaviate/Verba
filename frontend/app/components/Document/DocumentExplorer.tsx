@@ -1,53 +1,37 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import {
-  DocumentChunk,
-  DocumentPreview,
-  DocumentsPreviewPayload,
-} from "./types";
-import { FaSearch } from "react-icons/fa";
-import PulseLoader from "react-spinners/PulseLoader";
 import { SettingsConfiguration } from "../Settings/types";
-import { IoIosRefresh } from "react-icons/io";
-import { FaTrash } from "react-icons/fa";
 import { FaInfoCircle } from "react-icons/fa";
-import { SlGraph } from "react-icons/sl";
-
 import VectorView from "./VectorView";
 import ChunkView from "./ChunkView";
-
 import InfoComponent from "../Navigation/InfoComponent";
 import { MdCancel } from "react-icons/md";
-import { MdOutlineRefresh } from "react-icons/md";
 import { MdContentPaste } from "react-icons/md";
 import { MdContentCopy } from "react-icons/md";
 import { TbVectorTriangle } from "react-icons/tb";
 import ContentView from "./ContentView";
+import {
+  VerbaDocument,
+  DocumentPayload,
+  Credentials,
+  ChunkScore,
+} from "@/app/api_types";
 
-import { FaDatabase } from "react-icons/fa";
-import UserModalComponent from "../Navigation/UserModal";
-
-import { RAGConfig } from "../RAG/types";
-import { ChunkScore } from "../Chat/types";
-import ComponentStatus from "../Status/ComponentStatus";
-
-import { VerbaDocument, DocumentPayload } from "./types";
+import { fetchSelectedDocument } from "@/app/api";
 
 interface DocumentExplorerProps {
-  APIHost: string | null;
   selectedDocument: string | null;
   setSelectedDocument: (c: string | null) => void;
   settingConfig: SettingsConfiguration;
-  production: boolean;
   chunkScores?: ChunkScore[];
+  credentials: Credentials;
 }
 
 const DocumentExplorer: React.FC<DocumentExplorerProps> = ({
-  APIHost,
+  credentials,
   selectedDocument,
   settingConfig,
   setSelectedDocument,
-  production,
   chunkScores,
 }) => {
   const [selectedSetting, setSelectedSetting] = useState<
@@ -59,7 +43,7 @@ const DocumentExplorer: React.FC<DocumentExplorerProps> = ({
 
   useEffect(() => {
     if (selectedDocument) {
-      fetchSelectedDocument();
+      handleFetchSelectedDocument();
     } else {
       setDocument(null);
     }
@@ -70,21 +54,14 @@ const DocumentExplorer: React.FC<DocumentExplorerProps> = ({
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
-  const fetchSelectedDocument = async () => {
+  const handleFetchSelectedDocument = async () => {
     try {
       setIsFetching(true);
 
-      const response = await fetch(APIHost + "/api/get_document", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          uuid: selectedDocument,
-        }),
-      });
-
-      const data: DocumentPayload = await response.json();
+      const data: DocumentPayload | null = await fetchSelectedDocument(
+        selectedDocument,
+        credentials
+      );
 
       if (data) {
         if (data.error !== "") {
@@ -166,7 +143,7 @@ const DocumentExplorer: React.FC<DocumentExplorerProps> = ({
           <ContentView
             document={document}
             settingConfig={settingConfig}
-            APIHost={APIHost}
+            credentials={credentials}
             selectedDocument={selectedDocument}
             chunkScores={chunkScores}
           />
@@ -174,15 +151,15 @@ const DocumentExplorer: React.FC<DocumentExplorerProps> = ({
 
         {selectedSetting === "Chunks" && (
           <ChunkView
+            credentials={credentials}
             selectedDocument={selectedDocument}
-            APIHost={APIHost}
             settingConfig={settingConfig}
           />
         )}
 
         {selectedSetting === "Vector Space" && (
           <VectorView
-            APIHost={APIHost}
+            credentials={credentials}
             selectedDocument={selectedDocument}
             settingConfig={settingConfig}
             chunkScores={chunkScores}

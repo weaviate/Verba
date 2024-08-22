@@ -1,9 +1,8 @@
 "use client";
 import React, { useEffect } from "react";
-import { DocumentChunk } from "../Document/types";
+import { DocumentChunk, RAGConfig } from "@/app/api_types";
 import CountUp from "react-countup";
 
-import { RAGConfig } from "../RAG/types";
 import ComponentStatus from "../Status/ComponentStatus";
 
 import { FaSearch } from "react-icons/fa";

@@ -2,33 +2,28 @@
 
 import React, { useState, useEffect } from "react";
 import { SettingsConfiguration } from "../Settings/types";
-import {
-  DocumentChunk,
-  DocumentPreview,
-  VerbaDocument,
-  VerbaChunk,
-  ChunksPayload,
-} from "./types";
+import { VerbaChunk, ChunksPayload } from "@/app/api_types";
 import ReactMarkdown from "react-markdown";
-import PulseLoader from "react-spinners/PulseLoader";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import {
   oneDark,
   oneLight,
 } from "react-syntax-highlighter/dist/cjs/styles/prism";
-import { HiSparkles } from "react-icons/hi2";
 import { IoNewspaper } from "react-icons/io5";
 import { FaArrowAltCircleRight, FaArrowAltCircleLeft } from "react-icons/fa";
+
+import { fetch_chunks } from "@/app/api";
+import { Credentials } from "@/app/api_types";
 
 interface ChunkViewProps {
   selectedDocument: string | null;
   settingConfig: SettingsConfiguration;
-  APIHost: string | null;
+  credentials: Credentials;
 }
 
 const ChunkView: React.FC<ChunkViewProps> = ({
   selectedDocument,
-  APIHost,
+  credentials,
   settingConfig,
 }) => {
   const [isFetching, setIsFetching] = useState(false);
@@ -95,19 +90,12 @@ const ChunkView: React.FC<ChunkViewProps> = ({
     try {
       setIsFetching(true);
 
-      const response = await fetch(APIHost + "/api/get_chunks", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          uuid: selectedDocument,
-          page: pageNumber,
-          pageSize: pageSize,
-        }),
-      });
-
-      const data: ChunksPayload = await response.json();
+      const data: ChunksPayload | null = await fetch_chunks(
+        selectedDocument,
+        pageNumber,
+        pageSize,
+        credentials
+      );
 
       if (data) {
         if (data.error !== "") {

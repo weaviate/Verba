@@ -30,7 +30,7 @@ import SettingButton from "./SettingsButton";
 interface SettingsComponentProps {
   settingTemplate: string;
   setSettingTemplate: (s: string) => void;
-  importConfig: () => void;
+  importConfig: (RAG: any, SETTINGS: any) => any;
   baseSetting: Settings;
   setBaseSetting: (b: any) => void;
 }

@@ -1,26 +1,21 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import InfoComponent from "../Navigation/InfoComponent";
 import { SettingsConfiguration } from "../Settings/types";
-import { IoMdAddCircle } from "react-icons/io";
-import { FaFileImport } from "react-icons/fa";
 import { MdCancel } from "react-icons/md";
-import { PiChartPieSliceFill } from "react-icons/pi";
 import { IoSettingsSharp } from "react-icons/io5";
-import { FaLayerGroup } from "react-icons/fa";
-import { MdOutlineDataset } from "react-icons/md";
-import { VscSave } from "react-icons/vsc";
 import { VscSaveAll } from "react-icons/vsc";
-import { HiDocumentReport } from "react-icons/hi";
 import { FaHammer } from "react-icons/fa";
 
-import { closeOnClick } from "./util";
+import { updateRAGConfig } from "@/app/api";
 
 import UserModalComponent from "../Navigation/UserModal";
 
-import { FileMap, FileData } from "./types";
-import { RAGConfig } from "../RAG/types";
+import { FileMap, FileData } from "@/app/api_types";
+import { RAGConfig } from "@/app/api_types";
+
+import { Credentials } from "@/app/api_types";
 
 import BasicSettingView from "./BasicSettingView";
 import ComponentView from "./ComponentView";
@@ -32,7 +27,7 @@ interface ConfigurationViewProps {
   setRAGConfig: React.Dispatch<React.SetStateAction<RAGConfig | null>>;
   setSelectedFileData: (f: string | null) => void;
   fileMap: FileMap;
-  APIHost: string | null;
+  credentials: Credentials;
 
   setFileMap: React.Dispatch<React.SetStateAction<FileMap>>;
 }
@@ -45,7 +40,7 @@ const ConfigurationView: React.FC<ConfigurationViewProps> = ({
   RAGConfig,
   setRAGConfig,
   setSelectedFileData,
-  APIHost,
+  credentials,
 }) => {
   const [selectedSetting, setSelectedSetting] = useState<
     "Basic" | "Pipeline" | "Metadata"
@@ -77,33 +72,17 @@ const ConfigurationView: React.FC<ConfigurationViewProps> = ({
 
   const setAsDefault = async () => {
     if (selectedFileData) {
-      const newConfig = {
-        RAG: fileMap[selectedFileData].rag_config,
-        SETTING: settingConfig,
-      };
-
-      try {
-        const response = await fetch(APIHost + "/api/set_config", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ config: newConfig }),
-        });
-
-        const data = await response.json();
-
-        if (data.status === "200") {
-          // Update local state if the API call was successful
-          setRAGConfig(fileMap[selectedFileData].rag_config);
-          // You might want to show a success message to the user
-          console.log(data.status_msg);
-        } else {
-          // Handle error
-          console.error("Failed to set config:", data.status_msg);
-        }
-      } catch (error) {
-        console.error("Error setting config:", error);
+      const response = await updateRAGConfig(
+        fileMap[selectedFileData].rag_config,
+        credentials
+      );
+      if (response) {
+        // Update local state if the API call was successful
+        setRAGConfig(fileMap[selectedFileData].rag_config);
+        // You might want to show a success message to the user
+      } else {
+        // Handle error
+        console.error("Failed to set RAG config:");
       }
     }
   };
@@ -241,7 +220,6 @@ const ConfigurationView: React.FC<ConfigurationViewProps> = ({
         {selectedSetting === "Basic" && (
           <BasicSettingView
             selectedFileData={selectedFileData}
-            setSelectedFileData={setSelectedFileData}
             fileMap={fileMap}
             setFileMap={setFileMap}
             blocked={

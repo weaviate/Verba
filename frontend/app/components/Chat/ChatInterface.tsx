@@ -1,51 +1,52 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import InfoComponent from "../Navigation/InfoComponent";
-import { SettingsConfiguration } from "../Settings/types";
-import { IoMdAddCircle } from "react-icons/io";
-import { FaFileImport } from "react-icons/fa";
-import { MdCancel } from "react-icons/md";
-import { GoFileDirectoryFill } from "react-icons/go";
+import { MdCancel, MdOutlineRefresh } from "react-icons/md";
 import { TbPlugConnected } from "react-icons/tb";
 import { IoChatbubbleSharp } from "react-icons/io5";
 import { FaHammer } from "react-icons/fa";
-import { MdOutlineRefresh } from "react-icons/md";
 import { IoIosSend } from "react-icons/io";
 import { BiError } from "react-icons/bi";
 
-import { getWebSocketApiHost } from "./util";
+import {
+  updateRAGConfig,
+  sendUserQuery,
+  fetchDatacount,
+  fetchRAGConfig,
+} from "@/app/api";
+import { getWebSocketApiHost } from "@/app/util";
+import { SettingsConfiguration } from "../Settings/types";
+import {
+  Credentials,
+  QueryPayload,
+  DataCountPayload,
+  ChunkScore,
+  Message,
+  RAGConfig,
+} from "@/app/api_types";
 
-import { QueryPayload, DataCountPayload, ChunkScore } from "./types";
-
+import InfoComponent from "../Navigation/InfoComponent";
 import ChatConfig from "./ChatConfig";
 import ChatMessage from "./ChatMessage";
-import { Message } from "./types";
-
-import UserModalComponent from "../Navigation/UserModal";
-
-import { RAGConfig } from "../RAG/types";
 
 interface ChatInterfaceProps {
-  APIHost: string | null;
+  credentials: Credentials;
   settingConfig: SettingsConfiguration;
-  RAGConfig: RAGConfig | null;
-  selectedDocument: string | null;
   setSelectedDocument: (s: string | null) => void;
-  setRAGConfig: React.Dispatch<React.SetStateAction<RAGConfig | null>>;
   setSelectedChunkScore: (c: ChunkScore[]) => void;
   currentPage: string;
+  RAGConfig: RAGConfig | null;
+  setRAGConfig: React.Dispatch<React.SetStateAction<RAGConfig | null>>;
 }
 
 const ChatInterface: React.FC<ChatInterfaceProps> = ({
-  APIHost,
+  credentials,
   settingConfig,
-  RAGConfig,
-  setRAGConfig,
-  selectedDocument,
   setSelectedDocument,
   setSelectedChunkScore,
   currentPage,
+  RAGConfig,
+  setRAGConfig,
 }) => {
   const [selectedSetting, setSelectedSetting] = useState("Chat");
 
@@ -60,8 +61,6 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const [socketOnline, setSocketOnline] = useState(false);
   const [reconnect, setReconnect] = useState(false);
 
-  const [context, setContext] = useState("");
-
   const [selectedDocumentScore, setSelectedDocumentScore] = useState<
     string | null
   >(null);
@@ -70,79 +69,67 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
   const [userInput, setUserInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
-
-  const currentEmbeddingModel = RAGConfig
-    ? RAGConfig["Embedder"].components[RAGConfig["Embedder"].selected].config[
+  const currentEmbedding = RAGConfig
+    ? (RAGConfig["Embedder"].components[RAGConfig["Embedder"].selected].config[
         "Model"
-      ].value
-    : "No Embedding Model";
+      ].value as string)
+    : "No Config found";
+  useState("No Embedding Model");
+
+  const retrieveRAGConfig = async () => {
+    const config = await fetchRAGConfig(credentials);
+    if (config) {
+      setRAGConfig(config.rag_config);
+    }
+  };
 
   const sendUserMessage = async () => {
-    if (isFetching.current || APIHost === null) {
-      return;
-    }
+    if (isFetching.current || !userInput.trim()) return;
 
     const sendInput = userInput;
     setUserInput("");
+    isFetching.current = true;
+    setFetchingStatus("CHUNKS");
+    setMessages((prev) => [...prev, { type: "user", content: sendInput }]);
 
-    if (sendInput.trim()) {
-      try {
-        isFetching.current = true;
-        setFetchingStatus("CHUNKS");
-        setMessages((prev) => [...prev, { type: "user", content: sendInput }]);
+    try {
+      const data = await sendUserQuery(sendInput, RAGConfig, credentials);
 
-        const response = await fetch(APIHost + "/api/query", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            query: sendInput,
-            config: { RAG: RAGConfig, SETTING: settingConfig },
-          }),
-        });
-        const data: QueryPayload = await response.json();
+      if (!data || data.error) {
+        handleErrorResponse(data ? data.error : "No data received");
+      } else {
+        handleSuccessResponse(data, sendInput);
+      }
+    } catch (error) {
+      handleErrorResponse("Failed to fetch from API");
+      console.error("Failed to fetch from API:", error);
+    }
 
-        if (data.error != "") {
-          setMessages((prev) => [
-            ...prev,
-            { type: "error", content: data.error },
-          ]);
-          isFetching.current = false;
-          setFetchingStatus("DONE");
-        } else {
-          setMessages((prev) => [
-            ...prev,
-            { type: "retrieval", content: data.documents },
-          ]);
-          if (data.documents.length > 0) {
-            setSelectedDocument(data.documents[0].uuid);
-            setSelectedDocumentScore(
-              data.documents[0].uuid +
-                data.documents[0].score +
-                data.documents[0].chunks.length
-            );
-            setSelectedChunkScore(data.documents[0].chunks);
+    isFetching.current = false;
+    setFetchingStatus("DONE");
+  };
 
-            {
-              /* Send WebSocket Message to generate answer based on context */
-            }
+  const handleErrorResponse = (errorMessage: string) => {
+    setMessages((prev) => [...prev, { type: "error", content: errorMessage }]);
+  };
 
-            if (data.context) {
-              streamResponses(sendInput, data.context);
-              setContext(data.context);
-              setFetchingStatus("RESPONSE");
-            }
-          }
-        }
-      } catch (error) {
-        console.error("Failed to fetch from API:", error);
-        setMessages((prev) => [
-          ...prev,
-          { type: "error", content: "Failed to fetch from API" },
-        ]);
-        isFetching.current = false;
-        setFetchingStatus("DONE");
+  const handleSuccessResponse = (data: QueryPayload, sendInput: string) => {
+    setMessages((prev) => [
+      ...prev,
+      { type: "retrieval", content: data.documents },
+    ]);
+
+    if (data.documents.length > 0) {
+      const firstDoc = data.documents[0];
+      setSelectedDocument(firstDoc.uuid);
+      setSelectedDocumentScore(
+        `${firstDoc.uuid}${firstDoc.score}${firstDoc.chunks.length}`
+      );
+      setSelectedChunkScore(firstDoc.chunks);
+
+      if (data.context) {
+        streamResponses(sendInput, data.context);
+        setFetchingStatus("RESPONSE");
       }
     }
   };
@@ -161,6 +148,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         context: context,
         conversation: filteredMessages,
         rag_config: RAGConfig,
+        credentials: credentials,
       });
       socket.send(data);
     } else {
@@ -177,19 +165,10 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
   const retrieveDatacount = async () => {
     try {
-      const embedding_model = RAGConfig
-        ? RAGConfig["Embedder"].components[RAGConfig["Embedder"].selected]
-            .config["Model"].value
-        : "No Embedding Model";
-      const response = await fetch(APIHost + "/api/get_datacount", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ embedding_model: embedding_model }),
-      });
-      const data: DataCountPayload = await response.json();
-
+      const data: DataCountPayload | null = await fetchDatacount(
+        currentEmbedding,
+        credentials
+      );
       if (data) {
         setCurrentDatacount(data.datacount);
       }
@@ -212,7 +191,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     } else {
       setCurrentDatacount(0);
     }
-  }, [currentEmbeddingModel, currentPage]);
+  }, [currentEmbedding, currentPage]);
 
   // Setup WebSocket and messages to /ws/generate_stream
   useEffect(() => {
@@ -295,6 +274,22 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     };
   }, [reconnect]);
 
+  useEffect(() => {
+    if (RAGConfig) {
+      retrieveDatacount();
+    } else {
+      setCurrentDatacount(0);
+    }
+  }, [RAGConfig]);
+
+  const onSaveConfig = async () => {
+    await updateRAGConfig(RAGConfig, credentials);
+  };
+
+  const onResetConfig = async () => {
+    retrieveRAGConfig();
+  };
+
   return (
     <div className="flex flex-col gap-2 w-full">
       {/* Header */}
@@ -336,7 +331,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           <div className="flex w-full justify-start items-center text-text-alt-verba gap-2">
             {currentDatacount === 0 && <BiError size={15} />}
             {currentDatacount === 0 && (
-              <p className="text-text-alt-verba text-sm items-center flex">{`${currentDatacount} documents embedded by ${currentEmbeddingModel}`}</p>
+              <p className="text-text-alt-verba text-sm items-center flex">{`${currentDatacount} documents embedded by ${currentEmbedding}`}</p>
             )}
           </div>
           {messages.map((message, index) => (
@@ -382,7 +377,12 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           )}
         </div>
         {selectedSetting === "Config" && (
-          <ChatConfig RAGConfig={RAGConfig} setRAGConfig={setRAGConfig} />
+          <ChatConfig
+            RAGConfig={RAGConfig}
+            setRAGConfig={setRAGConfig}
+            onReset={onResetConfig}
+            onSave={onSaveConfig}
+          />
         )}
       </div>
 

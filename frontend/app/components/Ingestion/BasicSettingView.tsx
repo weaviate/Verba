@@ -1,24 +1,21 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { FileData, FileMap, statusTextMap, statusColorMap } from "./types";
+import {
+  FileData,
+  FileMap,
+  statusTextMap,
+  statusColorMap,
+} from "@/app/api_types";
 import { FaTrash } from "react-icons/fa";
-import { GoTriangleDown } from "react-icons/go";
 import { IoAddCircleSharp } from "react-icons/io5";
 import { CgDebug } from "react-icons/cg";
 
-import UserModalComponent from "../Navigation/UserModal";
 import { MdError } from "react-icons/md";
 import { FaCheckCircle } from "react-icons/fa";
-import { RAGConfig } from "../RAG/types";
-import { IoIosCheckmark } from "react-icons/io";
-import { MdModeEdit } from "react-icons/md";
-
-import { closeOnClick } from "./util";
 
 interface BasicSettingViewProps {
   selectedFileData: string | null;
-  setSelectedFileData: (f: string | null) => void;
   fileMap: FileMap;
   setFileMap: (f: FileMap) => void;
   blocked: boolean | undefined;
@@ -26,7 +23,6 @@ interface BasicSettingViewProps {
 
 const BasicSettingView: React.FC<BasicSettingViewProps> = ({
   selectedFileData,
-  setSelectedFileData,
   fileMap,
   setFileMap,
   blocked,

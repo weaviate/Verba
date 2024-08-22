@@ -2,38 +2,33 @@
 
 import React, { useState } from "react";
 import { SettingsConfiguration } from "../Settings/types";
-import { RAGConfig } from "../RAG/types";
 import ChatInterface from "./ChatInterface";
 
 import DocumentExplorer from "../Document/DocumentExplorer";
-import { ChunkScore } from "./types";
+
+import { Credentials, RAGConfig, ChunkScore } from "@/app/api_types";
 
 interface ChatViewProps {
   settingConfig: SettingsConfiguration;
-  APIHost: string | null;
-  setCurrentPage: (p: any) => void;
-  RAGConfig: RAGConfig | null;
+  credentials: Credentials;
   production: boolean;
-  setRAGConfig: React.Dispatch<React.SetStateAction<RAGConfig | null>>;
   currentPage: string;
+  RAGConfig: RAGConfig | null;
+  setRAGConfig: React.Dispatch<React.SetStateAction<RAGConfig | null>>;
 }
 
 const ChatView: React.FC<ChatViewProps> = ({
-  APIHost,
+  credentials,
   settingConfig,
-  setCurrentPage,
-  RAGConfig,
   production,
-  setRAGConfig,
   currentPage,
+  RAGConfig,
+  setRAGConfig,
 }) => {
   const [selectedDocument, setSelectedDocument] = useState<string | null>(null);
   const [selectedChunkScore, setSelectedChunkScore] = useState<ChunkScore[]>(
     []
   );
-
-  const _RAGConfig = { ...RAGConfig };
-
   return (
     <div className="flex justify-center gap-3 h-[80vh] ">
       <div
@@ -41,14 +36,13 @@ const ChatView: React.FC<ChatViewProps> = ({
       >
         {" "}
         <ChatInterface
-          setRAGConfig={setRAGConfig}
-          APIHost={APIHost}
+          credentials={credentials}
           settingConfig={settingConfig}
-          RAGConfig={_RAGConfig}
-          selectedDocument={selectedDocument}
           setSelectedDocument={setSelectedDocument}
           setSelectedChunkScore={setSelectedChunkScore}
           currentPage={currentPage}
+          RAGConfig={RAGConfig}
+          setRAGConfig={setRAGConfig}
         />{" "}
       </div>
 
@@ -56,8 +50,7 @@ const ChatView: React.FC<ChatViewProps> = ({
         className={`${selectedDocument ? "lg:w-[55vw] w-full flex" : "hidden lg:flex lg:w-[55vw]"}`}
       >
         <DocumentExplorer
-          production={production}
-          APIHost={APIHost}
+          credentials={credentials}
           setSelectedDocument={setSelectedDocument}
           settingConfig={settingConfig}
           selectedDocument={selectedDocument}

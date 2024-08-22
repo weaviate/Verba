@@ -1,27 +1,26 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import Navbar from "./components/Navigation/NavbarComponent";
-import SettingsComponent from "./components/Settings/SettingsComponent";
-import DocumentView from "./components/Document/DocumentView";
-import StatusComponent from "./components/Status/StatusComponent";
-import { Settings, BaseSettings } from "./components/Settings/types";
-import RAGComponent from "./components/RAG/RAGComponent";
-import { RAGConfig } from "./components/RAG/types";
-import { detectHost, fetchConfig, fetchHealth } from "./api";
-import IngestionView from "./components/Ingestion/IngestionView";
 import { GoogleAnalytics } from "@next/third-parties/google";
-import { fonts, FontKey } from "./info";
-import PulseLoader from "react-spinners/PulseLoader";
 
+// Components
+import Navbar from "./components/Navigation/NavbarComponent";
+import DocumentView from "./components/Document/DocumentView";
+import IngestionView from "./components/Ingestion/IngestionView";
 import LoginView from "./components/Login/LoginView";
-
 import ChatView from "./components/Chat/ChatView";
+
+// Types
+import { Settings, BaseSettings } from "./components/Settings/types";
+import { Credentials, RAGConfig } from "./api_types";
+
+// Utilities
+import { fetchHealth, fetchRAGConfig } from "./api";
+import { fonts, FontKey } from "./util";
 
 export default function Home() {
   // Page States
   const [currentPage, setCurrentPage] = useState("CHAT");
-
   const [production, setProduction] = useState(false);
   const [gtag, setGtag] = useState("");
 
@@ -35,71 +34,46 @@ export default function Home() {
     : null; // Safely cast if you're sure, or use a check
   const fontClassName = fontKey ? fonts[fontKey]?.className || "" : "";
 
-  // RAG Config
-  const [RAGConfig, setRAGConfig] = useState<RAGConfig | null>(null);
-  const [reconnect, setReconnect] = useState(false);
-
-  const [APIHost, setAPIHost] = useState<string | null>(null);
-
-  const [isLoaded, setIsLoaded] = useState(false);
+  // Login States
   const [isHealthy, setIsHealthy] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [credentials, setCredentials] = useState<Credentials>({
+    deployment: "Local",
+    url: "",
+    key: "",
+  });
 
-  const [deployments, setDeployments] = useState<{
-    WEAVIATE_URL_VERBA: string;
-    WEAVIATE_API_KEY_VERBA: boolean;
-  }>({ WEAVIATE_URL_VERBA: "", WEAVIATE_API_KEY_VERBA: false });
+  // RAG Config
+  const [RAGConfig, setRAGConfig] = useState<null | RAGConfig>(null);
 
   const initialFetch = useCallback(async () => {
     try {
-      const host = await detectHost();
-      setAPIHost(host);
-
       const [health_data] = await Promise.all([fetchHealth()]);
 
       if (health_data) {
         setProduction(health_data.production);
         setGtag(health_data.gtag);
         setIsHealthy(true);
-        setDeployments(health_data.deployments);
+        setCredentials({
+          deployment: "Local",
+          url: health_data.deployments.WEAVIATE_URL_VERBA,
+          key: health_data.deployments.WEAVIATE_API_KEY_VERBA,
+        });
       } else {
         console.warn("Could not retrieve health data");
         setIsHealthy(false);
+        setIsLoggedIn(false);
       }
     } catch (error) {
       console.error("Error during initial fetch:", error);
-      setAPIHost(null);
+      setIsHealthy(false);
+      setIsLoggedIn(false);
     }
   }, []);
 
   useEffect(() => {
     initialFetch();
-  }, [initialFetch, reconnect]);
-
-  const importConfig = async () => {
-    if (!APIHost || !baseSetting) {
-      return;
-    }
-
-    try {
-      const payload = {
-        config: {
-          RAG: RAGConfig,
-          SETTING: { selectedTheme: settingTemplate, themes: baseSetting },
-        },
-      };
-
-      const response = await fetch(APIHost + "/api/set_config", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-    } catch (error) {
-      console.error("Failed to update config:", error);
-    }
-  };
+  }, []);
 
   const updateCSSVariables = useCallback(() => {
     if (baseSetting) {
@@ -139,28 +113,28 @@ export default function Home() {
 
       {!isLoggedIn && isHealthy && (
         <LoginView
-          deployments={deployments}
+          credentials={credentials}
           setIsLoggedIn={setIsLoggedIn}
           setRAGConfig={setRAGConfig}
           setBaseSetting={setBaseSetting}
           setSettingTemplate={setSettingTemplate}
-          setIsLoaded={setIsLoaded}
+          setCredentials={setCredentials}
         />
       )}
 
-      {isLoggedIn && isHealthy && isLoaded && (
+      {isLoggedIn && isHealthy && (
         <div className="flex flex-col gap-2 p-5">
           <div
             className={`transition-all duration-1500 delay-500 ${
-              isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+              isLoggedIn
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 translate-y-4"
             }`}
           >
-            {baseSetting && isLoaded && (
+            {baseSetting && isLoggedIn && (
               <div>
                 <Navbar
-                  APIHost={APIHost}
                   production={production}
-                  handleViewChange={setCurrentPage}
                   title={
                     baseSetting[settingTemplate].Customization.settings.title
                       .text
@@ -184,31 +158,20 @@ export default function Home() {
                   }`}
                 >
                   <ChatView
+                    credentials={credentials}
                     RAGConfig={RAGConfig}
                     setRAGConfig={setRAGConfig}
                     production={production}
-                    setCurrentPage={setCurrentPage}
                     settingConfig={baseSetting[settingTemplate]}
-                    APIHost={APIHost}
                     currentPage={currentPage}
                   />
                 </div>
 
                 {currentPage === "DOCUMENTS" && !production && (
                   <DocumentView
-                    RAGConfig={RAGConfig}
+                    credentials={credentials}
                     production={production}
-                    setCurrentPage={setCurrentPage}
                     settingConfig={baseSetting[settingTemplate]}
-                    APIHost={APIHost}
-                  />
-                )}
-
-                {currentPage === "STATUS" && !production && (
-                  <StatusComponent
-                    fetchHost={() => {}}
-                    settingConfig={baseSetting[settingTemplate]}
-                    APIHost={APIHost}
                   />
                 )}
 
@@ -218,44 +181,38 @@ export default function Home() {
                   }`}
                 >
                   <IngestionView
-                    settingConfig={baseSetting[settingTemplate]}
                     RAGConfig={RAGConfig}
                     setRAGConfig={setRAGConfig}
-                    APIHost={APIHost}
-                    setReconnectMain={setReconnect}
+                    settingConfig={baseSetting[settingTemplate]}
+                    credentials={credentials}
                   />
                 </div>
 
-                {currentPage === "RAG" && !production && (
-                  <RAGComponent
-                    baseSetting={baseSetting}
-                    settingTemplate={settingTemplate}
-                    buttonTitle="Save"
-                    settingConfig={baseSetting[settingTemplate]}
-                    APIHost={APIHost}
-                    RAGConfig={RAGConfig}
-                    setRAGConfig={setRAGConfig}
-                    setCurrentPage={setCurrentPage}
-                    showComponents={["Embedder", "Retriever", "Generator"]}
-                  />
-                )}
-
-                {currentPage === "SETTINGS" && !production && (
+                {/* {currentPage === "SETTINGS" && !production && (
                   <SettingsComponent
-                    importConfig={importConfig}
+                    importConfig={updateRAGConfig}
                     settingTemplate={settingTemplate}
                     setSettingTemplate={setSettingTemplate}
                     baseSetting={baseSetting}
                     setBaseSetting={setBaseSetting}
                   />
-                )}
+                )} */}
+
+                {/* {currentPage === "STATUS" && !production && (
+                  <StatusComponent
+                    fetchHost={() => {}}
+                    settingConfig={baseSetting[settingTemplate]}
+                  />
+                )} */}
               </div>
             )}
           </div>
 
           <footer
             className={`footer footer-center p-4 mt-8 bg-bg-verba text-text-alt-verba transition-all duration-1500 delay-1000 ${
-              isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+              isLoggedIn
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 translate-y-4"
             }`}
           >
             <aside>

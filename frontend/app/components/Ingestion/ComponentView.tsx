@@ -1,21 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
-import { FileData, FileMap } from "./types";
+import React, { useState, useEffect } from "react";
 import { FaTrash } from "react-icons/fa";
 import { GoTriangleDown } from "react-icons/go";
 import { IoAddCircleSharp } from "react-icons/io5";
-import { CgDebug } from "react-icons/cg";
+import { RAGConfig } from "@/app/api_types";
 
-import UserModalComponent from "../Navigation/UserModal";
-import { RAGConfig, RAGSetting, ConfigSetting } from "../RAG/types";
-import { IoIosCheckmark } from "react-icons/io";
-import { FaCheckCircle } from "react-icons/fa";
-import { MdModeEdit } from "react-icons/md";
-
-import { statusTextMap } from "./types";
-
-import { closeOnClick } from "./util";
+import { closeOnClick } from "@/app/util";
 
 export const MultiInput: React.FC<{
   component_name: string;

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, use } from "react";
+import React, { useState, useEffect } from "react";
 import FileComponent from "./FileComponent";
 import InfoComponent from "../Navigation/InfoComponent";
 import { SettingsConfiguration } from "../Settings/types";
@@ -11,12 +11,12 @@ import { GoFileDirectoryFill } from "react-icons/go";
 import { TbPlugConnected } from "react-icons/tb";
 import { IoMdArrowDropdown } from "react-icons/io";
 
-import { closeOnClick } from "./util";
+import { closeOnClick } from "@/app/util";
 
 import UserModalComponent from "../Navigation/UserModal";
 
-import { FileMap, FileData } from "./types";
-import { RAGConfig } from "../RAG/types";
+import { FileMap } from "@/app/api_types";
+import { RAGConfig } from "@/app/api_types";
 
 interface FileSelectionViewProps {
   settingConfig: SettingsConfiguration;

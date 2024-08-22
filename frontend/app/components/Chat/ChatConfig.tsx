@@ -1,29 +1,24 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
-import { FaTrash } from "react-icons/fa";
-import { GoTriangleDown } from "react-icons/go";
-import { IoAddCircleSharp } from "react-icons/io5";
-import { CgDebug } from "react-icons/cg";
-
-import { MultiInput } from "../Ingestion/ComponentView";
-
-import UserModalComponent from "../Navigation/UserModal";
-import { RAGConfig, RAGSetting, ConfigSetting } from "../RAG/types";
-import { IoIosCheckmark } from "react-icons/io";
-import { FaCheckCircle } from "react-icons/fa";
-import { MdModeEdit } from "react-icons/md";
-
+import React from "react";
+import { MdCancel } from "react-icons/md";
+import { IoSettingsSharp } from "react-icons/io5";
+import { RAGConfig } from "@/app/api_types";
 import ComponentView from "../Ingestion/ComponentView";
-
-import { closeOnClick } from "../Ingestion/util";
 
 interface ChatConfigProps {
   RAGConfig: RAGConfig | null;
   setRAGConfig: React.Dispatch<React.SetStateAction<RAGConfig | null>>;
+  onSave: () => void; // New parameter for handling save
+  onReset: () => void; // New parameter for handling reset
 }
 
-const ChatConfig: React.FC<ChatConfigProps> = ({ RAGConfig, setRAGConfig }) => {
+const ChatConfig: React.FC<ChatConfigProps> = ({
+  RAGConfig,
+  setRAGConfig,
+  onSave,
+  onReset,
+}) => {
   const updateConfig = (
     component_n: string,
     configTitle: string,
@@ -82,6 +77,24 @@ const ChatConfig: React.FC<ChatConfigProps> = ({ RAGConfig, setRAGConfig }) => {
           updateConfig={updateConfig}
           blocked={false}
         />
+
+        {/* Add Save and Reset buttons */}
+        <div className="flex justify-end gap-2 mt-4">
+          <button
+            onClick={onSave}
+            className="flex btn border-none text-text-verba bg-button-verba hover:bg-button-hover-verba gap-2"
+          >
+            <IoSettingsSharp size={15} />
+            <p>Set as Default</p>
+          </button>
+          <button
+            onClick={onReset}
+            className="flex btn border-none text-text-verba bg-button-verba hover:bg-warning-verba gap-2"
+          >
+            <MdCancel size={15} />
+            <p>Reset</p>
+          </button>
+        </div>
       </div>
     );
   } else {

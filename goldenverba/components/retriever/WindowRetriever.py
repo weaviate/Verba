@@ -45,7 +45,7 @@ class WindowRetriever(Retriever):
             ),
         }
 
-    async def retrieve(self, query, vector, config, weaviate_manager, embedder):
+    async def retrieve(self, client, query, vector, config, weaviate_manager, embedder):
 
         search_mode = config["Search Mode"].value
         limit_mode = config["Limit Mode"].value
@@ -57,7 +57,7 @@ class WindowRetriever(Retriever):
 
         if search_mode == "Hybrid Search":
             chunks = await weaviate_manager.hybrid_chunks(
-                embedder, query, vector, limit_mode, limit
+                client, embedder, query, vector, limit_mode, limit
             )
         # TODO Add other search methods
 
@@ -67,7 +67,7 @@ class WindowRetriever(Retriever):
         for chunk in chunks:
             if chunk.properties["doc_uuid"] not in doc_map:
                 document = await weaviate_manager.get_document(
-                    chunk.properties["doc_uuid"]
+                    client, chunk.properties["doc_uuid"]
                 )
                 doc_map[chunk.properties["doc_uuid"]] = {
                     "title": document["title"],
@@ -113,7 +113,7 @@ class WindowRetriever(Retriever):
 
             if len(unique_chunk_ids) > 0:
                 additional_chunks = await weaviate_manager.get_chunk_by_ids(
-                    embedder, doc, unique_chunk_ids
+                    client, embedder, doc, unique_chunk_ids
                 )
                 existing_chunk_ids = set(
                     chunk["chunk_id"] for chunk in doc_map[doc]["chunks"]

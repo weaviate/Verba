@@ -3,24 +3,19 @@
 import React, { useState } from "react";
 import { SettingsConfiguration } from "../Settings/types";
 import DocumentSearch from "./DocumentSearch";
-
-import { RAGConfig } from "../RAG/types";
 import DocumentExplorer from "./DocumentExplorer";
+import { Credentials } from "@/app/api_types";
 
 interface DocumentViewProps {
   settingConfig: SettingsConfiguration;
-  APIHost: string | null;
-  setCurrentPage: (p: any) => void;
-  RAGConfig: RAGConfig | null;
   production: boolean;
+  credentials: Credentials;
 }
 
 const DocumentView: React.FC<DocumentViewProps> = ({
-  APIHost,
   settingConfig,
-  setCurrentPage,
-  RAGConfig,
   production,
+  credentials,
 }) => {
   const [selectedDocument, setSelectedDocument] = useState<string | null>(null);
 
@@ -31,9 +26,9 @@ const DocumentView: React.FC<DocumentViewProps> = ({
       >
         <DocumentSearch
           production={production}
-          APIHost={APIHost}
           setSelectedDocument={setSelectedDocument}
           settingConfig={settingConfig}
+          credentials={credentials}
           selectedDocument={selectedDocument}
         />
       </div>
@@ -42,8 +37,7 @@ const DocumentView: React.FC<DocumentViewProps> = ({
         className={`${selectedDocument ? "lg:w-[55vw] w-full flex" : "hidden lg:flex lg:w-[55vw]"}`}
       >
         <DocumentExplorer
-          production={production}
-          APIHost={APIHost}
+          credentials={credentials}
           setSelectedDocument={setSelectedDocument}
           settingConfig={settingConfig}
           selectedDocument={selectedDocument}

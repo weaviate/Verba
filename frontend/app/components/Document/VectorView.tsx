@@ -7,34 +7,28 @@ import React, {
 } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { extend } from "@react-three/fiber";
-import {
-  OrbitControls,
-  Float,
-  PerspectiveCamera,
-  Stats,
-} from "@react-three/drei";
-import { AxesHelper, GridHelper } from "three";
+import { OrbitControls, Float, PerspectiveCamera } from "@react-three/drei";
 import * as THREE from "three";
 import { MdCancel } from "react-icons/md";
 import { GoTriangleDown } from "react-icons/go";
-import { Text, Billboard } from "@react-three/drei";
 
 import { vectorToColor } from "./util";
 
-import { VerbaChunk, VerbaVector } from "./types";
-
 import { SettingsConfiguration } from "../Settings/types";
 
+import { fetch_chunk, fetch_vectors } from "@/app/api";
+
 import {
-  VerbaDocument,
   VectorsPayload,
   VectorGroup,
   ChunkPayload,
-} from "./types";
+  VerbaChunk,
+  VerbaVector,
+  Credentials,
+  ChunkScore,
+} from "@/app/api_types";
 
 import { colors } from "./util";
-
-import { ChunkScore } from "../Chat/types";
 
 extend({ OrbitControls: OrbitControls });
 
@@ -165,14 +159,14 @@ const Sphere: React.FC<{
 };
 
 interface VectorViewProps {
-  APIHost: string | null;
+  credentials: Credentials;
   selectedDocument: string | null;
   settingConfig: SettingsConfiguration;
   chunkScores?: ChunkScore[];
 }
 
 const VectorView: React.FC<VectorViewProps> = ({
-  APIHost,
+  credentials,
   selectedDocument,
   settingConfig,
   chunkScores,
@@ -234,18 +228,11 @@ const VectorView: React.FC<VectorViewProps> = ({
 
   const fetchChunk = async () => {
     try {
-      const response = await fetch(APIHost + "/api/get_chunk", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          uuid: selectedChunk,
-          embedder: embedder,
-        }),
-      });
-
-      const data: ChunkPayload = await response.json();
+      const data: ChunkPayload | null = await fetch_chunk(
+        selectedChunk,
+        embedder,
+        credentials
+      );
 
       if (data) {
         if (data.error !== "") {
@@ -265,18 +252,11 @@ const VectorView: React.FC<VectorViewProps> = ({
     try {
       setIsFetching(true);
 
-      const response = await fetch(APIHost + "/api/get_vectors", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          uuid: selectedDocument,
-          showAll: showAll,
-        }),
-      });
-
-      const data: VectorsPayload = await response.json();
+      const data: VectorsPayload | null = await fetch_vectors(
+        selectedDocument,
+        showAll,
+        credentials
+      );
 
       if (data) {
         if (data.error !== "") {

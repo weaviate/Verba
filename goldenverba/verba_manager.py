@@ -1,40 +1,21 @@
 import os
-import ssl
-import time
 import importlib
 import math
 import json
 
-from spacy.tokens import Doc
-import spacy
-
-import weaviate
-from dotenv import load_dotenv, find_dotenv
+from dotenv import load_dotenv
 from wasabi import msg
-from weaviate.embedded import EmbeddedOptions
 import asyncio
 
 from copy import deepcopy
 
 from goldenverba.server.helpers import LoggerManager
+from weaviate.client import WeaviateAsyncClient
 
-from goldenverba.components.chunk import Chunk
 from goldenverba.components.document import Document
-from goldenverba.server.types import (
-    ImportStreamPayload,
-    FileConfig,
-    FileStatus,
-    ChunkScore,
-)
+from goldenverba.server.types import FileConfig, FileStatus, ChunkScore, Credentials
 
-from goldenverba.components.interfaces import (
-    VerbaComponent,
-    Reader,
-    Chunker,
-    Embedder,
-    Retriever,
-    Generator,
-)
+from goldenverba.components.interfaces import VerbaComponent
 from goldenverba.components.managers import (
     ReaderManager,
     ChunkerManager,
@@ -57,7 +38,8 @@ class VerbaManager:
         self.retriever_manager = RetrieverManager()
         self.generator_manager = GeneratorManager()
         self.weaviate_manager = WeaviateManager()
-        self.config_uuid = "e0adcc12-9bad-4588-8a1e-bab0af6ed485"
+        self.rag_config_uuid = "e0adcc12-9bad-4588-8a1e-bab0af6ed485"
+        self.theme_config_uuid = "baab38a7-cb51-4108-acd8-6edeca222820"
         self.environment_variables = {}
         self.installed_libraries = {}
         self.weaviate_type = ""
@@ -66,49 +48,59 @@ class VerbaManager:
         self.verify_installed_libraries()
         self.verify_variables()
 
-    async def connect(self, deployment: str, weaviateURL: str, weaviateAPIKey: str):
-        client_ready = await self.weaviate_manager.connect(
-            deployment, weaviateURL, weaviateAPIKey
+    async def connect(self, credentials: Credentials):
+        start_time = asyncio.get_event_loop().time()
+        client = await self.weaviate_manager.connect(
+            credentials.deployment, credentials.url, credentials.key
         )
-
-        if client_ready:
-            initialized = await self.weaviate_manager.verify_collections(
-                self.environment_variables, self.installed_libraries
+        if client:
+            initialized = await self.weaviate_manager.verify_collection(
+                client, self.weaviate_manager.config_collection_name
             )
-            return initialized
-        else:
-            return False
+            if initialized:
+                end_time = asyncio.get_event_loop().time()
+                msg.info(f"Connection time: {end_time - start_time:.2f} seconds")
+                return client
+        raise Exception("Couldn't connect to Client")
 
-    async def disconnect(self):
-        await self.weaviate_manager.disconnect()
+    async def disconnect(self, client):
+        start_time = asyncio.get_event_loop().time()
+        result = await self.weaviate_manager.disconnect(client)
+        end_time = asyncio.get_event_loop().time()
+        msg.info(f"Disconnection time: {end_time - start_time:.2f} seconds")
+        return result
 
     async def get_deployments(self):
         deployments = {
             "WEAVIATE_URL_VERBA": (
                 os.getenv("WEAVIATE_URL_VERBA")
                 if os.getenv("WEAVIATE_URL_VERBA")
-                else False
+                else ""
             ),
             "WEAVIATE_API_KEY_VERBA": (
-                True if os.getenv("WEAVIATE_API_KEY_VERBA") else False
+                os.getenv("WEAVIATE_API_KEY_VERBA")
+                if os.getenv("WEAVIATE_API_KEY_VERBA")
+                else ""
             ),
         }
         return deployments
 
     # Import
 
-    async def import_document(self, fileConfig: FileConfig, logger: LoggerManager):
+    async def import_document(
+        self, client, fileConfig: FileConfig, logger: LoggerManager
+    ):
         try:
             loop = asyncio.get_running_loop()
             start_time = loop.time()
 
             duplicate_uuid = await self.weaviate_manager.exist_document_name(
-                fileConfig.filename
+                client, fileConfig.filename
             )
             if duplicate_uuid is not None and not fileConfig.overwrite:
                 raise Exception(f"{fileConfig.filename} already exists in Verba")
             elif duplicate_uuid is not None and fileConfig.overwrite:
-                await self.weaviate_manager.delete_document(duplicate_uuid)
+                await self.weaviate_manager.delete_document(client, duplicate_uuid)
                 await logger.send_report(
                     fileConfig.fileID,
                     status=FileStatus.STARTING,
@@ -128,7 +120,7 @@ class VerbaManager:
             )
 
             tasks = [
-                self.process_single_document(doc, fileConfig, logger)
+                self.process_single_document(client, doc, fileConfig, logger)
                 for doc in documents
             ]
 
@@ -182,7 +174,11 @@ class VerbaManager:
             return
 
     async def process_single_document(
-        self, document: Document, fileConfig: FileConfig, logger: LoggerManager
+        self,
+        client,
+        document: Document,
+        fileConfig: FileConfig,
+        logger: LoggerManager,
     ):
         loop = asyncio.get_running_loop()
         start_time = loop.time()
@@ -202,12 +198,12 @@ class VerbaManager:
 
         try:
             duplicate_uuid = await self.weaviate_manager.exist_document_name(
-                document.title
+                client, document.title
             )
             if duplicate_uuid is not None and not currentFileConfig.overwrite:
                 raise Exception(f"{document.title} already exists in Verba")
             elif duplicate_uuid is not None and currentFileConfig.overwrite:
-                await self.weaviate_manager.delete_document(duplicate_uuid)
+                await self.weaviate_manager.delete_document(client, duplicate_uuid)
 
             chunk_task = asyncio.create_task(
                 self.chunker_manager.chunk(
@@ -235,6 +231,7 @@ class VerbaManager:
             for document in vectorized_documents:
                 ingesting_task = asyncio.create_task(
                     self.weaviate_manager.import_document(
+                        client,
                         document,
                         currentFileConfig.rag_config["Embedder"]
                         .components[fileConfig.rag_config["Embedder"].selected]
@@ -270,8 +267,6 @@ class VerbaManager:
 
     def create_config(self) -> dict:
         """Creates the RAG Configuration and returns the full Verba Config with also Settings"""
-
-        setting_config = {}
 
         available_environments = self.environment_variables
         available_libraries = self.installed_libraries
@@ -332,67 +327,50 @@ class VerbaManager:
         }
 
         return {
-            "RAG": {
-                "Reader": reader_config,
-                "Chunker": chunkers_config,
-                "Embedder": embedder_config,
-                "Retriever": retrievers_config,
-                "Generator": generator_config,
-            },
-            "SETTING": setting_config,
+            "Reader": reader_config,
+            "Chunker": chunkers_config,
+            "Embedder": embedder_config,
+            "Retriever": retrievers_config,
+            "Generator": generator_config,
         }
 
-    async def set_config(self, config: dict):
-        msg.info("Saving Configuration")
-        await self.weaviate_manager.set_config(self.config_uuid, config)
+    async def set_theme_config(self, client, config: dict):
+        await self.weaviate_manager.set_config(client, self.theme_config_uuid, config)
 
-    async def load_config(self):
+    async def set_rag_config(self, client, config: dict):
+        await self.weaviate_manager.set_config(client, self.rag_config_uuid, config)
+
+    async def load_rag_config(self, client):
         """Check if a Configuration File exists in the database, if yes, check if corrupted. Returns a valid configuration file"""
-        loaded_config = await self.weaviate_manager.get_config(self.config_uuid)
+        loaded_config = await self.weaviate_manager.get_config(
+            client, self.rag_config_uuid
+        )
         new_config = self.create_config()
 
         if loaded_config is not None:
             if self.verify_config(loaded_config, new_config):
-                msg.info("Using Existing Configuration")
+                msg.info("Using Existing RAG Configuration")
                 return loaded_config
             else:
-                msg.info("Using New Configuration")
-                await self.set_config(new_config)
+                msg.info("Using New RAG Configuration")
+                await self.set_rag_config(client, new_config)
                 return new_config
         else:
-            msg.info("Using New Configuration")
+            msg.info("Using New RAG Configuration")
             return new_config
 
     def verify_config(self, a: dict, b: dict) -> bool:
         # Check Settings ( RAG & Settings )
         try:
-            if len(list(a.keys())) != len(list(b.keys())):
-                msg.fail(
-                    f"Config Validation Failed: {len(list(a.keys()))} != {len(list(b.keys()))}"
-                )
-                return False
-
-            if "RAG" not in a or "RAG" not in b:
-                msg.fail(
-                    f"Config Validation Failed, RAG is missing: {list(a.keys())} != {list(b.keys())}"
-                )
-                return False
-
-            if len(list(a["RAG"].keys())) != len(list(b["RAG"].keys())):
-                msg.fail(
-                    f"Config Validation Failed, RAG component count mismatch {len(list(a['RAG'].keys()))} != {len(list(b['RAG'].keys()))}"
-                )
-                return False
-
-            for a_component_key, b_component_key in zip(a["RAG"], b["RAG"]):
+            for a_component_key, b_component_key in zip(a, b):
                 if a_component_key != b_component_key:
                     msg.fail(
                         f"Config Validation Failed, component name mismatch: {a_component_key} != {b_component_key}"
                     )
                     return False
 
-                a_component = a["RAG"][a_component_key]["components"]
-                b_component = b["RAG"][b_component_key]["components"]
+                a_component = a[a_component_key]["components"]
+                b_component = b[b_component_key]["components"]
 
                 if len(a_component) != len(b_component):
                     msg.fail(
@@ -448,9 +426,13 @@ class VerbaManager:
             msg.fail(f"Config Validation failed: {str(e)}")
             return False
 
-    def reset_config(self):
-        msg.info("Resetting Configuration")
-        self.weaviate_manager.reset_config(self.config_uuid)
+    def reset_rag_config(self, client):
+        msg.info("Resetting RAG Configuration")
+        self.weaviate_manager.reset_config(self.rag_config_uuid)
+
+    def reset_theme_config(self, client):
+        msg.info("Resetting Theme Configuration")
+        self.weaviate_manager.reset_config(self.theme_config_uuid)
 
     # Environment and Libraries
 
@@ -535,7 +517,13 @@ class VerbaManager:
 
     # Document Content Retrieval
 
-    async def get_content(self, uuid: str, page: int, chunkScores: list[ChunkScore]):
+    async def get_content(
+        self,
+        client,
+        uuid: str,
+        page: int,
+        chunkScores: list[ChunkScore],
+    ):
         chunks_per_page = 10
         content_pieces = []
         total_batches = 0
@@ -547,7 +535,7 @@ class VerbaManager:
 
             total_batches = len(chunkScores)
             chunk = await self.weaviate_manager.get_chunk(
-                chunkScores[page].uuid, chunkScores[page].embedder
+                client, chunkScores[page].uuid, chunkScores[page].embedder
             )
 
             before_ids = [
@@ -559,6 +547,7 @@ class VerbaManager:
             ]
             if before_ids:
                 chunks_before_chunk = await self.weaviate_manager.get_chunk_by_ids(
+                    client,
                     chunkScores[page].embedder,
                     uuid,
                     ids=[
@@ -589,6 +578,7 @@ class VerbaManager:
             ]
             if after_ids:
                 chunks_after_chunk = await self.weaviate_manager.get_chunk_by_ids(
+                    client,
                     chunkScores[page].embedder,
                     uuid,
                     ids=[
@@ -636,7 +626,7 @@ class VerbaManager:
         # Return Content based on Page
         else:
             document = await self.weaviate_manager.get_document(
-                uuid, properties=["meta"]
+                client, uuid, properties=["meta"]
             )
             config = json.loads(document["meta"])
             embedder = config["Embedder"]["config"]["Model"]["value"]
@@ -649,10 +639,12 @@ class VerbaManager:
             ]
 
             chunks = await self.weaviate_manager.get_chunk_by_ids(
-                embedder, uuid, request_chunk_ids
+                client, embedder, uuid, request_chunk_ids
             )
 
-            total_chunks = await self.weaviate_manager.get_chunk_count(embedder, uuid)
+            total_chunks = await self.weaviate_manager.get_chunk_count(
+                client, embedder, uuid
+            )
             total_batches = int(math.ceil(total_chunks / chunks_per_page))
 
             content = "".join(
@@ -670,117 +662,9 @@ class VerbaManager:
 
         return (content_pieces, total_batches)
 
-    async def get_content_old(
-        self, uuid: str, page: int, chunkScores: list[ChunkScore]
-    ):
-        start_time = asyncio.get_event_loop().time()
-
-        # Time document retrieval
-        doc_retrieval_start = asyncio.get_event_loop().time()
-        document = await self.weaviate_manager.get_document(
-            uuid, properties=["content"]
-        )
-        doc_retrieval_time = asyncio.get_event_loop().time() - doc_retrieval_start
-
-        # Time NLP processing
-        nlp_start = asyncio.get_event_loop().time()
-        nlp = spacy.blank("en")
-        config = {"punct_chars": None}
-        nlp.add_pipe("sentencizer", config=config)
-
-        MAX_BATCH_SIZE = 500000
-
-        if nlp and len(document["content"]) > MAX_BATCH_SIZE:
-            # Process content in batches
-            docs = []
-            for i in range(0, len(document["content"]), MAX_BATCH_SIZE):
-                batch = document["content"][i : i + MAX_BATCH_SIZE]
-                docs.append(nlp(batch))
-
-            # Merge all processed docs
-            doc = Doc.from_docs(docs)
-        else:
-            doc = nlp(document["content"])
-        nlp_time = asyncio.get_event_loop().time() - nlp_start
-
-        total_time = asyncio.get_event_loop().time() - start_time
-
-        print(f"Document retrieval time: {doc_retrieval_time:.4f} seconds")
-        print(f"NLP processing time: {nlp_time:.4f} seconds")
-        print(f"Total time: {total_time:.4f} seconds")
-
-        batch_size = 2000
-        content_pieces = []
-
-        if len(chunkScores) > 0:
-            if page > len(chunkScores):
-                page = 0
-
-            total_batches = len(chunkScores)
-            chunk = await self.weaviate_manager.get_chunk(
-                chunkScores[page].uuid, chunkScores[page].embedder
-            )
-
-            start_index = int(chunk["start_i"])
-            end_index = int(chunk["end_i"])
-
-            before_start_index = max(start_index - (batch_size / 2), 0)
-            before_end_index = max(start_index - 1, 0)
-
-            after_start_index = min(end_index + 1, len(doc))
-            after_end_index = min(end_index + (batch_size / 2), len(doc))
-
-            content_pieces.append(
-                {
-                    "content": doc[before_start_index:before_end_index].text,
-                    "chunk_id": 0,
-                    "score": 0,
-                    "type": "text",
-                }
-            )
-            content_pieces.append(
-                {
-                    "content": doc[start_index:end_index].text,
-                    "chunk_id": chunkScores[page].chunk_id,
-                    "score": chunkScores[page].score,
-                    "type": "extract",
-                }
-            )
-            content_pieces.append(
-                {
-                    "content": doc[after_start_index:after_end_index].text,
-                    "chunk_id": 0,
-                    "score": 0,
-                    "type": "text",
-                }
-            )
-
-        else:
-            start_index = page * batch_size
-            end_index = start_index + batch_size
-
-            total_batches = math.ceil(len(doc) / batch_size)
-
-            if start_index >= len(doc):
-                return (
-                    "",
-                    total_batches,
-                )  # or handle as needed (e.g., return None or raise an error)
-
-            content_pieces.append(
-                {
-                    "content": doc[start_index:end_index].text,
-                    "chunk_id": 0,
-                    "score": 0,
-                    "type": "text",
-                }
-            )
-
-        return (content_pieces, total_batches)
-
     # Retrieval Augmented Generation
 
-    async def retrieve_chunks(self, query: str, rag_config: dict):
+    async def retrieve_chunks(self, client, query: str, rag_config: dict):
         retriever = rag_config["Retriever"].selected
         embedder = rag_config["Embedder"].selected
 
@@ -789,13 +673,18 @@ class VerbaManager:
         )
 
         documents, context = await self.retriever_manager.retrieve(
-            retriever, query, vector, rag_config, self.weaviate_manager
+            client, retriever, query, vector, rag_config, self.weaviate_manager
         )
 
         return (documents, context)
 
     async def generate_stream_answer(
-        self, rag_config: dict, query: str, context: str, conversation: list[dict]
+        self,
+        client,
+        rag_config: dict,
+        query: str,
+        context: str,
+        conversation: list[dict],
     ):
 
         full_text = ""
@@ -1065,3 +954,28 @@ class VerbaManager:
         return self.embedder_manager.embedders[
             self.embedder_manager.selected_embedder
         ].search_documents(self.client, query, doc_type, page, pageSize)
+
+
+class ClientManager:
+    def __init__(self) -> None:
+        self.clients: dict[str, WeaviateAsyncClient] = {}
+        self.manager: VerbaManager = VerbaManager()
+
+    def hash_credentials(self, credentials: Credentials) -> str:
+        return f"{credentials.deployment}:{credentials.url}:{credentials.key}"
+
+    async def connect(self, credentials: Credentials) -> WeaviateAsyncClient:
+        cred_hash = self.hash_credentials(credentials)
+        if cred_hash in self.clients:
+            msg.info("Found existing Client")
+            return self.clients[cred_hash]
+        else:
+            msg.good("Connecting new Client")
+            client = await self.manager.connect(credentials)
+            self.clients[cred_hash] = client
+            return client
+
+    async def disconnect(self):
+        msg.warn("Disconnecting Clients!")
+        for cred_hash, client in self.clients.items():
+            await self.manager.disconnect(client)

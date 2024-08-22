@@ -1,18 +1,21 @@
 "use client";
 
-import React, { useState, useEffect, use } from "react";
-import { FileData, FileMap, statusColorMap, statusTextMap } from "./types";
+import React, { useState, useEffect } from "react";
+import {
+  FileData,
+  FileMap,
+  statusColorMap,
+  statusTextMap,
+} from "@/app/api_types";
 import { FaTrash } from "react-icons/fa";
 import { GoTriangleDown } from "react-icons/go";
 import { FaCheckCircle } from "react-icons/fa";
 import { MdError } from "react-icons/md";
 
 import UserModalComponent from "../Navigation/UserModal";
-import { RAGConfig } from "../RAG/types";
-import { IoIosCheckmark } from "react-icons/io";
-import { MdModeEdit } from "react-icons/md";
+import { RAGConfig } from "@/app/api_types";
 
-import { closeOnClick } from "./util";
+import { closeOnClick } from "@/app/util";
 
 interface FileComponentProps {
   fileData: FileData;
@@ -53,20 +56,6 @@ const FileComponent: React.FC<FileComponentProps> = ({
     if (modal instanceof HTMLDialogElement) {
       modal.showModal();
     }
-  };
-
-  const switchEditMode = () => {
-    if (editURL) {
-      const newFileData: FileData = JSON.parse(
-        JSON.stringify(fileMap[fileData.fileID])
-      );
-      newFileData.content = URLValue;
-      const newFileMap: FileMap = { ...fileMap };
-      newFileMap[fileData.fileID] = newFileData;
-      setFileMap(newFileMap);
-    }
-
-    setEditURL((prevState) => !prevState);
   };
 
   const changeReader = (r: string) => {

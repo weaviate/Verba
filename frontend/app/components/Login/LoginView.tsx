@@ -1,22 +1,7 @@
 import * as THREE from "three";
-import React, {
-  useState,
-  useRef,
-  useEffect,
-  useMemo,
-  useCallback,
-  memo,
-} from "react";
+import React, { useState, useRef, useEffect, useMemo, memo } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import {
-  PresentationControls,
-  useGLTF,
-  ContactShadows,
-  Environment,
-  Float,
-  Text,
-  OrbitControls,
-} from "@react-three/drei";
+import { PresentationControls, useGLTF, Float } from "@react-three/drei";
 import CustomShaderMaterial from "three-custom-shader-material/vanilla";
 import GUI from "lil-gui";
 import { RGBELoader } from "three/addons/loaders/RGBELoader.js";
@@ -29,9 +14,10 @@ import wobbleFragmentShader from "!raw-loader!../../../public/shaders/wobble/fra
 import { FaDatabase } from "react-icons/fa";
 import { FaKey } from "react-icons/fa";
 
-import { connectToVerba } from "../../api";
+import { connectToVerba } from "@/app/api";
 
-import { RAGConfig } from "../RAG/types";
+import { Credentials, RAGConfig } from "@/app/api_types";
+
 import { Settings } from "../Settings/types";
 
 const VerbaThree = ({ color }: { color: string }) => {
@@ -304,23 +290,20 @@ const EnvironmentMap = () => {
 };
 
 interface LoginViewProps {
-  deployments: {
-    WEAVIATE_URL_VERBA: string;
-    WEAVIATE_API_KEY_VERBA: boolean;
-  };
+  credentials: Credentials;
+  setCredentials: (c: Credentials) => void;
   setIsLoggedIn: (isLoggedIn: boolean) => void;
   setRAGConfig: (RAGConfig: RAGConfig | null) => void;
   setBaseSetting: (baseSetting: Settings) => void;
   setSettingTemplate: (settingTemplate: string) => void;
-  setIsLoaded: (isLoaded: boolean) => void;
 }
 
 const LoginView: React.FC<LoginViewProps> = ({
-  deployments,
+  credentials,
+  setCredentials,
   setIsLoggedIn,
-  setRAGConfig,
   setBaseSetting,
-  setIsLoaded,
+  setRAGConfig,
   setSettingTemplate,
 }) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -335,14 +318,8 @@ const LoginView: React.FC<LoginViewProps> = ({
     "Weaviate" | "Docker" | "Local"
   >("Local");
 
-  const [weaviateURL, setWeaviateURL] = useState(
-    deployments.WEAVIATE_URL_VERBA
-  );
-  const [weaviateAPIKey, setWeaviateAPIKey] = useState(
-    deployments.WEAVIATE_API_KEY_VERBA
-      ? "YouShouldNotSendTheseKindsOfThingsToTheFrontend"
-      : ""
-  );
+  const [weaviateURL, setWeaviateURL] = useState(credentials.url);
+  const [weaviateAPIKey, setWeaviateAPIKey] = useState(credentials.key);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -366,8 +343,12 @@ const LoginView: React.FC<LoginViewProps> = ({
         setErrorText(response.error);
       } else {
         setIsLoggedIn(true);
-        setRAGConfig(response.config.RAG);
-        setIsLoaded(true);
+        setCredentials({
+          deployment: selectedDeployment,
+          key: weaviateAPIKey,
+          url: weaviateURL,
+        });
+        setRAGConfig(response.rag_config);
       }
     }
     setIsConnecting(false);

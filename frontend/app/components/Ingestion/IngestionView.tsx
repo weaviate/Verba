@@ -1,32 +1,31 @@
 "use client";
 
-import React, { useState, useEffect, use } from "react";
-
+import React, { useState, useEffect } from "react";
 import FileSelectionView from "./FileSelectionView";
 import ConfigurationView from "./ConfigurationView";
 import { SettingsConfiguration } from "../Settings/types";
-
-import { FileMap, StatusReport, CreateNewDocument } from "./types";
-import { RAGConfig } from "../RAG/types";
-
-import { getImportWebSocketApiHost } from "../RAG/util";
-
-import { FileData } from "./types";
+import {
+  FileMap,
+  StatusReport,
+  CreateNewDocument,
+  FileData,
+  Credentials,
+} from "@/app/api_types";
+import { RAGConfig } from "@/app/api_types";
+import { getImportWebSocketApiHost } from "@/app/util";
 
 interface IngestionViewProps {
   settingConfig: SettingsConfiguration;
+  credentials: Credentials;
   RAGConfig: RAGConfig | null;
   setRAGConfig: React.Dispatch<React.SetStateAction<RAGConfig | null>>;
-  setReconnectMain: React.Dispatch<React.SetStateAction<boolean>>;
-  APIHost: string | null;
 }
 
 const IngestionView: React.FC<IngestionViewProps> = ({
   settingConfig,
+  credentials,
   RAGConfig,
   setRAGConfig,
-  setReconnectMain,
-  APIHost,
 }) => {
   const [fileMap, setFileMap] = useState<FileMap>({});
   const [selectedFileData, setSelectedFileData] = useState<string | null>(null);
@@ -104,7 +103,6 @@ const IngestionView: React.FC<IngestionViewProps> = ({
 
   const reconnectToVerba = () => {
     setReconnect((prevState) => !prevState);
-    setReconnectMain((prevState) => !prevState);
   };
 
   const setSocketErrorStatus = () => {
@@ -215,6 +213,7 @@ const IngestionView: React.FC<IngestionViewProps> = ({
             total: totalBatches,
             order: order,
             fileID: fileID,
+            credentials: credentials,
           })
         );
       });
@@ -252,7 +251,7 @@ const IngestionView: React.FC<IngestionViewProps> = ({
             settingConfig={settingConfig}
             selectedFileData={selectedFileData}
             RAGConfig={RAGConfig}
-            APIHost={APIHost}
+            credentials={credentials}
             setRAGConfig={setRAGConfig}
             fileMap={fileMap}
             setFileMap={setFileMap}

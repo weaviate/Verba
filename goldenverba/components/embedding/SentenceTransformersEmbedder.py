@@ -1,4 +1,4 @@
-from goldenverba.components.interfaces import Embedder
+from goldenverba.components.interfaces import Embedding
 from goldenverba.components.types import InputConfig
 
 try:
@@ -7,7 +7,7 @@ except Exception as e:
     pass
 
 
-class SentenceTransformersEmbedder(Embedder):
+class SentenceTransformersEmbedder(Embedding):
     """
     SentenceTransformersEmbedder base class for Verba.
     """

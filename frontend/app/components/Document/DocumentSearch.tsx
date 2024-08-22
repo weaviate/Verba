@@ -1,42 +1,35 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import {
-  DocumentChunk,
   DocumentPreview,
+  Credentials,
   DocumentsPreviewPayload,
-} from "./types";
-import { FaSearch } from "react-icons/fa";
-import PulseLoader from "react-spinners/PulseLoader";
-import { SettingsConfiguration } from "../Settings/types";
-import { IoIosRefresh } from "react-icons/io";
-import { FaTrash } from "react-icons/fa";
-import { FaFilter } from "react-icons/fa";
-
-import InfoComponent from "../Navigation/InfoComponent";
-import { MdCancel } from "react-icons/md";
+} from "@/app/api_types";
+import {
+  retrieveAllDocuments,
+  deleteDocument,
+  deleteAllDocuments,
+} from "@/app/api";
+import { FaSearch, FaTrash } from "react-icons/fa";
 import { MdOutlineRefresh } from "react-icons/md";
-
-import { FaDatabase } from "react-icons/fa";
+import { SettingsConfiguration } from "../Settings/types";
+import InfoComponent from "../Navigation/InfoComponent";
 import UserModalComponent from "../Navigation/UserModal";
-import { closeOnClick } from "../Ingestion/util";
-
-import { RAGConfig } from "../RAG/types";
-import ComponentStatus from "../Status/ComponentStatus";
 
 interface DocumentSearchComponentProps {
-  APIHost: string | null;
   selectedDocument: string | null;
+  credentials: Credentials;
   setSelectedDocument: (c: string | null) => void;
   settingConfig: SettingsConfiguration;
   production: boolean;
 }
 
 const DocumentSearch: React.FC<DocumentSearchComponentProps> = ({
-  APIHost,
   selectedDocument,
   settingConfig,
   setSelectedDocument,
   production,
+  credentials,
 }) => {
   const [userInput, setUserInput] = useState("");
   const [page, setPage] = useState(1);
@@ -45,10 +38,8 @@ const DocumentSearch: React.FC<DocumentSearchComponentProps> = ({
 
   const pageSize = 20;
 
-  const [requestTime, setRequestTime] = useState(0);
   const [labels, setLabels] = useState<string[]>([]);
   const [selectedLabels, setSelectedLabels] = useState<string[]>([]);
-  const [currentEmbedder, setCurrentEmbedder] = useState<string | null>(null);
   const [triggerSearch, setTriggerSearch] = useState(false);
 
   const [isFetching, setIsFetching] = useState(false);
@@ -80,20 +71,13 @@ const DocumentSearch: React.FC<DocumentSearchComponentProps> = ({
     try {
       setIsFetching(true);
 
-      const response = await fetch(APIHost + "/api/get_all_documents", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          query: _userInput ? _userInput : "",
-          labels: selectedLabels,
-          page: page,
-          pageSize: pageSize,
-        }),
-      });
-
-      const data: DocumentsPreviewPayload = await response.json();
+      const data: DocumentsPreviewPayload | null = await retrieveAllDocuments(
+        _userInput ? _userInput : "",
+        selectedLabels,
+        page,
+        pageSize,
+        credentials
+      );
 
       if (data) {
         if (data.error !== "") {
@@ -103,7 +87,6 @@ const DocumentSearch: React.FC<DocumentSearchComponentProps> = ({
         } else {
           setDocuments(data.documents);
           setLabels(data.labels);
-          setRequestTime(data.took);
           setIsFetching(false);
         }
       }
@@ -118,12 +101,7 @@ const DocumentSearch: React.FC<DocumentSearchComponentProps> = ({
   }, []);
 
   useEffect(() => {
-    if (APIHost != null) {
-      fetchAllDocuments(userInput);
-    } else {
-      setDocuments(null);
-      setIsFetching(false);
-    }
+    fetchAllDocuments(userInput);
   }, [page, triggerSearch, selectedLabels]);
 
   const handleSearch = () => {
@@ -143,18 +121,11 @@ const DocumentSearch: React.FC<DocumentSearchComponentProps> = ({
     }
   };
 
-  const deleteDocument = async (d: string) => {
+  const handleDeleteDocument = async (d: string) => {
     if (production) {
       return;
     }
-    const response = await fetch(APIHost + "/api/delete_document", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ uuid: d }),
-    });
-
+    const response = await deleteDocument(d, credentials);
     if (response) {
       if (d == selectedDocument) {
         setSelectedDocument(null);
@@ -163,21 +134,14 @@ const DocumentSearch: React.FC<DocumentSearchComponentProps> = ({
     }
   };
 
-  const deleteAllDocuments = async () => {
+  const handleDeleteAllDocuments = async () => {
     if (production) {
       return;
     }
 
     setSelectedDocument(null);
     setDocuments(null);
-
-    await fetch(APIHost + "/api/reset", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ resetMode: "DOCUMENTS" }),
-    });
+    await deleteAllDocuments("DOCUMENTS", credentials);
   };
 
   const addLabel = (l: string) => {
@@ -299,7 +263,7 @@ const DocumentSearch: React.FC<DocumentSearchComponentProps> = ({
                   text={"Do you want to remove " + document.title + "?"}
                   triggerString="Delete"
                   triggerValue={document.uuid}
-                  triggerAccept={deleteDocument}
+                  triggerAccept={handleDeleteDocument}
                 />
               </div>
             ))}{" "}
@@ -350,7 +314,7 @@ const DocumentSearch: React.FC<DocumentSearchComponentProps> = ({
         text={"Do you want to all remove documents from Verba?"}
         triggerString={"Remove All"}
         triggerValue={null}
-        triggerAccept={deleteAllDocuments}
+        triggerAccept={handleDeleteAllDocuments}
       />
     </div>
   );

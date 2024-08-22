@@ -1,40 +1,38 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { SettingsConfiguration } from "../Settings/types";
-import { HiSparkles } from "react-icons/hi2";
-import { IoNewspaper } from "react-icons/io5";
-import { FaArrowAltCircleRight, FaArrowAltCircleLeft } from "react-icons/fa";
-import {
-  DocumentChunk,
-  DocumentPreview,
-  VerbaDocument,
-  ContentPayload,
-  ContentSnippet,
-} from "./types";
 import ReactMarkdown from "react-markdown";
-import PulseLoader from "react-spinners/PulseLoader";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import {
   oneDark,
   oneLight,
 } from "react-syntax-highlighter/dist/cjs/styles/prism";
-
-import { ChunkScore } from "../Chat/types";
+import { FaArrowAltCircleLeft, FaArrowAltCircleRight } from "react-icons/fa";
+import { HiSparkles } from "react-icons/hi2";
+import { IoNewspaper } from "react-icons/io5";
+import { SettingsConfiguration } from "../Settings/types";
+import {
+  VerbaDocument,
+  ContentPayload,
+  Credentials,
+  ContentSnippet,
+  ChunkScore,
+} from "@/app/api_types";
+import { fetchContent } from "@/app/api";
 
 interface ContentViewProps {
   document: VerbaDocument | null;
   settingConfig: SettingsConfiguration;
-  APIHost: string | null;
   selectedDocument: string;
+  credentials: Credentials;
   chunkScores?: ChunkScore[];
 }
 
 const ContentView: React.FC<ContentViewProps> = ({
   document,
   selectedDocument,
-  APIHost,
   settingConfig,
+  credentials,
   chunkScores,
 }) => {
   if (!document) {
@@ -66,7 +64,7 @@ const ContentView: React.FC<ContentViewProps> = ({
 
   useEffect(() => {
     if (document) {
-      fetchContent();
+      handleFetchContent();
       setPage(1);
       setMaxPage(1);
     } else {
@@ -78,7 +76,7 @@ const ContentView: React.FC<ContentViewProps> = ({
 
   useEffect(() => {
     if (document) {
-      fetchContent();
+      handleFetchContent();
     } else {
       setContent([]);
       setPage(1);
@@ -92,23 +90,16 @@ const ContentView: React.FC<ContentViewProps> = ({
     }
   }, [content, chunkScores]);
 
-  const fetchContent = async () => {
+  const handleFetchContent = async () => {
     try {
       setIsFetching(true);
 
-      const response = await fetch(APIHost + "/api/get_content", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          uuid: selectedDocument,
-          page: page,
-          chunkScores: chunkScores ? chunkScores : [],
-        }),
-      });
-
-      const data: ContentPayload = await response.json();
+      const data: ContentPayload | null = await fetchContent(
+        selectedDocument,
+        page,
+        chunkScores ? chunkScores : [],
+        credentials
+      );
 
       if (data) {
         if (data.error !== "") {

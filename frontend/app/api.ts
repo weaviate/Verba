@@ -1,4 +1,19 @@
-import { ConnectPayload, HealthPayload, ConfigResponse } from "./api_types";
+import {
+  ConnectPayload,
+  HealthPayload,
+  RAGConfig,
+  QueryPayload,
+  Credentials,
+  DocumentsPreviewPayload,
+  DocumentPayload,
+  ChunkScore,
+  ContentPayload,
+  ChunksPayload,
+  RAGConfigResponse,
+  DatacountResponse,
+  ChunkPayload,
+  VectorsPayload,
+} from "./api_types";
 
 const checkUrl = async (url: string): Promise<boolean> => {
   try {
@@ -45,12 +60,11 @@ export const fetchData = async <T>(endpoint: string): Promise<T | null> => {
   }
 };
 
+// Endpoint /api/health
 export const fetchHealth = (): Promise<HealthPayload | null> =>
   fetchData<HealthPayload>("/api/health");
 
-export const fetchConfig = (): Promise<ConfigResponse | null> =>
-  fetchData<ConfigResponse>("/api/config");
-
+// Endpoint /api/connect
 export const connectToVerba = async (
   deployment: string,
   url: string,
@@ -63,11 +77,349 @@ export const connectToVerba = async (
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      deployment: deployment,
-      weaviateURL: url,
-      weaviateAPIKey: apiKey,
+      credentials: {
+        deployment: deployment,
+        url: url,
+        key: apiKey,
+      },
     }),
   });
   const data = await response.json();
   return data;
+};
+
+// Endpoint /api/get_rag_config
+export const fetchRAGConfig = async (
+  credentials: Credentials
+): Promise<RAGConfigResponse | null> => {
+  try {
+    const host = await detectHost();
+    const response = await fetch(`${host}/api/get_rag_config`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(credentials),
+    });
+    const data: RAGConfigResponse = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error retrieving content", error);
+    return null;
+  }
+};
+
+// Endpoint /api/set_rag_config
+export const updateRAGConfig = async (
+  RAG: RAGConfig | null,
+  credentials: Credentials
+): Promise<boolean> => {
+  if (!RAG) {
+    return false;
+  }
+
+  try {
+    const host = await detectHost();
+    const response = await fetch(`${host}/api/set_rag_config`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ rag_config: RAG, credentials: credentials }),
+    });
+
+    return response.status === 200;
+  } catch (error) {
+    console.error("Error setting config:", error);
+    return false;
+  }
+};
+
+// Endpoint /api/query
+export const sendUserQuery = async (
+  query: string,
+  RAG: RAGConfig | null,
+  credentials: Credentials
+): Promise<QueryPayload | null> => {
+  try {
+    const host = await detectHost();
+    const response = await fetch(`${host}/api/query`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query: query,
+        RAG: RAG,
+        credentials: credentials,
+      }),
+    });
+
+    const data: QueryPayload = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error sending query", error);
+    return null;
+  }
+};
+
+// Endpoint /api/get_document
+export const fetchSelectedDocument = async (
+  uuid: string | null,
+  credentials: Credentials
+): Promise<DocumentPayload | null> => {
+  if (!uuid) {
+    return null;
+  }
+
+  try {
+    const host = await detectHost();
+    const response = await fetch(`${host}/api/get_document`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        uuid: uuid,
+        credentials: credentials,
+      }),
+    });
+    const data: DocumentPayload = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error retrieving selected document", error);
+    return null;
+  }
+};
+
+// Endpoint /api/get_datacount
+export const fetchDatacount = async (
+  embedding_model: string,
+  credentials: Credentials
+): Promise<DatacountResponse | null> => {
+  try {
+    const host = await detectHost();
+    const response = await fetch(`${host}/api/get_datacount`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        embedding_model: embedding_model,
+        credentials: credentials,
+      }),
+    });
+    const data: DatacountResponse = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error retrieving content", error);
+    return null;
+  }
+};
+
+// Endpoint /api/get_content
+export const fetchContent = async (
+  uuid: string | null,
+  page: number,
+  chunkScores: ChunkScore[],
+  credentials: Credentials
+): Promise<ContentPayload | null> => {
+  if (!uuid) {
+    return null;
+  }
+
+  try {
+    const host = await detectHost();
+    const response = await fetch(`${host}/api/get_content`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        uuid: uuid,
+        page: page,
+        chunkScores: chunkScores,
+        credentials: credentials,
+      }),
+    });
+    const data: ContentPayload = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error retrieving content", error);
+    return null;
+  }
+};
+
+// Endpoint /api/get_vectors
+export const fetch_vectors = async (
+  uuid: string | null,
+  showAll: boolean,
+  credentials: Credentials
+): Promise<VectorsPayload | null> => {
+  if (!uuid) {
+    return null;
+  }
+
+  try {
+    const host = await detectHost();
+    const response = await fetch(`${host}/api/get_vectors`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        uuid: uuid,
+        showAll: showAll,
+        credentials: credentials,
+      }),
+    });
+    const data: VectorsPayload | null = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error retrieving content", error);
+    return null;
+  }
+};
+
+// Endpoint /api/get_chunks
+export const fetch_chunks = async (
+  uuid: string | null,
+  page: number,
+  pageSize: number,
+  credentials: Credentials
+): Promise<ChunksPayload | null> => {
+  if (!uuid) {
+    return null;
+  }
+
+  try {
+    const host = await detectHost();
+    const response = await fetch(`${host}/api/get_chunks`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        uuid: uuid,
+        page: page,
+        pageSize: pageSize,
+        credentials: credentials,
+      }),
+    });
+    const data: ChunksPayload | null = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error retrieving content", error);
+    return null;
+  }
+};
+
+// Endpoint /api/get_chunk
+export const fetch_chunk = async (
+  uuid: string | null,
+  embedder: string,
+  credentials: Credentials
+): Promise<ChunkPayload | null> => {
+  if (!uuid) {
+    return null;
+  }
+
+  try {
+    const host = await detectHost();
+    const response = await fetch(`${host}/api/get_chunk`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        uuid: uuid,
+        embedder: embedder,
+        credentials: credentials,
+      }),
+    });
+    const data: ChunkPayload = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error retrieving content", error);
+    return null;
+  }
+};
+
+// Endpoint /api/get_all_documents
+export const retrieveAllDocuments = async (
+  query: string,
+  labels: string[],
+  page: number,
+  pageSize: number,
+  credentials: Credentials
+): Promise<DocumentsPreviewPayload | null> => {
+  try {
+    const host = await detectHost();
+    const response = await fetch(`${host}/api/get_all_documents`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query: query,
+        labels: labels,
+        page: page,
+        pageSize: pageSize,
+        credentials: credentials,
+      }),
+    });
+    const data: DocumentsPreviewPayload = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error retrieving all documents", error);
+    return null;
+  }
+};
+
+// Endpoint /api/delete_document
+export const deleteDocument = async (
+  uuid: string,
+  credentials: Credentials
+): Promise<boolean> => {
+  try {
+    const host = await detectHost();
+    const response = await fetch(`${host}/api/delete_document`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        uuid: uuid,
+        credentials: credentials,
+      }),
+    });
+    return response.status === 200;
+  } catch (error) {
+    console.error("Error deleting document", error);
+    return false;
+  }
+};
+
+// Endpoint /api/reset
+export const deleteAllDocuments = async (
+  resetMode: string,
+  credentials: Credentials
+): Promise<boolean> => {
+  try {
+    const host = await detectHost();
+    const response = await fetch(`${host}/api/reset`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        resetMode: resetMode,
+        credentials: credentials,
+      }),
+    });
+    return response.status === 200;
+  } catch (error) {
+    console.error("Error deleting all documents", error);
+    return false;
+  }
 };

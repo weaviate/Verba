@@ -1,5 +1,12 @@
+from typing import Literal
 from pydantic import BaseModel
 from enum import Enum
+
+
+class Credentials(BaseModel):
+    deployment: Literal["Weaviate", "Docker", "Local"]
+    url: str
+    key: str
 
 
 class ConversationItem(BaseModel):
@@ -7,41 +14,27 @@ class ConversationItem(BaseModel):
     content: str
 
 
-class SearchQueryPayload(BaseModel):
-    query: str
-    labels: list[str]
-    page: int
-    pageSize: int
-
-
 class ChunksPayload(BaseModel):
     uuid: str
     page: int
     pageSize: int
-
-
-class GetDocumentPayload(BaseModel):
-    uuid: str
+    credentials: Credentials
 
 
 class GetChunkPayload(BaseModel):
     uuid: str
     embedder: str
+    credentials: Credentials
 
 
 class GetVectorPayload(BaseModel):
     uuid: str
     showAll: bool
-
-
-class ResetPayload(BaseModel):
-    resetMode: str
+    credentials: Credentials
 
 
 class ConnectPayload(BaseModel):
-    deployment: str
-    weaviateURL: str
-    weaviateAPIKey: str
+    credentials: Credentials
 
 
 class DataBatchPayload(BaseModel):
@@ -50,6 +43,7 @@ class DataBatchPayload(BaseModel):
     total: int
     fileID: str
     order: int
+    credentials: Credentials
 
 
 class LoadPayload(BaseModel):
@@ -119,6 +113,14 @@ class RAGComponentClass(BaseModel):
     components: dict[str, RAGComponentConfig]
 
 
+class RAGConfig(BaseModel):
+    Reader: RAGComponentClass
+    Chunker: RAGComponentClass
+    Embedder: RAGComponentClass
+    Retriever: RAGComponentClass
+    Generator: RAGComponentClass
+
+
 class StatusReport(BaseModel):
     fileID: str
     status: str
@@ -158,11 +160,18 @@ class VerbaConfig(BaseModel):
 
 class QueryPayload(BaseModel):
     query: str
-    config: VerbaConfig
+    RAG: dict[str, RAGComponentClass]
+    credentials: Credentials
 
 
 class DatacountPayload(BaseModel):
     embedding_model: str
+    credentials: Credentials
+
+
+class SetRAGConfigPayload(BaseModel):
+    rag_config: RAGConfig
+    credentials: Credentials
 
 
 class ChunkScore(BaseModel):
@@ -176,6 +185,7 @@ class GetContentPayload(BaseModel):
     uuid: str
     page: int
     chunkScores: list[ChunkScore]
+    credentials: Credentials
 
 
 class GeneratePayload(BaseModel):
@@ -183,7 +193,30 @@ class GeneratePayload(BaseModel):
     context: str
     conversation: list[ConversationItem]
     rag_config: dict[str, RAGComponentClass]
+    credentials: Credentials
 
 
 class ConfigPayload(BaseModel):
     config: VerbaConfig
+
+
+class RAGConfigPayload(BaseModel):
+    config: VerbaConfig
+
+
+class SearchQueryPayload(BaseModel):
+    query: str
+    labels: list[str]
+    page: int
+    pageSize: int
+    credentials: Credentials
+
+
+class GetDocumentPayload(BaseModel):
+    uuid: str
+    credentials: Credentials
+
+
+class ResetPayload(BaseModel):
+    resetMode: str
+    credentials: Credentials

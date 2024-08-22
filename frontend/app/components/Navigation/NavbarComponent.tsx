@@ -8,7 +8,6 @@ import { HiOutlineStatusOnline } from "react-icons/hi";
 import { IoMdAddCircle } from "react-icons/io";
 import { IoSettingsSharp } from "react-icons/io5";
 import { FaGithub } from "react-icons/fa";
-import { IoBuildSharp } from "react-icons/io5";
 import { LuMenu } from "react-icons/lu";
 
 import NavbarButton from "./NavButton";
@@ -20,9 +19,7 @@ interface NavbarProps {
   subtitle: string;
   version: string;
   currentPage: string;
-  APIHost: string | null;
   production: boolean;
-  handleViewChange: (v: string) => void;
   setCurrentPage: (
     page: "CHAT" | "DOCUMENTS" | "STATUS" | "ADD" | "SETTINGS" | "RAG"
   ) => void;
@@ -39,12 +36,10 @@ const Navbar: React.FC<NavbarProps> = ({
   imageSrc,
   title,
   subtitle,
-  APIHost,
   version,
   currentPage,
   setCurrentPage,
   production,
-  handleViewChange,
 }) => {
   const [gitHubStars, setGitHubStars] = useState("0");
   const icon_size = 18;
@@ -102,7 +97,6 @@ const Navbar: React.FC<NavbarProps> = ({
           ></div>
           <NavbarButton
             hide={false}
-            APIHost={APIHost}
             Icon={IoChatbubbleSharp}
             iconSize={icon_size}
             title="Chat"
@@ -112,7 +106,6 @@ const Navbar: React.FC<NavbarProps> = ({
           />
           <NavbarButton
             hide={production}
-            APIHost={APIHost}
             Icon={IoMdAddCircle}
             iconSize={icon_size}
             title="Import Data"
@@ -122,7 +115,6 @@ const Navbar: React.FC<NavbarProps> = ({
           />
           <NavbarButton
             hide={false}
-            APIHost={APIHost}
             Icon={IoDocumentSharp}
             iconSize={icon_size}
             title="Documents"
@@ -135,7 +127,6 @@ const Navbar: React.FC<NavbarProps> = ({
           ></div>
           <NavbarButton
             hide={production}
-            APIHost={APIHost}
             Icon={IoSettingsSharp}
             iconSize={icon_size}
             title="App Settings"
@@ -145,7 +136,6 @@ const Navbar: React.FC<NavbarProps> = ({
           />
           <NavbarButton
             hide={production}
-            APIHost={APIHost}
             Icon={HiOutlineStatusOnline}
             iconSize={icon_size}
             title="Admin"
