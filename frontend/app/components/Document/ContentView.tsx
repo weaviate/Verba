@@ -121,10 +121,14 @@ const ContentView: React.FC<ContentViewProps> = ({
     }
   };
 
-  const renderText = (contentSnippet: ContentSnippet) => {
+  const renderText = (contentSnippet: ContentSnippet, index: number) => {
     if (contentSnippet.type === "text") {
       return (
-        <div className="flex p-2" ref={!chunkScores ? contentRef : null}>
+        <div
+          key={"CONTENT_SNIPPET" + index}
+          className="flex p-2"
+          ref={!chunkScores ? contentRef : null}
+        >
           <ReactMarkdown
             className="max-w-[50vw] items-center justify-center flex-wrap md:prose-base sm:prose-sm p-3 prose-pre:bg-bg-alt-verba"
             components={{
@@ -247,7 +251,7 @@ const ContentView: React.FC<ContentViewProps> = ({
             <div className="overflow-y-auto h-full">
               {content &&
                 content.map((contentSnippet, index) =>
-                  renderText(contentSnippet)
+                  renderText(contentSnippet, index)
                 )}
             </div>
           </div>

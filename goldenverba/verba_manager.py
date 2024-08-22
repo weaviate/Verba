@@ -42,8 +42,6 @@ class VerbaManager:
         self.theme_config_uuid = "baab38a7-cb51-4108-acd8-6edeca222820"
         self.environment_variables = {}
         self.installed_libraries = {}
-        self.weaviate_type = ""
-        self.enable_caching = True
 
         self.verify_installed_libraries()
         self.verify_variables()
@@ -680,7 +678,6 @@ class VerbaManager:
 
     async def generate_stream_answer(
         self,
-        client,
         rag_config: dict,
         query: str,
         context: str,

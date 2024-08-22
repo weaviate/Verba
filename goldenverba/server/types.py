@@ -193,7 +193,6 @@ class GeneratePayload(BaseModel):
     context: str
     conversation: list[ConversationItem]
     rag_config: dict[str, RAGComponentClass]
-    credentials: Credentials
 
 
 class ConfigPayload(BaseModel):

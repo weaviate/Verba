@@ -76,111 +76,6 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     : "No Config found";
   useState("No Embedding Model");
 
-  const retrieveRAGConfig = async () => {
-    const config = await fetchRAGConfig(credentials);
-    if (config) {
-      setRAGConfig(config.rag_config);
-    }
-  };
-
-  const sendUserMessage = async () => {
-    if (isFetching.current || !userInput.trim()) return;
-
-    const sendInput = userInput;
-    setUserInput("");
-    isFetching.current = true;
-    setFetchingStatus("CHUNKS");
-    setMessages((prev) => [...prev, { type: "user", content: sendInput }]);
-
-    try {
-      const data = await sendUserQuery(sendInput, RAGConfig, credentials);
-
-      if (!data || data.error) {
-        handleErrorResponse(data ? data.error : "No data received");
-      } else {
-        handleSuccessResponse(data, sendInput);
-      }
-    } catch (error) {
-      handleErrorResponse("Failed to fetch from API");
-      console.error("Failed to fetch from API:", error);
-    }
-
-    isFetching.current = false;
-    setFetchingStatus("DONE");
-  };
-
-  const handleErrorResponse = (errorMessage: string) => {
-    setMessages((prev) => [...prev, { type: "error", content: errorMessage }]);
-  };
-
-  const handleSuccessResponse = (data: QueryPayload, sendInput: string) => {
-    setMessages((prev) => [
-      ...prev,
-      { type: "retrieval", content: data.documents },
-    ]);
-
-    if (data.documents.length > 0) {
-      const firstDoc = data.documents[0];
-      setSelectedDocument(firstDoc.uuid);
-      setSelectedDocumentScore(
-        `${firstDoc.uuid}${firstDoc.score}${firstDoc.chunks.length}`
-      );
-      setSelectedChunkScore(firstDoc.chunks);
-
-      if (data.context) {
-        streamResponses(sendInput, data.context);
-        setFetchingStatus("RESPONSE");
-      }
-    }
-  };
-
-  const streamResponses = (query?: string, context?: string) => {
-    if (socket?.readyState === WebSocket.OPEN) {
-      const filteredMessages = messages
-        .filter((msg) => msg.type === "user" || msg.type === "system")
-        .map((msg) => ({
-          type: msg.type,
-          content: msg.content,
-        }));
-
-      const data = JSON.stringify({
-        query: query,
-        context: context,
-        conversation: filteredMessages,
-        rag_config: RAGConfig,
-        credentials: credentials,
-      });
-      socket.send(data);
-    } else {
-      console.error("WebSocket is not open. ReadyState:", socket?.readyState);
-    }
-  };
-
-  const handleKeyDown = (e: any) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault(); // Prevent new line
-      sendUserMessage(); // Submit form
-    }
-  };
-
-  const retrieveDatacount = async () => {
-    try {
-      const data: DataCountPayload | null = await fetchDatacount(
-        currentEmbedding,
-        credentials
-      );
-      if (data) {
-        setCurrentDatacount(data.datacount);
-      }
-    } catch (error) {
-      console.error("Failed to fetch from API:", error);
-    }
-  };
-
-  const reconnectToVerba = () => {
-    setReconnect((prevState) => !prevState);
-  };
-
   useEffect(() => {
     setReconnect(true);
   }, []);
@@ -217,6 +112,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         console.error("Received data is not valid JSON:", event.data);
         return; // Exit early if data isn't valid JSON
       }
+
       const newMessageContent = data.message;
       setPreviewText((prev) => prev + newMessageContent);
 
@@ -281,6 +177,109 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       setCurrentDatacount(0);
     }
   }, [RAGConfig]);
+
+  const retrieveRAGConfig = async () => {
+    const config = await fetchRAGConfig(credentials);
+    if (config) {
+      setRAGConfig(config.rag_config);
+    }
+  };
+
+  const sendUserMessage = async () => {
+    if (isFetching.current || !userInput.trim()) return;
+
+    const sendInput = userInput;
+    setUserInput("");
+    isFetching.current = true;
+    setFetchingStatus("CHUNKS");
+    setMessages((prev) => [...prev, { type: "user", content: sendInput }]);
+
+    try {
+      const data = await sendUserQuery(sendInput, RAGConfig, credentials);
+
+      if (!data || data.error) {
+        handleErrorResponse(data ? data.error : "No data received");
+      } else {
+        handleSuccessResponse(data, sendInput);
+      }
+    } catch (error) {
+      handleErrorResponse("Failed to fetch from API");
+      console.error("Failed to fetch from API:", error);
+    }
+  };
+
+  const handleErrorResponse = (errorMessage: string) => {
+    setMessages((prev) => [...prev, { type: "error", content: errorMessage }]);
+    isFetching.current = false;
+    setFetchingStatus("DONE");
+  };
+
+  const handleSuccessResponse = (data: QueryPayload, sendInput: string) => {
+    setMessages((prev) => [
+      ...prev,
+      { type: "retrieval", content: data.documents },
+    ]);
+
+    if (data.documents.length > 0) {
+      const firstDoc = data.documents[0];
+      setSelectedDocument(firstDoc.uuid);
+      setSelectedDocumentScore(
+        `${firstDoc.uuid}${firstDoc.score}${firstDoc.chunks.length}`
+      );
+      setSelectedChunkScore(firstDoc.chunks);
+
+      if (data.context) {
+        streamResponses(sendInput, data.context);
+        setFetchingStatus("RESPONSE");
+      }
+    }
+  };
+
+  const streamResponses = (query?: string, context?: string) => {
+    if (socket?.readyState === WebSocket.OPEN) {
+      const filteredMessages = messages
+        .filter((msg) => msg.type === "user" || msg.type === "system")
+        .map((msg) => ({
+          type: msg.type,
+          content: msg.content,
+        }));
+
+      const data = JSON.stringify({
+        query: query,
+        context: context,
+        conversation: filteredMessages,
+        rag_config: RAGConfig,
+      });
+      socket.send(data);
+    } else {
+      console.error("WebSocket is not open. ReadyState:", socket?.readyState);
+    }
+  };
+
+  const handleKeyDown = (e: any) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault(); // Prevent new line
+      sendUserMessage(); // Submit form
+    }
+  };
+
+  const retrieveDatacount = async () => {
+    try {
+      const data: DataCountPayload | null = await fetchDatacount(
+        currentEmbedding,
+        credentials
+      );
+      if (data) {
+        setCurrentDatacount(data.datacount);
+      }
+    } catch (error) {
+      console.error("Failed to fetch from API:", error);
+    }
+  };
+
+  const reconnectToVerba = () => {
+    setReconnect((prevState) => !prevState);
+  };
 
   const onSaveConfig = async () => {
     await updateRAGConfig(RAGConfig, credentials);

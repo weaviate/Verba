@@ -148,13 +148,11 @@ async def websocket_generate_stream(websocket: WebSocket):
             data = await websocket.receive_text()
             # Parse and validate the JSON string using Pydantic model
             payload = GeneratePayload.model_validate_json(data)
-            client = await client_manager.connect(payload.credentials)
 
             msg.good(f"Received generate stream call for {payload.query}")
 
             full_text = ""
             async for chunk in manager.generate_stream_answer(
-                client,
                 payload.rag_config,
                 payload.query,
                 payload.context,

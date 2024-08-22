@@ -34,7 +34,6 @@ const ChatView: React.FC<ChatViewProps> = ({
       <div
         className={`${selectedDocument ? "hidden lg:flex lg:w-[45vw]" : "w-full lg:w-[45vw] lg:flex"}`}
       >
-        {" "}
         <ChatInterface
           credentials={credentials}
           settingConfig={settingConfig}
@@ -43,7 +42,7 @@ const ChatView: React.FC<ChatViewProps> = ({
           currentPage={currentPage}
           RAGConfig={RAGConfig}
           setRAGConfig={setRAGConfig}
-        />{" "}
+        />
       </div>
 
       <div
