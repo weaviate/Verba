@@ -377,7 +377,7 @@ docker compose up -d
 
 ```bash
 
-docker compose --env-file .env up -d
+docker compose --env-file goldenverba/.env up -d --build
 
 ```
 
