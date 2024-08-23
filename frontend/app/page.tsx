@@ -19,6 +19,8 @@ import {
   LightTheme,
   Themes,
   DarkTheme,
+  WCDTheme,
+  WeaviateTheme,
 } from "./types";
 
 // Utilities
@@ -35,6 +37,8 @@ export default function Home() {
   const [themes, setThemes] = useState<Themes>({
     Light: LightTheme,
     Dark: DarkTheme,
+    Weaviate: WeaviateTheme,
+    WCD: WCDTheme,
   });
   const [selectedTheme, setSelectedTheme] = useState<Theme>(themes["Light"]);
 

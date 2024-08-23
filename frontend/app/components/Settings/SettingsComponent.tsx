@@ -10,6 +10,8 @@ import {
   ColorSetting,
   SelectSetting,
   NumberFieldSetting,
+  WeaviateTheme,
+  WCDTheme,
   LightTheme,
   DarkTheme,
   Credentials,
@@ -40,7 +42,12 @@ const SettingsComponent: React.FC<SettingsComponentProps> = ({
   const [imageURL, setImageURL] = useState("");
 
   const resetThemes = () => {
-    setThemes({ Light: LightTheme, Dark: DarkTheme });
+    setThemes({
+      Light: LightTheme,
+      Dark: DarkTheme,
+      Weaviate: WeaviateTheme,
+      WCD: WCDTheme,
+    });
     setSelectedTheme(LightTheme);
   };
 

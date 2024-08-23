@@ -473,76 +473,93 @@ export const LightTheme: Theme = {
 };
 
 export const DarkTheme: Theme = {
+  ...LightTheme,
   theme_name: "Dark",
-  title: { text: "Verba", type: "text", description: "Title of the Page" },
-  subtitle: {
-    text: "The Dark RAGtriever",
-    type: "text",
-    description: "Subtitle of the Page",
-  },
+  title: { ...LightTheme.title, text: "Verba" },
+  subtitle: { ...LightTheme.subtitle, text: "The Dark RAGtriever" },
   intro_message: {
+    ...LightTheme.intro_message,
     text: "Welcome to the dark mode version of Verba! Spooky, right?",
-    type: "text",
-    description: "Intro Message",
   },
   placeholder_message: {
+    ...LightTheme.placeholder_message,
     text: "Ask anything!",
-    type: "text",
-    description: "Input Placeholder",
   },
   image: {
+    ...LightTheme.image,
     src: "https://github.com/weaviate/Verba/blob/main/img/verba_icon.png?raw=true",
-    type: "image",
-    description: "Logo of the Page",
   },
-  primary_color: {
-    color: "#BB86FC",
-    type: "color",
-    description: "Primary Color",
-  },
-  secondary_color: {
-    color: "#008F82",
-    type: "color",
-    description: "Secondary Color",
-  },
-  warning_color: {
-    color: "#FF8399",
-    type: "color",
-    description: "Accent Color",
-  },
-  bg_color: {
-    color: "#202020",
-    type: "color",
-    description: "Background Color",
-  },
-  bg_alt_color: {
-    color: "#2F2929",
-    type: "color",
-    description: "Alternative Background Color",
-  },
-  text_color: { color: "#ffffff", type: "color", description: "Text Color" },
-  text_alt_color: {
-    color: "#999999",
-    type: "color",
-    description: "Alternative Text Color",
-  },
-  button_color: {
-    color: "#3C3C3C",
-    type: "color",
-    description: "Button Color",
-  },
-  button_hover_color: {
-    color: "#2C2C2C",
-    type: "color",
-    description: "Button Hover Color",
-  },
-  font: {
-    value: "Open_Sans",
-    type: "select",
-    options: AvailableFonts,
-    description: "Text Font",
-  },
+  primary_color: { ...LightTheme.primary_color, color: "#BB86FC" },
+  secondary_color: { ...LightTheme.secondary_color, color: "#008F82" },
+  warning_color: { ...LightTheme.warning_color, color: "#FF8399" },
+  bg_color: { ...LightTheme.bg_color, color: "#202020" },
+  bg_alt_color: { ...LightTheme.bg_alt_color, color: "#2F2929" },
+  text_color: { ...LightTheme.text_color, color: "#ffffff" },
+  text_alt_color: { ...LightTheme.text_alt_color, color: "#999999" },
+  button_color: { ...LightTheme.button_color, color: "#3C3C3C" },
+  button_hover_color: { ...LightTheme.button_hover_color, color: "#2C2C2C" },
+  font: { ...LightTheme.font, value: "Open_Sans" },
   theme: "dark",
+};
+
+export const WCDTheme: Theme = {
+  ...LightTheme,
+  theme_name: "WCD",
+  title: { ...LightTheme.title, text: "Verba" },
+  subtitle: { ...LightTheme.subtitle, text: "Chatbot for Weaviate" },
+  intro_message: {
+    ...LightTheme.intro_message,
+    text: "Welcome to Weaviate, your AI-Native vector database. How can I help you?",
+  },
+  placeholder_message: {
+    ...LightTheme.placeholder_message,
+    text: "Ask all questions related to Weaviate",
+  },
+  image: {
+    ...LightTheme.image,
+    src: "https://github.com/weaviate/Verba/blob/1.0.0/frontend/public/weaviate.png?raw=true",
+  },
+  primary_color: { ...LightTheme.primary_color, color: "#BF40C5" },
+  secondary_color: { ...LightTheme.secondary_color, color: "#28395B" },
+  warning_color: { ...LightTheme.warning_color, color: "#EA3A31" },
+  bg_color: { ...LightTheme.bg_color, color: "#0C1428" },
+  bg_alt_color: { ...LightTheme.bg_alt_color, color: "#192136" },
+  text_color: { ...LightTheme.text_color, color: "#ffffff" },
+  text_alt_color: { ...LightTheme.text_alt_color, color: "#AAAAAA" },
+  button_color: { ...LightTheme.button_color, color: "#1D253A" },
+  button_hover_color: { ...LightTheme.button_hover_color, color: "#313749" },
+  font: { ...LightTheme.font, value: "Open_Sans" },
+  theme: "dark",
+};
+
+export const WeaviateTheme: Theme = {
+  ...LightTheme,
+  theme_name: "Weaviate",
+  title: { ...LightTheme.title, text: "Weaviate Verba" },
+  subtitle: { ...LightTheme.subtitle, text: "Chatbot for Weaviate" },
+  intro_message: {
+    ...LightTheme.intro_message,
+    text: "Welcome to Weaviate, your AI-Native vector database. How can I help you with Weaviate today?",
+  },
+  placeholder_message: {
+    ...LightTheme.placeholder_message,
+    text: "Ask all questions related to Weaviate",
+  },
+  image: {
+    ...LightTheme.image,
+    src: "https://github.com/weaviate/Verba/blob/1.0.0/frontend/public/weaviate.png?raw=true",
+  },
+  primary_color: { ...LightTheme.primary_color, color: "#6BDF4A" },
+  secondary_color: { ...LightTheme.secondary_color, color: "#7AD6EB" },
+  warning_color: { ...LightTheme.warning_color, color: "#F4404E" },
+  bg_color: { ...LightTheme.bg_color, color: "#EDEDED" },
+  bg_alt_color: { ...LightTheme.bg_alt_color, color: "#ffffff" },
+  text_color: { ...LightTheme.text_color, color: "#130C49" },
+  text_alt_color: { ...LightTheme.text_alt_color, color: "#8196A6" },
+  button_color: { ...LightTheme.button_color, color: "#E6E3E3" },
+  button_hover_color: { ...LightTheme.button_hover_color, color: "#FFFFFF" },
+  font: { ...LightTheme.font, value: "Inter" },
+  theme: "light",
 };
 
 export interface Themes {
