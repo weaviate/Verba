@@ -4,7 +4,7 @@ import {
   DocumentPreview,
   Credentials,
   DocumentsPreviewPayload,
-} from "@/app/api_types";
+} from "@/app/types";
 import {
   retrieveAllDocuments,
   deleteDocument,
@@ -12,7 +12,6 @@ import {
 } from "@/app/api";
 import { FaSearch, FaTrash } from "react-icons/fa";
 import { MdOutlineRefresh } from "react-icons/md";
-import { SettingsConfiguration } from "../Settings/types";
 import InfoComponent from "../Navigation/InfoComponent";
 import UserModalComponent from "../Navigation/UserModal";
 
@@ -20,13 +19,11 @@ interface DocumentSearchComponentProps {
   selectedDocument: string | null;
   credentials: Credentials;
   setSelectedDocument: (c: string | null) => void;
-  settingConfig: SettingsConfiguration;
   production: boolean;
 }
 
 const DocumentSearch: React.FC<DocumentSearchComponentProps> = ({
   selectedDocument,
-  settingConfig,
   setSelectedDocument,
   production,
   credentials,
@@ -173,7 +170,6 @@ const DocumentSearch: React.FC<DocumentSearchComponentProps> = ({
       <div className="bg-bg-alt-verba rounded-2xl flex gap-2 p-6 items-center justify-between h-min w-full">
         <div className="flex gap-2 justify-start w-[8vw]">
           <InfoComponent
-            settingConfig={settingConfig}
             tooltip_text="Search and inspect different documents imported into Verba"
             display_text="Search"
           />
@@ -195,7 +191,7 @@ const DocumentSearch: React.FC<DocumentSearchComponentProps> = ({
         <button
           type="button"
           onClick={handleSearch}
-          className="btn btn-square border-none bg-primary-verba hover:bg-button-hover-verba"
+          className="btn btn-square border-none bg-primary-verba text-text-verba hover:bg-button-hover-verba"
         >
           <FaSearch size={15} />
         </button>
@@ -203,7 +199,7 @@ const DocumentSearch: React.FC<DocumentSearchComponentProps> = ({
         <button
           type="button"
           onClick={clearSearch}
-          className="btn btn-square border-none bg-button-verba hover:bg-button-hover-verba"
+          className="btn btn-square border-none bg-button-verba text-text-verba hover:bg-button-hover-verba"
         >
           <MdOutlineRefresh size={18} />
         </button>

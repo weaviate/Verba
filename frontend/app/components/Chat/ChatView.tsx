@@ -1,15 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
-import { SettingsConfiguration } from "../Settings/types";
 import ChatInterface from "./ChatInterface";
 
 import DocumentExplorer from "../Document/DocumentExplorer";
 
-import { Credentials, RAGConfig, ChunkScore } from "@/app/api_types";
+import { Credentials, RAGConfig, ChunkScore, Theme } from "@/app/types";
 
 interface ChatViewProps {
-  settingConfig: SettingsConfiguration;
+  selectedTheme: Theme;
   credentials: Credentials;
   production: boolean;
   currentPage: string;
@@ -19,7 +18,7 @@ interface ChatViewProps {
 
 const ChatView: React.FC<ChatViewProps> = ({
   credentials,
-  settingConfig,
+  selectedTheme,
   production,
   currentPage,
   RAGConfig,
@@ -36,7 +35,7 @@ const ChatView: React.FC<ChatViewProps> = ({
       >
         <ChatInterface
           credentials={credentials}
-          settingConfig={settingConfig}
+          selectedTheme={selectedTheme}
           setSelectedDocument={setSelectedDocument}
           setSelectedChunkScore={setSelectedChunkScore}
           currentPage={currentPage}
@@ -51,7 +50,7 @@ const ChatView: React.FC<ChatViewProps> = ({
         <DocumentExplorer
           credentials={credentials}
           setSelectedDocument={setSelectedDocument}
-          settingConfig={settingConfig}
+          selectedTheme={selectedTheme}
           selectedDocument={selectedDocument}
           chunkScores={selectedChunkScore}
         />

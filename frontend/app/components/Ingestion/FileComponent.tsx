@@ -1,19 +1,14 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import {
-  FileData,
-  FileMap,
-  statusColorMap,
-  statusTextMap,
-} from "@/app/api_types";
+import { FileData, FileMap, statusColorMap, statusTextMap } from "@/app/types";
 import { FaTrash } from "react-icons/fa";
 import { GoTriangleDown } from "react-icons/go";
 import { FaCheckCircle } from "react-icons/fa";
 import { MdError } from "react-icons/md";
 
 import UserModalComponent from "../Navigation/UserModal";
-import { RAGConfig } from "@/app/api_types";
+import { RAGConfig } from "@/app/types";
 
 import { closeOnClick } from "@/app/util";
 

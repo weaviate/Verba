@@ -1,5 +1,5 @@
 import { Inter, Plus_Jakarta_Sans, Open_Sans, PT_Mono } from "next/font/google";
-import { RAGConfig, FileData } from "./api_types";
+import { RAGConfig, FileData } from "./types";
 
 // Fonts
 const inter = Inter({ subsets: ["latin"] });

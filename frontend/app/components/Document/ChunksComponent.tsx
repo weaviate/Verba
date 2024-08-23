@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect } from "react";
-import { DocumentChunk, RAGConfig } from "@/app/api_types";
+import { DocumentChunk, RAGConfig } from "@/app/types";
 import CountUp from "react-countup";
 
 import ComponentStatus from "../Status/ComponentStatus";

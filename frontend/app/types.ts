@@ -1,9 +1,3 @@
-import {
-  TextFieldSetting,
-  NumberFieldSetting,
-  SettingsPayload,
-} from "./components/Settings/types";
-
 export type Credentials = {
   deployment: "Weaviate" | "Docker" | "Local";
   url: string;
@@ -14,6 +8,8 @@ export type ConnectPayload = {
   connected: boolean;
   error: string;
   rag_config: RAGConfig;
+  theme: Theme;
+  themes: Themes;
 };
 
 export type StatusPayload = {
@@ -62,13 +58,14 @@ export type SchemaStatus = {
   [key: string]: number;
 };
 
-export type ConfigResponse = {
-  data: { RAG: RAGConfig; SETTING: SettingsPayload };
+export type RAGConfigResponse = {
+  rag_config: RAGConfig;
   error: string;
 };
 
-export type RAGConfigResponse = {
-  rag_config: RAGConfig;
+export type ThemeConfigResponse = {
+  themes: Themes | null;
+  theme: Theme | null;
   error: string;
 };
 
@@ -330,4 +327,224 @@ export interface Message {
   content: string | DocumentScore[];
   cached?: boolean;
   distance?: string;
+}
+
+// Setting Fields
+
+export interface TextFieldSetting {
+  type: "text";
+  text: string;
+  description: string;
+}
+
+export interface NumberFieldSetting {
+  type: "number";
+  value: number;
+  description: string;
+}
+
+export interface ImageFieldSetting {
+  type: "image";
+  src: string;
+  description: string;
+}
+
+export interface CheckboxSetting {
+  type: "check";
+  checked: boolean;
+  description: string;
+}
+
+export interface ColorSetting {
+  type: "color";
+  color: string;
+  description: string;
+}
+
+export interface SelectSetting {
+  type: "select";
+  options: string[];
+  value: string;
+  description: string;
+}
+
+// Base Settings
+
+const AvailableFonts: string[] = [
+  "Inter",
+  "Plus_Jakarta_Sans",
+  "Open_Sans",
+  "PT_Mono",
+];
+
+const BaseFonts: SelectSetting = {
+  value: "Plus_Jakarta_Sans",
+  type: "select",
+  options: AvailableFonts,
+  description: "Text Font",
+};
+
+export interface Theme {
+  theme_name: string;
+  title: TextFieldSetting;
+  subtitle: TextFieldSetting;
+  intro_message: TextFieldSetting;
+  placeholder_message: TextFieldSetting;
+  image: ImageFieldSetting;
+  primary_color: ColorSetting;
+  secondary_color: ColorSetting;
+  warning_color: ColorSetting;
+  bg_color: ColorSetting;
+  bg_alt_color: ColorSetting;
+  text_color: ColorSetting;
+  text_alt_color: ColorSetting;
+  button_color: ColorSetting;
+  button_hover_color: ColorSetting;
+  font: SelectSetting;
+  theme: "light" | "dark";
+}
+
+export const LightTheme: Theme = {
+  theme_name: "Light",
+  title: { text: "Verba", type: "text", description: "Title" },
+  subtitle: {
+    text: "The Golden RAGtriever",
+    type: "text",
+    description: "Subtitle",
+  },
+  intro_message: {
+    text: "Welcome to Verba, your open-source RAG application!",
+    type: "text",
+    description: "First Message",
+  },
+  placeholder_message: {
+    text: "Ask Verba anything!",
+    type: "text",
+    description: "Chat Placeholder",
+  },
+  image: {
+    src: "https://github.com/weaviate/Verba/blob/main/img/verba_icon.png?raw=true",
+    type: "image",
+    description: "Logo",
+  },
+  primary_color: {
+    color: "#FDFF91",
+    type: "color",
+    description: "Primary",
+  },
+  secondary_color: {
+    color: "#90FFA8",
+    type: "color",
+    description: "Secondary",
+  },
+  warning_color: {
+    color: "#FF8399",
+    type: "color",
+    description: "Warning",
+  },
+  bg_color: {
+    color: "#FEF7F7",
+    type: "color",
+    description: "Background",
+  },
+  bg_alt_color: {
+    color: "#FFFFFF",
+    type: "color",
+    description: "Alt. Background",
+  },
+  text_color: { color: "#161616", type: "color", description: "Text" },
+  text_alt_color: {
+    color: "#8E8E8E",
+    type: "color",
+    description: "Alt. Text",
+  },
+  button_color: {
+    color: "#EFEFEF",
+    type: "color",
+    description: "Button",
+  },
+  button_hover_color: {
+    color: "#DCDCDC",
+    type: "color",
+    description: "Button Hover",
+  },
+  font: BaseFonts,
+  theme: "light",
+};
+
+export const DarkTheme: Theme = {
+  theme_name: "Dark",
+  title: { text: "Verba", type: "text", description: "Title of the Page" },
+  subtitle: {
+    text: "The Dark RAGtriever",
+    type: "text",
+    description: "Subtitle of the Page",
+  },
+  intro_message: {
+    text: "Welcome to the dark mode version of Verba! Spooky, right?",
+    type: "text",
+    description: "Intro Message",
+  },
+  placeholder_message: {
+    text: "Ask anything!",
+    type: "text",
+    description: "Input Placeholder",
+  },
+  image: {
+    src: "https://github.com/weaviate/Verba/blob/main/img/verba_icon.png?raw=true",
+    type: "image",
+    description: "Logo of the Page",
+  },
+  primary_color: {
+    color: "#BB86FC",
+    type: "color",
+    description: "Primary Color",
+  },
+  secondary_color: {
+    color: "#008F82",
+    type: "color",
+    description: "Secondary Color",
+  },
+  warning_color: {
+    color: "#FF8399",
+    type: "color",
+    description: "Accent Color",
+  },
+  bg_color: {
+    color: "#202020",
+    type: "color",
+    description: "Background Color",
+  },
+  bg_alt_color: {
+    color: "#2F2929",
+    type: "color",
+    description: "Alternative Background Color",
+  },
+  text_color: { color: "#ffffff", type: "color", description: "Text Color" },
+  text_alt_color: {
+    color: "#999999",
+    type: "color",
+    description: "Alternative Text Color",
+  },
+  button_color: {
+    color: "#3C3C3C",
+    type: "color",
+    description: "Button Color",
+  },
+  button_hover_color: {
+    color: "#2C2C2C",
+    type: "color",
+    description: "Button Hover Color",
+  },
+  font: {
+    value: "Open_Sans",
+    type: "select",
+    options: AvailableFonts,
+    description: "Text Font",
+  },
+  theme: "dark",
+};
+
+export interface Themes {
+  [key: string]: Theme;
 }

@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { SettingsConfiguration } from "../Settings/types";
-import { VerbaChunk, ChunksPayload } from "@/app/api_types";
+import { VerbaChunk, ChunksPayload, Theme } from "@/app/types";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import {
@@ -13,18 +12,18 @@ import { IoNewspaper } from "react-icons/io5";
 import { FaArrowAltCircleRight, FaArrowAltCircleLeft } from "react-icons/fa";
 
 import { fetch_chunks } from "@/app/api";
-import { Credentials } from "@/app/api_types";
+import { Credentials } from "@/app/types";
 
 interface ChunkViewProps {
   selectedDocument: string | null;
-  settingConfig: SettingsConfiguration;
+  selectedTheme: Theme;
   credentials: Credentials;
 }
 
 const ChunkView: React.FC<ChunkViewProps> = ({
   selectedDocument,
   credentials,
-  settingConfig,
+  selectedTheme,
 }) => {
   const [isFetching, setIsFetching] = useState(false);
   const [chunks, setChunks] = useState<VerbaChunk[]>([]);
@@ -155,7 +154,7 @@ const ChunkView: React.FC<ChunkViewProps> = ({
                     return !inline && match ? (
                       <SyntaxHighlighter
                         style={
-                          settingConfig.Customization.settings.theme === "dark"
+                          selectedTheme.theme === "dark"
                             ? (oneDark as any)
                             : (oneLight as any)
                         }

@@ -16,9 +16,7 @@ import { FaKey } from "react-icons/fa";
 
 import { connectToVerba } from "@/app/api";
 
-import { Credentials, RAGConfig } from "@/app/api_types";
-
-import { Settings } from "../Settings/types";
+import { Credentials, RAGConfig, Theme, Themes } from "@/app/types";
 
 const VerbaThree = ({ color }: { color: string }) => {
   const verba_model = useGLTF("/verba.glb");
@@ -294,17 +292,17 @@ interface LoginViewProps {
   setCredentials: (c: Credentials) => void;
   setIsLoggedIn: (isLoggedIn: boolean) => void;
   setRAGConfig: (RAGConfig: RAGConfig | null) => void;
-  setBaseSetting: (baseSetting: Settings) => void;
-  setSettingTemplate: (settingTemplate: string) => void;
+  setSelectedTheme: (theme: Theme) => void;
+  setThemes: (themes: Themes) => void;
 }
 
 const LoginView: React.FC<LoginViewProps> = ({
   credentials,
   setCredentials,
+  setSelectedTheme,
+  setThemes,
   setIsLoggedIn,
-  setBaseSetting,
   setRAGConfig,
-  setSettingTemplate,
 }) => {
   const [isLoading, setIsLoading] = useState(true);
 
@@ -349,6 +347,12 @@ const LoginView: React.FC<LoginViewProps> = ({
           url: weaviateURL,
         });
         setRAGConfig(response.rag_config);
+        if (response.themes) {
+          setThemes(response.themes);
+        }
+        if (response.theme) {
+          setSelectedTheme(response.theme);
+        }
       }
     }
     setIsConnecting(false);

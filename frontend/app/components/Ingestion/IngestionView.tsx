@@ -3,26 +3,23 @@
 import React, { useState, useEffect } from "react";
 import FileSelectionView from "./FileSelectionView";
 import ConfigurationView from "./ConfigurationView";
-import { SettingsConfiguration } from "../Settings/types";
 import {
   FileMap,
   StatusReport,
   CreateNewDocument,
   FileData,
   Credentials,
-} from "@/app/api_types";
-import { RAGConfig } from "@/app/api_types";
+} from "@/app/types";
+import { RAGConfig } from "@/app/types";
 import { getImportWebSocketApiHost } from "@/app/util";
 
 interface IngestionViewProps {
-  settingConfig: SettingsConfiguration;
   credentials: Credentials;
   RAGConfig: RAGConfig | null;
   setRAGConfig: React.Dispatch<React.SetStateAction<RAGConfig | null>>;
 }
 
 const IngestionView: React.FC<IngestionViewProps> = ({
-  settingConfig,
   credentials,
   RAGConfig,
   setRAGConfig,
@@ -229,7 +226,6 @@ const IngestionView: React.FC<IngestionViewProps> = ({
         className={`${selectedFileData ? "hidden lg:flex lg:w-[45vw]" : "w-full lg:w-[45vw] lg:flex"}`}
       >
         <FileSelectionView
-          settingConfig={settingConfig}
           fileMap={fileMap}
           setFileMap={setFileMap}
           RAGConfig={RAGConfig}
@@ -248,7 +244,6 @@ const IngestionView: React.FC<IngestionViewProps> = ({
       >
         {selectedFileData && (
           <ConfigurationView
-            settingConfig={settingConfig}
             selectedFileData={selectedFileData}
             RAGConfig={RAGConfig}
             credentials={credentials}

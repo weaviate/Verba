@@ -3,7 +3,7 @@
 import React from "react";
 import { MdCancel } from "react-icons/md";
 import { IoSettingsSharp } from "react-icons/io5";
-import { RAGConfig } from "@/app/api_types";
+import { RAGConfig } from "@/app/types";
 import ComponentView from "../Ingestion/ComponentView";
 
 interface ChatConfigProps {

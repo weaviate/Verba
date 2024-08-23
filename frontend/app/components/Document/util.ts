@@ -1,5 +1,5 @@
-import { FormattedDocument } from "@/app/api_types";
-import { VerbaVector } from "@/app/api_types";
+import { FormattedDocument } from "@/app/types";
+import { VerbaVector } from "@/app/types";
 import * as THREE from "three";
 
 export function splitDocument(

@@ -1,6 +1,5 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { SettingsConfiguration } from "../Settings/types";
 import { FaInfoCircle } from "react-icons/fa";
 import VectorView from "./VectorView";
 import ChunkView from "./ChunkView";
@@ -15,24 +14,25 @@ import {
   DocumentPayload,
   Credentials,
   ChunkScore,
-} from "@/app/api_types";
+  Theme,
+} from "@/app/types";
 
 import { fetchSelectedDocument } from "@/app/api";
 
 interface DocumentExplorerProps {
   selectedDocument: string | null;
   setSelectedDocument: (c: string | null) => void;
-  settingConfig: SettingsConfiguration;
   chunkScores?: ChunkScore[];
   credentials: Credentials;
+  selectedTheme: Theme;
 }
 
 const DocumentExplorer: React.FC<DocumentExplorerProps> = ({
   credentials,
   selectedDocument,
-  settingConfig,
   setSelectedDocument,
   chunkScores,
+  selectedTheme,
 }) => {
   const [selectedSetting, setSelectedSetting] = useState<
     "Content" | "Chunks" | "Metadata" | "Config" | "Vector Space" | "Graph"
@@ -90,7 +90,6 @@ const DocumentExplorer: React.FC<DocumentExplorerProps> = ({
       <div className="bg-bg-alt-verba rounded-2xl flex gap-2 p-6 items-center justify-between h-min w-full">
         <div className="flex gap-2 justify-start ">
           <InfoComponent
-            settingConfig={settingConfig}
             tooltip_text="Inspect your all information about your document, such as chunks, metadata and more."
             display_text={document ? document.title : "Loading..."}
           />
@@ -100,7 +99,7 @@ const DocumentExplorer: React.FC<DocumentExplorerProps> = ({
             onClick={() => {
               setSelectedSetting("Content");
             }}
-            className={`flex ${selectedSetting === "Content" ? "bg-primary-verba hover:bg-button-hover-verba" : "bg-button-verba hover:bg-button-hover-verba"} border-none btn text-text-verba gap-2`}
+            className={`flex ${selectedSetting === "Content" ? "bg-primary-verba hover:bg-button-hover-verba text-text-verba" : "bg-button-verba hover:text-text-verba hover:bg-button-hover-verba"} border-none btn text-text-alt-verba gap-2`}
           >
             <MdContentPaste size={15} />
             <p>Content</p>
@@ -110,7 +109,7 @@ const DocumentExplorer: React.FC<DocumentExplorerProps> = ({
             onClick={() => {
               setSelectedSetting("Chunks");
             }}
-            className={`flex ${selectedSetting === "Chunks" ? "bg-primary-verba hover:bg-button-hover-verba" : "bg-button-verba hover:bg-button-hover-verba"} border-none btn text-text-verba gap-2`}
+            className={`flex ${selectedSetting === "Chunks" ? "bg-primary-verba hover:bg-button-hover-verba text-text-verba" : "bg-button-verba hover:text-text-verba hover:bg-button-hover-verba"} border-none btn text-text-alt-verba gap-2`}
           >
             <MdContentCopy size={15} />
             <p>Chunks</p>
@@ -120,7 +119,7 @@ const DocumentExplorer: React.FC<DocumentExplorerProps> = ({
             onClick={() => {
               setSelectedSetting("Vector Space");
             }}
-            className={`flex ${selectedSetting === "Vector Space" ? "bg-primary-verba hover:bg-button-hover-verba" : "bg-button-verba hover:bg-button-hover-verba"} border-none btn text-text-verba gap-2`}
+            className={`flex ${selectedSetting === "Vector Space" ? "bg-primary-verba hover:bg-button-hover-verba text-text-verba" : "bg-button-verba hover:text-text-verba hover:bg-button-hover-verba"} border-none btn text-text-alt-verba gap-2`}
           >
             <TbVectorTriangle size={15} />
             <p>Vector</p>
@@ -130,7 +129,7 @@ const DocumentExplorer: React.FC<DocumentExplorerProps> = ({
             onClick={() => {
               setSelectedDocument(null);
             }}
-            className="flex btn btn-square border-none text-text-verba bg-button-verba hover:bg-warning-verba gap-2"
+            className="flex btn btn-square border-none text-text-verba bg-warning-verba hover:bg-button-hover-verba gap-2"
           >
             <MdCancel size={15} />
           </button>
@@ -141,8 +140,8 @@ const DocumentExplorer: React.FC<DocumentExplorerProps> = ({
       <div className="bg-bg-alt-verba rounded-2xl flex flex-col p-6 h-full w-full overflow-y-auto overflow-x-hidden">
         {selectedSetting === "Content" && (
           <ContentView
+            selectedTheme={selectedTheme}
             document={document}
-            settingConfig={settingConfig}
             credentials={credentials}
             selectedDocument={selectedDocument}
             chunkScores={chunkScores}
@@ -151,9 +150,9 @@ const DocumentExplorer: React.FC<DocumentExplorerProps> = ({
 
         {selectedSetting === "Chunks" && (
           <ChunkView
+            selectedTheme={selectedTheme}
             credentials={credentials}
             selectedDocument={selectedDocument}
-            settingConfig={settingConfig}
           />
         )}
 
@@ -161,7 +160,6 @@ const DocumentExplorer: React.FC<DocumentExplorerProps> = ({
           <VectorView
             credentials={credentials}
             selectedDocument={selectedDocument}
-            settingConfig={settingConfig}
             chunkScores={chunkScores}
           />
         )}
@@ -185,7 +183,7 @@ const DocumentExplorer: React.FC<DocumentExplorerProps> = ({
             onClick={() => {
               setSelectedSetting("Metadata");
             }}
-            className={`flex ${selectedSetting === "Metadata" ? "bg-primary-verba hover:bg-button-hover-verba" : "bg-button-verba hover:bg-button-hover-verba"} border-none btn text-text-verba gap-2`}
+            className={`flex ${selectedSetting === "Metadata" ? "bg-primary-verba hover:bg-button-hover-verba text-text-verba" : "bg-button-verba hover:text-text-verba hover:bg-button-hover-verba"} border-none btn text-text-alt-verba gap-2`}
           >
             <FaInfoCircle size={15} />
             <p>View Metadata</p>

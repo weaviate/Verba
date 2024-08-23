@@ -2,7 +2,6 @@
 
 import React, { useState, useCallback } from "react";
 import InfoComponent from "../Navigation/InfoComponent";
-import { SettingsConfiguration } from "../Settings/types";
 import { MdCancel } from "react-icons/md";
 import { IoSettingsSharp } from "react-icons/io5";
 import { VscSaveAll } from "react-icons/vsc";
@@ -12,16 +11,15 @@ import { updateRAGConfig } from "@/app/api";
 
 import UserModalComponent from "../Navigation/UserModal";
 
-import { FileMap, FileData } from "@/app/api_types";
-import { RAGConfig } from "@/app/api_types";
+import { FileMap, FileData } from "@/app/types";
+import { RAGConfig } from "@/app/types";
 
-import { Credentials } from "@/app/api_types";
+import { Credentials } from "@/app/types";
 
 import BasicSettingView from "./BasicSettingView";
 import ComponentView from "./ComponentView";
 
 interface ConfigurationViewProps {
-  settingConfig: SettingsConfiguration;
   selectedFileData: string | null;
   RAGConfig: RAGConfig | null;
   setRAGConfig: React.Dispatch<React.SetStateAction<RAGConfig | null>>;
@@ -33,7 +31,6 @@ interface ConfigurationViewProps {
 }
 
 const ConfigurationView: React.FC<ConfigurationViewProps> = ({
-  settingConfig,
   selectedFileData,
   fileMap,
   setFileMap,
@@ -178,7 +175,6 @@ const ConfigurationView: React.FC<ConfigurationViewProps> = ({
       <div className="bg-bg-alt-verba rounded-2xl flex gap-2 p-6 items-center justify-between h-min w-full">
         <div className="flex gap-2 justify-start ">
           <InfoComponent
-            settingConfig={settingConfig}
             tooltip_text="Configure all import settings related to chunking, embedding, adding meta data and more. You can save made changes individually or apply them to all other files"
             display_text="Import Config"
           />

@@ -174,6 +174,12 @@ class SetRAGConfigPayload(BaseModel):
     credentials: Credentials
 
 
+class SetThemeConfigPayload(BaseModel):
+    theme: dict
+    themes: dict
+    credentials: Credentials
+
+
 class ChunkScore(BaseModel):
     uuid: str
     score: float

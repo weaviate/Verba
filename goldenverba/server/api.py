@@ -26,6 +26,7 @@ from goldenverba.server.types import (
     ConnectPayload,
     DatacountPayload,
     GetContentPayload,
+    SetThemeConfigPayload,
     SearchQueryPayload,
     SetRAGConfigPayload,
     GetChunkPayload,
@@ -102,6 +103,8 @@ async def serve_frontend():
 @app.get("/api/health")
 async def health_check():
 
+    await client_manager.clean_up()
+
     return JSONResponse(
         content={
             "message": "Alive!",
@@ -117,12 +120,15 @@ async def connect_to_verba(payload: ConnectPayload):
     try:
         client = await client_manager.connect(payload.credentials)
         config = await manager.load_rag_config(client)
+        theme, themes = await manager.load_theme_config(client)
         return JSONResponse(
             status_code=200,
             content={
                 "connected": True,
                 "error": "",
                 "rag_config": config,
+                "theme": theme,
+                "themes": themes,
             },
         )
     except Exception as e:
@@ -133,6 +139,8 @@ async def connect_to_verba(payload: ConnectPayload):
                 "connected": False,
                 "error": f"Failed to connect to Weaviate {str(e)}",
                 "rag_config": {},
+                "theme": {},
+                "themes": {},
             },
         )
 
@@ -237,7 +245,7 @@ async def update_rag_config(payload: SetRAGConfigPayload):
 
     try:
         client = await client_manager.connect(payload.credentials)
-        await manager.set_rag_config(client, payload.model_dump())
+        await manager.set_rag_config(client, payload.rag_config.model_dump())
         return JSONResponse(
             content={
                 "status": 200,
@@ -252,18 +260,31 @@ async def update_rag_config(payload: SetRAGConfigPayload):
             }
         )
 
-    return JSONResponse(
-        content={
-            "status": "200",
-            "status_msg": "RAG Config Updated",
-        }
-    )
+
+# Get Configuration
+@app.post("/api/get_theme_config")
+async def retrieve_theme_config(payload: Credentials):
+    try:
+        client = await client_manager.connect(payload)
+        theme, themes = await manager.load_theme_config(client)
+        return JSONResponse(
+            status_code=200, content={"theme": theme, "themes": themes, "error": ""}
+        )
+
+    except Exception as e:
+        msg.warn(f"Could not retrieve configuration: {str(e)}")
+        return JSONResponse(
+            status_code=500,
+            content={
+                "theme": None,
+                "themes": None,
+                "error": f"Could not retrieve theme configuration: {str(e)}",
+            },
+        )
 
 
-# TODO
 @app.post("/api/set_theme_config")
-async def update_theme_config(payload: ConfigPayload):
-
+async def update_theme_config(payload: SetThemeConfigPayload):
     if production:
         return JSONResponse(
             content={
@@ -272,22 +293,24 @@ async def update_theme_config(payload: ConfigPayload):
             }
         )
 
-    config = payload.model_dump()["config"]
-
     try:
-        if manager.verify_config(config, manager.create_config()):
-            await manager.set_config(config)
-        else:
-            msg.warn("Configuration sent by Frontend is corrupted")
+        client = await client_manager.connect(payload.credentials)
+        await manager.set_theme_config(
+            client, {"theme": payload.theme, "themes": payload.themes}
+        )
+        return JSONResponse(
+            content={
+                "status": 200,
+            }
+        )
     except Exception as e:
-        msg.warn(f"Failed to set new Config {str(e)}")
-
-    return JSONResponse(
-        content={
-            "status": "200",
-            "status_msg": "Config Updated",
-        }
-    )
+        msg.warn(f"Failed to set new RAG Config {str(e)}")
+        return JSONResponse(
+            content={
+                "status": 400,
+                "status_msg": f"Failed to set new RAG Config {str(e)}",
+            }
+        )
 
 
 ### RAG ENDPOINTS

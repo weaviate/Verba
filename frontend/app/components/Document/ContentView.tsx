@@ -10,19 +10,19 @@ import {
 import { FaArrowAltCircleLeft, FaArrowAltCircleRight } from "react-icons/fa";
 import { HiSparkles } from "react-icons/hi2";
 import { IoNewspaper } from "react-icons/io5";
-import { SettingsConfiguration } from "../Settings/types";
 import {
   VerbaDocument,
   ContentPayload,
   Credentials,
   ContentSnippet,
+  Theme,
   ChunkScore,
-} from "@/app/api_types";
+} from "@/app/types";
 import { fetchContent } from "@/app/api";
 
 interface ContentViewProps {
   document: VerbaDocument | null;
-  settingConfig: SettingsConfiguration;
+  selectedTheme: Theme;
   selectedDocument: string;
   credentials: Credentials;
   chunkScores?: ChunkScore[];
@@ -31,7 +31,7 @@ interface ContentViewProps {
 const ContentView: React.FC<ContentViewProps> = ({
   document,
   selectedDocument,
-  settingConfig,
+  selectedTheme,
   credentials,
   chunkScores,
 }) => {
@@ -137,7 +137,7 @@ const ContentView: React.FC<ContentViewProps> = ({
                 return !inline && match ? (
                   <SyntaxHighlighter
                     style={
-                      settingConfig.Customization.settings.theme === "dark"
+                      selectedTheme.theme === "dark"
                         ? (oneDark as any)
                         : (oneLight as any)
                     }
@@ -193,7 +193,7 @@ const ContentView: React.FC<ContentViewProps> = ({
                 return !inline && match ? (
                   <SyntaxHighlighter
                     style={
-                      settingConfig.Customization.settings.theme === "dark"
+                      selectedTheme.theme === "dark"
                         ? (oneDark as any)
                         : (oneLight as any)
                     }
@@ -231,7 +231,12 @@ const ContentView: React.FC<ContentViewProps> = ({
                     <span className="loading loading-spinner loading-sm"></span>
                   </div>
                 )}
-                <p className="text-lg font-bold">{document.title}</p>
+                <p
+                  className="text-lg font-bold truncate max-w-[350px]"
+                  title={document.title}
+                >
+                  {document.title}
+                </p>
               </div>
               <div className="gap-2 grid grid-cols-3">
                 {Object.entries(document.labels).map(([key, label]) => (

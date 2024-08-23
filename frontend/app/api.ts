@@ -13,7 +13,10 @@ import {
   DatacountResponse,
   ChunkPayload,
   VectorsPayload,
-} from "./api_types";
+  ThemeConfigResponse,
+  Theme,
+  Themes,
+} from "./types";
 
 const checkUrl = async (url: string): Promise<boolean> => {
   try {
@@ -126,6 +129,54 @@ export const updateRAGConfig = async (
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ rag_config: RAG, credentials: credentials }),
+    });
+
+    return response.status === 200;
+  } catch (error) {
+    console.error("Error setting config:", error);
+    return false;
+  }
+};
+
+// Endpoint /api/get_theme_config
+export const fetchThemeConfig = async (
+  credentials: Credentials
+): Promise<ThemeConfigResponse | null> => {
+  try {
+    const host = await detectHost();
+    const response = await fetch(`${host}/api/get_theme_config`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(credentials),
+    });
+    const data: ThemeConfigResponse = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error retrieving content", error);
+    return null;
+  }
+};
+
+// Endpoint /api/set_theme_config
+export const updateThemeConfig = async (
+  themes: Themes,
+  theme: Theme,
+  credentials: Credentials
+): Promise<boolean> => {
+  try {
+    const host = await detectHost();
+    const response = await fetch(`${host}/api/set_theme_config`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        themes: themes,
+        theme: theme,
+        credentials: credentials,
+      }),
     });
 
     return response.status === 200;

@@ -15,7 +15,6 @@ import {
   fetchRAGConfig,
 } from "@/app/api";
 import { getWebSocketApiHost } from "@/app/util";
-import { SettingsConfiguration } from "../Settings/types";
 import {
   Credentials,
   QueryPayload,
@@ -23,7 +22,8 @@ import {
   ChunkScore,
   Message,
   RAGConfig,
-} from "@/app/api_types";
+  Theme,
+} from "@/app/types";
 
 import InfoComponent from "../Navigation/InfoComponent";
 import ChatConfig from "./ChatConfig";
@@ -31,21 +31,21 @@ import ChatMessage from "./ChatMessage";
 
 interface ChatInterfaceProps {
   credentials: Credentials;
-  settingConfig: SettingsConfiguration;
   setSelectedDocument: (s: string | null) => void;
   setSelectedChunkScore: (c: ChunkScore[]) => void;
   currentPage: string;
   RAGConfig: RAGConfig | null;
   setRAGConfig: React.Dispatch<React.SetStateAction<RAGConfig | null>>;
+  selectedTheme: Theme;
 }
 
 const ChatInterface: React.FC<ChatInterfaceProps> = ({
   credentials,
-  settingConfig,
   setSelectedDocument,
   setSelectedChunkScore,
   currentPage,
   RAGConfig,
+  selectedTheme,
   setRAGConfig,
 }) => {
   const [selectedSetting, setSelectedSetting] = useState("Chat");
@@ -295,7 +295,6 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       <div className="bg-bg-alt-verba rounded-2xl flex gap-2 p-6 items-center justify-between h-min w-full">
         <div className="flex gap-2 justify-start items-center">
           <InfoComponent
-            settingConfig={settingConfig}
             tooltip_text="Use the Chat interface to interact with your data and to perform Retrieval Augmented Generation (RAG)"
             display_text={"Chat"}
           />
@@ -305,7 +304,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
             onClick={() => {
               setSelectedSetting("Chat");
             }}
-            className={`flex ${selectedSetting === "Chat" ? "bg-primary-verba hover:bg-button-hover-verba" : "bg-button-verba hover:bg-button-hover-verba"} border-none btn text-text-verba gap-2`}
+            className={`flex ${selectedSetting === "Chat" ? "bg-primary-verba text-text-verba hover:bg-button-hover-verba" : "bg-button-verba hover:text-text-verba hover:bg-button-hover-verba"} border-none btn text-text-alt-verba gap-2`}
           >
             <IoChatbubbleSharp size={15} />
             <p>Chat</p>
@@ -315,7 +314,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
             onClick={() => {
               setSelectedSetting("Config");
             }}
-            className={`flex ${selectedSetting === "Config" ? "bg-primary-verba hover:bg-button-hover-verba" : "bg-button-verba hover:bg-button-hover-verba"} border-none btn text-text-verba gap-2`}
+            className={`flex ${selectedSetting === "Config" ? "bg-primary-verba text-text-verba hover:bg-button-hover-verba" : "bg-button-verba hover:text-text-verba hover:bg-button-hover-verba"} border-none btn text-text-alt-verba gap-2`}
           >
             <FaHammer size={15} />
             <p>Config</p>
@@ -341,7 +340,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
               <ChatMessage
                 message={message}
                 message_index={index}
-                settingConfig={settingConfig}
+                selectedTheme={selectedTheme}
                 selectedDocument={selectedDocumentScore}
                 setSelectedDocumentScore={setSelectedDocumentScore}
                 setSelectedDocument={setSelectedDocument}
@@ -353,7 +352,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
             <ChatMessage
               message={{ type: "system", content: previewText, cached: false }}
               message_index={-1}
-              settingConfig={settingConfig}
+              selectedTheme={selectedTheme}
               selectedDocument={selectedDocumentScore}
               setSelectedDocumentScore={setSelectedDocumentScore}
               setSelectedDocument={setSelectedDocument}
@@ -391,7 +390,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
             <label className="input flex items-center gap-2 w-full bg-bg-verba">
               <input
                 type="text"
-                className="grow w-full"
+                className="grow w-full placeholder-text-alt-verba"
                 placeholder={
                   currentDatacount > 0
                     ? `Chatting with ${currentDatacount} documents...`
@@ -410,7 +409,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
               onClick={(e) => {
                 sendUserMessage();
               }}
-              className="btn btn-square border-none bg-primary-verba hover:bg-button-hover-verba"
+              className="btn btn-square border-none text-text-verba bg-primary-verba hover:bg-button-hover-verba"
             >
               <IoIosSend size={15} />
             </button>
@@ -423,7 +422,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                 setSelectedChunkScore([]);
                 setSelectedDocumentScore(null);
               }}
-              className="btn btn-square border-none bg-button-verba hover:bg-button-hover-verba"
+              className="btn btn-square text-text-alt-verba hover:text-text-verba border-none bg-button-verba hover:bg-button-hover-verba"
             >
               <MdOutlineRefresh size={18} />
             </button>

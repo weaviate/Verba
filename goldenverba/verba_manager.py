@@ -2,6 +2,7 @@ import os
 import importlib
 import math
 import json
+from datetime import datetime
 
 from dotenv import load_dotenv
 from wasabi import msg
@@ -356,6 +357,16 @@ class VerbaManager:
         else:
             msg.info("Using New RAG Configuration")
             return new_config
+
+    async def load_theme_config(self, client):
+        loaded_config = await self.weaviate_manager.get_config(
+            client, self.theme_config_uuid
+        )
+
+        if loaded_config is None:
+            return None, None
+
+        return loaded_config["theme"], loaded_config["themes"]
 
     def verify_config(self, a: dict, b: dict) -> bool:
         # Check Settings ( RAG & Settings )
@@ -955,8 +966,9 @@ class VerbaManager:
 
 class ClientManager:
     def __init__(self) -> None:
-        self.clients: dict[str, WeaviateAsyncClient] = {}
+        self.clients: dict[str, dict] = {}
         self.manager: VerbaManager = VerbaManager()
+        self.max_time: int = 1
 
     def hash_credentials(self, credentials: Credentials) -> str:
         return f"{credentials.deployment}:{credentials.url}:{credentials.key}"
@@ -965,14 +977,31 @@ class ClientManager:
         cred_hash = self.hash_credentials(credentials)
         if cred_hash in self.clients:
             msg.info("Found existing Client")
-            return self.clients[cred_hash]
+            return self.clients[cred_hash]["client"]
         else:
             msg.good("Connecting new Client")
             client = await self.manager.connect(credentials)
-            self.clients[cred_hash] = client
+            self.clients[cred_hash] = {"client": client, "timestamp": datetime.now()}
             return client
 
     async def disconnect(self):
         msg.warn("Disconnecting Clients!")
         for cred_hash, client in self.clients.items():
-            await self.manager.disconnect(client)
+            await self.manager.disconnect(client["client"])
+
+    async def clean_up(self):
+        msg.info("Cleaning Clients Cache")
+        current_time = datetime.now()
+        clients_to_remove = []
+
+        for cred_hash, client_data in self.clients.items():
+            time_difference = current_time - client_data["timestamp"]
+            if time_difference.total_seconds() / 60 > self.max_time:
+                clients_to_remove.append(cred_hash)
+
+        for cred_hash in clients_to_remove:
+            await self.manager.disconnect(self.clients[cred_hash]["client"])
+            del self.clients[cred_hash]
+            msg.warn(f"Removed client: {cred_hash}")
+
+        msg.info(f"Cleaned up {len(clients_to_remove)} clients")

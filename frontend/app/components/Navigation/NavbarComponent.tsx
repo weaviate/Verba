@@ -78,7 +78,12 @@ const Navbar: React.FC<NavbarProps> = ({
     <div className="flex justify-between items-center mb-10">
       {/* Logo, Title, Subtitle */}
       <div className="flex flex-row items-center gap-5">
-        <img src={imageSrc} width={80} className="flex"></img>
+        <img
+          src={imageSrc}
+          width={80}
+          height={80}
+          className="flex rounded-lg w-[80px] h-[80px] object-contain"
+        />
         <div className="flex flex-col lg:flex-row lg:items-end justify-center lg:gap-3">
           <p className="sm:text-2xl md:text-3xl text-text-verba">{title}</p>
           <p className="sm:text-sm text-base text-text-alt-verba font-light">
@@ -122,26 +127,14 @@ const Navbar: React.FC<NavbarProps> = ({
             setCurrentPage={setCurrentPage}
             setPage="DOCUMENTS"
           />
-          <div
-            className={` ${production ? "h-[0vh]" : "sm:h-[3vh] lg:h-[5vh] mx-1"} hidden sm:block bg-text-alt-verba w-px`}
-          ></div>
           <NavbarButton
             hide={production}
             Icon={IoSettingsSharp}
             iconSize={icon_size}
-            title="App Settings"
+            title="Settings"
             currentPage={currentPage}
             setCurrentPage={setCurrentPage}
             setPage="SETTINGS"
-          />
-          <NavbarButton
-            hide={production}
-            Icon={HiOutlineStatusOnline}
-            iconSize={icon_size}
-            title="Admin"
-            currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
-            setPage="STATUS"
           />
           <div
             className={`sm:h-[3vh] lg:h-[5vh] mx-1 hidden sm:block bg-text-alt-verba w-px`}

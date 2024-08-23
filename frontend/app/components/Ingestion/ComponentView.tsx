@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { FaTrash } from "react-icons/fa";
 import { GoTriangleDown } from "react-icons/go";
 import { IoAddCircleSharp } from "react-icons/io5";
-import { RAGConfig } from "@/app/api_types";
+import { RAGConfig } from "@/app/types";
 
 import { closeOnClick } from "@/app/util";
 
@@ -70,15 +70,17 @@ export const MultiInput: React.FC<{
             key={value + index}
             className="flex bg-bg-verba w-full p-2 text-center text-sm text-text-verba justify-between items-center rounded-xl"
           >
-            <div className="flex w-full justify-center items-center">
-              <p> {value}</p>
+            <div className="flex w-full justify-center items-center overflow-hidden">
+              <p className="truncate" title={value}>
+                {value}
+              </p>
             </div>
             <button
               disabled={blocked}
               onClick={() => {
                 removeValue(value);
               }}
-              className="btn btn-sm btn-square bg-button-verba border-none hover:bg-warning-verba text-text-verba"
+              className="btn btn-sm btn-square bg-button-verba border-none hover:bg-warning-verba text-text-verba ml-2"
             >
               <FaTrash size={12} />
             </button>

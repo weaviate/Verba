@@ -1,12 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import {
-  FileData,
-  FileMap,
-  statusTextMap,
-  statusColorMap,
-} from "@/app/api_types";
+import { FileData, FileMap, statusTextMap, statusColorMap } from "@/app/types";
 import { FaTrash } from "react-icons/fa";
 import { IoAddCircleSharp } from "react-icons/io5";
 import { CgDebug } from "react-icons/cg";
@@ -139,15 +134,16 @@ const BasicSettingView: React.FC<BasicSettingViewProps> = ({
         key={fileData.fileID + key + label}
         className="flex bg-bg-verba min-w-[10vw] p-2 text-sm text-text-verba justify-between items-center rounded-xl"
       >
-        <p>{label}</p>
+        <p className="truncate max-w-[80%]" title={label}>
+          {label}
+        </p>
         <button
           onClick={() => {
             removeLabel(label);
           }}
           disabled={blocked}
-          className="btn btn-sm btn-square bg-button-verba border-none hover:bg-warning-verba text-text-verba"
+          className="btn btn-sm btn-square bg-button-verba border-none hover:bg-warning-verba text-text-verba ml-2"
         >
-          {" "}
           <FaTrash size={12} />
         </button>
       </div>
@@ -237,6 +233,7 @@ const BasicSettingView: React.FC<BasicSettingViewProps> = ({
                 setLabel(e.target.value);
               }}
               disabled={blocked}
+              title={label}
             />
           </label>
           <button

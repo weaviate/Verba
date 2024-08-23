@@ -9,13 +9,20 @@ import DocumentView from "./components/Document/DocumentView";
 import IngestionView from "./components/Ingestion/IngestionView";
 import LoginView from "./components/Login/LoginView";
 import ChatView from "./components/Chat/ChatView";
+import SettingsView from "./components/Settings/SettingsView";
 
 // Types
-import { Settings, BaseSettings } from "./components/Settings/types";
-import { Credentials, RAGConfig } from "./api_types";
+import {
+  Credentials,
+  RAGConfig,
+  Theme,
+  LightTheme,
+  Themes,
+  DarkTheme,
+} from "./types";
 
 // Utilities
-import { fetchHealth, fetchRAGConfig } from "./api";
+import { fetchHealth } from "./api";
 import { fonts, FontKey } from "./util";
 
 export default function Home() {
@@ -25,18 +32,19 @@ export default function Home() {
   const [gtag, setGtag] = useState("");
 
   // Settings
-  const [settingTemplate, setSettingTemplate] = useState("Default");
-  const [baseSetting, setBaseSetting] = useState<Settings>(BaseSettings);
+  const [themes, setThemes] = useState<Themes>({
+    Light: LightTheme,
+    Dark: DarkTheme,
+  });
+  const [selectedTheme, setSelectedTheme] = useState<Theme>(themes["Light"]);
 
-  const fontKey = baseSetting
-    ? (baseSetting[settingTemplate].Customization.settings.font
-        .value as FontKey)
-    : null; // Safely cast if you're sure, or use a check
+  const fontKey = selectedTheme.font.value as FontKey; // Safely cast if you're sure, or use a check
   const fontClassName = fontKey ? fonts[fontKey]?.className || "" : "";
 
   // Login States
   const [isHealthy, setIsHealthy] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
   const [credentials, setCredentials] = useState<Credentials>({
     deployment: "Local",
     url: "",
@@ -75,137 +83,118 @@ export default function Home() {
     initialFetch();
   }, []);
 
-  const updateCSSVariables = useCallback(() => {
-    if (baseSetting) {
-      const settings = baseSetting[settingTemplate].Customization.settings;
-      const cssVars = {
-        "--primary-verba": settings.primary_color.color,
-        "--secondary-verba": settings.secondary_color.color,
-        "--warning-verba": settings.warning_color.color,
-        "--bg-verba": settings.bg_color.color,
-        "--bg-alt-verba": settings.bg_alt_color.color,
-        "--text-verba": settings.text_color.color,
-        "--text-alt-verba": settings.text_alt_color.color,
-        "--button-verba": settings.button_color.color,
-        "--button-hover-verba": settings.button_hover_color.color,
-        "--bg-console-verba": settings.bg_console.color,
-        "--text-console-verba": settings.text_console.color,
-      };
+  useEffect(() => {
+    if (isLoggedIn) {
+      const timer = setTimeout(() => {
+        setIsLoaded(true);
+      }, 1000);
 
-      Object.entries(cssVars).forEach(([key, value]) => {
-        document.documentElement.style.setProperty(key, value);
-      });
+      return () => clearTimeout(timer);
     }
-  }, [baseSetting, settingTemplate]);
+  }, [isLoggedIn]);
 
-  useEffect(updateCSSVariables, [updateCSSVariables]);
+  const updateCSSVariables = useCallback(() => {
+    const cssVars = {
+      "--primary-verba": selectedTheme.primary_color.color,
+      "--secondary-verba": selectedTheme.secondary_color.color,
+      "--warning-verba": selectedTheme.warning_color.color,
+      "--bg-verba": selectedTheme.bg_color.color,
+      "--bg-alt-verba": selectedTheme.bg_alt_color.color,
+      "--text-verba": selectedTheme.text_color.color,
+      "--text-alt-verba": selectedTheme.text_alt_color.color,
+      "--button-verba": selectedTheme.button_color.color,
+      "--button-hover-verba": selectedTheme.button_hover_color.color,
+    };
+    Object.entries(cssVars).forEach(([key, value]) => {
+      document.documentElement.style.setProperty(key, value);
+    });
+  }, [selectedTheme]);
+
+  useEffect(updateCSSVariables, [selectedTheme]);
 
   return (
     <main
       className={`min-h-screen bg-bg-verba text-text-verba ${fontClassName}`}
-      data-theme={
-        baseSetting
-          ? baseSetting[settingTemplate].Customization.settings.theme
-          : "light"
-      }
+      data-theme={selectedTheme.theme}
     >
       {gtag !== "" && <GoogleAnalytics gaId={gtag} />}
 
       {!isLoggedIn && isHealthy && (
         <LoginView
+          setSelectedTheme={setSelectedTheme}
+          setThemes={setThemes}
           credentials={credentials}
           setIsLoggedIn={setIsLoggedIn}
           setRAGConfig={setRAGConfig}
-          setBaseSetting={setBaseSetting}
-          setSettingTemplate={setSettingTemplate}
           setCredentials={setCredentials}
         />
       )}
 
       {isLoggedIn && isHealthy && (
-        <div className="flex flex-col gap-2 p-5">
-          <div
-            className={`transition-all duration-1500 delay-500 ${
-              isLoggedIn
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-4"
-            }`}
-          >
-            {baseSetting && isLoggedIn && (
-              <div>
-                <Navbar
-                  production={production}
-                  title={
-                    baseSetting[settingTemplate].Customization.settings.title
-                      .text
-                  }
-                  subtitle={
-                    baseSetting[settingTemplate].Customization.settings.subtitle
-                      .text
-                  }
-                  imageSrc={
-                    baseSetting[settingTemplate].Customization.settings.image
-                      .src
-                  }
-                  version="v2.0.0"
-                  currentPage={currentPage}
-                  setCurrentPage={setCurrentPage}
-                />
+        <div
+          className={`transition-opacity duration-1000 ${
+            isLoaded ? "opacity-100" : "opacity-0"
+          } flex flex-col gap-2 p-5`}
+        >
+          <div>
+            <Navbar
+              production={production}
+              title={selectedTheme.title.text}
+              subtitle={selectedTheme.subtitle.text}
+              imageSrc={selectedTheme.image.src}
+              version="v2.0.0"
+              currentPage={currentPage}
+              setCurrentPage={setCurrentPage}
+            />
 
-                <div
-                  className={`${
-                    currentPage === "CHAT" && !production ? "" : "hidden"
-                  }`}
-                >
-                  <ChatView
-                    credentials={credentials}
-                    RAGConfig={RAGConfig}
-                    setRAGConfig={setRAGConfig}
-                    production={production}
-                    settingConfig={baseSetting[settingTemplate]}
-                    currentPage={currentPage}
-                  />
-                </div>
+            <div
+              className={`${
+                currentPage === "CHAT" && !production ? "" : "hidden"
+              }`}
+            >
+              <ChatView
+                credentials={credentials}
+                RAGConfig={RAGConfig}
+                setRAGConfig={setRAGConfig}
+                production={production}
+                selectedTheme={selectedTheme}
+                currentPage={currentPage}
+              />
+            </div>
 
-                {currentPage === "DOCUMENTS" && !production && (
-                  <DocumentView
-                    credentials={credentials}
-                    production={production}
-                    settingConfig={baseSetting[settingTemplate]}
-                  />
-                )}
-
-                <div
-                  className={`${
-                    currentPage === "ADD" && !production ? "" : "hidden"
-                  }`}
-                >
-                  <IngestionView
-                    RAGConfig={RAGConfig}
-                    setRAGConfig={setRAGConfig}
-                    settingConfig={baseSetting[settingTemplate]}
-                    credentials={credentials}
-                  />
-                </div>
-
-                {/* {currentPage === "SETTINGS" && !production && (
-                  <SettingsComponent
-                    importConfig={updateRAGConfig}
-                    settingTemplate={settingTemplate}
-                    setSettingTemplate={setSettingTemplate}
-                    baseSetting={baseSetting}
-                    setBaseSetting={setBaseSetting}
-                  />
-                )} */}
-
-                {/* {currentPage === "STATUS" && !production && (
-                  <StatusComponent
-                    fetchHost={() => {}}
-                    settingConfig={baseSetting[settingTemplate]}
-                  />
-                )} */}
-              </div>
+            {currentPage === "DOCUMENTS" && !production && (
+              <DocumentView
+                credentials={credentials}
+                production={production}
+                selectedTheme={selectedTheme}
+              />
             )}
+
+            <div
+              className={`${
+                currentPage === "ADD" && !production ? "" : "hidden"
+              }`}
+            >
+              <IngestionView
+                RAGConfig={RAGConfig}
+                setRAGConfig={setRAGConfig}
+                credentials={credentials}
+              />
+            </div>
+
+            <div
+              className={`${
+                currentPage === "SETTINGS" && !production ? "" : "hidden"
+              }`}
+            >
+              <SettingsView
+                credentials={credentials}
+                selectedTheme={selectedTheme}
+                setSelectedTheme={setSelectedTheme}
+                themes={themes}
+                setThemes={setThemes}
+              />
+            </div>
           </div>
 
           <footer

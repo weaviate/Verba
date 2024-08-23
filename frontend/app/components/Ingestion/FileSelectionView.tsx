@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from "react";
 import FileComponent from "./FileComponent";
 import InfoComponent from "../Navigation/InfoComponent";
-import { SettingsConfiguration } from "../Settings/types";
 import { IoMdAddCircle } from "react-icons/io";
 import { FaFileImport } from "react-icons/fa";
 import { MdCancel } from "react-icons/md";
@@ -15,11 +14,10 @@ import { closeOnClick } from "@/app/util";
 
 import UserModalComponent from "../Navigation/UserModal";
 
-import { FileMap } from "@/app/api_types";
-import { RAGConfig } from "@/app/api_types";
+import { FileMap } from "@/app/types";
+import { RAGConfig } from "@/app/types";
 
 interface FileSelectionViewProps {
-  settingConfig: SettingsConfiguration;
   fileMap: FileMap;
   setFileMap: React.Dispatch<React.SetStateAction<FileMap>>;
   RAGConfig: RAGConfig | null;
@@ -33,7 +31,6 @@ interface FileSelectionViewProps {
 }
 
 const FileSelectionView: React.FC<FileSelectionViewProps> = ({
-  settingConfig,
   fileMap,
   setFileMap,
   RAGConfig,
@@ -211,7 +208,6 @@ const FileSelectionView: React.FC<FileSelectionViewProps> = ({
       <div className="bg-bg-alt-verba rounded-2xl flex gap-2 p-6 items-center justify-between h-min w-full">
         <div className="flex gap-2 justify-start ">
           <InfoComponent
-            settingConfig={settingConfig}
             tooltip_text="Upload your data through this interface into Verba. You can select individual files, directories or add URL to fetch data from."
             display_text="File Selection"
           />

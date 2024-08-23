@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { ChunkScore, Message } from "./types";
+import { ChunkScore, Message } from "@/app/types";
 import ReactMarkdown from "react-markdown";
 import { FaDatabase } from "react-icons/fa";
 import { BiError } from "react-icons/bi";
@@ -11,12 +11,13 @@ import {
   oneDark,
   oneLight,
 } from "react-syntax-highlighter/dist/cjs/styles/prism";
-import { SettingsConfiguration } from "../Settings/types";
+
+import { Theme } from "@/app/types";
 
 interface ChatMessageProps {
   message: Message;
   message_index: number;
-  settingConfig: SettingsConfiguration;
+  selectedTheme: Theme;
   selectedDocument: string | null;
   setSelectedDocument: (s: string | null) => void;
   setSelectedDocumentScore: (s: string | null) => void;
@@ -25,7 +26,7 @@ interface ChatMessageProps {
 
 const ChatMessage: React.FC<ChatMessageProps> = ({
   message,
-  settingConfig,
+  selectedTheme,
   selectedDocument,
   setSelectedDocument,
   message_index,
@@ -59,7 +60,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                   return !inline && match ? (
                     <SyntaxHighlighter
                       style={
-                        settingConfig.Customization.settings.theme === "dark"
+                        selectedTheme.theme === "dark"
                           ? (oneDark as any)
                           : (oneLight as any)
                       }
@@ -105,12 +106,19 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
               setSelectedChunkScore(document.chunks);
             }}
             key={"Retrieval" + document.title + index}
-            className={`flex ${selectedDocument && selectedDocument === document.uuid + document.score + document.chunks.length ? "bg-secondary-verba hover:bg-button-hover-verba" : "bg-button-verba hover:bg-secondary-verba"} rounded-3xl p-3 items-center justify-center flex gap-2 transition-colors duration-300 ease-in-out border-none`}
+            className={`flex ${selectedDocument && selectedDocument === document.uuid + document.score + document.chunks.length ? "bg-secondary-verba hover:bg-button-hover-verba" : "bg-button-verba hover:bg-secondary-verba"} rounded-3xl p-3 items-center justify-between transition-colors duration-300 ease-in-out border-none`}
           >
-            <p className="text-xs flex">{document.title}</p>
-            <div className="flex gap-1 items-center text-text-verba">
-              <IoNewspaper size={12} />
-              <p className="text-sm">{document.chunks.length}</p>
+            <div className="flex items-center justify-between w-full">
+              <p
+                className="text-xs flex-grow truncate mr-2"
+                title={document.title}
+              >
+                {document.title}
+              </p>
+              <div className="flex gap-1 items-center text-text-verba flex-shrink-0">
+                <IoNewspaper size={12} />
+                <p className="text-sm">{document.chunks.length}</p>
+              </div>
             </div>
           </button>
         ))}

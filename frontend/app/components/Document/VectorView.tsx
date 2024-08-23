@@ -14,8 +14,6 @@ import { GoTriangleDown } from "react-icons/go";
 
 import { vectorToColor } from "./util";
 
-import { SettingsConfiguration } from "../Settings/types";
-
 import { fetch_chunk, fetch_vectors } from "@/app/api";
 
 import {
@@ -26,7 +24,7 @@ import {
   VerbaVector,
   Credentials,
   ChunkScore,
-} from "@/app/api_types";
+} from "@/app/types";
 
 import { colors } from "./util";
 
@@ -161,14 +159,12 @@ const Sphere: React.FC<{
 interface VectorViewProps {
   credentials: Credentials;
   selectedDocument: string | null;
-  settingConfig: SettingsConfiguration;
   chunkScores?: ChunkScore[];
 }
 
 const VectorView: React.FC<VectorViewProps> = ({
   credentials,
   selectedDocument,
-  settingConfig,
   chunkScores,
 }) => {
   const refs = useRef<(THREE.Mesh | null)[]>([]);
@@ -419,7 +415,9 @@ const VectorView: React.FC<VectorViewProps> = ({
 
       <div className="flex gap-5 h-[45vh] w-full">
         <div
-          className={`flex flex-grow ${selectedChunk ? "w-2/3" : "w-full"} h-full`}
+          className={`flex flex-grow transition-all duration-300 ease-in-out ${
+            selectedChunk ? "w-2/3" : "w-full"
+          } h-full`}
         >
           <Canvas>
             <ambientLight intensity={1} />
@@ -452,18 +450,20 @@ const VectorView: React.FC<VectorViewProps> = ({
             )}
           </Canvas>
         </div>
-        {chunk && (
-          <div
-            className={`flex flex-grow ${selectedChunk ? "w-1/3" : "w-full"} overflow-auto`}
-          >
-            <div className="flex flex-col p-3 gap-2">
+        <div
+          className={`flex flex-grow transition-all duration-300 ease-in-out ${
+            selectedChunk ? "w-1/3 opacity-100" : "w-0 opacity-0"
+          } overflow-auto`}
+        >
+          {chunk && (
+            <div className="flex flex-col p-3 gap-2 w-full">
               <p className="text-text-alt-verba fond-bold">
                 Chunk {chunk.chunk_id}
               </p>
               <p className="text-text-alt-verba text-sm">{chunk.content}</p>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

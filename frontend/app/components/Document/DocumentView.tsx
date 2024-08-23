@@ -1,19 +1,18 @@
 "use client";
 
 import React, { useState } from "react";
-import { SettingsConfiguration } from "../Settings/types";
 import DocumentSearch from "./DocumentSearch";
 import DocumentExplorer from "./DocumentExplorer";
-import { Credentials } from "@/app/api_types";
+import { Credentials, Theme } from "@/app/types";
 
 interface DocumentViewProps {
-  settingConfig: SettingsConfiguration;
+  selectedTheme: Theme;
   production: boolean;
   credentials: Credentials;
 }
 
 const DocumentView: React.FC<DocumentViewProps> = ({
-  settingConfig,
+  selectedTheme,
   production,
   credentials,
 }) => {
@@ -27,7 +26,6 @@ const DocumentView: React.FC<DocumentViewProps> = ({
         <DocumentSearch
           production={production}
           setSelectedDocument={setSelectedDocument}
-          settingConfig={settingConfig}
           credentials={credentials}
           selectedDocument={selectedDocument}
         />
@@ -39,7 +37,7 @@ const DocumentView: React.FC<DocumentViewProps> = ({
         <DocumentExplorer
           credentials={credentials}
           setSelectedDocument={setSelectedDocument}
-          settingConfig={settingConfig}
+          selectedTheme={selectedTheme}
           selectedDocument={selectedDocument}
         />
       </div>
