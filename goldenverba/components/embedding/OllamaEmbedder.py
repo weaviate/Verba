@@ -3,12 +3,12 @@ import requests
 from wasabi import msg
 import aiohttp
 
-from goldenverba.components.interfaces import Embedder
+from goldenverba.components.interfaces import Embedding
 from goldenverba.components.types import InputConfig
 from goldenverba.components.util import get_environment
 
 
-class OllamaEmbedder(Embedder):
+class OllamaEmbedder(Embedding):
 
     def __init__(self):
         super().__init__()

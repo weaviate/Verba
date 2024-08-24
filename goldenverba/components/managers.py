@@ -47,6 +47,7 @@ from goldenverba.components.chunking.SemanticChunker import SemanticChunker
 from goldenverba.components.embedding.OpenAIEmbedder import OpenAIEmbedder
 from goldenverba.components.embedding.CohereEmbedder import CohereEmbedder
 from goldenverba.components.embedding.OllamaEmbedder import OllamaEmbedder
+from goldenverba.components.embedding.WeaviateEmbedder import WeaviateEmbedder
 from goldenverba.components.embedding.VoyageAIEmbedder import VoyageAIEmbedder
 from goldenverba.components.embedding.SentenceTransformersEmbedder import (
     SentenceTransformersEmbedder,
@@ -88,6 +89,7 @@ chunkers = [
 embedders = [
     SentenceTransformersEmbedder(),
     OllamaEmbedder(),
+    WeaviateEmbedder(),
     VoyageAIEmbedder(),
     CohereEmbedder(),
     OpenAIEmbedder(),
@@ -919,8 +921,8 @@ class RetrieverManager:
                 .value
             )
             config = rag_config["Retriever"].components[retriever].config
-            documents, context = await self.retrievers[retriever].retrieve(client,
-                query, vector, config, weaviate_manager, embedder_model
+            documents, context = await self.retrievers[retriever].retrieve(
+                client, query, vector, config, weaviate_manager, embedder_model
             )
             return (documents, context)
 
