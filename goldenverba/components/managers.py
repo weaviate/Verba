@@ -69,38 +69,70 @@ except Exception:
 
 ### Add new components here ###
 
-readers = [
-    BasicReader(),
-    HTMLReader(),
-    GitReader(),
-    UnstructuredReader(),
-    FirecrawlReader(),
-]
-chunkers = [
-    TokenChunker(),
-    SentenceChunker(),
-    RecursiveChunker(),
-    SemanticChunker(),
-    HTMLChunker(),
-    MarkdownChunker(),
-    CodeChunker(),
-    JSONChunker(),
-]
-embedders = [
-    SentenceTransformersEmbedder(),
-    OllamaEmbedder(),
-    WeaviateEmbedder(),
-    VoyageAIEmbedder(),
-    CohereEmbedder(),
-    OpenAIEmbedder(),
-]
-retrievers = [WindowRetriever()]
-generators = [
-    OllamaGenerator(),
-    OpenAIGenerator(),
-    AnthropicGenerator(),
-    CohereGenerator(),
-]
+production = os.getenv("VERBA_PRODUCTION")
+if production != "Production":
+    readers = [
+        BasicReader(),
+        HTMLReader(),
+        GitReader(),
+        UnstructuredReader(),
+        FirecrawlReader(),
+    ]
+    chunkers = [
+        TokenChunker(),
+        SentenceChunker(),
+        RecursiveChunker(),
+        SemanticChunker(),
+        HTMLChunker(),
+        MarkdownChunker(),
+        CodeChunker(),
+        JSONChunker(),
+    ]
+    embedders = [
+        SentenceTransformersEmbedder(),
+        OllamaEmbedder(),
+        WeaviateEmbedder(),
+        VoyageAIEmbedder(),
+        CohereEmbedder(),
+        OpenAIEmbedder(),
+    ]
+    retrievers = [WindowRetriever()]
+    generators = [
+        OllamaGenerator(),
+        OpenAIGenerator(),
+        AnthropicGenerator(),
+        CohereGenerator(),
+    ]
+else:
+    readers = [
+        BasicReader(),
+        HTMLReader(),
+        GitReader(),
+        UnstructuredReader(),
+        FirecrawlReader(),
+    ]
+    chunkers = [
+        TokenChunker(),
+        SentenceChunker(),
+        RecursiveChunker(),
+        SemanticChunker(),
+        HTMLChunker(),
+        MarkdownChunker(),
+        CodeChunker(),
+        JSONChunker(),
+    ]
+    embedders = [
+        WeaviateEmbedder(),
+        VoyageAIEmbedder(),
+        CohereEmbedder(),
+        OpenAIEmbedder(),
+    ]
+    retrievers = [WindowRetriever()]
+    generators = [
+        OpenAIGenerator(),
+        AnthropicGenerator(),
+        CohereGenerator(),
+    ]
 
 
 ### ----------------------- ###
