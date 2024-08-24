@@ -10,6 +10,7 @@ import {
   ContentPayload,
   ChunksPayload,
   RAGConfigResponse,
+  MetadataPayload,
   DatacountResponse,
   ChunkPayload,
   VectorsPayload,
@@ -472,5 +473,26 @@ export const deleteAllDocuments = async (
   } catch (error) {
     console.error("Error deleting all documents", error);
     return false;
+  }
+};
+
+// Endpoint /api/get_meta
+export const fetchMeta = async (
+  credentials: Credentials
+): Promise<MetadataPayload | null> => {
+  try {
+    const host = await detectHost();
+    const response = await fetch(`${host}/api/get_meta`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(credentials),
+    });
+    const data: MetadataPayload = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error retrieving selected document", error);
+    return null;
   }
 };

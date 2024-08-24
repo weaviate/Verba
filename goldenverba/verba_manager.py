@@ -49,9 +49,12 @@ class VerbaManager:
 
     async def connect(self, credentials: Credentials):
         start_time = asyncio.get_event_loop().time()
-        client = await self.weaviate_manager.connect(
-            credentials.deployment, credentials.url, credentials.key
-        )
+        try:
+            client = await self.weaviate_manager.connect(
+                credentials.deployment, credentials.url, credentials.key
+            )
+        except Exception as e:
+            raise e
         if client:
             initialized = await self.weaviate_manager.verify_collection(
                 client, self.weaviate_manager.config_collection_name
@@ -60,7 +63,6 @@ class VerbaManager:
                 end_time = asyncio.get_event_loop().time()
                 msg.info(f"Connection time: {end_time - start_time:.2f} seconds")
                 return client
-        raise Exception("Couldn't connect to Client")
 
     async def disconnect(self, client):
         start_time = asyncio.get_event_loop().time()
@@ -968,21 +970,34 @@ class ClientManager:
     def __init__(self) -> None:
         self.clients: dict[str, dict] = {}
         self.manager: VerbaManager = VerbaManager()
-        self.max_time: int = 1
+        self.max_time: int = 10
 
     def hash_credentials(self, credentials: Credentials) -> str:
         return f"{credentials.deployment}:{credentials.url}:{credentials.key}"
 
     async def connect(self, credentials: Credentials) -> WeaviateAsyncClient:
-        cred_hash = self.hash_credentials(credentials)
+
+        _credentials = credentials
+
+        if not _credentials.url and not _credentials.key:
+            _credentials.url = os.environ.get("WEAVIATE_URL_VERBA", "")
+            _credentials.key = os.environ.get("WEAVIATE_API_KEY_VERBA", "")
+
+        cred_hash = self.hash_credentials(_credentials)
         if cred_hash in self.clients:
             msg.info("Found existing Client")
             return self.clients[cred_hash]["client"]
         else:
             msg.good("Connecting new Client")
-            client = await self.manager.connect(credentials)
-            self.clients[cred_hash] = {"client": client, "timestamp": datetime.now()}
-            return client
+            try:
+                client = await self.manager.connect(_credentials)
+                self.clients[cred_hash] = {
+                    "client": client,
+                    "timestamp": datetime.now(),
+                }
+                return client
+            except Exception as e:
+                raise e
 
     async def disconnect(self):
         msg.warn("Disconnecting Clients!")

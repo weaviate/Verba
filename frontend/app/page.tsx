@@ -30,7 +30,9 @@ import { fonts, FontKey } from "./util";
 export default function Home() {
   // Page States
   const [currentPage, setCurrentPage] = useState("CHAT");
-  const [production, setProduction] = useState(false);
+  const [production, setProduction] = useState<"Local" | "Demo" | "Production">(
+    "Local"
+  );
   const [gtag, setGtag] = useState("");
 
   // Settings
@@ -125,6 +127,7 @@ export default function Home() {
 
       {!isLoggedIn && isHealthy && (
         <LoginView
+          production={production}
           setSelectedTheme={setSelectedTheme}
           setThemes={setThemes}
           credentials={credentials}
@@ -151,11 +154,7 @@ export default function Home() {
               setCurrentPage={setCurrentPage}
             />
 
-            <div
-              className={`${
-                currentPage === "CHAT" && !production ? "" : "hidden"
-              }`}
-            >
+            <div className={`${currentPage === "CHAT" ? "" : "hidden"}`}>
               <ChatView
                 credentials={credentials}
                 RAGConfig={RAGConfig}
@@ -166,7 +165,7 @@ export default function Home() {
               />
             </div>
 
-            {currentPage === "DOCUMENTS" && !production && (
+            {currentPage === "DOCUMENTS" && (
               <DocumentView
                 credentials={credentials}
                 production={production}
@@ -176,7 +175,7 @@ export default function Home() {
 
             <div
               className={`${
-                currentPage === "ADD" && !production ? "" : "hidden"
+                currentPage === "ADD" && production != "Demo" ? "" : "hidden"
               }`}
             >
               <IngestionView
@@ -188,7 +187,9 @@ export default function Home() {
 
             <div
               className={`${
-                currentPage === "SETTINGS" && !production ? "" : "hidden"
+                currentPage === "SETTINGS" && production != "Demo"
+                  ? ""
+                  : "hidden"
               }`}
             >
               <SettingsView

@@ -41,12 +41,10 @@ setup(
         "spacy==3.7.5",
         "aiohttp==3.9.5",
         "aiofiles==24.1.0",
+        "sentence-transformers==3.0.1",
     ],
     extras_require={
         "dev": ["pytest", "wheel", "twine", "black>=23.7.0", "setuptools"],
-        "huggingface": [
-            "sentence-transformers==3.0.1",
-        ],
         "google": [
             "vertexai==1.46.0",
         ],

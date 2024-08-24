@@ -11,6 +11,7 @@ interface ChatConfigProps {
   setRAGConfig: React.Dispatch<React.SetStateAction<RAGConfig | null>>;
   onSave: () => void; // New parameter for handling save
   onReset: () => void; // New parameter for handling reset
+  production: "Local" | "Demo" | "Production";
 }
 
 const ChatConfig: React.FC<ChatConfigProps> = ({
@@ -18,6 +19,7 @@ const ChatConfig: React.FC<ChatConfigProps> = ({
   setRAGConfig,
   onSave,
   onReset,
+  production,
 }) => {
   const updateConfig = (
     component_n: string,
@@ -61,27 +63,28 @@ const ChatConfig: React.FC<ChatConfigProps> = ({
           component_name="Embedder"
           selectComponent={selectComponent}
           updateConfig={updateConfig}
-          blocked={false}
+          blocked={production == "Demo"}
         />
         <ComponentView
           RAGConfig={RAGConfig}
           component_name="Generator"
           selectComponent={selectComponent}
           updateConfig={updateConfig}
-          blocked={false}
+          blocked={production == "Demo"}
         />
         <ComponentView
           RAGConfig={RAGConfig}
           component_name="Retriever"
           selectComponent={selectComponent}
           updateConfig={updateConfig}
-          blocked={false}
+          blocked={production == "Demo"}
         />
 
         {/* Add Save and Reset buttons */}
         <div className="flex justify-end gap-2 mt-4">
           <button
             onClick={onSave}
+            disabled={production == "Demo"}
             className="flex btn border-none text-text-verba bg-button-verba hover:bg-button-hover-verba gap-2"
           >
             <IoSettingsSharp size={15} />
@@ -89,6 +92,7 @@ const ChatConfig: React.FC<ChatConfigProps> = ({
           </button>
           <button
             onClick={onReset}
+            disabled={production == "Demo"}
             className="flex btn border-none text-text-verba bg-button-verba hover:bg-warning-verba gap-2"
           >
             <MdCancel size={15} />

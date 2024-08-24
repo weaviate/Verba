@@ -142,10 +142,10 @@ class WeaviateManager:
         self, deployment: str, weaviateURL: str, weaviateAPIKey: str
     ) -> WeaviateAsyncClient:
         try:
-            if os.environ.get("WEAVIATE_URL_VERBA"):
+            if weaviateURL == "" and os.environ.get("WEAVIATE_URL_VERBA"):
                 weaviateURL = os.environ.get("WEAVIATE_URL_VERBA")
 
-            if os.environ.get("WEAVIATE_API_KEY_VERBA"):
+            if weaviateAPIKey == "" and os.environ.get("WEAVIATE_API_KEY_VERBA"):
                 weaviateAPIKey = os.environ.get("WEAVIATE_API_KEY_VERBA")
 
             if deployment == "Weaviate":
@@ -165,7 +165,9 @@ class WeaviateManager:
 
         except Exception as e:
             msg.fail(f"Couldn't connect to Weaviate, check your URL/API KEY: {str(e)}")
-            return False
+            raise Exception(
+                f"Couldn't connect to Weaviate, check your URL/API KEY: {str(e)}"
+            )
 
     async def disconnect(self, client: WeaviateAsyncClient):
         try:
@@ -174,6 +176,39 @@ class WeaviateManager:
         except Exception as e:
             msg.fail(f"Couldn't disconnect Weaviate: {str(e)}")
             return False
+
+    ### Metadata
+
+    async def get_metadata(self, client: WeaviateAsyncClient):
+
+        # Node Information
+        nodes = await client.cluster.nodes(output="verbose")
+        node_payload = {"node_count": 0, "weaviate_version": "", "nodes": []}
+        for node in nodes:
+            node_payload["nodes"].append(
+                {
+                    "status": node.status,
+                    "shards": len(node.shards),
+                    "version": node.version,
+                    "name": node.name,
+                }
+            )
+        node_payload["node_count"] = len(nodes)
+        node_payload["weaviate_version"] = nodes[0].version
+
+        # Collection Information
+
+        collections = await client.collections.list_all()
+        collection_payload = {"collection_count": 0, "collections": []}
+        for collection_name in collections:
+            collection_objects = await client.collections.get(collection_name).length()
+            collection_payload["collections"].append(
+                {"name": collection_name, "count": collection_objects}
+            )
+        collection_payload["collections"].sort(key=lambda x: x["count"], reverse=True)
+        collection_payload["collection_count"] = len(collections)
+
+        return node_payload, collection_payload
 
     ### Collection Handling
 
@@ -356,6 +391,18 @@ class WeaviateManager:
             document_collection = client.collections.get(self.document_collection_name)
             async for item in document_collection.iterator():
                 await self.delete_document(client, item.uuid)
+
+    async def delete_all_configs(self, client: WeaviateAsyncClient):
+        if await self.verify_collection(client, self.config_collection_name):
+            config_collection = client.collections.get(self.config_collection_name)
+            async for item in config_collection.iterator():
+                await config_collection.data.delete_by_id(item.uuid)
+
+    async def delete_all(self, client: WeaviateAsyncClient):
+        node_payload, collection_payload = await self.get_metadata(client)
+        for collection in collection_payload["collections"]:
+            if "VERBA" in collection["name"]:
+                await client.collections.delete(collection["name"])
 
     async def get_documents(
         self,

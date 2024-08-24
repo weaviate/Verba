@@ -37,9 +37,11 @@ interface ChatInterfaceProps {
   RAGConfig: RAGConfig | null;
   setRAGConfig: React.Dispatch<React.SetStateAction<RAGConfig | null>>;
   selectedTheme: Theme;
+  production: "Local" | "Demo" | "Production";
 }
 
 const ChatInterface: React.FC<ChatInterfaceProps> = ({
+  production,
   credentials,
   setSelectedDocument,
   setSelectedChunkScore,
@@ -87,6 +89,20 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       setCurrentDatacount(0);
     }
   }, [currentEmbedding, currentPage]);
+
+  useEffect(() => {
+    setMessages((prev) => {
+      if (prev.length === 0) {
+        return [
+          {
+            type: "system",
+            content: selectedTheme.intro_message.text,
+          },
+        ];
+      }
+      return prev;
+    });
+  }, [selectedTheme.intro_message.text]);
 
   // Setup WebSocket and messages to /ws/generate_stream
   useEffect(() => {
@@ -376,6 +392,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         </div>
         {selectedSetting === "Config" && (
           <ChatConfig
+            production={production}
             RAGConfig={RAGConfig}
             setRAGConfig={setRAGConfig}
             onReset={onResetConfig}
@@ -417,10 +434,15 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
             <button
               type="button"
               onClick={() => {
-                setMessages([]);
                 setSelectedDocument(null);
                 setSelectedChunkScore([]);
                 setSelectedDocumentScore(null);
+                setMessages([
+                  {
+                    type: "system",
+                    content: selectedTheme.intro_message.text,
+                  },
+                ]);
               }}
               className="btn btn-square text-text-alt-verba hover:text-text-verba border-none bg-button-verba hover:bg-button-hover-verba"
             >

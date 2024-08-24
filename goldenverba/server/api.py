@@ -18,7 +18,6 @@ from goldenverba import verba_manager
 
 from goldenverba.server.types import (
     ResetPayload,
-    ConfigPayload,
     QueryPayload,
     GeneratePayload,
     Credentials,
@@ -38,13 +37,15 @@ from goldenverba.server.types import (
 load_dotenv()
 
 # Check if runs in production
-production_key = os.environ.get("VERBA_PRODUCTION", "")
+production_key = os.environ.get("VERBA_PRODUCTION")
 tag = os.environ.get("VERBA_GOOGLE_TAG", "")
-if production_key == "True":
-    msg.info("API runs in Production Mode")
-    production = True
+
+
+if production_key:
+    msg.info(f"Verba runs in {production_key} mode")
+    production = production_key
 else:
-    production = False
+    production = "Local"
 
 manager = verba_manager.VerbaManager()
 
@@ -105,12 +106,17 @@ async def health_check():
 
     await client_manager.clean_up()
 
+    if production == "Local":
+        deployments = await manager.get_deployments()
+    else:
+        deployments = {"WEAVIATE_URL_VERBA": "", "WEAVIATE_API_KEY_VERBA": ""}
+
     return JSONResponse(
         content={
             "message": "Alive!",
             "production": production,
             "gtag": tag,
-            "deployments": await manager.get_deployments(),
+            "deployments": deployments,
         }
     )
 
@@ -186,6 +192,9 @@ async def websocket_generate_stream(websocket: WebSocket):
 @app.websocket("/ws/import_files")
 async def websocket_import_files(websocket: WebSocket):
 
+    if production == "Demo":
+        return
+
     await websocket.accept()
     logger = LoggerManager(websocket)
     batcher = BatchManager()
@@ -235,7 +244,7 @@ async def retrieve_rag_config(payload: Credentials):
 
 @app.post("/api/set_rag_config")
 async def update_rag_config(payload: SetRAGConfigPayload):
-    if production:
+    if production == "Demo":
         return JSONResponse(
             content={
                 "status": "200",
@@ -285,7 +294,7 @@ async def retrieve_theme_config(payload: Credentials):
 
 @app.post("/api/set_theme_config")
 async def update_theme_config(payload: SetThemeConfigPayload):
-    if production:
+    if production == "Demo":
         return JSONResponse(
             content={
                 "status": "200",
@@ -527,7 +536,7 @@ async def get_all_documents(payload: SearchQueryPayload):
 # Delete specific document based on UUID
 @app.post("/api/delete_document")
 async def delete_document(payload: GetDocumentPayload):
-    if production:
+    if production == "Demo":
         msg.warn("Can't delete documents when in Production Mode")
         return JSONResponse(status_code=200, content={})
 
@@ -547,21 +556,17 @@ async def delete_document(payload: GetDocumentPayload):
 
 @app.post("/api/reset")
 async def reset_verba(payload: ResetPayload):
-    if production:
+    if production == "Demo":
         return JSONResponse(status_code=200, content={})
 
     try:
         client = await client_manager.connect(payload.credentials)
-        if payload.resetMode == "VERBA":
-            manager.reset()
+        if payload.resetMode == "ALL":
+            await manager.weaviate_manager.delete_all(client)
         elif payload.resetMode == "DOCUMENTS":
             await manager.weaviate_manager.delete_all_documents(client)
-        elif payload.resetMode == "CACHE":
-            manager.reset_cache()
-        elif payload.resetMode == "SUGGESTIONS":
-            manager.reset_suggestion()
         elif payload.resetMode == "CONFIG":
-            manager.reset_config()
+            await manager.weaviate_manager.delete_all_configs(client)
 
         msg.info(f"Resetting Verba in ({payload.resetMode}) mode")
 
@@ -572,51 +577,32 @@ async def reset_verba(payload: ResetPayload):
         return JSONResponse(status_code=500, content={})
 
 
-#### OLD ####
-
-
 # Get Status meta data
-@app.get("/api/get_status")
-async def get_status():
+@app.post("/api/get_meta")
+async def get_meta(payload: Credentials):
     try:
-        schemas = manager.get_schemas()
-        sorted_schemas = dict(
-            sorted(schemas.items(), key=lambda item: item[1], reverse=True)
+        client = await client_manager.connect(payload)
+        node_payload, collection_payload = await manager.weaviate_manager.get_metadata(
+            client
         )
-
-        sorted_libraries = dict(
-            sorted(
-                manager.installed_libraries.items(),
-                key=lambda item: (not item[1], item[0]),
-            )
+        return JSONResponse(
+            content={
+                "error": "",
+                "node_payload": node_payload,
+                "collection_payload": collection_payload,
+            }
         )
-        sorted_variables = dict(
-            sorted(
-                manager.environment_variables.items(),
-                key=lambda item: (not item[1], item[0]),
-            )
-        )
-
-        data = {
-            "type": manager.weaviate_type,
-            "libraries": sorted_libraries,
-            "variables": sorted_variables,
-            "schemas": sorted_schemas,
-            "error": "",
-        }
-
-        msg.info("Status Retrieved")
-        return JSONResponse(content=data)
     except Exception as e:
-        data = {
-            "type": "",
-            "libraries": {},
-            "variables": {},
-            "schemas": {},
-            "error": f"Status retrieval failed: {str(e)}",
-        }
-        msg.fail(f"Status retrieval failed: {str(e)}")
-        return JSONResponse(content=data)
+        return JSONResponse(
+            content={
+                "error": f"Couldn't retrieve metadata {str(e)}",
+                "node_payload": {},
+                "collection_payload": {},
+            }
+        )
+
+
+#### OLD ####
 
 
 # Retrieve auto complete suggestions based on user input

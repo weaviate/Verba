@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 
-import { IoIosInformationCircle } from "react-icons/io";
 import { RiAdminFill } from "react-icons/ri";
 import { FaPaintBrush } from "react-icons/fa";
 import { BiSolidCommentError } from "react-icons/bi";
@@ -13,6 +12,7 @@ import { Theme, Themes, Credentials } from "@/app/types";
 import SettingsComponent from "./SettingsComponent";
 
 import InfoComponent from "../Navigation/InfoComponent";
+import InfoView from "./InfoView";
 
 interface SettingsViewProps {
   selectedTheme: Theme;
@@ -40,7 +40,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({
           <div className="bg-bg-alt-verba rounded-2xl flex gap-2 p-6 items-center justify-between h-min w-full">
             <div className="flex gap-2 justify-start ">
               <InfoComponent
-                tooltip_text="Adjust Verba's Settings here"
+                tooltip_text="Customize Verba's Theme, reset collections, logout or report issues."
                 display_text={"Settings"}
               />
             </div>
@@ -50,14 +50,6 @@ const SettingsView: React.FC<SettingsViewProps> = ({
               key={"Info Button Setting"}
               onClick={() => setSettingMode("INFO")}
               className={`flex ${settingMode === "INFO" ? "bg-secondary-verba hover:bg-button-hover-verba" : "bg-button-verba hover:bg-secondary-verba"}  w-full p-3 rounded-lg items-center text-text-verba gap-2 transition-colors duration-300 ease-in-out border-none`}
-            >
-              <IoIosInformationCircle size={18} />
-              <p className="text-text-verba">Info</p>
-            </button>
-            <button
-              key={"Admin Button Setting"}
-              onClick={() => setSettingMode("ADMIN")}
-              className={`flex ${settingMode === "ADMIN" ? "bg-secondary-verba hover:bg-button-hover-verba" : "bg-button-verba hover:bg-secondary-verba"}  w-full p-3 rounded-lg items-center text-text-verba gap-2 transition-colors duration-300 ease-in-out border-none`}
             >
               <RiAdminFill size={18} />
               <p className="text-text-verba">Admin</p>
@@ -107,6 +99,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({
                 selectedTheme={selectedTheme}
               />
             )}
+            {settingMode === "INFO" && <InfoView credentials={credentials} />}
           </div>
         </div>
       </div>

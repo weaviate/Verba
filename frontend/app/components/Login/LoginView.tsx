@@ -18,8 +18,15 @@ import { connectToVerba } from "@/app/api";
 
 import { Credentials, RAGConfig, Theme, Themes } from "@/app/types";
 
+let prefix = "";
+if (process.env.NODE_ENV === "production") {
+  prefix = "/static";
+} else {
+  prefix = "";
+}
+
 const VerbaThree = ({ color }: { color: string }) => {
-  const verba_model = useGLTF("/verba.glb");
+  const verba_model = useGLTF(prefix + "/verba.glb");
 
   const material = useMemo(
     () =>
@@ -273,12 +280,14 @@ const CoolShape = memo(
   }
 );
 
+CoolShape.displayName = "CoolShape";
+
 const EnvironmentMap = () => {
   const { scene } = useThree();
 
   useEffect(() => {
     const rgbeLoader = new RGBELoader();
-    rgbeLoader.load("/cloudy.hdr", (environmentMap) => {
+    rgbeLoader.load(prefix + "/cloudy.hdr", (environmentMap) => {
       environmentMap.mapping = THREE.EquirectangularReflectionMapping;
       scene.environment = environmentMap;
     });
@@ -294,6 +303,7 @@ interface LoginViewProps {
   setRAGConfig: (RAGConfig: RAGConfig | null) => void;
   setSelectedTheme: (theme: Theme) => void;
   setThemes: (themes: Themes) => void;
+  production: "Local" | "Demo" | "Production";
 }
 
 const LoginView: React.FC<LoginViewProps> = ({
@@ -302,6 +312,7 @@ const LoginView: React.FC<LoginViewProps> = ({
   setSelectedTheme,
   setThemes,
   setIsLoggedIn,
+  production,
   setRAGConfig,
 }) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -327,11 +338,11 @@ const LoginView: React.FC<LoginViewProps> = ({
     return () => clearTimeout(timer);
   }, []);
 
-  const connect = async () => {
+  const connect = async (deployment: "Local" | "Weaviate" | "Docker") => {
     setErrorText("");
     setIsConnecting(true);
     const response = await connectToVerba(
-      selectedDeployment,
+      deployment,
       weaviateURL,
       weaviateAPIKey
     );
@@ -342,7 +353,7 @@ const LoginView: React.FC<LoginViewProps> = ({
       } else {
         setIsLoggedIn(true);
         setCredentials({
-          deployment: selectedDeployment,
+          deployment: deployment,
           key: weaviateAPIKey,
           url: weaviateURL,
         });
@@ -409,82 +420,167 @@ const LoginView: React.FC<LoginViewProps> = ({
                 </p>
                 <p className="font-light text-5xl text-text-verba">Verba</p>
               </div>
-              <p className="text-text-verba text-lg ">Choose your deployment</p>
+              {production == "Local" && (
+                <p className="text-text-verba text-lg ">
+                  Choose your deployment
+                </p>
+              )}
             </div>
             {selectStage ? (
               <div className="flex flex-col justify-start gap-4 w-full">
-                <button
-                  onClick={() => {
-                    setSelectStage(false);
-                    setSelectedDeployment("Weaviate");
-                  }}
-                  className="bg-button-verba btn border-none hover:bg-secondary-verba text-text-alt-verba hover:text-text-verba p-3 rounded-lg"
-                >
-                  <p>Weaviate</p>
-                </button>
-                <button
-                  onClick={() => {
-                    setSelectStage(false);
-                    setSelectedDeployment("Docker");
-                  }}
-                  className="bg-button-verba btn border-none hover:bg-secondary-verba text-text-alt-verba hover:text-text-verba p-3 rounded-lg"
-                >
-                  <p>Docker</p>
-                </button>
-                <button
-                  onClick={() => {
-                    setSelectedDeployment("Local");
-                    connect();
-                  }}
-                  className="bg-button-verba btn border-none hover:bg-secondary-verba text-text-alt-verba hover:text-text-verba p-3 rounded-lg"
-                >
-                  <p>Local</p>
-                </button>
+                {production == "Local" && (
+                  <div className="flex flex-col justify-start gap-4 w-full">
+                    <button
+                      onClick={() => {
+                        setSelectStage(false);
+                        setSelectedDeployment("Weaviate");
+                      }}
+                      className="bg-button-verba btn border-none hover:bg-secondary-verba text-text-alt-verba hover:text-text-verba p-3 rounded-lg"
+                    >
+                      <p>Weaviate</p>
+                    </button>
+                    <button
+                      onClick={() => {
+                        setSelectStage(false);
+                        setSelectedDeployment("Docker");
+                      }}
+                      className="bg-button-verba btn border-none hover:bg-secondary-verba text-text-alt-verba hover:text-text-verba p-3 rounded-lg"
+                    >
+                      <p>Docker</p>
+                    </button>
+                    <button
+                      onClick={() => {
+                        setSelectedDeployment("Local");
+                        connect("Local");
+                      }}
+                      className="bg-button-verba btn border-none hover:bg-secondary-verba text-text-alt-verba hover:text-text-verba p-3 rounded-lg"
+                    >
+                      <p>Local</p>
+                    </button>
+                  </div>
+                )}
+                {production == "Demo" && (
+                  <div className="flex flex-col justify-start gap-4 w-full">
+                    <button
+                      onClick={() => {
+                        setSelectedDeployment("Weaviate");
+                        connect("Weaviate");
+                      }}
+                      className="bg-button-verba btn border-none hover:bg-secondary-verba text-text-alt-verba hover:text-text-verba p-3 rounded-lg"
+                      disabled={isConnecting}
+                    >
+                      {isConnecting ? (
+                        <span className="loading loading-spinner loading-sm"></span>
+                      ) : (
+                        <p>Start Demo</p>
+                      )}
+                    </button>
+                  </div>
+                )}
+                {production == "Production" && (
+                  <div className="flex flex-col justify-start gap-4 w-full">
+                    <button
+                      onClick={() => {
+                        setSelectStage(false);
+                        setSelectedDeployment("Weaviate");
+                      }}
+                      className="bg-button-verba btn border-none hover:bg-secondary-verba text-text-alt-verba hover:text-text-verba p-3 rounded-lg"
+                    >
+                      <p>Start Verba</p>
+                    </button>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="flex flex-col justify-start gap-4 w-full">
-                <label className="input flex items-center gap-2 border-none shadow-md bg-bg-verba">
-                  <FaDatabase className="text-text-alt-verba" />
-                  <input
-                    type="text"
-                    value={weaviateURL}
-                    onChange={(e) => setWeaviateURL(e.target.value)}
-                    placeholder="Weaviate URL"
-                    className="grow bg-button-verba text-text-alt-verba hover:text-text-verba w-full"
-                  />
-                </label>
-                <label className="input flex items-center gap-2 border-none shadow-md bg-bg-verba">
-                  <FaKey className="text-text-alt-verba" />
-                  <input
-                    type="password"
-                    value={weaviateAPIKey}
-                    onChange={(e) => setWeaviateAPIKey(e.target.value)}
-                    placeholder="API Key"
-                    className="grow bg-button-verba text-text-alt-verba hover:text-text-verba w-full"
-                  />
-                </label>
-                <div className="flex justify-between gap-4">
-                  <button
-                    onClick={() => setSelectStage(true)}
-                    className="flex-1 bg-button-verba btn border-none hover:bg-secondary-verba text-text-alt-verba hover:text-text-verba p-3 rounded-lg"
-                  >
-                    Other Deployments
-                  </button>
-                  <button
-                    onClick={connect}
-                    className="flex-1 bg-secondary-verba btn border-none hover:bg-button-hover-verba text-text-verba hover:text-text-verba p-3 rounded-lg"
-                    disabled={isConnecting}
-                  >
-                    {isConnecting ? (
-                      <span className="loading loading-spinner"></span>
-                    ) : (
-                      "Connect"
+                {production == "Local" && (
+                  <div className="flex flex-col justify-start gap-4 w-full">
+                    <label className="input flex items-center gap-2 border-none shadow-md bg-bg-verba">
+                      <FaDatabase className="text-text-alt-verba" />
+                      <input
+                        type="text"
+                        value={weaviateURL}
+                        onChange={(e) => setWeaviateURL(e.target.value)}
+                        placeholder="Weaviate URL"
+                        className="grow bg-button-verba text-text-alt-verba hover:text-text-verba w-full"
+                      />
+                    </label>
+                    <label className="input flex items-center gap-2 border-none shadow-md bg-bg-verba">
+                      <FaKey className="text-text-alt-verba" />
+                      <input
+                        type="password"
+                        value={weaviateAPIKey}
+                        onChange={(e) => setWeaviateAPIKey(e.target.value)}
+                        placeholder="API Key"
+                        className="grow bg-button-verba text-text-alt-verba hover:text-text-verba w-full"
+                      />
+                    </label>
+                    <div className="flex justify-between gap-4">
+                      <button
+                        onClick={() => setSelectStage(true)}
+                        className="flex-1 bg-button-verba btn border-none hover:bg-secondary-verba text-text-alt-verba hover:text-text-verba p-3 rounded-lg"
+                      >
+                        Other Deployments
+                      </button>
+                      <button
+                        onClick={() => connect(selectedDeployment)}
+                        className="flex-1 bg-secondary-verba btn border-none hover:bg-button-hover-verba text-text-verba hover:text-text-verba p-3 rounded-lg"
+                        disabled={isConnecting}
+                      >
+                        {isConnecting ? (
+                          <span className="loading loading-spinner"></span>
+                        ) : (
+                          "Connect"
+                        )}
+                      </button>
+                    </div>
+                    {errorText && (
+                      <div className="bg-red-100 p-2 rounded w-full">
+                        <p className="flex w-full">{errorText}</p>
+                      </div>
                     )}
-                  </button>
-                </div>
-                {errorText && (
-                  <div className="bg-red-100 p-2 rounded w-full">
-                    <p className="flex w-full">{errorText}</p>
+                  </div>
+                )}
+                {production == "Production" && (
+                  <div className="flex flex-col justify-start gap-4 w-full">
+                    <label className="input flex items-center gap-2 border-none shadow-md bg-bg-verba">
+                      <FaDatabase className="text-text-alt-verba" />
+                      <input
+                        type="text"
+                        value={weaviateURL}
+                        onChange={(e) => setWeaviateURL(e.target.value)}
+                        placeholder="Weaviate URL"
+                        className="grow bg-button-verba text-text-alt-verba hover:text-text-verba w-full"
+                      />
+                    </label>
+                    <label className="input flex items-center gap-2 border-none shadow-md bg-bg-verba">
+                      <FaKey className="text-text-alt-verba" />
+                      <input
+                        type="password"
+                        value={weaviateAPIKey}
+                        onChange={(e) => setWeaviateAPIKey(e.target.value)}
+                        placeholder="API Key"
+                        className="grow bg-button-verba text-text-alt-verba hover:text-text-verba w-full"
+                      />
+                    </label>
+                    <div className="flex justify-between gap-4">
+                      <button
+                        onClick={() => connect("Weaviate")}
+                        className="flex-1 bg-secondary-verba btn border-none hover:bg-button-hover-verba text-text-verba hover:text-text-verba p-3 rounded-lg"
+                        disabled={isConnecting}
+                      >
+                        {isConnecting ? (
+                          <span className="loading loading-spinner"></span>
+                        ) : (
+                          "Connect"
+                        )}
+                      </button>
+                    </div>
+                    {errorText && (
+                      <div className="bg-red-100 p-2 rounded w-full">
+                        <p className="flex w-full">{errorText}</p>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

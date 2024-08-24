@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 
 import { IoChatbubbleSharp } from "react-icons/io5";
 import { IoDocumentSharp } from "react-icons/io5";
-import { HiOutlineStatusOnline } from "react-icons/hi";
 import { IoMdAddCircle } from "react-icons/io";
 import { IoSettingsSharp } from "react-icons/io5";
 import { FaGithub } from "react-icons/fa";
@@ -19,7 +18,7 @@ interface NavbarProps {
   subtitle: string;
   version: string;
   currentPage: string;
-  production: boolean;
+  production: "Local" | "Demo" | "Production";
   setCurrentPage: (
     page: "CHAT" | "DOCUMENTS" | "STATUS" | "ADD" | "SETTINGS" | "RAG"
   ) => void;
@@ -110,7 +109,7 @@ const Navbar: React.FC<NavbarProps> = ({
             setPage="CHAT"
           />
           <NavbarButton
-            hide={production}
+            hide={production == "Demo"}
             Icon={IoMdAddCircle}
             iconSize={icon_size}
             title="Import Data"
@@ -128,7 +127,7 @@ const Navbar: React.FC<NavbarProps> = ({
             setPage="DOCUMENTS"
           />
           <NavbarButton
-            hide={production}
+            hide={production == "Demo"}
             Icon={IoSettingsSharp}
             iconSize={icon_size}
             title="Settings"

@@ -35,10 +35,6 @@ const ContentView: React.FC<ContentViewProps> = ({
   credentials,
   chunkScores,
 }) => {
-  if (!document) {
-    return <div></div>;
-  }
-
   const [isFetching, setIsFetching] = useState(true);
   const [page, setPage] = useState(1);
   const [maxPage, setMaxPage] = useState(1);
@@ -217,6 +213,10 @@ const ContentView: React.FC<ContentViewProps> = ({
       );
     }
   };
+
+  if (!document) {
+    return <div></div>;
+  }
 
   return (
     <div className="flex flex-col h-full">

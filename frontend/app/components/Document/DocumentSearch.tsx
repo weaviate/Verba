@@ -19,7 +19,7 @@ interface DocumentSearchComponentProps {
   selectedDocument: string | null;
   credentials: Credentials;
   setSelectedDocument: (c: string | null) => void;
-  production: boolean;
+  production: "Local" | "Demo" | "Production";
 }
 
 const DocumentSearch: React.FC<DocumentSearchComponentProps> = ({
@@ -119,7 +119,7 @@ const DocumentSearch: React.FC<DocumentSearchComponentProps> = ({
   };
 
   const handleDeleteDocument = async (d: string) => {
-    if (production) {
+    if (production == "Demo") {
       return;
     }
     const response = await deleteDocument(d, credentials);
@@ -132,7 +132,7 @@ const DocumentSearch: React.FC<DocumentSearchComponentProps> = ({
   };
 
   const handleDeleteAllDocuments = async () => {
-    if (production) {
+    if (production == "Demo") {
       return;
     }
 
@@ -248,6 +248,7 @@ const DocumentSearch: React.FC<DocumentSearchComponentProps> = ({
                     onClick={() => {
                       openDeleteModal("remove_document" + document.uuid);
                     }}
+                    disabled={production == "Demo"}
                     className="btn btn-square bg-button-verba border-none hover:bg-warning-verba text-text-verba"
                   >
                     <FaTrash size={15} />
@@ -297,6 +298,7 @@ const DocumentSearch: React.FC<DocumentSearchComponentProps> = ({
                 modal.showModal();
               }
             }}
+            disabled={production == "Demo"}
             className={`flex bg-button-verba hover:bg-button-hover-verba border-none btn text-text-verba gap-2`}
           >
             <FaTrash size={15} />

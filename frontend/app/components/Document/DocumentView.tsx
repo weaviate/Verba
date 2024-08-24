@@ -7,7 +7,7 @@ import { Credentials, Theme } from "@/app/types";
 
 interface DocumentViewProps {
   selectedTheme: Theme;
-  production: boolean;
+  production: "Local" | "Demo" | "Production";
   credentials: Credentials;
 }
 

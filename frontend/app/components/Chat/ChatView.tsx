@@ -10,7 +10,7 @@ import { Credentials, RAGConfig, ChunkScore, Theme } from "@/app/types";
 interface ChatViewProps {
   selectedTheme: Theme;
   credentials: Credentials;
-  production: boolean;
+  production: "Local" | "Demo" | "Production";
   currentPage: string;
   RAGConfig: RAGConfig | null;
   setRAGConfig: React.Dispatch<React.SetStateAction<RAGConfig | null>>;
@@ -34,6 +34,7 @@ const ChatView: React.FC<ChatViewProps> = ({
         className={`${selectedDocument ? "hidden lg:flex lg:w-[45vw]" : "w-full lg:w-[45vw] lg:flex"}`}
       >
         <ChatInterface
+          production={production}
           credentials={credentials}
           selectedTheme={selectedTheme}
           setSelectedDocument={setSelectedDocument}

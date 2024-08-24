@@ -22,7 +22,7 @@ export type StatusPayload = {
 
 export type HealthPayload = {
   message: string;
-  production: boolean;
+  production: "Local" | "Demo" | "Production";
   gtag: string;
   deployments: {
     WEAVIATE_URL_VERBA: string;
@@ -228,6 +228,36 @@ export type DocumentPayload = {
   document: VerbaDocument;
 };
 
+type NodeInfo = {
+  status: string;
+  shards: number;
+  version: string;
+  name: string;
+};
+
+export type NodePayload = {
+  node_count: number;
+  weaviate_version: string;
+  nodes: NodeInfo[];
+};
+
+// Collection payload types
+type CollectionInfo = {
+  name: string;
+  count: number;
+};
+
+export type CollectionPayload = {
+  collection_count: number;
+  collections: CollectionInfo[];
+};
+
+export type MetadataPayload = {
+  error: string;
+  node_payload: NodePayload;
+  collection_payload: CollectionPayload;
+};
+
 export type ChunksPayload = {
   error: string;
   chunks: VerbaChunk[];
@@ -389,7 +419,6 @@ export interface Theme {
   title: TextFieldSetting;
   subtitle: TextFieldSetting;
   intro_message: TextFieldSetting;
-  placeholder_message: TextFieldSetting;
   image: ImageFieldSetting;
   primary_color: ColorSetting;
   secondary_color: ColorSetting;
@@ -416,11 +445,6 @@ export const LightTheme: Theme = {
     text: "Welcome to Verba, your open-source RAG application!",
     type: "text",
     description: "First Message",
-  },
-  placeholder_message: {
-    text: "Ask Verba anything!",
-    type: "text",
-    description: "Chat Placeholder",
   },
   image: {
     src: "https://github.com/weaviate/Verba/blob/main/img/verba_icon.png?raw=true",
@@ -481,10 +505,6 @@ export const DarkTheme: Theme = {
     ...LightTheme.intro_message,
     text: "Welcome to the dark mode version of Verba! Spooky, right?",
   },
-  placeholder_message: {
-    ...LightTheme.placeholder_message,
-    text: "Ask anything!",
-  },
   image: {
     ...LightTheme.image,
     src: "https://github.com/weaviate/Verba/blob/main/img/verba_icon.png?raw=true",
@@ -511,10 +531,6 @@ export const WCDTheme: Theme = {
     ...LightTheme.intro_message,
     text: "Welcome to Weaviate, your AI-Native vector database. How can I help you?",
   },
-  placeholder_message: {
-    ...LightTheme.placeholder_message,
-    text: "Ask all questions related to Weaviate",
-  },
   image: {
     ...LightTheme.image,
     src: "https://github.com/weaviate/Verba/blob/1.0.0/frontend/public/weaviate.png?raw=true",
@@ -540,10 +556,6 @@ export const WeaviateTheme: Theme = {
   intro_message: {
     ...LightTheme.intro_message,
     text: "Welcome to Weaviate, your AI-Native vector database. How can I help you with Weaviate today?",
-  },
-  placeholder_message: {
-    ...LightTheme.placeholder_message,
-    text: "Ask all questions related to Weaviate",
   },
   image: {
     ...LightTheme.image,
