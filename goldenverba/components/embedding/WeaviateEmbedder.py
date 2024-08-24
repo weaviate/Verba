@@ -17,7 +17,9 @@ class WeaviateEmbedder(Embedding):
         models = ["Embedding Service"]
 
         api_key = os.getenv("EMBEDDING_SERVICE_KEY")
-        base_url = os.getenv("EMBEDDING_SERVICE_URL")
+        base_url = os.getenv(
+            "EMBEDDING_SERVICE_URL", ""
+        )  # Provide empty string as default
 
         self.config = {
             "Model": InputConfig(
@@ -38,7 +40,7 @@ class WeaviateEmbedder(Embedding):
         if base_url is None:
             self.config["URL"] = InputConfig(
                 type="text",
-                value=base_url,
+                value="",  # Use empty string as default value
                 description="Weaviate Embedding Service URL (if different from default)",
                 values=[],
             )
