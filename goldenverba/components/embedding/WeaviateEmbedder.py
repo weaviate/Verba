@@ -37,7 +37,7 @@ class WeaviateEmbedder(Embedding):
                 description="Weaviate Embedding Service Key (or set EMBEDDING_SERVICE_KEY env var)",
                 values=[],
             )
-        if base_url is None:
+        if base_url is "":
             self.config["URL"] = InputConfig(
                 type="text",
                 value="",  # Use empty string as default value

@@ -412,7 +412,7 @@ const LoginView: React.FC<LoginViewProps> = ({
           </Canvas>
         </div>
         <div className="w-2/5 h-full flex justify-start items-center p-5">
-          <div className="flex flex-col gap-8 items-start justify-center">
+          <div className="flex flex-col gap-8 items-start justify-center w-4/5">
             <div className="flex flex-col items-start gap-2">
               <div className="flex items-center gap-3">
                 <p className="font-light text-5xl text-text-alt-verba">
@@ -493,92 +493,57 @@ const LoginView: React.FC<LoginViewProps> = ({
               </div>
             ) : (
               <div className="flex flex-col justify-start gap-4 w-full">
-                {production == "Local" && (
+                {production != "Demo" && (
                   <div className="flex flex-col justify-start gap-4 w-full">
-                    <label className="input flex items-center gap-2 border-none shadow-md bg-bg-verba">
-                      <FaDatabase className="text-text-alt-verba" />
-                      <input
-                        type="text"
-                        value={weaviateURL}
-                        onChange={(e) => setWeaviateURL(e.target.value)}
-                        placeholder="Weaviate URL"
-                        className="grow bg-button-verba text-text-alt-verba hover:text-text-verba w-full"
-                      />
-                    </label>
-                    <label className="input flex items-center gap-2 border-none shadow-md bg-bg-verba">
-                      <FaKey className="text-text-alt-verba" />
-                      <input
-                        type="password"
-                        value={weaviateAPIKey}
-                        onChange={(e) => setWeaviateAPIKey(e.target.value)}
-                        placeholder="API Key"
-                        className="grow bg-button-verba text-text-alt-verba hover:text-text-verba w-full"
-                      />
-                    </label>
-                    <div className="flex justify-between gap-4">
-                      <button
-                        onClick={() => setSelectStage(true)}
-                        className="flex-1 bg-button-verba btn border-none hover:bg-secondary-verba text-text-alt-verba hover:text-text-verba p-3 rounded-lg"
-                      >
-                        Other Deployments
-                      </button>
-                      <button
-                        onClick={() => connect(selectedDeployment)}
-                        className="flex-1 bg-secondary-verba btn border-none hover:bg-button-hover-verba text-text-verba hover:text-text-verba p-3 rounded-lg"
-                        disabled={isConnecting}
-                      >
-                        {isConnecting ? (
-                          <span className="loading loading-spinner"></span>
-                        ) : (
-                          "Connect"
-                        )}
-                      </button>
-                    </div>
-                    {errorText && (
-                      <div className="bg-red-100 p-2 rounded w-full">
-                        <p className="flex w-full">{errorText}</p>
+                    <form
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        connect("Weaviate");
+                      }}
+                    >
+                      <label className="input flex items-center gap-2 border-none shadow-md bg-bg-verba">
+                        <FaDatabase className="text-text-alt-verba" />
+                        <input
+                          type="text"
+                          name="username"
+                          value={weaviateURL}
+                          onChange={(e) => setWeaviateURL(e.target.value)}
+                          placeholder="Weaviate URL"
+                          className="grow bg-button-verba text-text-alt-verba hover:text-text-verba w-full"
+                          autoComplete="username"
+                        />
+                      </label>
+                      <label className="input flex items-center gap-2 border-none shadow-md bg-bg-verba mt-4">
+                        <FaKey className="text-text-alt-verba" />
+                        <input
+                          type="password"
+                          name="current-password"
+                          value={weaviateAPIKey}
+                          onChange={(e) => setWeaviateAPIKey(e.target.value)}
+                          placeholder="API Key"
+                          className="grow bg-button-verba text-text-alt-verba hover:text-text-verba w-full"
+                          autoComplete="current-password"
+                        />
+                      </label>
+                      <div className="flex justify-between gap-4 mt-4">
+                        <button
+                          type="submit"
+                          className="w-full bg-secondary-verba btn border-none hover:bg-button-hover-verba text-text-verba hover:text-text-verba p-3 rounded-lg"
+                          disabled={isConnecting}
+                        >
+                          {isConnecting ? (
+                            <span className="loading loading-spinner"></span>
+                          ) : (
+                            "Connect"
+                          )}
+                        </button>
                       </div>
-                    )}
-                  </div>
-                )}
-                {production == "Production" && (
-                  <div className="flex flex-col justify-start gap-4 w-full">
-                    <label className="input flex items-center gap-2 border-none shadow-md bg-bg-verba">
-                      <FaDatabase className="text-text-alt-verba" />
-                      <input
-                        type="text"
-                        value={weaviateURL}
-                        onChange={(e) => setWeaviateURL(e.target.value)}
-                        placeholder="Weaviate URL"
-                        className="grow bg-button-verba text-text-alt-verba hover:text-text-verba w-full"
-                      />
-                    </label>
-                    <label className="input flex items-center gap-2 border-none shadow-md bg-bg-verba">
-                      <FaKey className="text-text-alt-verba" />
-                      <input
-                        type="password"
-                        value={weaviateAPIKey}
-                        onChange={(e) => setWeaviateAPIKey(e.target.value)}
-                        placeholder="API Key"
-                        className="grow bg-button-verba text-text-alt-verba hover:text-text-verba w-full"
-                      />
-                    </label>
-                    <div className="flex justify-between gap-4">
-                      <button
-                        onClick={() => connect("Weaviate")}
-                        className="flex-1 bg-secondary-verba btn border-none hover:bg-button-hover-verba text-text-verba hover:text-text-verba p-3 rounded-lg"
-                        disabled={isConnecting}
-                      >
-                        {isConnecting ? (
-                          <span className="loading loading-spinner"></span>
-                        ) : (
-                          "Connect"
-                        )}
-                      </button>
-                    </div>
+                    </form>
                     {errorText && (
-                      <div className="bg-red-100 p-2 rounded w-full">
-                        <p className="flex w-full">{errorText}</p>
+                      <div className="bg-warning-verba p-4 rounded w-full">
+                        <p className="flex w-full whitespace-pre-wrap">
+                          {errorText}
+                        </p>
                       </div>
                     )}
                   </div>

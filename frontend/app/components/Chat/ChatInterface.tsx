@@ -254,6 +254,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const streamResponses = (query?: string, context?: string) => {
     if (socket?.readyState === WebSocket.OPEN) {
       const filteredMessages = messages
+        .slice(1) // Skip the first message
         .filter((msg) => msg.type === "user" || msg.type === "system")
         .map((msg) => ({
           type: msg.type,
