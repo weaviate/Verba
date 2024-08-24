@@ -40,13 +40,11 @@ class FirecrawlReader(Reader):
         }
 
         if os.getenv("FIRECRAWL_API_KEY") is None:
-            self.config["Firecrawl API Key"] = (
-                InputConfig(
-                    type="password",
-                    value="",
-                    description="You can set your Firecrawl API Key or set it as environment variable `FIRECRAWL_API_KEY`",
-                    values=[],
-                ),
+            self.config["Firecrawl API Key"] = InputConfig(
+                type="password",
+                value="",
+                description="You can set your Firecrawl API Key or set it as environment variable `FIRECRAWL_API_KEY`",
+                values=[],
             )
 
     async def load(self, config: dict, fileConfig: FileConfig) -> List[Document]:

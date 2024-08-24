@@ -347,7 +347,6 @@ class VerbaManager:
             client, self.rag_config_uuid
         )
         new_config = self.create_config()
-
         if loaded_config is not None:
             if self.verify_config(loaded_config, new_config):
                 msg.info("Using Existing RAG Configuration")
