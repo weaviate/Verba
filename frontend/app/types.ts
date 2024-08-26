@@ -17,6 +17,16 @@ export type ConnectPayload = {
   themes: Themes;
 };
 
+export type Suggestion = {
+  query: string;
+  timestamp: string;
+  uuid: string;
+};
+
+export type SuggestionsPayload = {
+  suggestions: Suggestion[];
+};
+
 export type StatusPayload = {
   type: string;
   variables: Status;

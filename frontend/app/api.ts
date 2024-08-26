@@ -12,6 +12,7 @@ import {
   RAGConfigResponse,
   MetadataPayload,
   DatacountResponse,
+  SuggestionsPayload,
   ChunkPayload,
   DocumentFilter,
   VectorsPayload,
@@ -520,6 +521,84 @@ export const fetchMeta = async (
     return data;
   } catch (error) {
     console.error("Error retrieving selected document", error);
+    return null;
+  }
+};
+
+// Endpoint /api/get_suggestions
+export const fetchSuggestions = async (
+  query: string,
+  limit: number,
+  credentials: Credentials
+): Promise<SuggestionsPayload | null> => {
+  try {
+    const host = await detectHost();
+    const response = await fetch(`${host}/api/get_suggestions`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query: query,
+        limit: limit,
+        credentials: credentials,
+      }),
+    });
+    const data: SuggestionsPayload = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error retrieving suggestions", error);
+    return null;
+  }
+};
+
+// Endpoint /api/delete_suggestion
+export const deleteSuggestion = async (
+  uuid: string,
+  credentials: Credentials
+): Promise<boolean> => {
+  try {
+    const host = await detectHost();
+    const response = await fetch(`${host}/api/delete_suggestion`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        uuid: uuid,
+        credentials: credentials,
+      }),
+    });
+    return response.status === 200;
+  } catch (error) {
+    console.error("Error deleting suggestion", error);
+    return false;
+  }
+};
+
+// Endpoint /api/get_all_suggestions
+export const getAllSuggestions = async (
+  page: number,
+  pageSize: number,
+  credentials: Credentials
+): Promise<SuggestionsPayload | null> => {
+  try {
+    const host = await detectHost();
+    const response = await fetch(`${host}/api/get_all_suggestions`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        page: page,
+        pageSize: pageSize,
+        credentials: credentials,
+      }),
+    });
+    const data: SuggestionsPayload = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error retrieving all suggestions", error);
     return null;
   }
 };

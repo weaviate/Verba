@@ -14,12 +14,14 @@ import {
   sendUserQuery,
   fetchDatacount,
   fetchRAGConfig,
+  fetchSuggestions,
   fetchLabels,
 } from "@/app/api";
 import { getWebSocketApiHost } from "@/app/util";
 import {
   Credentials,
   QueryPayload,
+  Suggestion,
   DataCountPayload,
   ChunkScore,
   Message,
@@ -70,6 +72,10 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const [socket, setSocket] = useState<WebSocket | null>(null);
   const [socketOnline, setSocketOnline] = useState(false);
   const [reconnect, setReconnect] = useState(false);
+
+  const [currentSuggestions, setCurrentSuggestions] = useState<Suggestion[]>(
+    []
+  );
 
   const [labels, setLabels] = useState<string[]>([]);
   const [filterLabels, setFilterLabels] = useState<string[]>([]);
@@ -218,6 +224,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     const sendInput = userInput;
     setUserInput("");
     isFetching.current = true;
+    setCurrentSuggestions([]);
     setFetchingStatus("CHUNKS");
     setMessages((prev) => [...prev, { type: "user", content: sendInput }]);
 
@@ -327,6 +334,20 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
   const onResetConfig = async () => {
     retrieveRAGConfig();
+  };
+
+  const handleSuggestions = async () => {
+    if (
+      RAGConfig &&
+      RAGConfig["Retriever"].components[RAGConfig["Retriever"].selected].config[
+        "Suggestion"
+      ].value
+    ) {
+      const suggestions = await fetchSuggestions(userInput, 3, credentials);
+      if (suggestions) {
+        setCurrentSuggestions(suggestions.suggestions);
+      }
+    }
   };
 
   return (
@@ -522,11 +543,10 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
       <div className="bg-bg-alt-verba rounded-2xl flex gap-2 p-6 items-center justify-end h-min w-full">
         {socketOnline ? (
-          <div className="flex gap-2 items-center justify-end w-full">
-            <label className="input flex items-center gap-2 w-full bg-bg-verba">
-              <input
-                type="text"
-                className="grow w-full placeholder-text-alt-verba"
+          <div className="flex gap-2 items-center justify-end w-full relative">
+            <div className="relative w-full">
+              <textarea
+                className="textarea textarea-bordered w-full bg-bg-verba placeholder-text-alt-verba max-h-32 overflow-y-auto"
                 placeholder={
                   currentDatacount > 0
                     ? `Chatting with ${currentDatacount} documents...`
@@ -535,11 +555,43 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                 onKeyDown={handleKeyDown}
                 value={userInput}
                 onChange={(e) => {
-                  setUserInput(e.target.value);
+                  const newValue = e.target.value;
+                  setUserInput(newValue);
+                  if ((newValue.length - 1) % 3 === 0) {
+                    handleSuggestions();
+                  }
                 }}
               />
-            </label>
-
+              {currentSuggestions.length > 0 && (
+                <ul className="absolute flex gap-2 justify-between top-full left-0 w-full mt-2 z-10 max-h-40 overflow-y-auto">
+                  {currentSuggestions.map((suggestion, index) => (
+                    <li
+                      key={index}
+                      className="p-3 bg-button-verba hover:bg-secondary-verba text-text-alt-verba rounded-xl w-full hover:text-text-verba cursor-pointer"
+                      onClick={() => {
+                        setUserInput(suggestion.query);
+                        setCurrentSuggestions([]);
+                      }}
+                    >
+                      <p className="text-sm">
+                        {suggestion.query.length > 50
+                          ? suggestion.query.substring(0, 50) + "..."
+                          : suggestion.query
+                              .split(new RegExp(`(${userInput})`, "gi"))
+                              .map((part, i) =>
+                                part.toLowerCase() ===
+                                userInput.toLowerCase() ? (
+                                  <strong key={i}>{part}</strong>
+                                ) : (
+                                  part
+                                )
+                              )}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
             <button
               type="button"
               onClick={(e) => {
@@ -555,7 +607,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
               onClick={() => {
                 setSelectedDocument(null);
                 setSelectedChunkScore([]);
+                setUserInput("");
                 setSelectedDocumentScore(null);
+                setCurrentSuggestions([]);
                 setMessages([
                   {
                     type: "system",

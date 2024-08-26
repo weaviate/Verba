@@ -57,7 +57,7 @@ const ChatConfig: React.FC<ChatConfigProps> = ({
 
   if (RAGConfig) {
     return (
-      <div className="flex flex-col justify-start gap-3 rounded-2xl p-1 w-full ">
+      <div className="flex flex-col justify-start gap-3 rounded-2xl p-1 w-full p-6 ">
         <ComponentView
           RAGConfig={RAGConfig}
           component_name="Embedder"

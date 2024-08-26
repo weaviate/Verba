@@ -11,6 +11,7 @@ import os
 import asyncio
 import json
 import re
+from datetime import datetime
 
 from sklearn.decomposition import PCA
 
@@ -744,6 +745,82 @@ class WeaviateManager:
                 sort=Sort.by_property("chunk_id", ascending=True),
             )
             return weaviate_chunks.objects
+
+    ### Suggestion Logic
+
+    async def add_suggestion(self, client: WeaviateAsyncClient, query: str):
+        if await self.verify_collection(client, self.suggestion_collection_name):
+            suggestion_collection = client.collections.get(
+                self.suggestion_collection_name
+            )
+            aggregation = await suggestion_collection.aggregate.over_all(
+                total_count=True
+            )
+            if aggregation.total_count > 0:
+                does_suggestion_exists = (
+                    await suggestion_collection.query.fetch_objects(
+                        filters=Filter.by_property("query").equal(query)
+                    )
+                )
+                if len(does_suggestion_exists.objects) > 0:
+                    return
+            await suggestion_collection.data.insert(
+                {"query": query, "timestamp": datetime.now().isoformat()}
+            )
+
+    async def retrieve_suggestions(
+        self, client: WeaviateAsyncClient, query: str, limit: int
+    ):
+        if await self.verify_collection(client, self.suggestion_collection_name):
+            suggestion_collection = client.collections.get(
+                self.suggestion_collection_name
+            )
+            suggestions = await suggestion_collection.query.bm25(
+                query=query, limit=limit
+            )
+            return_suggestions = [
+                {
+                    "query": suggestion.properties["query"],
+                    "timestamp": suggestion.properties["timestamp"],
+                    "uuid": str(suggestion.uuid),
+                }
+                for suggestion in suggestions.objects
+            ]
+            return return_suggestions
+
+    async def retrieve_all_suggestions(
+        self, client: WeaviateAsyncClient, page: int, pageSize: int
+    ):
+        if await self.verify_collection(client, self.suggestion_collection_name):
+            suggestion_collection = client.collections.get(
+                self.suggestion_collection_name
+            )
+            offset = pageSize * (page - 1)
+            suggestions = await suggestion_collection.query.fetch_objects(
+                limit=pageSize,
+                offset=offset,
+                sort=Sort.by_property("timestamp", ascending=False),
+            )
+            return_suggestions = [
+                {
+                    "query": suggestion.properties["query"],
+                    "timestamp": suggestion.properties["timestamp"],
+                    "uuid": str(suggestion.uuid),
+                }
+                for suggestion in suggestions.objects
+            ]
+            return return_suggestions
+
+    async def delete_suggestions(self, client: WeaviateAsyncClient, uuid: str):
+        if await self.verify_collection(client, self.suggestion_collection_name):
+            suggestion_collection = client.collections.get(
+                self.suggestion_collection_name
+            )
+            await suggestion_collection.data.delete_by_id(uuid)
+
+    async def delete_all_suggestions(self, client: WeaviateAsyncClient):
+        if await self.verify_collection(client, self.suggestion_collection_name):
+            await client.collections.delete(self.suggestion_collection_name)
 
     ### Metadata Retrieval
 

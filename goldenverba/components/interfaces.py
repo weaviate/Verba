@@ -366,6 +366,18 @@ class Retriever(VerbaComponent):
 
     def __init__(self):
         super().__init__()
+        self.config["Suggestion"] = InputConfig(
+            type="bool",
+            value=True,
+            description="Enable Autocomplete Suggestions",
+            values=[],
+        )
+        self.config["Cache"] = InputConfig(
+            type="bool",
+            value=True,
+            description="Enable Semantic Cache",
+            values=[],
+        )
 
     async def retrieve(
         self,

@@ -12,38 +12,36 @@ class WindowRetriever(Retriever):
         self.description = "Retrieve relevant chunks from Weaviate"
         self.name = "Advanced"
 
-        self.config = {
-            "Search Mode": InputConfig(
-                type="dropdown",
-                value="Hybrid Search",
-                description="Switch between search types.",
-                values=["Hybrid Search"],
-            ),
-            "Limit Mode": InputConfig(
-                type="dropdown",
-                value="Autocut",
-                description="Method for limiting the results. Autocut decides automatically how many chunks to retrieve, while fixed sets a fixed limit.",
-                values=["Autocut", "Fixed"],
-            ),
-            "Limit/Sensitivity": InputConfig(
-                type="number",
-                value=1,
-                description="Value for limiting the results. Value controls Autocut sensitivity and Fixed Size",
-                values=[],
-            ),
-            "Chunk Window": InputConfig(
-                type="number",
-                value=1,
-                description="Number of surrounding chunks of retrieved chunks to add to context",
-                values=[],
-            ),
-            "Threshold": InputConfig(
-                type="number",
-                value=80,
-                description="Threshold of chunk score to apply window technique (1-100)",
-                values=[],
-            ),
-        }
+        self.config["Search Mode"] = InputConfig(
+            type="dropdown",
+            value="Hybrid Search",
+            description="Switch between search types.",
+            values=["Hybrid Search"],
+        )
+        self.config["Limit Mode"] = InputConfig(
+            type="dropdown",
+            value="Autocut",
+            description="Method for limiting the results. Autocut decides automatically how many chunks to retrieve, while fixed sets a fixed limit.",
+            values=["Autocut", "Fixed"],
+        )
+        self.config["Limit/Sensitivity"] = InputConfig(
+            type="number",
+            value=1,
+            description="Value for limiting the results. Value controls Autocut sensitivity and Fixed Size",
+            values=[],
+        )
+        self.config["Chunk Window"] = InputConfig(
+            type="number",
+            value=1,
+            description="Number of surrounding chunks of retrieved chunks to add to context",
+            values=[],
+        )
+        self.config["Threshold"] = InputConfig(
+            type="number",
+            value=80,
+            description="Threshold of chunk score to apply window technique (1-100)",
+            values=[],
+        )
 
     async def retrieve(
         self,

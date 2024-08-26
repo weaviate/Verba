@@ -163,6 +163,23 @@ class DocumentFilter(BaseModel):
     uuid: str
 
 
+class GetSuggestionsPayload(BaseModel):
+    query: str
+    limit: int
+    credentials: Credentials
+
+
+class DeleteSuggestionPayload(BaseModel):
+    uuid: str
+    credentials: Credentials
+
+
+class GetAllSuggestionsPayload(BaseModel):
+    page: int
+    pageSize: int
+    credentials: Credentials
+
+
 class QueryPayload(BaseModel):
     query: str
     RAG: dict[str, RAGComponentClass]

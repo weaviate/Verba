@@ -244,7 +244,10 @@ const ComponentView: React.FC<ComponentViewProps> = ({
 
             {/* Checkbox Input */}
             {config.type == "bool" && (
-              <div className="flex justify-center items-center w-full">
+              <div className="flex gap-5 justify-start items-center w-full my-4">
+                <p className="text-sm text-text-alt-verba text-start w-[250px]">
+                  {config.description}
+                </p>
                 <input
                   type="checkbox"
                   className="checkbox checkbox-md"
@@ -264,12 +267,14 @@ const ComponentView: React.FC<ComponentViewProps> = ({
               </div>
             )}
           </div>
-          <div className="flex gap-2 items-center text-text-verba">
-            <p className="flex min-w-[8vw]"></p>
-            <p className="text-sm text-text-alt-verba text-start">
-              {config.description}
-            </p>
-          </div>
+          {config.type != "bool" && (
+            <div className="flex gap-2 items-center text-text-verba">
+              <p className="flex min-w-[8vw]"></p>
+              <p className="text-sm text-text-alt-verba text-start">
+                {config.description}
+              </p>
+            </div>
+          )}
         </div>
       ))}
     </div>

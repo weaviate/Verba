@@ -691,11 +691,24 @@ class VerbaManager:
         retriever = rag_config["Retriever"].selected
         embedder = rag_config["Embedder"].selected
 
+        suggestion_enabled = bool(
+            rag_config["Retriever"].components[retriever].config["Suggestion"].value
+        )
+        if suggestion_enabled:
+            await self.weaviate_manager.add_suggestion(client, query)
+
         vector = await self.embedder_manager.vectorize_query(
             embedder, query, rag_config
         )
         documents, context = await self.retriever_manager.retrieve(
-            client, retriever, query, vector, rag_config, self.weaviate_manager, labels,document_uuids
+            client,
+            retriever,
+            query,
+            vector,
+            rag_config,
+            self.weaviate_manager,
+            labels,
+            document_uuids,
         )
 
         return (documents, context)

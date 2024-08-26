@@ -49,6 +49,13 @@ const InfoView: React.FC<InfoViewProps> = ({ credentials }) => {
     }
   };
 
+  const resetSuggestions = async () => {
+    const response = await deleteAllDocuments("SUGGESTIONS", credentials);
+    if (response) {
+      fetchMetadata();
+    }
+  };
+
   const openModal = (modal_id: string) => {
     const modal = document.getElementById(modal_id);
     if (modal instanceof HTMLDialogElement) {
@@ -86,6 +93,13 @@ const InfoView: React.FC<InfoViewProps> = ({ credentials }) => {
               >
                 <IoTrash size={16} />
                 <p>Clear Everything</p>
+              </button>
+              <button
+                onClick={() => openModal("reset-suggestions")}
+                className="btn border-none hover:text-text-verba text-text-alt-verba shadow-none bg-button-verba hover:bg-button-hover-verba"
+              >
+                <IoTrash size={16} />
+                <p>Clear Suggestions</p>
               </button>
             </div>
             <button
@@ -194,6 +208,13 @@ const InfoView: React.FC<InfoViewProps> = ({ credentials }) => {
         title="Reset Verba"
         text="Are you sure you want to reset Verba? This will delete all collections related to Verba."
         triggerAccept={resetVerba}
+        triggerString="Reset"
+      />
+      <UserModalComponent
+        modal_id="reset-suggestions"
+        title="Reset Suggestions"
+        text="Are you sure you want to reset all autocomplete suggestions?"
+        triggerAccept={resetSuggestions}
         triggerString="Reset"
       />
     </div>

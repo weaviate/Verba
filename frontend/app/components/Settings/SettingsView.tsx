@@ -6,6 +6,8 @@ import { RiAdminFill } from "react-icons/ri";
 import { FaPaintBrush } from "react-icons/fa";
 import { BiSolidCommentError } from "react-icons/bi";
 import { IoLogOutSharp } from "react-icons/io5";
+import { IoChatboxEllipsesSharp } from "react-icons/io5";
+import { FaDatabase } from "react-icons/fa";
 
 import { Theme, Themes, Credentials } from "@/app/types";
 
@@ -29,9 +31,9 @@ const SettingsView: React.FC<SettingsViewProps> = ({
   setSelectedTheme,
   credentials,
 }) => {
-  const [settingMode, setSettingMode] = useState<"INFO" | "ADMIN" | "THEME">(
-    "INFO"
-  );
+  const [settingMode, setSettingMode] = useState<
+    "INFO" | "ADMIN" | "THEME" | "SUGGESTIONS" | "CACHE"
+  >("INFO");
 
   return (
     <div className="flex justify-center gap-3 h-[80vh] ">
@@ -61,6 +63,22 @@ const SettingsView: React.FC<SettingsViewProps> = ({
             >
               <FaPaintBrush size={18} />
               <p className="text-text-verba">Customize Theme</p>
+            </button>
+            <button
+              key={"Suggestions Button Setting"}
+              onClick={() => setSettingMode("SUGGESTIONS")}
+              className={`flex ${settingMode === "SUGGESTIONS" ? "bg-secondary-verba hover:bg-button-hover-verba" : "bg-button-verba hover:bg-secondary-verba"}  w-full p-3 rounded-lg items-center text-text-verba gap-2 transition-colors duration-300 ease-in-out border-none`}
+            >
+              <IoChatboxEllipsesSharp size={18} />
+              <p className="text-text-verba">Manage Suggestions</p>
+            </button>
+            <button
+              key={"Cache Button Setting"}
+              onClick={() => setSettingMode("CACHE")}
+              className={`flex ${settingMode === "CACHE" ? "bg-secondary-verba hover:bg-button-hover-verba" : "bg-button-verba hover:bg-secondary-verba"}  w-full p-3 rounded-lg items-center text-text-verba gap-2 transition-colors duration-300 ease-in-out border-none`}
+            >
+              <FaDatabase size={18} />
+              <p className="text-text-verba">Manage Cache</p>
             </button>
             <button
               key={"Logout Button Setting"}

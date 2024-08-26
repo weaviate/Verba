@@ -24,6 +24,9 @@ from goldenverba.server.types import (
     GetDocumentPayload,
     ConnectPayload,
     DatacountPayload,
+    GetSuggestionsPayload,
+    GetAllSuggestionsPayload,
+    DeleteSuggestionPayload,
     GetContentPayload,
     SetThemeConfigPayload,
     SearchQueryPayload,
@@ -588,6 +591,8 @@ async def reset_verba(payload: ResetPayload):
             await manager.weaviate_manager.delete_all_documents(client)
         elif payload.resetMode == "CONFIG":
             await manager.weaviate_manager.delete_all_configs(client)
+        elif payload.resetMode == "SUGGESTIONS":
+            await manager.weaviate_manager.delete_all_suggestions(client)
 
         msg.info(f"Resetting Verba in ({payload.resetMode}) mode")
 
@@ -623,15 +628,16 @@ async def get_meta(payload: Credentials):
         )
 
 
-#### OLD ####
+### Suggestions
 
 
-# Retrieve auto complete suggestions based on user input
-@app.post("/api/suggestions")
-async def suggestions(payload: QueryPayload):
+@app.post("/api/get_suggestions")
+async def get_suggestions(payload: GetSuggestionsPayload):
     try:
-        suggestions = manager.get_suggestions(payload.query)
-
+        client = await client_manager.connect(payload.credentials)
+        suggestions = await manager.weaviate_manager.retrieve_suggestions(
+            client, payload.query, payload.limit
+        )
         return JSONResponse(
             content={
                 "suggestions": suggestions,
@@ -641,5 +647,43 @@ async def suggestions(payload: QueryPayload):
         return JSONResponse(
             content={
                 "suggestions": [],
+            }
+        )
+
+
+@app.post("/api/get_all_suggestions")
+async def get_all_suggestions(payload: GetAllSuggestionsPayload):
+    try:
+        client = await client_manager.connect(payload.credentials)
+        suggestions = await manager.weaviate_manager.retrieve_all_suggestions(
+            client, payload.page, payload.pageSize
+        )
+        return JSONResponse(
+            content={
+                "suggestions": suggestions,
+            }
+        )
+    except Exception:
+        return JSONResponse(
+            content={
+                "suggestions": [],
+            }
+        )
+
+
+@app.post("/api/delete_suggestion")
+async def delete_suggestion(payload: DeleteSuggestionPayload):
+    try:
+        client = await client_manager.connect(payload.credentials)
+        await manager.weaviate_manager.delete_suggestions(client, payload.uuid)
+        return JSONResponse(
+            content={
+                "status": 200,
+            }
+        )
+    except Exception:
+        return JSONResponse(
+            content={
+                "status": 400,
             }
         )
