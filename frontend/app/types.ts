@@ -4,6 +4,11 @@ export type Credentials = {
   key: string;
 };
 
+export type DocumentFilter = {
+  title: string;
+  uuid: string;
+};
+
 export type ConnectPayload = {
   connected: boolean;
   error: string;

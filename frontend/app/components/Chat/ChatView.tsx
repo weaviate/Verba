@@ -5,7 +5,13 @@ import ChatInterface from "./ChatInterface";
 
 import DocumentExplorer from "../Document/DocumentExplorer";
 
-import { Credentials, RAGConfig, ChunkScore, Theme } from "@/app/types";
+import {
+  Credentials,
+  RAGConfig,
+  ChunkScore,
+  Theme,
+  DocumentFilter,
+} from "@/app/types";
 
 interface ChatViewProps {
   selectedTheme: Theme;
@@ -14,6 +20,8 @@ interface ChatViewProps {
   currentPage: string;
   RAGConfig: RAGConfig | null;
   setRAGConfig: React.Dispatch<React.SetStateAction<RAGConfig | null>>;
+  documentFilter: DocumentFilter[];
+  setDocumentFilter: React.Dispatch<React.SetStateAction<DocumentFilter[]>>;
 }
 
 const ChatView: React.FC<ChatViewProps> = ({
@@ -23,6 +31,8 @@ const ChatView: React.FC<ChatViewProps> = ({
   currentPage,
   RAGConfig,
   setRAGConfig,
+  documentFilter,
+  setDocumentFilter,
 }) => {
   const [selectedDocument, setSelectedDocument] = useState<string | null>(null);
   const [selectedChunkScore, setSelectedChunkScore] = useState<ChunkScore[]>(
@@ -42,6 +52,8 @@ const ChatView: React.FC<ChatViewProps> = ({
           currentPage={currentPage}
           RAGConfig={RAGConfig}
           setRAGConfig={setRAGConfig}
+          documentFilter={documentFilter}
+          setDocumentFilter={setDocumentFilter}
         />
       </div>
 
@@ -50,6 +62,8 @@ const ChatView: React.FC<ChatViewProps> = ({
       >
         <DocumentExplorer
           credentials={credentials}
+          documentFilter={documentFilter}
+          setDocumentFilter={setDocumentFilter}
           setSelectedDocument={setSelectedDocument}
           selectedTheme={selectedTheme}
           selectedDocument={selectedDocument}

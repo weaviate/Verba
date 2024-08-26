@@ -331,9 +331,11 @@ async def query(payload: QueryPayload):
     msg.good(f"Received query: {payload.query}")
     try:
         client = await client_manager.connect(payload.credentials)
+        documents_uuid = [document.uuid for document in payload.documentFilter]
         documents, context = await manager.retrieve_chunks(
-            client, payload.query, payload.RAG, payload.labels
+            client, payload.query, payload.RAG, payload.labels, documents_uuid
         )
+
         return JSONResponse(
             content={"error": "", "documents": documents, "context": context}
         )

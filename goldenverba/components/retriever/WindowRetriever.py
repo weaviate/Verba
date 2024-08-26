@@ -46,7 +46,15 @@ class WindowRetriever(Retriever):
         }
 
     async def retrieve(
-        self, client, query, vector, config, weaviate_manager, embedder, labels
+        self,
+        client,
+        query,
+        vector,
+        config,
+        weaviate_manager,
+        embedder,
+        labels,
+        document_uuids,
     ):
 
         search_mode = config["Search Mode"].value
@@ -59,9 +67,19 @@ class WindowRetriever(Retriever):
 
         if search_mode == "Hybrid Search":
             chunks = await weaviate_manager.hybrid_chunks(
-                client, embedder, query, vector, limit_mode, limit, labels
+                client,
+                embedder,
+                query,
+                vector,
+                limit_mode,
+                limit,
+                labels,
+                document_uuids,
             )
         # TODO Add other search methods
+
+        if len(chunks) == 0:
+            return ([], "We couldn't find any chunks to the query")
 
         # Group Chunks by document and sum score
         doc_map = {}

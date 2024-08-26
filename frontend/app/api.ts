@@ -13,6 +13,7 @@ import {
   MetadataPayload,
   DatacountResponse,
   ChunkPayload,
+  DocumentFilter,
   VectorsPayload,
   ThemeConfigResponse,
   Theme,
@@ -193,6 +194,7 @@ export const sendUserQuery = async (
   query: string,
   RAG: RAGConfig | null,
   labels: string[],
+  documentFilter: DocumentFilter[],
   credentials: Credentials
 ): Promise<QueryPayload | null> => {
   try {
@@ -206,6 +208,7 @@ export const sendUserQuery = async (
         query: query,
         RAG: RAG,
         labels: labels,
+        documentFilter: documentFilter,
         credentials: credentials,
       }),
     });

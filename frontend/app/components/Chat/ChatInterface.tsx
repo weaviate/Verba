@@ -26,6 +26,7 @@ import {
   LabelsResponse,
   RAGConfig,
   Theme,
+  DocumentFilter,
 } from "@/app/types";
 
 import InfoComponent from "../Navigation/InfoComponent";
@@ -41,6 +42,8 @@ interface ChatInterfaceProps {
   setRAGConfig: React.Dispatch<React.SetStateAction<RAGConfig | null>>;
   selectedTheme: Theme;
   production: "Local" | "Demo" | "Production";
+  documentFilter: DocumentFilter[];
+  setDocumentFilter: React.Dispatch<React.SetStateAction<DocumentFilter[]>>;
 }
 
 const ChatInterface: React.FC<ChatInterfaceProps> = ({
@@ -52,6 +55,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   RAGConfig,
   selectedTheme,
   setRAGConfig,
+  documentFilter,
+  setDocumentFilter,
 }) => {
   const [selectedSetting, setSelectedSetting] = useState("Chat");
 
@@ -221,6 +226,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         sendInput,
         RAGConfig,
         filterLabels,
+        documentFilter,
         credentials
       );
 
@@ -259,6 +265,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         streamResponses(sendInput, data.context);
         setFetchingStatus("RESPONSE");
       }
+    } else {
+      handleErrorResponse("We couldn't find any chunks to your query");
     }
   };
 
@@ -394,10 +402,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                 </ul>
               </div>
             </div>
-            {filterLabels.length > 0 && (
+            {(filterLabels.length > 0 || documentFilter.length > 0) && (
               <button
                 onClick={() => {
                   setFilterLabels([]);
+                  setDocumentFilter([]);
                 }}
                 className="btn btn-sm border-none shadow-none bg-button-verba text-text-alt-verba hover:text-text-verba hover:bg-button-hover-verba"
               >
@@ -415,7 +424,28 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                 }}
                 className="btn btn-sm border-none shadow-none text-text-alt-verba hover:text-text-verba bg-button-verba hover:bg-button-hover-verba"
               >
-                <p className="text-xs">{label}</p>
+                <p className="text-xs truncate max-w-[200px]" title={label}>
+                  {label}
+                </p>
+                <MdCancel size={15} />
+              </button>
+            ))}
+            {documentFilter.map((filter, index) => (
+              <button
+                key={"DocumentFilter" + index}
+                onClick={() => {
+                  setDocumentFilter(
+                    documentFilter.filter((f) => f.uuid !== filter.uuid)
+                  );
+                }}
+                className="btn btn-sm border-none shadow-none text-text-alt-verba hover:text-text-verba bg-button-verba hover:bg-button-hover-verba"
+              >
+                <p
+                  className="text-xs truncate max-w-[200px]"
+                  title={filter.title}
+                >
+                  {filter.title}
+                </p>
                 <MdCancel size={15} />
               </button>
             ))}

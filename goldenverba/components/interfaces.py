@@ -368,7 +368,15 @@ class Retriever(VerbaComponent):
         super().__init__()
 
     async def retrieve(
-        self, client, query, vector, config, weaviate_manager, embedder, labels
+        self,
+        client,
+        query,
+        vector,
+        config,
+        weaviate_manager,
+        embedder,
+        labels,
+        document_uuids,
     ):
 
         raise NotImplementedError("retrieve method must be implemented by a subclass.")

@@ -9,12 +9,14 @@ import { MdContentPaste } from "react-icons/md";
 import { MdContentCopy } from "react-icons/md";
 import { TbVectorTriangle } from "react-icons/tb";
 import ContentView from "./ContentView";
+import { IoMdAddCircle } from "react-icons/io";
 import {
   VerbaDocument,
   DocumentPayload,
   Credentials,
   ChunkScore,
   Theme,
+  DocumentFilter,
 } from "@/app/types";
 
 import { fetchSelectedDocument } from "@/app/api";
@@ -25,6 +27,8 @@ interface DocumentExplorerProps {
   chunkScores?: ChunkScore[];
   credentials: Credentials;
   selectedTheme: Theme;
+  documentFilter: DocumentFilter[];
+  setDocumentFilter: React.Dispatch<React.SetStateAction<DocumentFilter[]>>;
 }
 
 const DocumentExplorer: React.FC<DocumentExplorerProps> = ({
@@ -33,6 +37,8 @@ const DocumentExplorer: React.FC<DocumentExplorerProps> = ({
   setSelectedDocument,
   chunkScores,
   selectedTheme,
+  documentFilter,
+  setDocumentFilter,
 }) => {
   const [selectedSetting, setSelectedSetting] = useState<
     "Content" | "Chunks" | "Metadata" | "Config" | "Vector Space" | "Graph"
@@ -166,8 +172,40 @@ const DocumentExplorer: React.FC<DocumentExplorerProps> = ({
       </div>
 
       {/* Import Footer */}
-      <div className="bg-bg-alt-verba rounded-2xl flex gap-2 p-6 items-center justify-end h-min w-full">
-        <div className="flex gap-3 justify-end">
+      <div className="bg-bg-alt-verba rounded-2xl flex gap-2 p-6 items-center justify-between h-min w-full">
+        <div className="flex gap-3">
+          {documentFilter.some(
+            (filter) => filter.uuid === selectedDocument
+          ) && (
+            <button
+              onClick={() => {
+                setDocumentFilter(
+                  documentFilter.filter((f) => f.uuid !== selectedDocument)
+                );
+              }}
+              className="btn border-none shadow-none text-text-verba bg-warning-verba hover:bg-button-hover-verba"
+            >
+              <MdCancel size={15} />
+              <p>Remove from Chat</p>
+            </button>
+          )}
+          {!documentFilter.some((filter) => filter.uuid === selectedDocument) &&
+            document && (
+              <button
+                onClick={() => {
+                  setDocumentFilter([
+                    ...documentFilter,
+                    { uuid: selectedDocument, title: document.title },
+                  ]);
+                }}
+                className="btn border-none shadow-none text-text-verba bg-primary-verba hover:bg-button-hover-verba"
+              >
+                <IoMdAddCircle size={15} />
+                <p>Add to Chat</p>
+              </button>
+            )}
+        </div>
+        <div className="flex gap-3">
           {selectedDocument && document && document.source && (
             <button
               onClick={() => {

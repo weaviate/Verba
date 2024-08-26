@@ -158,10 +158,16 @@ class VerbaConfig(BaseModel):
     SETTING: dict
 
 
+class DocumentFilter(BaseModel):
+    title: str
+    uuid: str
+
+
 class QueryPayload(BaseModel):
     query: str
     RAG: dict[str, RAGComponentClass]
     labels: list[str]
+    documentFilter: list[DocumentFilter]
     credentials: Credentials
 
 

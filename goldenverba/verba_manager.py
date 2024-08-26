@@ -14,7 +14,13 @@ from goldenverba.server.helpers import LoggerManager
 from weaviate.client import WeaviateAsyncClient
 
 from goldenverba.components.document import Document
-from goldenverba.server.types import FileConfig, FileStatus, ChunkScore, Credentials
+from goldenverba.server.types import (
+    FileConfig,
+    FileStatus,
+    ChunkScore,
+    Credentials,
+    DocumentFilter,
+)
 
 from goldenverba.components.interfaces import VerbaComponent
 from goldenverba.components.managers import (
@@ -674,16 +680,22 @@ class VerbaManager:
 
     # Retrieval Augmented Generation
 
-    async def retrieve_chunks(self, client, query: str, rag_config: dict, labels: list[str]):
+    async def retrieve_chunks(
+        self,
+        client,
+        query: str,
+        rag_config: dict,
+        labels: list[str],
+        document_uuids: list[str],
+    ):
         retriever = rag_config["Retriever"].selected
         embedder = rag_config["Embedder"].selected
 
         vector = await self.embedder_manager.vectorize_query(
             embedder, query, rag_config
         )
-
         documents, context = await self.retriever_manager.retrieve(
-            client, retriever, query, vector, rag_config, self.weaviate_manager, labels
+            client, retriever, query, vector, rag_config, self.weaviate_manager, labels,document_uuids
         )
 
         return (documents, context)

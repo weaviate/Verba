@@ -19,6 +19,7 @@ import {
   LightTheme,
   Themes,
   DarkTheme,
+  DocumentFilter,
   WCDTheme,
   WeaviateTheme,
 } from "./types";
@@ -59,6 +60,8 @@ export default function Home() {
 
   // RAG Config
   const [RAGConfig, setRAGConfig] = useState<null | RAGConfig>(null);
+
+  const [documentFilter, setDocumentFilter] = useState<DocumentFilter[]>([]);
 
   const initialFetch = useCallback(async () => {
     try {
@@ -162,6 +165,8 @@ export default function Home() {
                 production={production}
                 selectedTheme={selectedTheme}
                 currentPage={currentPage}
+                documentFilter={documentFilter}
+                setDocumentFilter={setDocumentFilter}
               />
             </div>
 
@@ -170,6 +175,8 @@ export default function Home() {
                 credentials={credentials}
                 production={production}
                 selectedTheme={selectedTheme}
+                documentFilter={documentFilter}
+                setDocumentFilter={setDocumentFilter}
               />
             )}
 

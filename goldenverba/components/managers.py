@@ -690,21 +690,35 @@ class WeaviateManager:
         limit_mode: str,
         limit: int,
         labels: list[str],
+        document_uuids: list[str],
     ):
         if await self.verify_embedding_collection(client, embedder):
             embedder_collection = client.collections.get(self.embedding_table[embedder])
 
+            filters = []
+
             if labels:
-                filter = Filter.by_property("labels").contains_all(labels)
+                filters.append(Filter.by_property("labels").contains_all(labels))
+
+            if document_uuids:
+                filters.append(
+                    Filter.by_property("doc_uuid").contains_any(document_uuids)
+                )
+
+            if filters:
+                apply_filters = filters[0]
+                for filter in filters[1:]:
+                    apply_filters = apply_filters & filter
             else:
-                filter = None
+                apply_filters = None
+
             if limit_mode == "Autocut":
                 chunks = await embedder_collection.query.hybrid(
                     query=query,
                     vector=vector,
                     auto_limit=limit,
                     return_metadata=MetadataQuery(score=True, explain_score=False),
-                    filters=filter,
+                    filters=apply_filters,
                 )
             else:
                 chunks = await embedder_collection.query.hybrid(
@@ -712,7 +726,7 @@ class WeaviateManager:
                     vector=vector,
                     limit=limit,
                     return_metadata=MetadataQuery(score=True, explain_score=False),
-                    filters=filter,
+                    filters=apply_filters,
                 )
 
             return chunks.objects
@@ -991,6 +1005,7 @@ class RetrieverManager:
         rag_config: dict,
         weaviate_manager: WeaviateManager,
         labels: list[str],
+        document_uuids: list[str],
     ):
         try:
             if retriever not in self.retrievers:
@@ -1004,7 +1019,14 @@ class RetrieverManager:
             )
             config = rag_config["Retriever"].components[retriever].config
             documents, context = await self.retrievers[retriever].retrieve(
-                client, query, vector, config, weaviate_manager, embedder_model, labels
+                client,
+                query,
+                vector,
+                config,
+                weaviate_manager,
+                embedder_model,
+                labels,
+                document_uuids,
             )
             return (documents, context)
 
