@@ -453,7 +453,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         </div>
 
         <div
-          className={`${selectedSetting === "Chat" ? "flex flex-col gap-3 p-2" : "hidden"}`}
+          className={`${selectedSetting === "Chat" ? "flex flex-col gap-3 p-4" : "hidden"}`}
         >
           <div className="flex w-full justify-start items-center text-text-alt-verba gap-2">
             {currentDatacount === 0 && <BiError size={15} />}

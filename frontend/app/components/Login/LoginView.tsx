@@ -424,9 +424,9 @@ const LoginView: React.FC<LoginViewProps> = ({
             {/**coolShapes**/}
             <VerbaThree
               color=""
-              useMaterial={production == "Local" ? true : true}
+              useMaterial={production == "Local" ? false : true}
               model_path={
-                production == "Local" ? "/weaviate.glb" : "/weaviate.glb"
+                production == "Local" ? "/verba.glb" : "/weaviate.glb"
               }
             />
           </Canvas>
@@ -474,8 +474,13 @@ const LoginView: React.FC<LoginViewProps> = ({
                         connect("Local");
                       }}
                       className="bg-button-verba btn border-none hover:bg-secondary-verba text-text-alt-verba hover:text-text-verba p-3 rounded-lg"
+                      disabled={isConnecting}
                     >
-                      <p>Local</p>
+                      {isConnecting ? (
+                        <span className="loading loading-spinner loading-sm"></span>
+                      ) : (
+                        <p>Local</p>
+                      )}
                     </button>
                   </div>
                 )}
@@ -573,11 +578,6 @@ const LoginView: React.FC<LoginViewProps> = ({
           </div>
         </div>
       </div>
-      {isLoading && (
-        <div className="absolute inset-0 bg-white flex justify-center items-center">
-          {/* You can add a loading spinner or text here */}
-        </div>
-      )}
     </div>
   );
 };

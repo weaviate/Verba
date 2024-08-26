@@ -34,7 +34,7 @@ setup(
         "asyncio==3.4.3",
         "tiktoken==0.6.0",
         "requests==2.31.0",
-        "pypdf==4.3.0",
+        "pypdf==4.3.1",
         "python-docx==1.1.2",
         "scikit-learn==1.5.1",
         "langchain-text-splitters==0.2.2",
