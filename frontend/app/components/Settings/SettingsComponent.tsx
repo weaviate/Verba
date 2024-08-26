@@ -48,7 +48,7 @@ const SettingsComponent: React.FC<SettingsComponentProps> = ({
       Weaviate: WeaviateTheme,
       WCD: WCDTheme,
     });
-    setSelectedTheme(LightTheme);
+    setSelectedTheme(WeaviateTheme);
   };
 
   const saveTheme = async () => {

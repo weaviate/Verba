@@ -503,7 +503,7 @@ export const DarkTheme: Theme = {
   subtitle: { ...LightTheme.subtitle, text: "The Dark RAGtriever" },
   intro_message: {
     ...LightTheme.intro_message,
-    text: "Welcome to the dark mode version of Verba! Spooky, right?",
+    text: "Welcome to Verba, your open-source RAG application!",
   },
   image: {
     ...LightTheme.image,
@@ -526,10 +526,10 @@ export const WCDTheme: Theme = {
   ...LightTheme,
   theme_name: "WCD",
   title: { ...LightTheme.title, text: "Verba" },
-  subtitle: { ...LightTheme.subtitle, text: "Chatbot for Weaviate" },
+  subtitle: { ...LightTheme.subtitle, text: "Weaviate Chatbot" },
   intro_message: {
     ...LightTheme.intro_message,
-    text: "Welcome to Weaviate, your AI-Native vector database. How can I help you?",
+    text: "Welcome to Verba, your open-source RAG application!",
   },
   image: {
     ...LightTheme.image,
@@ -551,26 +551,26 @@ export const WCDTheme: Theme = {
 export const WeaviateTheme: Theme = {
   ...LightTheme,
   theme_name: "Weaviate",
-  title: { ...LightTheme.title, text: "Weaviate Verba" },
-  subtitle: { ...LightTheme.subtitle, text: "Chatbot for Weaviate" },
+  title: { ...LightTheme.title, text: "Verba" },
+  subtitle: { ...LightTheme.subtitle, text: "Weaviate Chatbot" },
   intro_message: {
     ...LightTheme.intro_message,
-    text: "Welcome to Weaviate, your AI-Native vector database. How can I help you with Weaviate today?",
+    text: "Welcome to Verba, your open-source RAG application!",
   },
   image: {
     ...LightTheme.image,
     src: "https://github.com/weaviate/Verba/blob/1.0.0/frontend/public/weaviate.png?raw=true",
   },
-  primary_color: { ...LightTheme.primary_color, color: "#6BDF4A" },
-  secondary_color: { ...LightTheme.secondary_color, color: "#7AD6EB" },
+  primary_color: { ...LightTheme.primary_color, color: "#83e897" },
+  secondary_color: { ...LightTheme.secondary_color, color: "#94e8fb" },
   warning_color: { ...LightTheme.warning_color, color: "#F4404E" },
-  bg_color: { ...LightTheme.bg_color, color: "#EDEDED" },
-  bg_alt_color: { ...LightTheme.bg_alt_color, color: "#ffffff" },
+  bg_color: { ...LightTheme.bg_color, color: "#ffffff" },
+  bg_alt_color: { ...LightTheme.bg_alt_color, color: "#f8f8f8" },
   text_color: { ...LightTheme.text_color, color: "#130C49" },
-  text_alt_color: { ...LightTheme.text_alt_color, color: "#8196A6" },
-  button_color: { ...LightTheme.button_color, color: "#E6E3E3" },
-  button_hover_color: { ...LightTheme.button_hover_color, color: "#FFFFFF" },
-  font: { ...LightTheme.font, value: "Inter" },
+  text_alt_color: { ...LightTheme.text_alt_color, color: "#c6c6c6" },
+  button_color: { ...LightTheme.button_color, color: "#f1f1f1" },
+  button_hover_color: { ...LightTheme.button_hover_color, color: "#fdfdfd" },
+  font: { ...LightTheme.font, value: "Plus_Jakarta_Sans" },
   theme: "light",
 };
 

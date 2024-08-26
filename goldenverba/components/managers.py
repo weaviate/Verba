@@ -375,7 +375,7 @@ class WeaviateManager:
 
             except Exception as e:
                 if doc_uuid:
-                    await self.delete_document(doc_uuid)
+                    await self.delete_document(client, doc_uuid)
                 raise Exception(f"Chunk import failed with : {str(e)}")
 
     ### Document CRUD

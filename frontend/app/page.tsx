@@ -42,7 +42,7 @@ export default function Home() {
     Weaviate: WeaviateTheme,
     WCD: WCDTheme,
   });
-  const [selectedTheme, setSelectedTheme] = useState<Theme>(themes["Light"]);
+  const [selectedTheme, setSelectedTheme] = useState<Theme>(themes["Weaviate"]);
 
   const fontKey = selectedTheme.font.value as FontKey; // Safely cast if you're sure, or use a check
   const fontClassName = fontKey ? fonts[fontKey]?.className || "" : "";

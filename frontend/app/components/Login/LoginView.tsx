@@ -25,8 +25,16 @@ if (process.env.NODE_ENV === "production") {
   prefix = "";
 }
 
-const VerbaThree = ({ color }: { color: string }) => {
-  const verba_model = useGLTF(prefix + "/verba.glb");
+const VerbaThree = ({
+  color,
+  useMaterial,
+  model_path,
+}: {
+  color: string;
+  useMaterial: boolean;
+  model_path: string;
+}) => {
+  const verba_model = useGLTF(prefix + model_path);
 
   const material = useMemo(
     () =>
@@ -69,7 +77,13 @@ const VerbaThree = ({ color }: { color: string }) => {
   useEffect(() => {
     verba_model.scene.traverse((child) => {
       if (child instanceof THREE.Mesh) {
-        child.material = material;
+        console.log("Mesh:", child.name, "Material:", child.material);
+        if (!useMaterial) {
+          child.material = material;
+        } else {
+          child.material.roughness = 0.2;
+          child.material.metalness = 0.6;
+        }
       }
     });
   }, [verba_model, material]);
@@ -287,7 +301,7 @@ const EnvironmentMap = () => {
 
   useEffect(() => {
     const rgbeLoader = new RGBELoader();
-    rgbeLoader.load(prefix + "/cloudy.hdr", (environmentMap) => {
+    rgbeLoader.load(prefix + "/alps_field_1k.hdr", (environmentMap) => {
       environmentMap.mapping = THREE.EquirectangularReflectionMapping;
       scene.environment = environmentMap;
     });
@@ -406,9 +420,15 @@ const LoginView: React.FC<LoginViewProps> = ({
             <color attach="background" args={["#ffffff"]} />
             <EnvironmentMap />
             <ambientLight intensity={0.5} />
-            <directionalLight position={[5, 5, 5]} intensity={1} />
+            <directionalLight position={[5, 5, 5]} intensity={1.5} />
             {/**coolShapes**/}
-            <VerbaThree color="" />
+            <VerbaThree
+              color=""
+              useMaterial={production == "Local" ? true : true}
+              model_path={
+                production == "Local" ? "/weaviate.glb" : "/weaviate.glb"
+              }
+            />
           </Canvas>
         </div>
         <div className="w-2/5 h-full flex justify-start items-center p-5">
