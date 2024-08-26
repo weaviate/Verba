@@ -674,7 +674,7 @@ class VerbaManager:
 
     # Retrieval Augmented Generation
 
-    async def retrieve_chunks(self, client, query: str, rag_config: dict):
+    async def retrieve_chunks(self, client, query: str, rag_config: dict, labels: list[str]):
         retriever = rag_config["Retriever"].selected
         embedder = rag_config["Embedder"].selected
 
@@ -683,7 +683,7 @@ class VerbaManager:
         )
 
         documents, context = await self.retriever_manager.retrieve(
-            client, retriever, query, vector, rag_config, self.weaviate_manager
+            client, retriever, query, vector, rag_config, self.weaviate_manager, labels
         )
 
         return (documents, context)

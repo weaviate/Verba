@@ -241,7 +241,12 @@ const DocumentSearch: React.FC<DocumentSearchComponentProps> = ({
                   onClick={() => setSelectedDocument(document.uuid)}
                   className={`flex ${selectedDocument && selectedDocument === document.uuid ? "bg-secondary-verba hover:bg-button-hover-verba" : "bg-button-verba hover:bg-secondary-verba"}  w-full p-3 rounded-lg transition-colors duration-300 ease-in-out border-none`}
                 >
-                  <p className="text-text-verba">{document.title}</p>
+                  <p
+                    className="text-text-verba truncate max-w-[400px]"
+                    title={document.title}
+                  >
+                    {document.title}
+                  </p>
                 </button>
                 <div className="flex justify-end items-center">
                   <button

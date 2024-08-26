@@ -45,7 +45,9 @@ class WindowRetriever(Retriever):
             ),
         }
 
-    async def retrieve(self, client, query, vector, config, weaviate_manager, embedder):
+    async def retrieve(
+        self, client, query, vector, config, weaviate_manager, embedder, labels
+    ):
 
         search_mode = config["Search Mode"].value
         limit_mode = config["Limit Mode"].value
@@ -57,7 +59,7 @@ class WindowRetriever(Retriever):
 
         if search_mode == "Hybrid Search":
             chunks = await weaviate_manager.hybrid_chunks(
-                client, embedder, query, vector, limit_mode, limit
+                client, embedder, query, vector, limit_mode, limit, labels
             )
         # TODO Add other search methods
 

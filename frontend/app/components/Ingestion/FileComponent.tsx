@@ -165,7 +165,9 @@ const FileComponent: React.FC<FileComponentProps> = ({
         } w-full p-3 rounded-lg transition-colors duration-300 ease-in-out border-none overflow-hidden`}
       >
         <p className="text-text-verba truncate">
-          {fileMap[fileData.fileID].filename}
+          {fileMap[fileData.fileID].filename
+            ? fileMap[fileData.fileID].filename
+            : "No Filename"}
         </p>
       </button>
 

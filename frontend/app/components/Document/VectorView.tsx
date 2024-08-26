@@ -326,7 +326,12 @@ const VectorView: React.FC<VectorViewProps> = ({
             </div>
             <div className="flex gap-1 items-center">
               <p className="text-text-alt-verba text-sm font-bold">Hover:</p>
-              <p className="text-sm text-text-alt-verba">{hoverTitleState}</p>
+              <p
+                className="text-sm text-text-alt-verba truncate max-w-[300px]"
+                title={hoverTitleState ?? ""}
+              >
+                {hoverTitleState ?? ""}
+              </p>
             </div>
             <div className="flex gap-1 items-center">
               <p className="text-text-alt-verba text-sm font-bold">Vectors:</p>

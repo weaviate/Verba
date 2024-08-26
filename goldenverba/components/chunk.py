@@ -18,6 +18,7 @@ class Chunk:
         self.start_i = start_i
         self.end_i = end_i
         self.content_without_overlap = content_without_overlap
+        self.labels = []
 
     def to_json(self) -> dict:
         """Convert the Chunk object to a dictionary."""
@@ -29,6 +30,7 @@ class Chunk:
             "start_i": self.start_i,
             "end_i": self.end_i,
             "content_without_overlap": self.content_without_overlap,
+            "labels": self.labels,
         }
 
     @classmethod
@@ -40,6 +42,7 @@ class Chunk:
             start_i=data.get("start_i", 0),
             end_i=data.get("end_i", 0),
             content_without_overlap=data.get("content_without_overlap", ""),
+            labels=data.get("labels", []),
         )
         chunk.doc_uuid = (data.get("doc_uuid", ""),)
         return chunk

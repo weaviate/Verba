@@ -72,6 +72,9 @@ export type ThemeConfigResponse = {
 export type DatacountResponse = {
   datacount: number;
 };
+export type LabelsResponse = {
+  labels: string[];
+};
 
 export type ImportResponse = {
   logging: ConsoleMessage[];
@@ -567,7 +570,7 @@ export const WeaviateTheme: Theme = {
   bg_color: { ...LightTheme.bg_color, color: "#ffffff" },
   bg_alt_color: { ...LightTheme.bg_alt_color, color: "#f8f8f8" },
   text_color: { ...LightTheme.text_color, color: "#130C49" },
-  text_alt_color: { ...LightTheme.text_alt_color, color: "#c6c6c6" },
+  text_alt_color: { ...LightTheme.text_alt_color, color: "#a1a1a1" },
   button_color: { ...LightTheme.button_color, color: "#f1f1f1" },
   button_hover_color: { ...LightTheme.button_hover_color, color: "#fdfdfd" },
   font: { ...LightTheme.font, value: "Plus_Jakarta_Sans" },

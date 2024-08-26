@@ -7,12 +7,14 @@ import { IoChatbubbleSharp } from "react-icons/io5";
 import { FaHammer } from "react-icons/fa";
 import { IoIosSend } from "react-icons/io";
 import { BiError } from "react-icons/bi";
+import { IoMdAddCircle } from "react-icons/io";
 
 import {
   updateRAGConfig,
   sendUserQuery,
   fetchDatacount,
   fetchRAGConfig,
+  fetchLabels,
 } from "@/app/api";
 import { getWebSocketApiHost } from "@/app/util";
 import {
@@ -21,6 +23,7 @@ import {
   DataCountPayload,
   ChunkScore,
   Message,
+  LabelsResponse,
   RAGConfig,
   Theme,
 } from "@/app/types";
@@ -62,6 +65,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const [socket, setSocket] = useState<WebSocket | null>(null);
   const [socketOnline, setSocketOnline] = useState(false);
   const [reconnect, setReconnect] = useState(false);
+
+  const [labels, setLabels] = useState<string[]>([]);
+  const [filterLabels, setFilterLabels] = useState<string[]>([]);
 
   const [selectedDocumentScore, setSelectedDocumentScore] = useState<
     string | null
@@ -211,7 +217,12 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     setMessages((prev) => [...prev, { type: "user", content: sendInput }]);
 
     try {
-      const data = await sendUserQuery(sendInput, RAGConfig, credentials);
+      const data = await sendUserQuery(
+        sendInput,
+        RAGConfig,
+        filterLabels,
+        credentials
+      );
 
       if (!data || data.error) {
         handleErrorResponse(data ? data.error : "No data received");
@@ -286,8 +297,12 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         currentEmbedding,
         credentials
       );
+      const labels: LabelsResponse | null = await fetchLabels(credentials);
       if (data) {
         setCurrentDatacount(data.datacount);
+      }
+      if (labels) {
+        setLabels(labels.labels);
       }
     } catch (error) {
       console.error("Failed to fetch from API:", error);
@@ -339,9 +354,76 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         </div>
       </div>
 
-      <div className="bg-bg-alt-verba rounded-2xl flex flex-col p-6 h-full w-full overflow-y-auto overflow-x-hidden">
+      <div className="bg-bg-alt-verba rounded-2xl flex flex-col h-full w-full overflow-y-auto overflow-x-hidden relative">
+        {/* New fixed tab */}
+        <div className="sticky flex flex-col gap-2 top-0 z-10 p-4 backdrop-blur-sm bg-opacity-70 bg-transparent rounded-lg">
+          <div className="flex gap-2 justify-between items-center">
+            <div className="flex gap-2">
+              <div className="dropdown dropdown-hover">
+                <label
+                  tabIndex={0}
+                  className="btn btn-sm border-none shadow-none bg-button-verba text-text-alt-verba hover:text-text-verba hover:bg-button-hover-verba"
+                >
+                  <IoMdAddCircle size={15} />
+                  <p className="text-xs">Label</p>
+                </label>
+                <ul
+                  tabIndex={0}
+                  className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+                >
+                  {labels.map((label, index) => (
+                    <li key={"Label" + index}>
+                      <a
+                        onClick={() => {
+                          if (!filterLabels.includes(label)) {
+                            setFilterLabels([...filterLabels, label]);
+                          }
+                          const dropdownElement =
+                            document.activeElement as HTMLElement;
+                          dropdownElement.blur();
+                          const dropdown = dropdownElement.closest(
+                            ".dropdown"
+                          ) as HTMLElement;
+                          if (dropdown) dropdown.blur();
+                        }}
+                      >
+                        {label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+            {filterLabels.length > 0 && (
+              <button
+                onClick={() => {
+                  setFilterLabels([]);
+                }}
+                className="btn btn-sm border-none shadow-none bg-button-verba text-text-alt-verba hover:text-text-verba hover:bg-button-hover-verba"
+              >
+                <MdCancel size={15} />
+                <p className="text-xs">Clear Filters</p>
+              </button>
+            )}
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {filterLabels.map((label, index) => (
+              <button
+                key={"FilterLabel" + index}
+                onClick={() => {
+                  setFilterLabels(filterLabels.filter((l) => l !== label));
+                }}
+                className="btn btn-sm border-none shadow-none text-text-alt-verba hover:text-text-verba bg-button-verba hover:bg-button-hover-verba"
+              >
+                <p className="text-xs">{label}</p>
+                <MdCancel size={15} />
+              </button>
+            ))}
+          </div>
+        </div>
+
         <div
-          className={`flex flex-col gap-3 ${selectedSetting === "Chat" ? "flex flex-col gap-3 " : "hidden"}`}
+          className={`${selectedSetting === "Chat" ? "flex flex-col gap-3 p-2" : "hidden"}`}
         >
           <div className="flex w-full justify-start items-center text-text-alt-verba gap-2">
             {currentDatacount === 0 && <BiError size={15} />}
@@ -384,7 +466,13 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                   {fetchingStatus === "CHUNKS" && "Retrieving..."}
                   {fetchingStatus === "RESPONSE" && "Generating..."}
                 </p>
-                <button className="btn btn-circle btn-sm bg-bg-alt-verba hover:bg-warning-verba hover:text-text-verba text-text-alt-verba shadow-none border-none text-sm">
+                <button
+                  onClick={() => {
+                    setFetchingStatus("DONE");
+                    isFetching.current = false;
+                  }}
+                  className="btn btn-circle btn-sm bg-bg-alt-verba hover:bg-warning-verba hover:text-text-verba text-text-alt-verba shadow-none border-none text-sm"
+                >
                   <MdCancel size={15} />
                 </button>
               </div>

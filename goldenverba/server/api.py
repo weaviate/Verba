@@ -332,7 +332,7 @@ async def query(payload: QueryPayload):
     try:
         client = await client_manager.connect(payload.credentials)
         documents, context = await manager.retrieve_chunks(
-            client, payload.query, payload.RAG
+            client, payload.query, payload.RAG, payload.labels
         )
         return JSONResponse(
             content={"error": "", "documents": documents, "context": context}
@@ -401,6 +401,25 @@ async def get_document_count(payload: DatacountPayload):
         return JSONResponse(
             content={
                 "datacount": 0,
+            }
+        )
+
+
+@app.post("/api/get_labels")
+async def get_labels(payload: Credentials):
+    try:
+        client = await client_manager.connect(payload)
+        labels = await manager.weaviate_manager.get_labels(client)
+        return JSONResponse(
+            content={
+                "labels": labels,
+            }
+        )
+    except Exception as e:
+        msg.fail(f"Document Labels retrieval failed: {str(e)}")
+        return JSONResponse(
+            content={
+                "labels": [],
             }
         )
 

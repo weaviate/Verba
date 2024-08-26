@@ -8,6 +8,7 @@ import { CgDebug } from "react-icons/cg";
 
 import { MdError } from "react-icons/md";
 import { FaCheckCircle } from "react-icons/fa";
+import { FaCircleInfo } from "react-icons/fa6";
 
 interface BasicSettingViewProps {
   selectedFileData: string | null;
@@ -190,6 +191,13 @@ const BasicSettingView: React.FC<BasicSettingViewProps> = ({
               )
             )}
         </div>
+
+        {selectedFileData && fileMap[selectedFileData].isURL && (
+          <div className="justify-center items-center text-text-alt-verba flex gap-2">
+            <FaCircleInfo size={15} />
+            <p>URL settings can be configured in the Config tab.</p>
+          </div>
+        )}
 
         <div className="divider text-text-alt-verba">File Settings</div>
 

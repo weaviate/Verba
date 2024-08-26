@@ -260,14 +260,14 @@ const ConfigurationView: React.FC<ConfigurationViewProps> = ({
             className="flex btn border-none text-text-verba bg-secondary-verba hover:bg-button-hover-verba gap-2"
           >
             <VscSaveAll size={15} />
-            <p>Apply to All</p>
+            <p>Apply to All Files</p>
           </button>
           <button
             onClick={openDefaultModal}
-            className="flex btn border-none text-text-verba bg-button-verba hover:bg-button-hover-verba gap-2"
+            className="flex btn border-none text-text-verba bg-primary-verba hover:bg-button-hover-verba gap-2"
           >
             <IoSettingsSharp size={15} />
-            <p>Set as Default</p>
+            <p>Save Config</p>
           </button>
           <button
             onClick={openResetModal}

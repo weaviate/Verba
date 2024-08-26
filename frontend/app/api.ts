@@ -16,6 +16,7 @@ import {
   VectorsPayload,
   ThemeConfigResponse,
   Theme,
+  LabelsResponse,
   Themes,
 } from "./types";
 
@@ -191,6 +192,7 @@ export const updateThemeConfig = async (
 export const sendUserQuery = async (
   query: string,
   RAG: RAGConfig | null,
+  labels: string[],
   credentials: Credentials
 ): Promise<QueryPayload | null> => {
   try {
@@ -203,6 +205,7 @@ export const sendUserQuery = async (
       body: JSON.stringify({
         query: query,
         RAG: RAG,
+        labels: labels,
         credentials: credentials,
       }),
     });
@@ -262,6 +265,27 @@ export const fetchDatacount = async (
       }),
     });
     const data: DatacountResponse = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error retrieving content", error);
+    return null;
+  }
+};
+
+// Endpoint /api/get_labels
+export const fetchLabels = async (
+  credentials: Credentials
+): Promise<LabelsResponse | null> => {
+  try {
+    const host = await detectHost();
+    const response = await fetch(`${host}/api/get_labels`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(credentials),
+    });
+    const data: LabelsResponse = await response.json();
     return data;
   } catch (error) {
     console.error("Error retrieving content", error);

@@ -161,6 +161,7 @@ class VerbaConfig(BaseModel):
 class QueryPayload(BaseModel):
     query: str
     RAG: dict[str, RAGComponentClass]
+    labels: list[str]
     credentials: Credentials
 
 
