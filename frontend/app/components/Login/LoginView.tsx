@@ -551,17 +551,40 @@ const LoginView: React.FC<LoginViewProps> = ({
                         />
                       </label>
                       <div className="flex justify-between gap-4 mt-4">
-                        <button
-                          type="submit"
-                          className="w-full bg-secondary-verba btn border-none hover:bg-button-hover-verba text-text-verba hover:text-text-verba p-3 rounded-lg"
-                          disabled={isConnecting}
-                        >
-                          {isConnecting ? (
-                            <span className="loading loading-spinner"></span>
-                          ) : (
-                            "Connect"
-                          )}
-                        </button>
+                        <div className="flex flex-col w-full gap-2">
+                          <button
+                            type="submit"
+                            className="w-full bg-secondary-verba btn border-none hover:bg-button-hover-verba text-text-verba  p-3 rounded-lg"
+                            disabled={isConnecting}
+                          >
+                            {isConnecting ? (
+                              <span className="loading loading-spinner"></span>
+                            ) : (
+                              "Connect"
+                            )}
+                          </button>
+                          <button
+                            type="button"
+                            className="w-full bg-button-verba btn border-none hover:bg-button-hover-verba text-text-alt-verba hover:text-text-verba p-3 rounded-lg"
+                            disabled={isConnecting}
+                            onClick={() =>
+                              window.open(
+                                "https://console.weaviate.cloud",
+                                "_blank"
+                              )
+                            }
+                          >
+                            Register
+                          </button>
+                          <button
+                            type="button"
+                            className="w-full bg-button-verba btn border-none hover:bg-button-hover-verba text-text-alt-verba hover:text-text-verba p-3 rounded-lg"
+                            disabled={isConnecting}
+                            onClick={() => setSelectStage(true)}
+                          >
+                            Back
+                          </button>
+                        </div>
                       </div>
                     </form>
                     {errorText && (

@@ -198,6 +198,11 @@ class SetRAGConfigPayload(BaseModel):
     credentials: Credentials
 
 
+class SetUserConfigPayload(BaseModel):
+    user_config: dict
+    credentials: Credentials
+
+
 class SetThemeConfigPayload(BaseModel):
     theme: dict
     themes: dict

@@ -801,6 +801,9 @@ class WeaviateManager:
                 offset=offset,
                 sort=Sort.by_property("timestamp", ascending=False),
             )
+            aggregation = await suggestion_collection.aggregate.over_all(
+                total_count=True
+            )
             return_suggestions = [
                 {
                     "query": suggestion.properties["query"],
@@ -809,7 +812,7 @@ class WeaviateManager:
                 }
                 for suggestion in suggestions.objects
             ]
-            return return_suggestions
+            return return_suggestions, aggregation.total_count
 
     async def delete_suggestions(self, client: WeaviateAsyncClient, uuid: str):
         if await self.verify_collection(client, self.suggestion_collection_name):

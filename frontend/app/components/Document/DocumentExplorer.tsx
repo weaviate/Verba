@@ -10,6 +10,7 @@ import { MdContentCopy } from "react-icons/md";
 import { TbVectorTriangle } from "react-icons/tb";
 import ContentView from "./ContentView";
 import { IoMdAddCircle } from "react-icons/io";
+import { FaExternalLinkAlt } from "react-icons/fa";
 import {
   VerbaDocument,
   DocumentPayload,
@@ -211,9 +212,9 @@ const DocumentExplorer: React.FC<DocumentExplorerProps> = ({
               onClick={() => {
                 handleSourceClick(document.source);
               }}
-              className="flex btn border-none text-text-verba bg-button-verba hover:bg-button-hover-verba gap-2"
+              className="flex btn border-none text-text-alt-verba hover:text-text-verba bg-button-verba hover:bg-button-hover-verba gap-2"
             >
-              <FaInfoCircle size={15} />
+              <FaExternalLinkAlt size={15} />
               <p>View Source</p>
             </button>
           )}

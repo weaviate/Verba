@@ -385,7 +385,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
       <div className="bg-bg-alt-verba rounded-2xl flex flex-col h-full w-full overflow-y-auto overflow-x-hidden relative">
         {/* New fixed tab */}
-        <div className="sticky flex flex-col gap-2 top-0 z-10 p-4 backdrop-blur-sm bg-opacity-70 bg-transparent rounded-lg">
+        <div className="sticky flex flex-col gap-2 top-0 z-10 p-4 backdrop-blur-sm bg-opacity-30 bg-bg-alt-verba rounded-lg">
           <div className="flex gap-2 justify-between items-center">
             <div className="flex gap-2">
               <div className="dropdown dropdown-hover">

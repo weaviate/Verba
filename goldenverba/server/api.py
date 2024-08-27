@@ -1,4 +1,4 @@
-from fastapi import FastAPI, WebSocket
+from fastapi import FastAPI, WebSocket, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from contextlib import asynccontextmanager
@@ -29,6 +29,7 @@ from goldenverba.server.types import (
     DeleteSuggestionPayload,
     GetContentPayload,
     SetThemeConfigPayload,
+    SetUserConfigPayload,
     SearchQueryPayload,
     SetRAGConfigPayload,
     GetChunkPayload,
@@ -66,20 +67,29 @@ async def lifespan(app: FastAPI):
 # FastAPI App
 app = FastAPI(lifespan=lifespan)
 
-origins = [
-    "http://localhost:3000",
-    "https://verba-golden-ragtriever.onrender.com",
-    "http://localhost:8000",
-]
-
-# Add middleware for handling Cross Origin Resource Sharing (CORS)
+# Allow requests only from the same origin
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],  # This will be restricted by the custom middleware
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# Custom middleware to check if the request is from the same origin
+@app.middleware("http")
+async def check_same_origin(request: Request, call_next):
+    origin = request.headers.get("origin")
+    if origin == request.base_url or (
+        origin
+        and origin.startswith("http://localhost:")
+        and request.base_url.hostname == "localhost"
+    ):
+        return await call_next(request)
+    else:
+        return JSONResponse(status_code=403, content={"error": "Not allowed"})
+
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -129,6 +139,7 @@ async def connect_to_verba(payload: ConnectPayload):
     try:
         client = await client_manager.connect(payload.credentials)
         config = await manager.load_rag_config(client)
+        user_config = await manager.load_user_config(client)
         theme, themes = await manager.load_theme_config(client)
         return JSONResponse(
             status_code=200,
@@ -136,6 +147,7 @@ async def connect_to_verba(payload: ConnectPayload):
                 "connected": True,
                 "error": "",
                 "rag_config": config,
+                "user_config": user_config,
                 "theme": theme,
                 "themes": themes,
             },
@@ -239,7 +251,7 @@ async def retrieve_rag_config(payload: Credentials):
         return JSONResponse(
             status_code=500,
             content={
-                "data": {},
+                "rag_config": {},
                 "error": f"Could not retrieve rag configuration: {str(e)}",
             },
         )
@@ -261,6 +273,55 @@ async def update_rag_config(payload: SetRAGConfigPayload):
         return JSONResponse(
             content={
                 "status": 200,
+            }
+        )
+    except Exception as e:
+        msg.warn(f"Failed to set new RAG Config {str(e)}")
+        return JSONResponse(
+            content={
+                "status": 400,
+                "status_msg": f"Failed to set new RAG Config {str(e)}",
+            }
+        )
+
+
+@app.post("/api/get_user_config")
+async def retrieve_user_config(payload: Credentials):
+    try:
+        client = await client_manager.connect(payload)
+        config = await manager.load_user_config(client)
+        return JSONResponse(
+            status_code=200, content={"user_config": config, "error": ""}
+        )
+
+    except Exception as e:
+        msg.warn(f"Could not retrieve user configuration: {str(e)}")
+        return JSONResponse(
+            status_code=500,
+            content={
+                "user_config": {},
+                "error": f"Could not retrieve rag configuration: {str(e)}",
+            },
+        )
+
+
+@app.post("/api/set_user_config")
+async def update_user_config(payload: SetUserConfigPayload):
+    if production == "Demo":
+        return JSONResponse(
+            content={
+                "status": "200",
+                "status_msg": "Config can't be updated in Production Mode",
+            }
+        )
+
+    try:
+        client = await client_manager.connect(payload.credentials)
+        await manager.set_user_config(client, payload.user_config)
+        return JSONResponse(
+            content={
+                "status": 200,
+                "status_msg": "User config updated",
             }
         )
     except Exception as e:
@@ -655,18 +716,22 @@ async def get_suggestions(payload: GetSuggestionsPayload):
 async def get_all_suggestions(payload: GetAllSuggestionsPayload):
     try:
         client = await client_manager.connect(payload.credentials)
-        suggestions = await manager.weaviate_manager.retrieve_all_suggestions(
-            client, payload.page, payload.pageSize
+        suggestions, total_count = (
+            await manager.weaviate_manager.retrieve_all_suggestions(
+                client, payload.page, payload.pageSize
+            )
         )
         return JSONResponse(
             content={
                 "suggestions": suggestions,
+                "total_count": total_count,
             }
         )
     except Exception:
         return JSONResponse(
             content={
                 "suggestions": [],
+                "total_count": 0,
             }
         )
 

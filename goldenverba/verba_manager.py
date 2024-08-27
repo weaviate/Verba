@@ -47,6 +47,7 @@ class VerbaManager:
         self.weaviate_manager = WeaviateManager()
         self.rag_config_uuid = "e0adcc12-9bad-4588-8a1e-bab0af6ed485"
         self.theme_config_uuid = "baab38a7-cb51-4108-acd8-6edeca222820"
+        self.user_config_uuid = "f53f7738-08be-4d5a-b003-13eb4bf03ac7"
         self.environment_variables = {}
         self.installed_libraries = {}
 
@@ -341,11 +342,17 @@ class VerbaManager:
             "Generator": generator_config,
         }
 
+    def create_user_config(self) -> dict:
+        return {"getting_started": False}
+
     async def set_theme_config(self, client, config: dict):
         await self.weaviate_manager.set_config(client, self.theme_config_uuid, config)
 
     async def set_rag_config(self, client, config: dict):
         await self.weaviate_manager.set_config(client, self.rag_config_uuid, config)
+
+    async def set_user_config(self, client, config: dict):
+        await self.weaviate_manager.set_config(client, self.user_config_uuid, config)
 
     async def load_rag_config(self, client):
         """Check if a Configuration File exists in the database, if yes, check if corrupted. Returns a valid configuration file"""
@@ -374,6 +381,16 @@ class VerbaManager:
             return None, None
 
         return loaded_config["theme"], loaded_config["themes"]
+
+    async def load_user_config(self, client):
+        loaded_config = await self.weaviate_manager.get_config(
+            client, self.user_config_uuid
+        )
+
+        if loaded_config is None:
+            return self.create_user_config()
+
+        return loaded_config
 
     def verify_config(self, a: dict, b: dict) -> bool:
         # Check Settings ( RAG & Settings )
@@ -442,13 +459,17 @@ class VerbaManager:
             msg.fail(f"Config Validation failed: {str(e)}")
             return False
 
-    def reset_rag_config(self, client):
+    async def reset_rag_config(self, client):
         msg.info("Resetting RAG Configuration")
-        self.weaviate_manager.reset_config(self.rag_config_uuid)
+        await self.weaviate_manager.reset_config(client, self.rag_config_uuid)
 
-    def reset_theme_config(self, client):
+    async def reset_theme_config(self, client):
         msg.info("Resetting Theme Configuration")
-        self.weaviate_manager.reset_config(self.theme_config_uuid)
+        await self.weaviate_manager.reset_config(client, self.theme_config_uuid)
+
+    async def reset_user_config(self, client):
+        msg.info("Resetting User Configuration")
+        await self.weaviate_manager.reset_config(client, self.user_config_uuid)
 
     # Environment and Libraries
 
@@ -694,8 +715,8 @@ class VerbaManager:
         suggestion_enabled = bool(
             rag_config["Retriever"].components[retriever].config["Suggestion"].value
         )
-        if suggestion_enabled:
-            await self.weaviate_manager.add_suggestion(client, query)
+
+        await self.weaviate_manager.add_suggestion(client, query)
 
         vector = await self.embedder_manager.vectorize_query(
             embedder, query, rag_config
@@ -727,267 +748,6 @@ class VerbaManager:
         ):
             full_text += result["message"]
             yield result
-
-    ########
-
-    def get_schemas(self) -> dict:
-        """
-        @returns dict - A dictionary with the schema names and their object count.
-        """
-        schema_info = self.client.schema.get()
-
-        schemas = {}
-
-        try:
-            for _class in schema_info["classes"]:
-                results = (
-                    self.client.query.aggregate(_class["class"]).with_meta_count().do()
-                )
-                if "VERBA" in _class["class"]:
-                    schemas[_class["class"]] = (
-                        results.get("data", {})
-                        .get("Aggregate", {})
-                        .get(_class["class"], [{}])[0]
-                        .get("meta", {})
-                        .get("count", 0)
-                    )
-        except Exception as e:
-            msg.fail(
-                f"Couldn't retrieve information about Collections, if you're using Weaviate Embedded, try to reset `~/.local/share/weaviate` ({str(e)})"
-            )
-
-        return schemas
-
-    def get_suggestions(self, query: str) -> list[str]:
-        """Retrieve suggestions based on user query
-        @parameter query : str - User query
-        @returns list[str] - List of possible autocomplete suggestions.
-        """
-        query_results = (
-            self.client.query.get(
-                class_name="VERBA_Suggestion",
-                properties=["suggestion"],
-            )
-            .with_bm25(query=query)
-            .with_limit(3)
-            .do()
-        )
-
-        results = query_results["data"]["Get"]["VERBA_Suggestion"]
-
-        if not results:
-            return []
-
-        suggestions = []
-
-        for result in results:
-            suggestions.append(result["suggestion"])
-
-        return suggestions
-
-    def set_suggestions(self, query: str):
-        """Adds suggestions to the suggestion class
-        @parameter query : str - Query to save in suggestions.
-        """
-        # Don't set new suggestions when in production
-        production_key = os.environ.get("VERBA_PRODUCTION", "")
-        if production_key == "True":
-            return
-        check_results = (
-            self.client.query.get(
-                class_name="VERBA_Suggestion",
-                properties=["suggestion"],
-            )
-            .with_where(
-                {
-                    "path": ["suggestion"],
-                    "operator": "Equal",
-                    "valueText": query,
-                }
-            )
-            .with_limit(1)
-            .do()
-        )
-
-        if (
-            "data" in check_results
-            and len(check_results["data"]["Get"]["VERBA_Suggestion"]) > 0
-        ):
-            if (
-                query
-                == check_results["data"]["Get"]["VERBA_Suggestion"][0]["suggestion"]
-            ):
-                return
-
-        with self.client.batch as batch:
-            batch.batch_size = 1
-            properties = {
-                "suggestion": query,
-            }
-            self.client.batch.add_data_object(properties, "VERBA_Suggestion")
-
-        msg.info("Added query to suggestions")
-
-    def retrieve_all_document_types(self) -> list:
-        """Aggreagtes and returns all document types from Weaviate
-        @returns list - Document list.
-        """
-        class_name = "VERBA_Document_" + schema_manager.strip_non_letters(
-            self.embedder_manager.embedders[
-                self.embedder_manager.selected_embedder
-            ].vectorizer
-        )
-
-        query_results = (
-            self.client.query.aggregate(class_name)
-            .with_fields("doc_type {count topOccurrences {value occurs}}")
-            .do()
-        )
-
-        results = [
-            doc_type["value"]
-            for doc_type in query_results["data"]["Aggregate"][class_name][0][
-                "doc_type"
-            ]["topOccurrences"]
-        ]
-        return results
-
-    def retrieve_document(self, doc_id: str) -> dict:
-        """Return a document by it's ID (UUID format) from Weaviate
-        @parameter doc_id : str - Document ID
-        @returns dict - Document dict.
-        """
-        class_name = "VERBA_Document_" + schema_manager.strip_non_letters(
-            self.embedder_manager.embedders[
-                self.embedder_manager.selected_embedder
-            ].vectorizer
-        )
-
-        document = self.client.data_object.get_by_id(
-            doc_id,
-            class_name=class_name,
-        )
-        return document
-
-    async def generate_answer(
-        self, queries: list[str], contexts: list[str], conversation: dict
-    ):
-        semantic_result = None
-        if self.enable_caching:
-            semantic_query = self.embedder_manager.embedders[
-                self.embedder_manager.selected_embedder
-            ].conversation_to_query(queries, conversation)
-            (
-                semantic_result,
-                distance,
-            ) = self.embedder_manager.embedders[
-                self.embedder_manager.selected_embedder
-            ].retrieve_semantic_cache(self.client, semantic_query)
-
-        if semantic_result is not None:
-            return {
-                "message": str(semantic_result),
-                "finish_reason": "stop",
-                "cached": True,
-                "distance": distance,
-            }
-
-        else:
-            full_text = await self.generator_manager.generators[
-                self.generator_manager.selected_generator
-            ].generate(queries, contexts, conversation)
-            if self.enable_caching:
-                self.embedder_manager.embedders[
-                    self.embedder_manager.selected_embedder
-                ].add_to_semantic_cache(self.client, semantic_query, full_text)
-                self.set_suggestions(" ".join(queries))
-            return full_text
-
-    def reset(self):
-        self.client.schema.delete_class("VERBA_Suggestion")
-        # Check if all schemas exist for all possible vectorizers
-        for vectorizer in schema_manager.VECTORIZERS:
-            schema_manager.reset_schemas(self.client, vectorizer)
-
-        for embedding in schema_manager.EMBEDDINGS:
-            schema_manager.reset_schemas(self.client, embedding)
-
-        for vectorizer in schema_manager.VECTORIZERS:
-            schema_manager.init_schemas(self.client, vectorizer, False, True)
-
-        for embedding in schema_manager.EMBEDDINGS:
-            schema_manager.init_schemas(self.client, embedding, False, True)
-
-    def reset_cache(self):
-        # Check if all schemas exist for all possible vectorizers
-        for vectorizer in schema_manager.VECTORIZERS:
-            class_name = "VERBA_Cache_" + schema_manager.strip_non_letters(vectorizer)
-            self.client.schema.delete_class(class_name)
-            schema_manager.init_schemas(self.client, vectorizer, False, True)
-
-        for embedding in schema_manager.EMBEDDINGS:
-            class_name = "VERBA_Cache_" + schema_manager.strip_non_letters(embedding)
-            self.client.schema.delete_class(class_name)
-            schema_manager.init_schemas(self.client, embedding, False, True)
-
-    def reset_suggestion(self):
-        self.client.schema.delete_class("VERBA_Suggestion")
-        schema_manager.init_suggestion(self.client, "", False, True)
-
-    def check_if_document_exits(self, document: Document) -> bool:
-        """Return a document by it's ID (UUID format) from Weaviate
-        @parameter document : Document - Document object
-        @returns bool - Whether the doc name exist in the cluster.
-        """
-        class_name = "VERBA_Document_" + schema_manager.strip_non_letters(
-            self.embedder_manager.embedders[
-                self.embedder_manager.selected_embedder
-            ].vectorizer
-        )
-
-        results = (
-            self.client.query.get(
-                class_name=class_name,
-                properties=[
-                    "doc_name",
-                ],
-            )
-            .with_where(
-                {
-                    "path": ["doc_name"],
-                    "operator": "Equal",
-                    "valueText": document.name,
-                }
-            )
-            .with_limit(1)
-            .do()
-        )
-
-        if "data" in results:
-            if results["data"]["Get"][class_name]:
-                msg.warn(f"{document.name} already exists")
-                return True
-        else:
-            msg.warn(f"Error occured while checking for duplicates: {results}")
-
-        return False
-
-    def check_verba_component(self, component: VerbaComponent) -> tuple[bool, str]:
-        return component.check_available(
-            self.environment_variables, self.installed_libraries
-        )
-
-    def delete_document_by_id(self, doc_id: str) -> None:
-        self.embedder_manager.embedders[
-            self.embedder_manager.selected_embedder
-        ].remove_document_by_id(self.client, doc_id)
-
-    def search_documents(
-        self, query: str, doc_type: str, page: int, pageSize: int
-    ) -> list:
-        return self.embedder_manager.embedders[
-            self.embedder_manager.selected_embedder
-        ].search_documents(self.client, query, doc_type, page, pageSize)
 
 
 class ClientManager:

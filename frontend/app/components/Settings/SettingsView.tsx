@@ -14,6 +14,7 @@ import { Theme, Themes, Credentials } from "@/app/types";
 import SettingsComponent from "./SettingsComponent";
 
 import InfoComponent from "../Navigation/InfoComponent";
+import SuggestionView from "./SuggestionView";
 import InfoView from "./InfoView";
 
 interface SettingsViewProps {
@@ -118,6 +119,9 @@ const SettingsView: React.FC<SettingsViewProps> = ({
               />
             )}
             {settingMode === "INFO" && <InfoView credentials={credentials} />}
+            {settingMode === "SUGGESTIONS" && (
+              <SuggestionView credentials={credentials} />
+            )}
           </div>
         </div>
       </div>

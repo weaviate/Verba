@@ -51,6 +51,12 @@ export const MultiInput: React.FC<{
             onChange={(e) => {
               setCurrentInput(e.target.value);
             }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                addValue(currentInput);
+              }
+            }}
           />
         </label>
         <button
@@ -58,9 +64,10 @@ export const MultiInput: React.FC<{
             addValue(currentInput);
           }}
           disabled={blocked}
-          className="btn btn-square bg-button-verba border-none hover:bg-secondary-verba text-text-verba"
+          className="btn flex gap-2 bg-button-verba border-none hover:bg-secondary-verba text-text-verba"
         >
           <IoAddCircleSharp size={15} />
+          <p>Add</p>
         </button>
       </div>
 

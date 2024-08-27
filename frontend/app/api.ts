@@ -10,14 +10,17 @@ import {
   ContentPayload,
   ChunksPayload,
   RAGConfigResponse,
+  AllSuggestionsPayload,
   MetadataPayload,
   DatacountResponse,
   SuggestionsPayload,
   ChunkPayload,
   DocumentFilter,
   VectorsPayload,
+  UserConfigResponse,
   ThemeConfigResponse,
   Theme,
+  UserConfig,
   LabelsResponse,
   Themes,
 } from "./types";
@@ -133,6 +136,52 @@ export const updateRAGConfig = async (
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ rag_config: RAG, credentials: credentials }),
+    });
+
+    return response.status === 200;
+  } catch (error) {
+    console.error("Error setting config:", error);
+    return false;
+  }
+};
+
+// Endpoint /api/get_user_config
+export const fetchUserConfig = async (
+  credentials: Credentials
+): Promise<UserConfigResponse | null> => {
+  try {
+    const host = await detectHost();
+    const response = await fetch(`${host}/api/get_user_config`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(credentials),
+    });
+    const data: UserConfigResponse = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error retrieving content", error);
+    return null;
+  }
+};
+
+// Endpoint /api/set_user_config
+export const updateUserConfig = async (
+  user_config: UserConfig,
+  credentials: Credentials
+): Promise<boolean> => {
+  try {
+    const host = await detectHost();
+    const response = await fetch(`${host}/api/set_user_config`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        user_config: user_config,
+        credentials: credentials,
+      }),
     });
 
     return response.status === 200;
@@ -577,11 +626,11 @@ export const deleteSuggestion = async (
 };
 
 // Endpoint /api/get_all_suggestions
-export const getAllSuggestions = async (
+export const fetchAllSuggestions = async (
   page: number,
   pageSize: number,
   credentials: Credentials
-): Promise<SuggestionsPayload | null> => {
+): Promise<AllSuggestionsPayload | null> => {
   try {
     const host = await detectHost();
     const response = await fetch(`${host}/api/get_all_suggestions`, {
@@ -595,7 +644,7 @@ export const getAllSuggestions = async (
         credentials: credentials,
       }),
     });
-    const data: SuggestionsPayload = await response.json();
+    const data: AllSuggestionsPayload = await response.json();
     return data;
   } catch (error) {
     console.error("Error retrieving all suggestions", error);

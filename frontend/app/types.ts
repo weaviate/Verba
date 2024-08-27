@@ -9,10 +9,15 @@ export type DocumentFilter = {
   uuid: string;
 };
 
+export type UserConfig = {
+  getting_started: boolean;
+};
+
 export type ConnectPayload = {
   connected: boolean;
   error: string;
   rag_config: RAGConfig;
+  user_config: UserConfig;
   theme: Theme;
   themes: Themes;
 };
@@ -25,6 +30,11 @@ export type Suggestion = {
 
 export type SuggestionsPayload = {
   suggestions: Suggestion[];
+};
+
+export type AllSuggestionsPayload = {
+  suggestions: Suggestion[];
+  total_count: number;
 };
 
 export type StatusPayload = {
@@ -75,6 +85,11 @@ export type SchemaStatus = {
 
 export type RAGConfigResponse = {
   rag_config: RAGConfig;
+  error: string;
+};
+
+export type UserConfigResponse = {
+  user_config: UserConfig;
   error: string;
 };
 

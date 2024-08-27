@@ -20,6 +20,7 @@
     "@types/react-dom": "18.2.7",
     "@types/three": "^0.166.0",
     "autoprefixer": "10.4.15",
+    "date-fns": "^3.6.0",
     "eslint": "8.47.0",
     "eslint-config-next": "^14.2.6",
     "lil-gui": "^0.19.2",

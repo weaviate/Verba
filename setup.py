@@ -40,6 +40,7 @@ setup(
         "langchain-text-splitters==0.2.2",
         "spacy==3.7.5",
         "aiohttp==3.9.5",
+        "markdownify==0.13.1",
         "aiofiles==24.1.0",
         "beautifulsoup4==4.12.3",
     ],
