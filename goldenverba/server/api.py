@@ -80,15 +80,37 @@ app.add_middleware(
 # Custom middleware to check if the request is from the same origin
 @app.middleware("http")
 async def check_same_origin(request: Request, call_next):
+    # Allow public access to /api/health
+    if request.url.path == "/api/health":
+        return await call_next(request)
+
     origin = request.headers.get("origin")
-    if origin == request.base_url or (
+    if origin == str(request.base_url).rstrip("/") or (
         origin
         and origin.startswith("http://localhost:")
         and request.base_url.hostname == "localhost"
     ):
         return await call_next(request)
     else:
-        return JSONResponse(status_code=403, content={"error": "Not allowed"})
+        # Only apply restrictions to /api/ routes (except /api/health)
+        if request.url.path.startswith("/api/"):
+            return JSONResponse(
+                status_code=403,
+                content={
+                    "error": "Not allowed",
+                    "details": {
+                        "request_origin": origin,
+                        "expected_origin": str(request.base_url),
+                        "request_method": request.method,
+                        "request_url": str(request.url),
+                        "request_headers": dict(request.headers),
+                        "expected_header": "Origin header matching the server's base URL or localhost",
+                    },
+                },
+            )
+
+        # Allow non-API routes to pass through
+        return await call_next(request)
 
 
 BASE_DIR = Path(__file__).resolve().parent

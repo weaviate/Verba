@@ -74,14 +74,6 @@ const SettingsView: React.FC<SettingsViewProps> = ({
               <p className="text-text-verba">Manage Suggestions</p>
             </button>
             <button
-              key={"Cache Button Setting"}
-              onClick={() => setSettingMode("CACHE")}
-              className={`flex ${settingMode === "CACHE" ? "bg-secondary-verba hover:bg-button-hover-verba" : "bg-button-verba hover:bg-secondary-verba"}  w-full p-3 rounded-lg items-center text-text-verba gap-2 transition-colors duration-300 ease-in-out border-none`}
-            >
-              <FaDatabase size={18} />
-              <p className="text-text-verba">Manage Cache</p>
-            </button>
-            <button
               key={"Logout Button Setting"}
               className={`flex bg-button-verba hover:bg-secondary-verba  w-full p-3 rounded-lg items-center text-text-verba gap-2 transition-colors duration-300 ease-in-out border-none`}
               onClick={() => window.location.reload()}

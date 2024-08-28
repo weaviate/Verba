@@ -155,17 +155,12 @@ class WeaviateManager:
                 cluster_url=w_url,
                 auth_credentials=AuthApiKey(w_key),
             )
-        elif w_url is not None and w_key is None:
-            if "localhost" in w_url:
-                msg.info(f"Connecting to Local Weaviate {w_url} without Auth")
-                return weaviate.use_async_with_local()
-            else:
-                msg.info(f"Connecting to Weaviate Cluster {w_url} without Auth")
-                return weaviate.use_async_with_weaviate_cloud(cluster_url=w_url)
+        else:
+            raise Exception("No URL or API Key provided")
 
-    async def connect_to_docker(self):
+    async def connect_to_docker(self, w_url):
         msg.info(f"Connecting to Weaviate Docker")
-        return weaviate.use_async_with_local()
+        return weaviate.use_async_with_local(host=w_url)
 
     async def connect_to_embedded(self):
         msg.info(f"Connecting to Weaviate Embedded")
@@ -175,16 +170,17 @@ class WeaviateManager:
         self, deployment: str, weaviateURL: str, weaviateAPIKey: str
     ) -> WeaviateAsyncClient:
         try:
-            if weaviateURL == "" and os.environ.get("WEAVIATE_URL_VERBA"):
-                weaviateURL = os.environ.get("WEAVIATE_URL_VERBA")
-
-            if weaviateAPIKey == "" and os.environ.get("WEAVIATE_API_KEY_VERBA"):
-                weaviateAPIKey = os.environ.get("WEAVIATE_API_KEY_VERBA")
 
             if deployment == "Weaviate":
+                if weaviateURL == "" and os.environ.get("WEAVIATE_URL_VERBA"):
+                    weaviateURL = os.environ.get("WEAVIATE_URL_VERBA")
+
+                if weaviateAPIKey == "" and os.environ.get("WEAVIATE_API_KEY_VERBA"):
+                    weaviateAPIKey = os.environ.get("WEAVIATE_API_KEY_VERBA")
+
                 client = await self.connect_to_cluster(weaviateURL, weaviateAPIKey)
             elif deployment == "Docker":
-                client = await self.connect_to_docker()
+                client = await self.connect_to_docker("weaviate")
             elif deployment == "Local":
                 client = await self.connect_to_embedded()
 

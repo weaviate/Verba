@@ -460,13 +460,18 @@ const LoginView: React.FC<LoginViewProps> = ({
                       <p>Weaviate</p>
                     </button>
                     <button
+                      disabled={isConnecting}
                       onClick={() => {
-                        setSelectStage(false);
                         setSelectedDeployment("Docker");
+                        connect("Docker");
                       }}
                       className="bg-button-verba btn border-none hover:bg-secondary-verba text-text-alt-verba hover:text-text-verba p-3 rounded-lg"
                     >
-                      <p>Docker</p>
+                      {isConnecting ? (
+                        <span className="loading loading-spinner loading-sm"></span>
+                      ) : (
+                        <p>Docker</p>
+                      )}
                     </button>
                     <button
                       onClick={() => {
@@ -523,7 +528,7 @@ const LoginView: React.FC<LoginViewProps> = ({
                     <form
                       onSubmit={(e) => {
                         e.preventDefault();
-                        connect("Weaviate");
+                        connect(selectedDeployment);
                       }}
                     >
                       <label className="input flex items-center gap-2 border-none shadow-md bg-bg-verba">
@@ -587,15 +592,13 @@ const LoginView: React.FC<LoginViewProps> = ({
                         </div>
                       </div>
                     </form>
-                    {errorText && (
-                      <div className="bg-warning-verba p-4 rounded w-full">
-                        <p className="flex w-full whitespace-pre-wrap">
-                          {errorText}
-                        </p>
-                      </div>
-                    )}
                   </div>
                 )}
+              </div>
+            )}
+            {errorText && (
+              <div className="bg-warning-verba p-4 rounded w-full">
+                <p className="flex w-full whitespace-pre-wrap">{errorText}</p>
               </div>
             )}
           </div>
