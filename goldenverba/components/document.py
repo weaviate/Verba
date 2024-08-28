@@ -2,6 +2,7 @@ from goldenverba.server.types import FileConfig
 from goldenverba.components.chunk import Chunk
 from spacy.tokens import Doc
 from spacy.language import Language
+import spacy
 import json
 
 
@@ -15,7 +16,6 @@ class Document:
         labels: list[str] = [],
         source: str = "",
         meta: dict = {},
-        spacy_doc: Doc = None,
     ):
         self.title = title
         self.content = content
@@ -25,7 +25,11 @@ class Document:
         self.source = source
         self.meta = meta
         self.chunks: list[Chunk] = []
-        self.spacy_doc = spacy_doc
+
+        nlp = spacy.blank("en")
+        nlp.add_pipe("sentencizer", config={"punct_chars": None})
+
+        self.spacy_doc = nlp(content)
 
     @staticmethod
     def to_json(document) -> dict:
@@ -68,9 +72,12 @@ class Document:
             return None
 
 
-def create_document(content: str, nlp: Language, fileConfig: FileConfig) -> Document:
+def create_document(content: str, fileConfig: FileConfig) -> Document:
     """Create a Document object from the file content."""
     MAX_BATCH_SIZE = 500000
+
+    nlp = spacy.blank("en")
+    nlp.add_pipe("sentencizer", config={"punct_chars": None})
 
     if nlp and len(content) > MAX_BATCH_SIZE:
         # Process content in batches

@@ -1,8 +1,6 @@
 import contextlib
 
 from wasabi import msg
-import re
-import spacy
 
 with contextlib.suppress(Exception):
     from sklearn.metrics.pairwise import cosine_similarity
@@ -48,8 +46,8 @@ class SemanticChunker(Chunker):
         self,
         config: dict,
         documents: list[Document],
-        embedder: Embedding,
-        embedder_config: dict,
+        embedder: Embedding | None = None,
+        embedder_config: dict | None = None,
     ) -> list[Document]:
 
         breakpoint_percentile_threshold = int(

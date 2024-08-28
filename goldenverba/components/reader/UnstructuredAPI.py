@@ -12,13 +12,6 @@ from goldenverba.server.types import FileConfig
 from goldenverba.components.util import get_environment
 from goldenverba.components.types import InputConfig
 
-# Optional import with error handling
-try:
-    import spacy
-except ImportError:
-    msg.warn("spacy not installed, NLP functionality will be limited.")
-    spacy = None
-
 
 class UnstructuredReader(Reader):
     """
@@ -30,11 +23,6 @@ class UnstructuredReader(Reader):
         self.requires_env = ["UNSTRUCTURED_API_KEY"]
         self.name = "Unstructured IO"
         self.description = "Uses the Unstructured API to import multiple file types such as plain text and documents"
-
-        # Initialize spaCy model if available
-        self.nlp = spacy.blank("en") if spacy else None
-        if self.nlp:
-            self.nlp.add_pipe("sentencizer", config={"punct_chars": None})
 
         # Define configuration options
         self.config = {
@@ -115,7 +103,7 @@ class UnstructuredReader(Reader):
                         chunk.get("text", "") for chunk in json_response
                     )
 
-                    return [create_document(file_content, self.nlp, fileConfig)]
+                    return [create_document(file_content, fileConfig)]
 
         except requests.RequestException as e:
             raise Exception(

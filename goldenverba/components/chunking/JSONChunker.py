@@ -1,6 +1,5 @@
 import contextlib
 
-from wasabi import msg
 import json
 
 with contextlib.suppress(Exception):
@@ -38,8 +37,8 @@ class JSONChunker(Chunker):
         self,
         config: dict,
         documents: list[Document],
-        embedder: Embedding,
-        embedder_config: dict,
+        embedder: Embedding | None = None,
+        embedder_config: dict | None = None,
     ) -> list[Document]:
 
         units = int(config["Chunk Size"].value)

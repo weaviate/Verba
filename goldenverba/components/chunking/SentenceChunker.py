@@ -1,9 +1,4 @@
-import contextlib
-
 from wasabi import msg
-
-with contextlib.suppress(Exception):
-    import tiktoken
 
 from goldenverba.components.chunk import Chunk
 from goldenverba.components.interfaces import Chunker
@@ -40,8 +35,8 @@ class SentenceChunker(Chunker):
         self,
         config: dict,
         documents: list[Document],
-        embedder: Embedding,
-        embedder_config: dict,
+        embedder: Embedding | None = None,
+        embedder_config: dict | None = None,
     ) -> list[Document]:
 
         units = int(config["Sentences"].value)

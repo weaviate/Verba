@@ -602,7 +602,7 @@ export const WeaviateTheme: Theme = {
   text_color: { ...LightTheme.text_color, color: "#130C49" },
   text_alt_color: { ...LightTheme.text_alt_color, color: "#a1a1a1" },
   button_color: { ...LightTheme.button_color, color: "#f1f1f1" },
-  button_hover_color: { ...LightTheme.button_hover_color, color: "#fdfdfd" },
+  button_hover_color: { ...LightTheme.button_hover_color, color: "#eaeaea" },
   font: { ...LightTheme.font, value: "Plus_Jakarta_Sans" },
   theme: "light",
 };

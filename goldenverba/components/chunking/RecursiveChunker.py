@@ -1,9 +1,6 @@
 import contextlib
 
-from wasabi import msg
-
 with contextlib.suppress(Exception):
-    import langchain_text_splitters
     from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from goldenverba.components.chunk import Chunk
@@ -56,8 +53,8 @@ class RecursiveChunker(Chunker):
         self,
         config: dict,
         documents: list[Document],
-        embedder: Embedding,
-        embedder_config: dict,
+        embedder: Embedding | None = None,
+        embedder_config: dict | None = None,
     ) -> list[Document]:
 
         units = int(config["Chunk Size"].value)

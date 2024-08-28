@@ -706,8 +706,8 @@ class VerbaManager:
         client,
         query: str,
         rag_config: dict,
-        labels: list[str],
-        document_uuids: list[str],
+        labels: list[str] = [],
+        document_uuids: list[str] = [],
     ):
         retriever = rag_config["Retriever"].selected
         embedder = rag_config["Embedder"].selected

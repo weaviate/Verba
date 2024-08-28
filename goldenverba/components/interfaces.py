@@ -1,5 +1,4 @@
 from goldenverba.components.document import Document
-from goldenverba.components.chunk import Chunk
 from goldenverba.server.types import FileConfig
 from goldenverba.components.types import InputConfig
 
@@ -7,11 +6,6 @@ from dotenv import load_dotenv
 
 from wasabi import msg
 from weaviate import Client
-
-try:
-    import tiktoken
-except Exception:
-    msg.warn("tiktoken not installed, your base installation might be corrupted.")
 
 load_dotenv()
 
@@ -107,14 +101,14 @@ class Chunker(VerbaComponent):
         self,
         config: dict,
         documents: list[Document],
-        embedder: Embedding,
-        embedder_config: dict,
+        embedder: Embedding | None = None,
+        embedder_config: dict | None = None,
     ) -> list[Document]:
         """Split Verba documents into chunks.
         @parameter: config : dict - Chunker Configuration
         @parameter: documents : list[Document] - List of Verba documents to chunk
-        @parameter: embedder : Embedding - Selected Embedder if the Chunker requires vectorization
-        @parameter: embedder_config : dict - Embedder Configuration
+        @parameter: embedder : Embedding | None - (Optional) Selected Embedder if the Chunker requires vectorization
+        @parameter: embedder_config : dict | None - (Optional) Embedder Configuration
         @return: list[Documents]
         """
         raise NotImplementedError("chunk method must be implemented by a subclass.")

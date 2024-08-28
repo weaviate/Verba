@@ -1,15 +1,11 @@
 import contextlib
 
-from wasabi import msg
-
 with contextlib.suppress(Exception):
-    import langchain_text_splitters
     from langchain_text_splitters import HTMLHeaderTextSplitter
 
 from goldenverba.components.chunk import Chunk
 from goldenverba.components.interfaces import Chunker
 from goldenverba.components.document import Document
-from goldenverba.components.types import InputConfig
 from goldenverba.components.interfaces import Embedding
 
 
@@ -28,8 +24,8 @@ class HTMLChunker(Chunker):
         self,
         config: dict,
         documents: list[Document],
-        embedder: Embedding,
-        embedder_config: dict,
+        embedder: Embedding | None = None,
+        embedder_config: dict | None = None,
     ) -> list[Document]:
 
         text_splitter = HTMLHeaderTextSplitter(

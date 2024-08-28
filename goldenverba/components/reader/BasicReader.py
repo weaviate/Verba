@@ -101,7 +101,7 @@ class BasicReader(Reader):
                         f"Unsupported file extension: {fileConfig.extension}"
                     )
 
-            return [create_document(file_content, self.nlp, fileConfig)]
+            return [create_document(file_content, fileConfig)]
         except Exception as e:
             msg.fail(f"Failed to load {fileConfig.filename}: {str(e)}")
             raise
@@ -124,11 +124,7 @@ class BasicReader(Reader):
             return (
                 [document]
                 if document
-                else [
-                    create_document(
-                        json.dumps(json_obj, indent=2), self.nlp, fileConfig
-                    )
-                ]
+                else [create_document(json.dumps(json_obj, indent=2), fileConfig)]
             )
         except json.JSONDecodeError as e:
             raise ValueError(f"Invalid JSON in {fileConfig.filename}: {str(e)}")

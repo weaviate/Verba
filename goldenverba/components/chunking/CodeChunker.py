@@ -1,7 +1,5 @@
 import contextlib
 
-from wasabi import msg
-
 with contextlib.suppress(Exception):
     from langchain_text_splitters import (
         Language,
@@ -38,8 +36,8 @@ class CodeChunker(Chunker):
         self,
         config: dict,
         documents: list[Document],
-        embedder: Embedding,
-        embedder_config: dict,
+        embedder: Embedding | None = None,
+        embedder_config: dict | None = None,
     ) -> list[Document]:
 
         Language = config["Language"].value
