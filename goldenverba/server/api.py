@@ -421,7 +421,15 @@ async def get_document(payload: GetDocumentPayload):
         document = await manager.weaviate_manager.get_document(
             client,
             payload.uuid,
-            properties=["title", "extension", "fileSize", "labels", "source", "meta"],
+            properties=[
+                "title",
+                "extension",
+                "fileSize",
+                "labels",
+                "source",
+                "meta",
+                "metadata",
+            ],
         )
         if document is not None:
             document["content"] = ""

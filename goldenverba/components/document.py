@@ -16,6 +16,7 @@ class Document:
         labels: list[str] = [],
         source: str = "",
         meta: dict = {},
+        metadata: str = "",
     ):
         self.title = title
         self.content = content
@@ -24,12 +25,27 @@ class Document:
         self.labels = labels
         self.source = source
         self.meta = meta
+        self.metadata = metadata
         self.chunks: list[Chunk] = []
+
+        MAX_BATCH_SIZE = 500000
 
         nlp = spacy.blank("en")
         nlp.add_pipe("sentencizer", config={"punct_chars": None})
 
-        self.spacy_doc = nlp(content)
+        if nlp and len(content) > MAX_BATCH_SIZE:
+            # Process content in batches
+            docs = []
+            for i in range(0, len(content), MAX_BATCH_SIZE):
+                batch = content[i : i + MAX_BATCH_SIZE]
+                docs.append(nlp(batch))
+
+            # Merge all processed docs
+            doc = Doc.from_docs(docs)
+        else:
+            doc = nlp(content) if nlp else None
+
+        self.spacy_doc = doc
 
     @staticmethod
     def to_json(document) -> dict:
@@ -42,6 +58,7 @@ class Document:
             "labels": document.labels,
             "source": document.source,
             "meta": json.dumps(document.meta),
+            "metadata": document.metadata,
         }
         return doc_dict
 
@@ -57,6 +74,7 @@ class Document:
             and "labels" in doc_dict
             and "source" in doc_dict
             and "meta" in doc_dict
+            and "metadata" in doc_dict
         ):
             document = Document(
                 title=doc_dict.get("title", ""),
@@ -66,6 +84,7 @@ class Document:
                 labels=doc_dict.get("labels", []),
                 source=doc_dict.get("source", ""),
                 meta=doc_dict.get("meta", {}),
+                metadata=doc_dict.get("metadata", ""),
             )
             return document
         else:
@@ -74,23 +93,6 @@ class Document:
 
 def create_document(content: str, fileConfig: FileConfig) -> Document:
     """Create a Document object from the file content."""
-    MAX_BATCH_SIZE = 500000
-
-    nlp = spacy.blank("en")
-    nlp.add_pipe("sentencizer", config={"punct_chars": None})
-
-    if nlp and len(content) > MAX_BATCH_SIZE:
-        # Process content in batches
-        docs = []
-        for i in range(0, len(content), MAX_BATCH_SIZE):
-            batch = content[i : i + MAX_BATCH_SIZE]
-            docs.append(nlp(batch))
-
-        # Merge all processed docs
-        doc = Doc.from_docs(docs)
-    else:
-        doc = nlp(content) if nlp else None
-
     return Document(
         title=fileConfig.filename,
         content=content,
@@ -98,6 +100,6 @@ def create_document(content: str, fileConfig: FileConfig) -> Document:
         labels=fileConfig.labels,
         source=fileConfig.source,
         fileSize=fileConfig.file_size,
-        spacy_doc=doc,
+        metadata=fileConfig.metadata,
         meta={},
     )

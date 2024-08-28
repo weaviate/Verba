@@ -19,10 +19,8 @@ from goldenverba.server.types import (
     FileStatus,
     ChunkScore,
     Credentials,
-    DocumentFilter,
 )
 
-from goldenverba.components.interfaces import VerbaComponent
 from goldenverba.components.managers import (
     ReaderManager,
     ChunkerManager,
@@ -711,10 +709,6 @@ class VerbaManager:
     ):
         retriever = rag_config["Retriever"].selected
         embedder = rag_config["Embedder"].selected
-
-        suggestion_enabled = bool(
-            rag_config["Retriever"].components[retriever].config["Suggestion"].value
-        )
 
         await self.weaviate_manager.add_suggestion(client, query)
 

@@ -4,6 +4,9 @@ import { FaInfoCircle } from "react-icons/fa";
 import VectorView from "./VectorView";
 import ChunkView from "./ChunkView";
 import InfoComponent from "../Navigation/InfoComponent";
+
+import DocumentMetaView from "./DocumentMetaView";
+
 import { MdCancel } from "react-icons/md";
 import { MdContentPaste } from "react-icons/md";
 import { MdContentCopy } from "react-icons/md";
@@ -168,6 +171,13 @@ const DocumentExplorer: React.FC<DocumentExplorerProps> = ({
             credentials={credentials}
             selectedDocument={selectedDocument}
             chunkScores={chunkScores}
+          />
+        )}
+
+        {selectedSetting === "Metadata" && (
+          <DocumentMetaView
+            credentials={credentials}
+            selectedDocument={selectedDocument}
           />
         )}
       </div>

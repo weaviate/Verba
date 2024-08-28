@@ -146,6 +146,7 @@ class FileConfig(BaseModel):
     rag_config: dict[str, RAGComponentClass]
     file_size: int
     status: FileStatus
+    metadata: str
     status_report: dict
 
 

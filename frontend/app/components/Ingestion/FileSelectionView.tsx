@@ -118,6 +118,7 @@ const FileSelectionView: React.FC<FileSelectionViewProps> = ({
           status_report: {},
           source: "",
           isURL: false,
+          metadata: "",
           overwrite: false,
           content: fileContent,
           labels: ["Document"],
@@ -148,6 +149,7 @@ const FileSelectionView: React.FC<FileSelectionViewProps> = ({
       newFileMap[fileID] = {
         fileID,
         filename,
+        metadata: "",
         status_report: {},
         extension,
         isURL: true,
@@ -369,10 +371,11 @@ const FileSelectionView: React.FC<FileSelectionViewProps> = ({
           <div className="flex gap-3 justify-end">
             <button
               onClick={reconnect}
-              className="flex btn border-none text-text-verba bg-button-verba hover:bg-button-hover-verba gap-2"
+              className="flex btn border-none text-text-verba bg-button-verba hover:bg-button-hover-verba gap-2 items-center"
             >
               <TbPlugConnected size={15} />
-              <p>Reconnect to Verba</p>
+              <p>Reconnecting...</p>
+              <span className="loading loading-spinner loading-xs"></span>
             </button>
           </div>
         </div>

@@ -7,6 +7,7 @@ import { FaDatabase } from "react-icons/fa";
 import { BiError } from "react-icons/bi";
 import { IoNewspaper } from "react-icons/io5";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { IoDocumentAttach } from "react-icons/io5";
 import {
   oneDark,
   oneLight,
@@ -95,7 +96,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
     );
   } else {
     return (
-      <div className="grid grid-cols-3 gap-3 w-full">
+      <div className="grid grid-cols-3 gap-3 w-full items-center">
         {message.content.map((document, index) => (
           <button
             onClick={() => {
@@ -122,6 +123,31 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
             </div>
           </button>
         ))}
+        <button
+          className="btn btn-sm btn-square focus:outline-none text-text-alt-verba bg-button-verba hover:bg-button-hover-verba hover:text-text-verba border-none shadow-none"
+          onClick={() =>
+            (
+              document.getElementById(
+                "context-modal-" + message_index
+              ) as HTMLDialogElement
+            ).showModal()
+          }
+        >
+          <IoDocumentAttach size={15} />
+        </button>
+        <dialog id={"context-modal-" + message_index} className="modal">
+          <div className="modal-box">
+            <h3 className="font-bold text-lg">Context</h3>
+            <p className="py-4">{message.context}</p>
+            <div className="modal-action">
+              <form method="dialog">
+                <button className="btn focus:outline-none text-text-alt-verba bg-button-verba hover:bg-button-hover-verba hover:text-text-verba border-none shadow-none">
+                  <p>Close</p>
+                </button>
+              </form>
+            </div>
+          </div>
+        </dialog>
       </div>
     );
   }

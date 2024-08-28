@@ -159,6 +159,7 @@ export type FileData = {
   source: string;
   content: string;
   labels: string[];
+  metadata: string;
   file_size: number;
   block?: boolean;
   status_report: StatusReportMap;
@@ -325,6 +326,7 @@ export type VectorsPayload = {
 
 export type VerbaDocument = {
   title: string;
+  metadata: string;
   extension: string;
   fileSize: number;
   labels: string[];
@@ -390,6 +392,7 @@ export interface Message {
   content: string | DocumentScore[];
   cached?: boolean;
   distance?: string;
+  context?: string;
 }
 
 // Setting Fields

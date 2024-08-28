@@ -263,6 +263,14 @@ class WeaviateManager:
             await self.verify_collection(client, self.embedding_table[embedder])
         return True
 
+    async def verify_cache_collection(self, client: WeaviateAsyncClient, embedder):
+        if embedder not in self.embedding_table:
+            self.embedding_table[embedder] = "VERBA_Cache_" + re.sub(
+                r"[^a-zA-Z0-9]", "_", embedder
+            )
+            await self.verify_collection(client, self.embedding_table[embedder])
+        return True
+
     async def verify_embedding_collections(
         self, client: WeaviateAsyncClient, environment_variables, libraries
     ):
@@ -825,6 +833,10 @@ class WeaviateManager:
         if await self.verify_collection(client, self.suggestion_collection_name):
             await client.collections.delete(self.suggestion_collection_name)
 
+    ### Cache Logic
+
+    # TODO: Implement Cache Logic
+
     ### Metadata Retrieval
 
     async def get_datacount(self, client: WeaviateAsyncClient, embedder: str) -> int:
@@ -980,7 +992,10 @@ class EmbeddingManager:
                 config = fileConfig.rag_config["Embedder"].components[embedder].config
 
                 for document in documents:
-                    content = [chunk.content for chunk in document.chunks]
+                    content = [
+                        document.metadata + "\n" + chunk.content
+                        for chunk in document.chunks
+                    ]
                     embeddings = await self.batch_vectorize(embedder, config, content)
 
                     if len(embeddings) >= 3:

@@ -75,6 +75,7 @@ const IngestionView: React.FC<IngestionViewProps> = ({
       console.error("Import WebSocket Error:", error);
       setSocketStatus("OFFLINE");
       setSocketErrorStatus();
+      setReconnect((prev) => !prev);
     };
 
     localSocket.onclose = (event) => {
@@ -87,6 +88,7 @@ const IngestionView: React.FC<IngestionViewProps> = ({
       } else {
         console.error("WebSocket connection died");
       }
+      setReconnect((prev) => !prev);
     };
 
     setSocket(localSocket);

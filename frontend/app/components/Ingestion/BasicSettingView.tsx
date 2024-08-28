@@ -25,17 +25,19 @@ const BasicSettingView: React.FC<BasicSettingViewProps> = ({
 }) => {
   const [filename, setFilename] = useState("");
   const [source, setSource] = useState("");
+  const [metadata, setMetadata] = useState("");
   const [label, setLabel] = useState("");
 
   useEffect(() => {
     if (selectedFileData) {
       setFilename(fileMap[selectedFileData].filename);
       setSource(fileMap[selectedFileData].source);
+      setMetadata(fileMap[selectedFileData].metadata);
     }
   }, [fileMap, selectedFileData]);
 
   const updateFileMap = useCallback(
-    (key: "filename" | "source", value: string) => {
+    (key: "filename" | "source" | "metadata", value: string) => {
       if (selectedFileData) {
         const newFileData: FileData = JSON.parse(
           JSON.stringify(fileMap[selectedFileData])
@@ -63,6 +65,15 @@ const BasicSettingView: React.FC<BasicSettingViewProps> = ({
       const newSource = e.target.value;
       setSource(newSource);
       updateFileMap("source", newSource);
+    },
+    [updateFileMap]
+  );
+
+  const handleMetadataChange = useCallback(
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      const newMetadata = e.target.value;
+      setMetadata(newMetadata);
+      updateFileMap("metadata", newMetadata);
     },
     [updateFileMap]
   );
@@ -215,6 +226,14 @@ const BasicSettingView: React.FC<BasicSettingViewProps> = ({
           </label>
         </div>
 
+        <div className="flex gap-2 items-center text-text-verba">
+          <p className="flex min-w-[8vw]"></p>
+          <p className="text-sm text-text-alt-verba text-start">
+            Add a Title to the document. If you are adding a URL, all URL will
+            have a have their corresponding URL as filename.
+          </p>
+        </div>
+
         {/* Source */}
         <div className="flex gap-2 justify-between items-center text-text-verba">
           <p className="flex min-w-[8vw]">Source Link</p>
@@ -227,6 +246,14 @@ const BasicSettingView: React.FC<BasicSettingViewProps> = ({
               disabled={blocked}
             />
           </label>
+        </div>
+
+        <div className="flex gap-2 items-center text-text-verba">
+          <p className="flex min-w-[8vw]"></p>
+          <p className="text-sm text-text-alt-verba text-start">
+            Add a link to reference the original source of the document. You can
+            access it through the Document Explorer via the View Source button
+          </p>
         </div>
 
         {/* Labels */}
@@ -249,9 +276,10 @@ const BasicSettingView: React.FC<BasicSettingViewProps> = ({
               addLabel(label);
             }}
             disabled={blocked}
-            className="btn btn-square bg-button-verba border-none hover:bg-secondary-verba text-text-verba"
+            className="btn bg-button-verba border-none hover:bg-secondary-verba text-text-verba"
           >
             <IoAddCircleSharp size={15} />
+            <p>Add</p>
           </button>
         </div>
 
@@ -285,7 +313,36 @@ const BasicSettingView: React.FC<BasicSettingViewProps> = ({
           />
         </div>
 
-        <div className="divider  text-text-alt-verba">File Info</div>
+        <div className="flex gap-2 items-center text-text-verba">
+          <p className="flex min-w-[8vw]"></p>
+          <p className="text-sm text-text-alt-verba text-start">
+            Overwrite existing documents with the same name.
+          </p>
+        </div>
+
+        <div className="divider  text-text-alt-verba">Metadata</div>
+
+        {/* Metadata */}
+        <div className="flex gap-2 justify-between items-center text-text-verba">
+          <p className="flex min-w-[8vw]">Metadata</p>
+          <textarea
+            className="grow w-full textarea flex items-center gap-2 max-h-64 bg-bg-verba"
+            value={metadata}
+            onChange={handleMetadataChange}
+            disabled={blocked}
+          />
+        </div>
+
+        <div className="flex gap-2 items-center text-text-verba">
+          <p className="flex min-w-[8vw]"></p>
+          <p className="text-sm text-text-alt-verba text-start">
+            Add metadata to the document to improve retrieval and generation.
+            Metadata will added to the context sent to the embedding and
+            generation, to influcence the results.
+          </p>
+        </div>
+
+        <div className="divider  text-text-alt-verba">File Information</div>
 
         {/* Extension */}
         <div className="flex gap-2 justify-between items-center text-text-verba">

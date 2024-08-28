@@ -91,6 +91,7 @@ class WindowRetriever(Retriever):
                     "title": document["title"],
                     "chunks": [],
                     "score": 0,
+                    "metadata": document["metadata"],
                 }
             doc_map[chunk.properties["doc_uuid"]]["chunks"].append(
                 {
@@ -175,6 +176,7 @@ class WindowRetriever(Retriever):
                     "title": doc_map[doc]["title"],
                     "chunks": _chunks_sorted,
                     "score": doc_map[doc]["score"],
+                    "metadata": doc_map[doc]["metadata"],
                     "uuid": str(doc),
                 }
             )
@@ -185,6 +187,7 @@ class WindowRetriever(Retriever):
                     "chunks": context_chunks_sorted,
                     "score": doc_map[doc]["score"],
                     "uuid": str(doc),
+                    "metadata": doc_map[doc]["metadata"],
                 }
             )
 
@@ -203,6 +206,8 @@ class WindowRetriever(Retriever):
 
         for document in documents:
             context += f"Document Title: {document['title']}\n"
+            if len(document["metadata"]) > 0:
+                context += f"Document Metadata: {document['metadata']}\n"
             for chunk in document["chunks"]:
                 context += f"Chunk: {int(chunk['chunk_id'])+1}\n"
                 if chunk["score"] > 0:

@@ -179,6 +179,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       setSocketOnline(false);
       isFetching.current = false;
       setFetchingStatus("DONE");
+      setReconnect((prev) => !prev);
     };
 
     localSocket.onclose = (event) => {
@@ -192,6 +193,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       setSocketOnline(false);
       isFetching.current = false;
       setFetchingStatus("DONE");
+      setReconnect((prev) => !prev);
     };
 
     setSocket(localSocket);
@@ -257,7 +259,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const handleSuccessResponse = (data: QueryPayload, sendInput: string) => {
     setMessages((prev) => [
       ...prev,
-      { type: "retrieval", content: data.documents },
+      { type: "retrieval", content: data.documents, context: data.context },
     ]);
 
     if (data.documents.length > 0) {
@@ -626,10 +628,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           <div className="flex gap-2 items-center justify-end w-full">
             <button
               onClick={reconnectToVerba}
-              className="flex btn border-none text-text-verba bg-button-verba hover:bg-button-hover-verba gap-2"
+              className="flex btn border-none text-text-verba bg-button-verba hover:bg-button-hover-verba gap-2 items-center"
             >
               <TbPlugConnected size={15} />
-              <p>Reconnect to Verba</p>
+              <p>Reconnecting...</p>
+              <span className="loading loading-spinner loading-xs"></span>
             </button>
           </div>
         )}
