@@ -20,7 +20,6 @@ pip install goldenverba
 - [🔑 API Keys](#api-keys)
   - [Weaviate](#weaviate)
   - [Ollama](#ollama)
-  - [Google](#google)
   - [Unstructured](#unstructured)
   - [OpenAI](#openai)
   - [HuggingFace](#huggingface)
@@ -193,10 +192,6 @@ Another local alternative is deploying Weaviate using Docker. For more details, 
 Verba supports Ollama models. Download and Install Ollama on your device (https://ollama.com/download). Make sure to install your preferred LLM using `ollama run <model>`.
 
 Tested with `llama3`, `llama3:70b` and `mistral`. The bigger models generally perform better, but need more computational power.
-
-> Ensure that you have the right configurations for the `Embedder` and `Generator` selected before going ahead.
-
-![verba-embedder](https://github.com/weaviate/Verba/blob/main/img/verba_select_embedder.png)
 
 > Make sure Ollama Server runs in the background and that you don't ingest documents with different ollama models since their vector dimension can vary that will lead to errors
 
