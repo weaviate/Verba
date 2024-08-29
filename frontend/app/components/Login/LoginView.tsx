@@ -12,9 +12,17 @@ import wobbleVertexShader from "!raw-loader!../../../public/shaders/wobble/verte
 import wobbleFragmentShader from "!raw-loader!../../../public/shaders/wobble/fragment.glsl";
 
 import { FaDatabase } from "react-icons/fa";
+import { FaDocker } from "react-icons/fa";
 import { FaKey } from "react-icons/fa";
+import { FaLaptopCode } from "react-icons/fa";
+import { GrConnect } from "react-icons/gr";
+import { CgWebsite } from "react-icons/cg";
+import { FaBackspace } from "react-icons/fa";
+import { HiMiniSparkles } from "react-icons/hi2";
 
 import { connectToVerba } from "@/app/api";
+
+import VerbaButton from "../Navigation/VerbaButton";
 
 import { Credentials, RAGConfig, Theme, Themes } from "@/app/types";
 
@@ -412,18 +420,18 @@ const LoginView: React.FC<LoginViewProps> = ({
           isLoading ? "opacity-0" : "opacity-100"
         }`}
       >
-        <div className="w-3/5 h-full bg-white">
+        <div className="hidden md:flex md:w-1/2 lg:w-3/5 h-full">
           <Canvas
-            camera={{ position: [0, -0.25, 3], fov: 40 }}
+            camera={{ position: [0, -0.25, 3], fov: 50 }}
             className="w-full h-full touch-none"
           >
-            <color attach="background" args={["#ffffff"]} />
+            <color attach="background" args={["#FAFAFA"]} />
             <EnvironmentMap />
             <ambientLight intensity={0.5} />
             <directionalLight position={[5, 5, 5]} intensity={1.5} />
             {/**coolShapes**/}
             <VerbaThree
-              color=""
+              color="#FAFAFA"
               useMaterial={production == "Local" ? false : true}
               model_path={
                 production == "Local" ? "/verba.glb" : "/weaviate.glb"
@@ -431,17 +439,19 @@ const LoginView: React.FC<LoginViewProps> = ({
             />
           </Canvas>
         </div>
-        <div className="w-2/5 h-full flex justify-start items-center p-5">
+        <div className="w-full md:flex md:w-1/2 lg:w-2/5 h-full flex justify-center items-center p-5">
           <div className="flex flex-col gap-8 items-start justify-center w-4/5">
             <div className="flex flex-col items-start gap-2">
               <div className="flex items-center gap-3">
-                <p className="font-light text-5xl text-text-alt-verba">
+                <p className="font-light text-2xl lg:text-4xl text-text-alt-verba">
                   Welcome to
                 </p>
-                <p className="font-light text-5xl text-text-verba">Verba</p>
+                <p className="font-light text-2xl lg:text-4xl text-text-verba">
+                  Verba
+                </p>
               </div>
               {production == "Local" && (
-                <p className="text-text-verba text-lg ">
+                <p className="text-text-verba text-base lg:text-lg ">
                   Choose your deployment
                 </p>
               )}
@@ -449,75 +459,62 @@ const LoginView: React.FC<LoginViewProps> = ({
             {selectStage ? (
               <div className="flex flex-col justify-start gap-4 w-full">
                 {production == "Local" && (
-                  <div className="flex flex-col justify-start gap-4 w-full">
-                    <button
+                  <div className="flex flex-col justify-start gap-2 w-full">
+                    <VerbaButton
+                      Icon={FaDatabase}
+                      title="Weaviate"
+                      disabled={isConnecting}
                       onClick={() => {
                         setSelectStage(false);
                         setSelectedDeployment("Weaviate");
                       }}
-                      className="bg-button-verba btn border-none hover:bg-secondary-verba text-text-alt-verba hover:text-text-verba p-3 rounded-lg"
-                    >
-                      <p>Weaviate</p>
-                    </button>
-                    <button
+                    />
+                    <VerbaButton
+                      title="Docker"
+                      Icon={FaDocker}
                       disabled={isConnecting}
                       onClick={() => {
                         setSelectedDeployment("Docker");
                         connect("Docker");
                       }}
-                      className="bg-button-verba btn border-none hover:bg-secondary-verba text-text-alt-verba hover:text-text-verba p-3 rounded-lg"
-                    >
-                      {isConnecting ? (
-                        <span className="loading loading-spinner loading-sm"></span>
-                      ) : (
-                        <p>Docker</p>
-                      )}
-                    </button>
-                    <button
+                      loading={isConnecting && selectedDeployment == "Docker"}
+                    />
+                    <VerbaButton
+                      title="Local"
+                      Icon={FaLaptopCode}
+                      disabled={isConnecting}
                       onClick={() => {
                         setSelectedDeployment("Local");
                         connect("Local");
                       }}
-                      className="bg-button-verba btn border-none hover:bg-secondary-verba text-text-alt-verba hover:text-text-verba p-3 rounded-lg"
-                      disabled={isConnecting}
-                    >
-                      {isConnecting ? (
-                        <span className="loading loading-spinner loading-sm"></span>
-                      ) : (
-                        <p>Local</p>
-                      )}
-                    </button>
+                      loading={isConnecting && selectedDeployment == "Local"}
+                    />
                   </div>
                 )}
                 {production == "Demo" && (
                   <div className="flex flex-col justify-start gap-4 w-full">
-                    <button
+                    <VerbaButton
+                      Icon={HiMiniSparkles}
+                      title="Start Demo"
+                      disabled={isConnecting}
                       onClick={() => {
                         setSelectedDeployment("Weaviate");
                         connect("Weaviate");
                       }}
-                      className="bg-button-verba btn border-none hover:bg-secondary-verba text-text-alt-verba hover:text-text-verba p-3 rounded-lg"
-                      disabled={isConnecting}
-                    >
-                      {isConnecting ? (
-                        <span className="loading loading-spinner loading-sm"></span>
-                      ) : (
-                        <p>Start Demo</p>
-                      )}
-                    </button>
+                      loading={isConnecting && selectedDeployment == "Weaviate"}
+                    />
                   </div>
                 )}
                 {production == "Production" && (
                   <div className="flex flex-col justify-start gap-4 w-full">
-                    <button
+                    <VerbaButton
+                      Icon={HiMiniSparkles}
+                      title="Start Verba"
                       onClick={() => {
                         setSelectStage(false);
                         setSelectedDeployment("Weaviate");
                       }}
-                      className="bg-button-verba btn border-none hover:bg-secondary-verba text-text-alt-verba hover:text-text-verba p-3 rounded-lg"
-                    >
-                      <p>Start Verba</p>
-                    </button>
+                    />
                   </div>
                 )}
               </div>
@@ -557,38 +554,38 @@ const LoginView: React.FC<LoginViewProps> = ({
                       </label>
                       <div className="flex justify-between gap-4 mt-4">
                         <div className="flex flex-col w-full gap-2">
-                          <button
-                            type="submit"
-                            className="w-full bg-secondary-verba btn border-none hover:bg-button-hover-verba text-text-verba  p-3 rounded-lg"
-                            disabled={isConnecting}
-                          >
-                            {isConnecting ? (
-                              <span className="loading loading-spinner"></span>
-                            ) : (
-                              "Connect"
-                            )}
-                          </button>
-                          <button
-                            type="button"
-                            className="w-full bg-button-verba btn border-none hover:bg-button-hover-verba text-text-alt-verba hover:text-text-verba p-3 rounded-lg"
-                            disabled={isConnecting}
-                            onClick={() =>
-                              window.open(
-                                "https://console.weaviate.cloud",
-                                "_blank"
-                              )
-                            }
-                          >
-                            Register
-                          </button>
-                          <button
-                            type="button"
-                            className="w-full bg-button-verba btn border-none hover:bg-button-hover-verba text-text-alt-verba hover:text-text-verba p-3 rounded-lg"
-                            disabled={isConnecting}
-                            onClick={() => setSelectStage(true)}
-                          >
-                            Back
-                          </button>
+                          <div className="flex flex-col justify-start gap-2 w-full">
+                            <VerbaButton
+                              Icon={GrConnect}
+                              title="Connect to Weaviate"
+                              type="submit"
+                              selected={true}
+                              selected_color="bg-primary-verba"
+                              loading={isConnecting}
+                            />
+                            <VerbaButton
+                              Icon={CgWebsite}
+                              title="Register"
+                              type="button"
+                              disabled={isConnecting}
+                              onClick={() =>
+                                window.open(
+                                  "https://console.weaviate.cloud",
+                                  "_blank"
+                                )
+                              }
+                            />
+                            <VerbaButton
+                              Icon={FaBackspace}
+                              title="Back to Deployments"
+                              type="button"
+                              button_size="btn-sm"
+                              text_size="text-xs"
+                              icon_size={12}
+                              onClick={() => setSelectStage(true)}
+                              disabled={isConnecting}
+                            />
+                          </div>
                         </div>
                       </div>
                     </form>

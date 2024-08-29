@@ -47,14 +47,14 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
         className={`flex items-end gap-2 ${message.type === "user" ? "justify-end" : "justify-start"}`}
       >
         <div
-          className={`flex flex-col items-start p-5 rounded-3xl animate-press-in sm:text-sm md:text-base ${colorTable[message.type]}`}
+          className={`flex flex-col items-start p-5 rounded-3xl animate-press-in text-sm lg:text-base ${colorTable[message.type]}`}
         >
           {message.cached && (
             <FaDatabase size={12} className="text-text-verba" />
           )}
           {message.type === "system" && (
             <ReactMarkdown
-              className="prose md:prose-base sm:prose-sm p-3 prose-pre:bg-bg-alt-verba"
+              className="prose md:prose-sm lg:prose-base p-3 prose-pre:bg-bg-alt-verba"
               components={{
                 code({ node, inline, className, children, ...props }) {
                   const match = /language-(\w+)/.exec(className || "");
@@ -96,7 +96,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
     );
   } else {
     return (
-      <div className="grid grid-cols-3 gap-3 w-full items-center">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 w-full items-center">
         {message.content.map((document, index) => (
           <button
             onClick={() => {

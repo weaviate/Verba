@@ -7,7 +7,11 @@ import { IoDocumentSharp } from "react-icons/io5";
 import { IoMdAddCircle } from "react-icons/io";
 import { IoSettingsSharp } from "react-icons/io5";
 import { FaGithub } from "react-icons/fa";
-import { LuMenu } from "react-icons/lu";
+import { TiThMenu } from "react-icons/ti";
+
+import { closeOnClick } from "@/app/util";
+
+import VerbaButton from "./VerbaButton";
 
 import NavbarButton from "./NavButton";
 import { getGitHubStars } from "./util";
@@ -35,7 +39,6 @@ const Navbar: React.FC<NavbarProps> = ({
   imageSrc,
   title,
   subtitle,
-  version,
   currentPage,
   setCurrentPage,
   production,
@@ -79,30 +82,80 @@ const Navbar: React.FC<NavbarProps> = ({
       <div className="flex flex-row items-center gap-5">
         <img
           src={imageSrc}
-          width={80}
-          height={80}
-          className="flex rounded-lg w-[80px] h-[80px] object-contain"
+          className="flex rounded-lg w-[50px] md:w-[80px] md:h-[80px] object-contain"
         />
         <div className="flex flex-col lg:flex-row lg:items-end justify-center lg:gap-3">
-          <p className="sm:text-2xl md:text-3xl text-text-verba">{title}</p>
-          <p className="sm:text-sm text-base text-text-alt-verba font-light">
+          <p className="text-2xl md:text-3xl text-text-verba">{title}</p>
+          <p className="text-sm md:text-base text-text-alt-verba font-light">
             {subtitle}
           </p>
+        </div>
+        <div className="flex md:hidden flex-col items-center gap-3 justify-between">
+          <div className="dropdown dropdown-hover">
+            <VerbaButton Icon={TiThMenu} title="Menu" />
+            <ul
+              tabIndex={0}
+              className="dropdown-content dropdown-left z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+            >
+              <li key={"Menu Button1"}>
+                <a
+                  className={currentPage === "CHAT" ? "font-bold" : ""}
+                  onClick={() => {
+                    setCurrentPage("CHAT");
+                    closeOnClick();
+                  }}
+                >
+                  Chat
+                </a>
+              </li>
+              <li key={"Menu Button2"}>
+                <a
+                  className={currentPage === "DOCUMENTS" ? "font-bold" : ""}
+                  onClick={() => {
+                    setCurrentPage("DOCUMENTS");
+                    closeOnClick();
+                  }}
+                >
+                  Documents
+                </a>
+              </li>
+              {production != "Demo" && (
+                <li key={"Menu Button4"}>
+                  <a
+                    className={currentPage === "ADD" ? "font-bold" : ""}
+                    onClick={() => {
+                      setCurrentPage("ADD");
+                      closeOnClick();
+                    }}
+                  >
+                    Import Data
+                  </a>
+                </li>
+              )}
+              {production != "Demo" && (
+                <li key={"Menu Button4"}>
+                  <a
+                    className={currentPage === "SETTINGS" ? "font-bold" : ""}
+                    onClick={() => {
+                      setCurrentPage("SETTINGS");
+                      closeOnClick();
+                    }}
+                  >
+                    Settings
+                  </a>
+                </li>
+              )}
+            </ul>
+          </div>
         </div>
       </div>
 
       <div className="flex flex-row justify-center items-center">
-        <div className="hidden sm:h-[3vh] lg:h-[5vh] bg-text-alt-verba w-px sm:mx-2 md:mx-4"></div>
-
         {/* Pages */}
-        <div className="lg:flex hidden lg:flex-row items-center lg:gap-3 justify-between">
-          <div
-            className={` ${production ? "h-[0vh]" : "sm:h-[3vh] lg:h-[5vh] mx-1"} hidden sm:block bg-text-alt-verba w-px`}
-          ></div>
+        <div className="hidden md:flex flex-row items-center gap-3 justify-between">
           <NavbarButton
             hide={false}
             Icon={IoChatbubbleSharp}
-            iconSize={icon_size}
             title="Chat"
             currentPage={currentPage}
             setCurrentPage={setCurrentPage}
@@ -111,7 +164,6 @@ const Navbar: React.FC<NavbarProps> = ({
           <NavbarButton
             hide={production == "Demo"}
             Icon={IoMdAddCircle}
-            iconSize={icon_size}
             title="Import Data"
             currentPage={currentPage}
             setCurrentPage={setCurrentPage}
@@ -120,7 +172,6 @@ const Navbar: React.FC<NavbarProps> = ({
           <NavbarButton
             hide={false}
             Icon={IoDocumentSharp}
-            iconSize={icon_size}
             title="Documents"
             currentPage={currentPage}
             setCurrentPage={setCurrentPage}
@@ -129,104 +180,24 @@ const Navbar: React.FC<NavbarProps> = ({
           <NavbarButton
             hide={production == "Demo"}
             Icon={IoSettingsSharp}
-            iconSize={icon_size}
             title="Settings"
             currentPage={currentPage}
             setCurrentPage={setCurrentPage}
             setPage="SETTINGS"
           />
           <div
-            className={`sm:h-[3vh] lg:h-[5vh] mx-1 hidden sm:block bg-text-alt-verba w-px`}
+            className={`sm:h-[3vh] lg:h-[5vh] mx-1 hidden md:block bg-text-alt-verba w-px`}
           ></div>
-          <button
-            className={`md:hidden btn md:btn-sm lg:btn-md lg:flex items-center justify-center border-none bg-secondary-verba hover:bg-button-hover-verba`}
+          <VerbaButton
+            title={gitHubStars}
+            Icon={FaGithub}
             onClick={handleGitHubClick}
-          >
-            <FaGithub size={icon_size} className="text-text-verba" />
-            <p className="text-xs sm:hidden md:flex text-text-verba ">
-              {gitHubStars}
-            </p>
-          </button>
-          <p className="hidden lg:flex text-xs text-text-alt-verba">
-            {version}
-          </p>
-        </div>
-
-        {/* Menu */}
-        <div className="flex flex-row items-center sm:gap-1 lg:gap-5 justify-between">
-          <div className="lg:hidden sm:flex md:ml-4 sm:mr-8">
-            <ul className="menu md:menu-md sm:menu-sm sm:menu-horizontal bg-base-200 rounded-box hover:bg-button-hover-verba bg-button-verba z-50">
-              <li>
-                <details>
-                  <summary>
-                    <LuMenu size={20} />
-                  </summary>
-                  <ul className="bg-bg-alt-verba">
-                    <li
-                      onClick={(e) => {
-                        setCurrentPage("CHAT");
-                      }}
-                    >
-                      <a>Chat</a>
-                    </li>
-                    <li
-                      onClick={(e) => {
-                        setCurrentPage("DOCUMENTS");
-                      }}
-                    >
-                      <a>Documents</a>
-                    </li>
-                    {!production && (
-                      <li
-                        onClick={(e) => {
-                          setCurrentPage("STATUS");
-                        }}
-                      >
-                        <a>Status</a>
-                      </li>
-                    )}
-
-                    {!production && (
-                      <li
-                        onClick={(e) => {
-                          setCurrentPage("ADD");
-                        }}
-                      >
-                        <a>Add Documents</a>
-                      </li>
-                    )}
-
-                    {!production && (
-                      <li
-                        onClick={(e) => {
-                          setCurrentPage("RAG");
-                        }}
-                      >
-                        <a>RAG</a>
-                      </li>
-                    )}
-
-                    {!production && (
-                      <li
-                        onClick={(e) => {
-                          setCurrentPage("SETTINGS");
-                        }}
-                      >
-                        <a>Settings</a>
-                      </li>
-                    )}
-
-                    <li onClick={handleGitHubClick}>
-                      <a>GitHub</a>
-                    </li>
-                    <li className="items-center justify-center text-xs text-text-alt-verba mt-2">
-                      {version}
-                    </li>
-                  </ul>
-                </details>
-              </li>
-            </ul>
-          </div>
+            className="hidden md:block"
+            text_size="text-xs"
+            icon_size={18}
+            disabled={false}
+            selected={false}
+          />
         </div>
       </div>
     </div>

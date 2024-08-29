@@ -39,9 +39,9 @@ const ChatView: React.FC<ChatViewProps> = ({
     []
   );
   return (
-    <div className="flex justify-center gap-3 h-[80vh] ">
+    <div className="flex md:flex-row flex-col justify-center gap-3 md:h-[80vh] ">
       <div
-        className={`${selectedDocument ? "hidden lg:flex lg:w-[45vw]" : "w-full lg:w-[45vw] lg:flex"}`}
+        className={`${selectedDocument ? "hidden md:flex md:w-[45vw]" : "w-full md:w-[45vw] md:flex"}`}
       >
         <ChatInterface
           production={production}
@@ -58,7 +58,7 @@ const ChatView: React.FC<ChatViewProps> = ({
       </div>
 
       <div
-        className={`${selectedDocument ? "lg:w-[55vw] w-full flex" : "hidden lg:flex lg:w-[55vw]"}`}
+        className={`${selectedDocument ? "md:w-[55vw] w-full flex" : "hidden md:flex md:w-[55vw]"}`}
       >
         <DocumentExplorer
           credentials={credentials}

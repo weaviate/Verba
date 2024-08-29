@@ -835,11 +835,21 @@ class WeaviateManager:
 
     ### Metadata Retrieval
 
-    async def get_datacount(self, client: WeaviateAsyncClient, embedder: str) -> int:
+    async def get_datacount(
+        self, client: WeaviateAsyncClient, embedder: str, document_uuids: list[str] = []
+    ) -> int:
         if await self.verify_embedding_collection(client, embedder):
             embedder_collection = client.collections.get(self.embedding_table[embedder])
+
+            if document_uuids:
+                filters = Filter.by_property("doc_uuid").contains_any(document_uuids)
+            else:
+                filters = None
+
             response = await embedder_collection.aggregate.over_all(
-                group_by=GroupByAggregate(prop="doc_uuid"), total_count=True
+                filters=filters,
+                group_by=GroupByAggregate(prop="doc_uuid"),
+                total_count=True,
             )
             return len(response.groups)
 

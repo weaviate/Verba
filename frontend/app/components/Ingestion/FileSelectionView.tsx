@@ -142,7 +142,7 @@ const FileSelectionView: React.FC<FileSelectionViewProps> = ({
       newRAGConfig["Reader"].selected = URLReader;
 
       const now = new Date();
-      const filename = "New " + URLReader + " URL";
+      const filename = "New " + URLReader + " Job";
       const fileID = now.toISOString();
       const extension = "URL";
 

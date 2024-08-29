@@ -225,7 +225,7 @@ const IngestionView: React.FC<IngestionViewProps> = ({
   return (
     <div className="flex justify-center gap-3 h-[80vh] ">
       <div
-        className={`${selectedFileData ? "hidden lg:flex lg:w-[45vw]" : "w-full lg:w-[45vw] lg:flex"}`}
+        className={`${selectedFileData ? "hidden md:flex md:w-[45vw]" : "w-full md:w-[45vw] md:flex"}`}
       >
         <FileSelectionView
           fileMap={fileMap}
@@ -242,7 +242,7 @@ const IngestionView: React.FC<IngestionViewProps> = ({
       </div>
 
       <div
-        className={`${selectedFileData ? "lg:w-[55vw] w-full flex" : "hidden lg:flex lg:w-[55vw]"}`}
+        className={`${selectedFileData ? "md:w-[55vw] w-full flex" : "hidden md:flex md:w-[55vw]"}`}
       >
         {selectedFileData && (
           <ConfigurationView

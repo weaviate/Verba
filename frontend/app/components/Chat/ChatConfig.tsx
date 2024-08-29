@@ -1,9 +1,10 @@
 "use client";
 
-import React from "react";
+import React, { useCallback } from "react";
 import { MdCancel } from "react-icons/md";
 import { IoSettingsSharp } from "react-icons/io5";
-import { RAGConfig } from "@/app/types";
+import { RAGConfig, RAGComponentConfig, Credentials } from "@/app/types";
+import { updateRAGConfig } from "@/app/api";
 import ComponentView from "../Ingestion/ComponentView";
 
 interface ChatConfigProps {
@@ -11,6 +12,7 @@ interface ChatConfigProps {
   setRAGConfig: React.Dispatch<React.SetStateAction<RAGConfig | null>>;
   onSave: () => void; // New parameter for handling save
   onReset: () => void; // New parameter for handling reset
+  credentials: Credentials;
   production: "Local" | "Demo" | "Production";
 }
 
@@ -18,6 +20,7 @@ const ChatConfig: React.FC<ChatConfigProps> = ({
   RAGConfig,
   setRAGConfig,
   onSave,
+  credentials,
   onReset,
   production,
 }) => {
@@ -55,6 +58,26 @@ const ChatConfig: React.FC<ChatConfigProps> = ({
     });
   };
 
+  const saveComponentConfig = useCallback(
+    async (
+      component_n: string,
+      selected_component: string,
+      component_config: RAGComponentConfig
+    ) => {
+      if (!RAGConfig) return;
+
+      const newRAGConfig = JSON.parse(JSON.stringify(RAGConfig));
+      newRAGConfig[component_n].selected = selected_component;
+      newRAGConfig[component_n].components[selected_component] =
+        component_config;
+      const response = await updateRAGConfig(newRAGConfig, credentials);
+      if (response) {
+        setRAGConfig(newRAGConfig);
+      }
+    },
+    [RAGConfig, credentials]
+  );
+
   if (RAGConfig) {
     return (
       <div className="flex flex-col justify-start gap-3 rounded-2xl p-1 w-full p-6 ">
@@ -63,6 +86,7 @@ const ChatConfig: React.FC<ChatConfigProps> = ({
           component_name="Embedder"
           selectComponent={selectComponent}
           updateConfig={updateConfig}
+          saveComponentConfig={saveComponentConfig}
           blocked={production == "Demo"}
         />
         <ComponentView
@@ -70,6 +94,7 @@ const ChatConfig: React.FC<ChatConfigProps> = ({
           component_name="Generator"
           selectComponent={selectComponent}
           updateConfig={updateConfig}
+          saveComponentConfig={saveComponentConfig}
           blocked={production == "Demo"}
         />
         <ComponentView
@@ -77,6 +102,7 @@ const ChatConfig: React.FC<ChatConfigProps> = ({
           component_name="Retriever"
           selectComponent={selectComponent}
           updateConfig={updateConfig}
+          saveComponentConfig={saveComponentConfig}
           blocked={production == "Demo"}
         />
 
@@ -88,7 +114,7 @@ const ChatConfig: React.FC<ChatConfigProps> = ({
             className="flex btn border-none text-text-verba bg-button-verba hover:bg-button-hover-verba gap-2"
           >
             <IoSettingsSharp size={15} />
-            <p>Set as Default</p>
+            <p>Save Config</p>
           </button>
           <button
             onClick={onReset}

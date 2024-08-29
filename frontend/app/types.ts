@@ -463,6 +463,8 @@ export interface Theme {
   bg_alt_color: ColorSetting;
   text_color: ColorSetting;
   text_alt_color: ColorSetting;
+  button_text_color: ColorSetting;
+  button_text_alt_color: ColorSetting;
   button_color: ColorSetting;
   button_hover_color: ColorSetting;
   font: SelectSetting;
@@ -518,6 +520,16 @@ export const LightTheme: Theme = {
     type: "color",
     description: "Alt. Text",
   },
+  button_text_color: {
+    color: "#161616",
+    type: "color",
+    description: "Button Text",
+  },
+  button_text_alt_color: {
+    color: "#8E8E8E",
+    type: "color",
+    description: "Button Alt. Text",
+  },
   button_color: {
     color: "#EFEFEF",
     type: "color",
@@ -552,6 +564,11 @@ export const DarkTheme: Theme = {
   bg_alt_color: { ...LightTheme.bg_alt_color, color: "#2F2929" },
   text_color: { ...LightTheme.text_color, color: "#ffffff" },
   text_alt_color: { ...LightTheme.text_alt_color, color: "#999999" },
+  button_text_color: { ...LightTheme.button_text_color, color: "#ffffff" },
+  button_text_alt_color: {
+    ...LightTheme.button_text_alt_color,
+    color: "#999999",
+  },
   button_color: { ...LightTheme.button_color, color: "#3C3C3C" },
   button_hover_color: { ...LightTheme.button_hover_color, color: "#2C2C2C" },
   font: { ...LightTheme.font, value: "Open_Sans" },
@@ -578,6 +595,11 @@ export const WCDTheme: Theme = {
   bg_alt_color: { ...LightTheme.bg_alt_color, color: "#192136" },
   text_color: { ...LightTheme.text_color, color: "#ffffff" },
   text_alt_color: { ...LightTheme.text_alt_color, color: "#AAAAAA" },
+  button_text_color: { ...LightTheme.button_text_color, color: "#ffffff" },
+  button_text_alt_color: {
+    ...LightTheme.button_text_alt_color,
+    color: "#AAAAAA",
+  },
   button_color: { ...LightTheme.button_color, color: "#1D253A" },
   button_hover_color: { ...LightTheme.button_hover_color, color: "#313749" },
   font: { ...LightTheme.font, value: "Open_Sans" },
@@ -597,15 +619,20 @@ export const WeaviateTheme: Theme = {
     ...LightTheme.image,
     src: "https://github.com/weaviate/Verba/blob/1.0.0/frontend/public/weaviate.png?raw=true",
   },
-  primary_color: { ...LightTheme.primary_color, color: "#83e897" },
-  secondary_color: { ...LightTheme.secondary_color, color: "#94e8fb" },
-  warning_color: { ...LightTheme.warning_color, color: "#F4404E" },
-  bg_color: { ...LightTheme.bg_color, color: "#ffffff" },
-  bg_alt_color: { ...LightTheme.bg_alt_color, color: "#f8f8f8" },
+  primary_color: { ...LightTheme.primary_color, color: "#9bfc88" },
+  secondary_color: { ...LightTheme.secondary_color, color: "#8bffe7" },
+  warning_color: { ...LightTheme.warning_color, color: "#f77579" },
+  bg_color: { ...LightTheme.bg_color, color: "#FEF7F7" },
+  bg_alt_color: { ...LightTheme.bg_alt_color, color: "#ffffff" },
   text_color: { ...LightTheme.text_color, color: "#130C49" },
-  text_alt_color: { ...LightTheme.text_alt_color, color: "#a1a1a1" },
-  button_color: { ...LightTheme.button_color, color: "#f1f1f1" },
-  button_hover_color: { ...LightTheme.button_hover_color, color: "#eaeaea" },
+  text_alt_color: { ...LightTheme.text_alt_color, color: "#929292" },
+  button_text_color: { ...LightTheme.button_text_color, color: "#130C49" },
+  button_text_alt_color: {
+    ...LightTheme.button_text_alt_color,
+    color: "#929292",
+  },
+  button_color: { ...LightTheme.button_color, color: "#eeeeee" },
+  button_hover_color: { ...LightTheme.button_hover_color, color: "#7dfffb" },
   font: { ...LightTheme.font, value: "Plus_Jakarta_Sans" },
   theme: "light",
 };

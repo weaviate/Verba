@@ -1,26 +1,25 @@
 import type { Config } from "tailwindcss";
-const colors = require('tailwindcss/colors')
-
+const colors = require("tailwindcss/colors");
 
 const config: Config = {
   purge: {
     options: {
       safelist: [
-        'bg-yellow-300',
-        'bg-gray-300',
-        'bg-gray-400',
-        'bg-zinc-300',
-        'bg-zinc-400',
-        'bg-red-300',
-        'bg-green-300',
-        'bg-cyan-300',
-        'bg-fuchsia-300',
-        'bg-yellow-400',
-        'bg-green-400',
-        'bg-cyan-400',
-        'bg-fuchsia-400',
-        'bg-red-400',
-        'bg-indigo-400'
+        "bg-yellow-300",
+        "bg-gray-300",
+        "bg-gray-400",
+        "bg-zinc-300",
+        "bg-zinc-400",
+        "bg-red-300",
+        "bg-green-300",
+        "bg-cyan-300",
+        "bg-fuchsia-300",
+        "bg-yellow-400",
+        "bg-green-400",
+        "bg-cyan-400",
+        "bg-fuchsia-400",
+        "bg-red-400",
+        "bg-indigo-400",
         // ... any other dynamically constructed classes
       ],
     },
@@ -32,14 +31,14 @@ const config: Config = {
   ],
   theme: {
     screens: {
-      sm: '100px',
-      md: '800px',
-      lg: '1330px',
-      full: '1700px',
+      sm: "100px",
+      md: "930px",
+      lg: "1280px",
+      full: "1700px",
     },
     colors: {
-      transparent: 'transparent',
-      current: 'currentColor',
+      transparent: "transparent",
+      current: "currentColor",
       black: colors.black,
       white: colors.white,
       gray: colors.gray,
@@ -48,7 +47,7 @@ const config: Config = {
       green: colors.green,
       blue: colors.blue,
       yellow: colors.yellow,
-      red: colors.red
+      red: colors.red,
     },
     extend: {
       colors: {
@@ -61,8 +60,8 @@ const config: Config = {
         "warning-verba": "var(--warning-verba, #FF8399)",
         "text-verba": "var(--text-verba, #161616)",
         "text-alt-verba": "var(--text-alt-verba, #8E8E8E)",
-        "bg-console-verba": "var(--bg-console-verba, #3F3E40)",
-        "text-console-verba": "var(--text-console-verba, #FFFFFF)"
+        "text-verba-button": "var(--text-verba-button, #161616)",
+        "text-alt-verba-button": "var(--text-alt-verba-button, #8E8E8E)",
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
@@ -71,7 +70,7 @@ const config: Config = {
       },
     },
   },
-  plugins: [require("daisyui"), require('@tailwindcss/typography')],
+  plugins: [require("daisyui"), require("@tailwindcss/typography")],
 
   daisyui: {
     themes: ["light", "dark"],

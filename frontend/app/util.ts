@@ -36,8 +36,8 @@ export function deepCopyRAGConfig(config: RAGConfig): RAGConfig {
   return JSON.parse(JSON.stringify(config));
 }
 
-export const closeOnClick = () => {
-  const elem = document.activeElement;
+export const closeOnClick = (element?: HTMLElement) => {
+  const elem = element || document.activeElement;
   if (elem && elem instanceof HTMLElement) {
     elem.blur();
   }

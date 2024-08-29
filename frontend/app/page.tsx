@@ -114,6 +114,8 @@ export default function Home() {
       "--text-alt-verba": selectedTheme.text_alt_color.color,
       "--button-verba": selectedTheme.button_color.color,
       "--button-hover-verba": selectedTheme.button_hover_color.color,
+      "--text-verba-button": selectedTheme.button_text_color.color,
+      "--text-alt-verba-button": selectedTheme.button_text_alt_color.color,
     };
     Object.entries(cssVars).forEach(([key, value]) => {
       document.documentElement.style.setProperty(key, value);

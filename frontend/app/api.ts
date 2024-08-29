@@ -303,6 +303,7 @@ export const fetchSelectedDocument = async (
 // Endpoint /api/get_datacount
 export const fetchDatacount = async (
   embedding_model: string,
+  documentFilter: DocumentFilter[],
   credentials: Credentials
 ): Promise<DatacountResponse | null> => {
   try {
@@ -314,6 +315,7 @@ export const fetchDatacount = async (
       },
       body: JSON.stringify({
         embedding_model: embedding_model,
+        documentFilter: documentFilter,
         credentials: credentials,
       }),
     });

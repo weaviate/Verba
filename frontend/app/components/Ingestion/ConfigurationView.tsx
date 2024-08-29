@@ -14,7 +14,7 @@ import UserModalComponent from "../Navigation/UserModal";
 import { FileMap, FileData } from "@/app/types";
 import { RAGConfig } from "@/app/types";
 
-import { Credentials } from "@/app/types";
+import { Credentials, RAGComponentConfig } from "@/app/types";
 
 import BasicSettingView from "./BasicSettingView";
 import ComponentView from "./ComponentView";
@@ -169,6 +169,26 @@ const ConfigurationView: React.FC<ConfigurationViewProps> = ({
     });
   };
 
+  const saveComponentConfig = useCallback(
+    async (
+      component_n: string,
+      selected_component: string,
+      component_config: RAGComponentConfig
+    ) => {
+      if (!RAGConfig) return;
+
+      const newRAGConfig = JSON.parse(JSON.stringify(RAGConfig));
+      newRAGConfig[component_n].selected = selected_component;
+      newRAGConfig[component_n].components[selected_component] =
+        component_config;
+      const response = await updateRAGConfig(newRAGConfig, credentials);
+      if (response) {
+        setRAGConfig(newRAGConfig);
+      }
+    },
+    [RAGConfig, credentials]
+  );
+
   return (
     <div className="flex flex-col gap-2 w-full">
       {/* FileSelection Header */}
@@ -217,6 +237,9 @@ const ConfigurationView: React.FC<ConfigurationViewProps> = ({
           <BasicSettingView
             selectedFileData={selectedFileData}
             fileMap={fileMap}
+            selectComponent={selectComponent}
+            updateConfig={updateConfig}
+            saveComponentConfig={saveComponentConfig}
             setFileMap={setFileMap}
             blocked={
               selectedFileData
@@ -229,16 +252,10 @@ const ConfigurationView: React.FC<ConfigurationViewProps> = ({
           <div className="flex flex-col gap-10 w-full">
             <ComponentView
               RAGConfig={fileMap[selectedFileData].rag_config}
-              component_name="Reader"
-              selectComponent={selectComponent}
-              updateConfig={updateConfig}
-              blocked={fileMap[selectedFileData].block}
-            />
-            <ComponentView
-              RAGConfig={fileMap[selectedFileData].rag_config}
               component_name="Chunker"
               selectComponent={selectComponent}
               updateConfig={updateConfig}
+              saveComponentConfig={saveComponentConfig}
               blocked={fileMap[selectedFileData].block}
             />
             <ComponentView
@@ -246,6 +263,7 @@ const ConfigurationView: React.FC<ConfigurationViewProps> = ({
               component_name="Embedder"
               selectComponent={selectComponent}
               updateConfig={updateConfig}
+              saveComponentConfig={saveComponentConfig}
               blocked={fileMap[selectedFileData].block}
             />
           </div>

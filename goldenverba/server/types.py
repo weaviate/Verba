@@ -191,6 +191,7 @@ class QueryPayload(BaseModel):
 
 class DatacountPayload(BaseModel):
     embedding_model: str
+    documentFilter: list[DocumentFilter]
     credentials: Credentials
 
 

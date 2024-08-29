@@ -1,6 +1,11 @@
 "use client";
 
 import React, { useEffect, useRef } from "react";
+import VerbaButton from "../Navigation/VerbaButton";
+import { FaGithub } from "react-icons/fa";
+import { FaYoutube } from "react-icons/fa";
+import { IoDocumentTextSharp } from "react-icons/io5";
+import { FaHeart } from "react-icons/fa";
 
 interface GettingStartedComponentProps {}
 
@@ -21,9 +26,13 @@ const GettingStartedComponent: React.FC<
         <div className="hero">
           <div className="hero-content flex-row">
             <div className="text-center lg:text-left">
-              <h1 className="text-5xl font-bold">Welcome to Verba</h1>
-              <h2 className="text-2xl mt-2">Your Open Source RAG App</h2>
-              <p className="py-6">
+              <h1 className="text-2xl md:text-5xl font-bold">
+                Welcome to Verba
+              </h1>
+              <h2 className="text-lg md:text-2xl mt-2">
+                Your Open Source RAG App
+              </h2>
+              <p className="py-6 text-sm md:text-base">
                 Verba is an open-source application designed to offer an
                 end-to-end, streamlined, and user-friendly interface for
                 Retrieval-Augmented Generation (RAG) out of the box. In just a
@@ -31,46 +40,43 @@ const GettingStartedComponent: React.FC<
                 ease, either locally with HuggingFace and Ollama or through LLM
                 providers such as Anthrophic, Cohere, and OpenAI.
               </p>
-              <p className="py-6">
+              <p className="py-6 text-sm md:text-base">
                 Learn more by visiting our GitHub repository, our blog post, or
                 our video on Verba. Verba is currently still in development. If
                 you have any questions or find issues, please reach out to us on
                 GitHub.
               </p>
-              <div className="flex flex-col sm:flex-row gap-2">
-                <button
-                  className="btn border-none shadow-none bg-button-verba hover:bg-button-hover-verba text-text-alt-verba hover:text-text-verba"
+              <div className="flex flex-col md:flex-row gap-2">
+                <VerbaButton
+                  title="GitHub"
+                  Icon={FaGithub}
                   onClick={() =>
                     window.open("https://github.com/weaviate/verba", "_blank")
                   }
-                >
-                  GitHub
-                </button>
-                <button
-                  className="btn border-none shadow-none bg-button-verba hover:bg-button-hover-verba text-text-alt-verba hover:text-text-verba"
+                />
+                <VerbaButton
+                  title="YouTube"
+                  Icon={FaYoutube}
                   onClick={() =>
                     window.open(
                       "https://www.youtube.com/watch?v=swKKRdLBhas",
                       "_blank"
                     )
                   }
-                >
-                  YouTube
-                </button>
-                <button
-                  className="btn border-none shadow-none bg-button-verba hover:bg-button-hover-verba text-text-alt-verba hover:text-text-verba"
+                />
+                <VerbaButton
+                  title="Blog Post"
+                  Icon={IoDocumentTextSharp}
                   onClick={() =>
                     window.open(
                       "https://weaviate.io/blog/verba-open-source-rag-app",
                       "_blank"
                     )
                   }
-                >
-                  Blog Post
-                </button>
+                />
               </div>
             </div>
-            <div className="shrink-0">
+            <div className="hidden md:block shrink-0">
               <img
                 src="https://raw.githubusercontent.com/weaviate/Verba/main/img/thumbnail.png"
                 alt="Verba AI"
@@ -80,11 +86,15 @@ const GettingStartedComponent: React.FC<
             </div>
           </div>
         </div>
-        <div className="modal-action mt-6">
+        <div className="modal-action mt-6 justify-center md:justify-end">
           <form method="dialog">
-            <button className="btn text-text-alt-verba hover:text-text-verba bg-button-verba border-none hover:bg-primary-verba">
-              Lets get started ♥
-            </button>
+            <VerbaButton
+              title="Let's get started"
+              type="submit"
+              selected={true}
+              selected_color="bg-primary-verba"
+              Icon={FaHeart}
+            />
           </form>
         </div>
       </div>

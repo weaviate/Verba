@@ -8,6 +8,7 @@ import { FaHammer } from "react-icons/fa";
 import { IoIosSend } from "react-icons/io";
 import { BiError } from "react-icons/bi";
 import { IoMdAddCircle } from "react-icons/io";
+import VerbaButton from "../Navigation/VerbaButton";
 
 import {
   updateRAGConfig,
@@ -105,7 +106,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     } else {
       setCurrentDatacount(0);
     }
-  }, [currentEmbedding, currentPage]);
+  }, [currentEmbedding, currentPage, documentFilter]);
 
   useEffect(() => {
     setMessages((prev) => {
@@ -312,6 +313,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     try {
       const data: DataCountPayload | null = await fetchDatacount(
         currentEmbedding,
+        documentFilter,
         credentials
       );
       const labels: LabelsResponse | null = await fetchLabels(credentials);
@@ -358,123 +360,122 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       <div className="bg-bg-alt-verba rounded-2xl flex gap-2 p-6 items-center justify-between h-min w-full">
         <div className="flex gap-2 justify-start items-center">
           <InfoComponent
-            tooltip_text="Use the Chat interface to interact with your data and to perform Retrieval Augmented Generation (RAG)"
+            tooltip_text="Use the Chat interface to interact with your data and perform Retrieval Augmented Generation (RAG). This interface allows you to ask questions, analyze sources, and generate responses based on your stored documents."
             display_text={"Chat"}
           />
         </div>
-        <div className="flex gap-3 justify-end">
-          <button
+        <div className="flex gap-3 justify-end items-center">
+          <VerbaButton
+            title="Chat"
+            Icon={IoChatbubbleSharp}
             onClick={() => {
               setSelectedSetting("Chat");
             }}
-            className={`flex ${selectedSetting === "Chat" ? "bg-primary-verba text-text-verba hover:bg-button-hover-verba" : "bg-button-verba hover:text-text-verba hover:bg-button-hover-verba"} border-none btn text-text-alt-verba gap-2`}
-          >
-            <IoChatbubbleSharp size={15} />
-            <p>Chat</p>
-          </button>
-
-          <button
+            selected={selectedSetting === "Chat"}
+            disabled={false}
+            selected_color="bg-secondary-verba"
+          />
+          <VerbaButton
+            title="Config"
+            Icon={FaHammer}
             onClick={() => {
               setSelectedSetting("Config");
             }}
-            className={`flex ${selectedSetting === "Config" ? "bg-primary-verba text-text-verba hover:bg-button-hover-verba" : "bg-button-verba hover:text-text-verba hover:bg-button-hover-verba"} border-none btn text-text-alt-verba gap-2`}
-          >
-            <FaHammer size={15} />
-            <p>Config</p>
-          </button>
+            selected={selectedSetting === "Config"}
+            disabled={false}
+            selected_color="bg-secondary-verba"
+          />
         </div>
       </div>
 
       <div className="bg-bg-alt-verba rounded-2xl flex flex-col h-full w-full overflow-y-auto overflow-x-hidden relative">
         {/* New fixed tab */}
-        <div className="sticky flex flex-col gap-2 top-0 z-10 p-4 backdrop-blur-sm bg-opacity-30 bg-bg-alt-verba rounded-lg">
-          <div className="flex gap-2 justify-between items-center">
-            <div className="flex gap-2">
-              <div className="dropdown dropdown-hover">
-                <label
-                  tabIndex={0}
+        {selectedSetting == "Chat" && (
+          <div className="sticky flex flex-col gap-2 top-0 z-9 p-4 backdrop-blur-sm bg-opacity-30 bg-bg-alt-verba rounded-lg">
+            <div className="flex gap-2 justify-start items-center">
+              <div className="flex gap-2">
+                <div className="dropdown dropdown-hover">
+                  <label
+                    tabIndex={0}
+                    className="btn btn-sm border-none shadow-none bg-button-verba text-text-alt-verba hover:text-text-verba hover:bg-button-hover-verba"
+                  >
+                    <IoMdAddCircle size={15} />
+                    <p className="text-xs">Label</p>
+                  </label>
+                  <ul
+                    tabIndex={0}
+                    className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+                  >
+                    {labels.map((label, index) => (
+                      <li key={"Label" + index}>
+                        <a
+                          onClick={() => {
+                            if (!filterLabels.includes(label)) {
+                              setFilterLabels([...filterLabels, label]);
+                            }
+                            const dropdownElement =
+                              document.activeElement as HTMLElement;
+                            dropdownElement.blur();
+                            const dropdown = dropdownElement.closest(
+                              ".dropdown"
+                            ) as HTMLElement;
+                            if (dropdown) dropdown.blur();
+                          }}
+                        >
+                          {label}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+              {(filterLabels.length > 0 || documentFilter.length > 0) && (
+                <button
+                  onClick={() => {
+                    setFilterLabels([]);
+                    setDocumentFilter([]);
+                  }}
                   className="btn btn-sm border-none shadow-none bg-button-verba text-text-alt-verba hover:text-text-verba hover:bg-button-hover-verba"
                 >
-                  <IoMdAddCircle size={15} />
-                  <p className="text-xs">Label</p>
-                </label>
-                <ul
-                  tabIndex={0}
-                  className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
-                >
-                  {labels.map((label, index) => (
-                    <li key={"Label" + index}>
-                      <a
-                        onClick={() => {
-                          if (!filterLabels.includes(label)) {
-                            setFilterLabels([...filterLabels, label]);
-                          }
-                          const dropdownElement =
-                            document.activeElement as HTMLElement;
-                          dropdownElement.blur();
-                          const dropdown = dropdownElement.closest(
-                            ".dropdown"
-                          ) as HTMLElement;
-                          if (dropdown) dropdown.blur();
-                        }}
-                      >
-                        {label}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+                  <MdCancel size={15} />
+                  <p className="text-xs">Clear Filters</p>
+                </button>
+              )}
             </div>
-            {(filterLabels.length > 0 || documentFilter.length > 0) && (
-              <button
-                onClick={() => {
-                  setFilterLabels([]);
-                  setDocumentFilter([]);
-                }}
-                className="btn btn-sm border-none shadow-none bg-button-verba text-text-alt-verba hover:text-text-verba hover:bg-button-hover-verba"
-              >
-                <MdCancel size={15} />
-                <p className="text-xs">Clear Filters</p>
-              </button>
-            )}
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {filterLabels.map((label, index) => (
-              <button
-                key={"FilterLabel" + index}
-                onClick={() => {
-                  setFilterLabels(filterLabels.filter((l) => l !== label));
-                }}
-                className="btn btn-sm border-none shadow-none text-text-alt-verba hover:text-text-verba bg-button-verba hover:bg-button-hover-verba"
-              >
-                <p className="text-xs truncate max-w-[200px]" title={label}>
-                  {label}
-                </p>
-                <MdCancel size={15} />
-              </button>
-            ))}
-            {documentFilter.map((filter, index) => (
-              <button
-                key={"DocumentFilter" + index}
-                onClick={() => {
-                  setDocumentFilter(
-                    documentFilter.filter((f) => f.uuid !== filter.uuid)
-                  );
-                }}
-                className="btn btn-sm border-none shadow-none text-text-alt-verba hover:text-text-verba bg-button-verba hover:bg-button-hover-verba"
-              >
-                <p
-                  className="text-xs truncate max-w-[200px]"
+            <div className="flex flex-wrap gap-2">
+              {filterLabels.map((label, index) => (
+                <VerbaButton
+                  title={label}
+                  key={"FilterLabel" + index}
+                  Icon={MdCancel}
+                  className="btn-sm min-w-min"
+                  icon_size={12}
+                  text_class_name="truncate max-w-[200px]"
+                  text_size="text-xs"
+                  onClick={() => {
+                    setFilterLabels(filterLabels.filter((l) => l !== label));
+                  }}
+                />
+              ))}
+              {documentFilter.map((filter, index) => (
+                <VerbaButton
                   title={filter.title}
-                >
-                  {filter.title}
-                </p>
-                <MdCancel size={15} />
-              </button>
-            ))}
+                  key={"DocumentFilter" + index}
+                  Icon={MdCancel}
+                  className="btn-sm min-w-min"
+                  icon_size={12}
+                  text_size="text-xs"
+                  text_class_name="truncate md:max-w-[100px] lg:max-w-[200px]"
+                  onClick={() => {
+                    setDocumentFilter(
+                      documentFilter.filter((f) => f.uuid !== filter.uuid)
+                    );
+                  }}
+                />
+              ))}
+            </div>
           </div>
-        </div>
-
+        )}
         <div
           className={`${selectedSetting === "Chat" ? "flex flex-col gap-3 p-4" : "hidden"}`}
         >
@@ -536,6 +537,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           <ChatConfig
             production={production}
             RAGConfig={RAGConfig}
+            credentials={credentials}
             setRAGConfig={setRAGConfig}
             onReset={onResetConfig}
             onSave={onSaveConfig}
@@ -548,7 +550,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           <div className="flex gap-2 items-center justify-end w-full relative">
             <div className="relative w-full">
               <textarea
-                className="textarea textarea-bordered w-full bg-bg-verba placeholder-text-alt-verba max-h-32 overflow-y-auto"
+                className="textarea textarea-bordered w-full bg-bg-verba placeholder-text-alt-verb min-h min-h-[40px] max-h-[150px] overflow-y-auto"
                 placeholder={
                   currentDatacount > 0
                     ? `Chatting with ${currentDatacount} documents...`
@@ -594,18 +596,18 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                 </ul>
               )}
             </div>
-            <button
+            <VerbaButton
               type="button"
-              onClick={(e) => {
+              Icon={IoIosSend}
+              onClick={() => {
                 sendUserMessage();
               }}
-              className="btn btn-square border-none text-text-verba bg-primary-verba hover:bg-button-hover-verba"
-            >
-              <IoIosSend size={15} />
-            </button>
-
-            <button
+              disabled={false}
+              selected_color="bg-primary-verba"
+            />
+            <VerbaButton
               type="button"
+              Icon={MdOutlineRefresh}
               onClick={() => {
                 setSelectedDocument(null);
                 setSelectedChunkScore([]);
@@ -619,10 +621,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                   },
                 ]);
               }}
-              className="btn btn-square text-text-alt-verba hover:text-text-verba border-none bg-button-verba hover:bg-button-hover-verba"
-            >
-              <MdOutlineRefresh size={18} />
-            </button>
+              disabled={false}
+              selected_color="bg-primary-verba"
+            />
           </div>
         ) : (
           <div className="flex gap-2 items-center justify-end w-full">
