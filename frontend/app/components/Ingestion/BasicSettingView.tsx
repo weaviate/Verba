@@ -9,7 +9,8 @@ import {
   RAGComponentConfig,
   RAGConfig,
 } from "@/app/types";
-import { FaTrash } from "react-icons/fa";
+import VerbaButton from "../Navigation/VerbaButton";
+import { MdCancel } from "react-icons/md";
 import { IoAddCircleSharp } from "react-icons/io5";
 import { CgDebug } from "react-icons/cg";
 
@@ -35,6 +36,10 @@ interface BasicSettingViewProps {
     selected_component: string,
     component_config: RAGComponentConfig
   ) => void;
+  addStatusMessage: (
+    message: string,
+    type: "INFO" | "WARNING" | "SUCCESS" | "ERROR"
+  ) => void;
 }
 
 const BasicSettingView: React.FC<BasicSettingViewProps> = ({
@@ -45,6 +50,7 @@ const BasicSettingView: React.FC<BasicSettingViewProps> = ({
   saveComponentConfig,
   setFileMap,
   blocked,
+  addStatusMessage,
 }) => {
   const [filename, setFilename] = useState("");
   const [source, setSource] = useState("");
@@ -165,23 +171,16 @@ const BasicSettingView: React.FC<BasicSettingViewProps> = ({
 
   function renderLabelBoxes(fileData: FileData) {
     return Object.entries(fileData.labels).map(([key, label]) => (
-      <div
+      <VerbaButton
+        title={label}
         key={fileData.fileID + key + label}
-        className="flex bg-bg-verba min-w-[10vw] p-2 text-sm text-text-verba justify-between items-center rounded-xl"
-      >
-        <p className="truncate max-w-[80%]" title={label}>
-          {label}
-        </p>
-        <button
-          onClick={() => {
-            removeLabel(label);
-          }}
-          disabled={blocked}
-          className="btn btn-sm btn-square bg-button-verba border-none hover:bg-warning-verba text-text-verba ml-2"
-        >
-          <FaTrash size={12} />
-        </button>
-      </div>
+        className="btn-sm"
+        text_class_name="text-xs"
+        onClick={() => {
+          removeLabel(label);
+        }}
+        Icon={MdCancel}
+      />
     ));
   }
 
@@ -293,20 +292,24 @@ const BasicSettingView: React.FC<BasicSettingViewProps> = ({
               onChange={(e) => {
                 setLabel(e.target.value);
               }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  addLabel(label);
+                }
+              }}
               disabled={blocked}
               title={label}
             />
           </label>
-          <button
+          <VerbaButton
+            title="Add"
+            Icon={IoAddCircleSharp}
             onClick={() => {
               addLabel(label);
             }}
             disabled={blocked}
-            className="btn bg-button-verba border-none hover:bg-secondary-verba text-text-verba"
-          >
-            <IoAddCircleSharp size={15} />
-            <p>Add</p>
-          </button>
+          />
         </div>
 
         <div className="flex gap-2 items-center text-text-verba">
@@ -318,7 +321,7 @@ const BasicSettingView: React.FC<BasicSettingViewProps> = ({
 
         <div className="flex gap-2 items-center text-text-verba">
           <p className="flex min-w-[8vw]"></p>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="flex flex-wrap gap-2">
             {renderLabelBoxes(fileMap[selectedFileData])}
           </div>
         </div>
@@ -471,18 +474,17 @@ const BasicSettingView: React.FC<BasicSettingViewProps> = ({
 
         <div className="flex gap-2 justify-between items-center text-text-verba">
           <p className="flex min-w-[8vw]">Debug</p>
-          <button
+          <VerbaButton
+            Icon={CgDebug}
             onClick={openDebugModal}
-            className="btn btn-square bg-button-verba border-none hover:bg-secondary-verba text-text-verba"
-          >
-            <CgDebug size={15} />
-          </button>
+            className="max-w-min"
+          />
         </div>
 
         <dialog id={"File_Debug_Modal"} className="modal">
           <div className="modal-box min-w-fit">
             <h3 className="font-bold text-lg">Debugging File Configuration</h3>
-            <pre className="whitespace-pre-wrap">
+            <pre className="whitespace-pre-wrap text-xs">
               {selectedFileData
                 ? (() => {
                     // Create a shallow copy of the object

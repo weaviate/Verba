@@ -16,6 +16,10 @@ import {
 interface ChatViewProps {
   selectedTheme: Theme;
   credentials: Credentials;
+  addStatusMessage: (
+    message: string,
+    type: "INFO" | "WARNING" | "SUCCESS" | "ERROR"
+  ) => void;
   production: "Local" | "Demo" | "Production";
   currentPage: string;
   RAGConfig: RAGConfig | null;
@@ -27,6 +31,7 @@ interface ChatViewProps {
 const ChatView: React.FC<ChatViewProps> = ({
   credentials,
   selectedTheme,
+  addStatusMessage,
   production,
   currentPage,
   RAGConfig,
@@ -39,11 +44,12 @@ const ChatView: React.FC<ChatViewProps> = ({
     []
   );
   return (
-    <div className="flex md:flex-row flex-col justify-center gap-3 md:h-[80vh] ">
+    <div className="flex md:flex-row flex-col justify-center gap-3 h-[50vh] md:h-[80vh] ">
       <div
         className={`${selectedDocument ? "hidden md:flex md:w-[45vw]" : "w-full md:w-[45vw] md:flex"}`}
       >
         <ChatInterface
+          addStatusMessage={addStatusMessage}
           production={production}
           credentials={credentials}
           selectedTheme={selectedTheme}
@@ -61,6 +67,7 @@ const ChatView: React.FC<ChatViewProps> = ({
         className={`${selectedDocument ? "md:w-[55vw] w-full flex" : "hidden md:flex md:w-[55vw]"}`}
       >
         <DocumentExplorer
+          addStatusMessage={addStatusMessage}
           credentials={credentials}
           documentFilter={documentFilter}
           setDocumentFilter={setDocumentFilter}

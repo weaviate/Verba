@@ -45,6 +45,10 @@ interface ChatInterfaceProps {
   setRAGConfig: React.Dispatch<React.SetStateAction<RAGConfig | null>>;
   selectedTheme: Theme;
   production: "Local" | "Demo" | "Production";
+  addStatusMessage: (
+    message: string,
+    type: "INFO" | "WARNING" | "SUCCESS" | "ERROR"
+  ) => void;
   documentFilter: DocumentFilter[];
   setDocumentFilter: React.Dispatch<React.SetStateAction<DocumentFilter[]>>;
 }
@@ -58,6 +62,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   RAGConfig,
   selectedTheme,
   setRAGConfig,
+  addStatusMessage,
   documentFilter,
   setDocumentFilter,
 }) => {
@@ -153,6 +158,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       if (data.finish_reason === "stop") {
         isFetching.current = false;
         setFetchingStatus("DONE");
+        addStatusMessage("Finished generation", "SUCCESS");
         const full_text = data.full_text;
         if (data.cached) {
           const distance = data.distance;
@@ -218,6 +224,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     const config = await fetchRAGConfig(credentials);
     if (config) {
       setRAGConfig(config.rag_config);
+    } else {
+      addStatusMessage("Failed to fetch RAG Config", "ERROR");
     }
   };
 
@@ -232,6 +240,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     setMessages((prev) => [...prev, { type: "user", content: sendInput }]);
 
     try {
+      addStatusMessage("Sending query...", "INFO");
       const data = await sendUserQuery(
         sendInput,
         RAGConfig,
@@ -252,6 +261,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   };
 
   const handleErrorResponse = (errorMessage: string) => {
+    addStatusMessage("Query failed", "ERROR");
     setMessages((prev) => [...prev, { type: "error", content: errorMessage }]);
     isFetching.current = false;
     setFetchingStatus("DONE");
@@ -262,6 +272,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       ...prev,
       { type: "retrieval", content: data.documents, context: data.context },
     ]);
+
+    addStatusMessage(
+      "Received " + Object.entries(data.documents).length + " documents",
+      "SUCCESS"
+    );
 
     if (data.documents.length > 0) {
       const firstDoc = data.documents[0];
@@ -325,6 +340,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       }
     } catch (error) {
       console.error("Failed to fetch from API:", error);
+      addStatusMessage("Failed to fetch datacount: " + error, "ERROR");
     }
   };
 
@@ -333,10 +349,12 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   };
 
   const onSaveConfig = async () => {
+    addStatusMessage("Saved Config", "SUCCESS");
     await updateRAGConfig(RAGConfig, credentials);
   };
 
   const onResetConfig = async () => {
+    addStatusMessage("Reset Config", "WARNING");
     retrieveRAGConfig();
   };
 
@@ -358,13 +376,13 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     <div className="flex flex-col gap-2 w-full">
       {/* Header */}
       <div className="bg-bg-alt-verba rounded-2xl flex gap-2 p-6 items-center justify-between h-min w-full">
-        <div className="flex gap-2 justify-start items-center">
+        <div className="hidden md:flex gap-2 justify-start items-center">
           <InfoComponent
             tooltip_text="Use the Chat interface to interact with your data and perform Retrieval Augmented Generation (RAG). This interface allows you to ask questions, analyze sources, and generate responses based on your stored documents."
             display_text={"Chat"}
           />
         </div>
-        <div className="flex gap-3 justify-end items-center">
+        <div className="w-full md:w-fit flex gap-3 justify-end items-center">
           <VerbaButton
             title="Chat"
             Icon={IoChatbubbleSharp}
@@ -388,19 +406,23 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         </div>
       </div>
 
-      <div className="bg-bg-alt-verba rounded-2xl flex flex-col h-full w-full overflow-y-auto overflow-x-hidden relative">
+      <div className="bg-bg-alt-verba rounded-2xl flex flex-col h-[50vh] md:h-full w-full overflow-y-auto overflow-x-hidden relative">
         {/* New fixed tab */}
         {selectedSetting == "Chat" && (
           <div className="sticky flex flex-col gap-2 top-0 z-9 p-4 backdrop-blur-sm bg-opacity-30 bg-bg-alt-verba rounded-lg">
             <div className="flex gap-2 justify-start items-center">
               <div className="flex gap-2">
                 <div className="dropdown dropdown-hover">
-                  <label
-                    tabIndex={0}
-                    className="btn btn-sm border-none shadow-none bg-button-verba text-text-alt-verba hover:text-text-verba hover:bg-button-hover-verba"
-                  >
-                    <IoMdAddCircle size={15} />
-                    <p className="text-xs">Label</p>
+                  <label tabIndex={0}>
+                    <VerbaButton
+                      title="Label"
+                      className="btn-sm min-w-min"
+                      icon_size={12}
+                      text_class_name="text-xs"
+                      Icon={IoMdAddCircle}
+                      selected={false}
+                      disabled={false}
+                    />
                   </label>
                   <ul
                     tabIndex={0}
@@ -430,16 +452,19 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                 </div>
               </div>
               {(filterLabels.length > 0 || documentFilter.length > 0) && (
-                <button
+                <VerbaButton
                   onClick={() => {
                     setFilterLabels([]);
                     setDocumentFilter([]);
                   }}
-                  className="btn btn-sm border-none shadow-none bg-button-verba text-text-alt-verba hover:text-text-verba hover:bg-button-hover-verba"
-                >
-                  <MdCancel size={15} />
-                  <p className="text-xs">Clear Filters</p>
-                </button>
+                  title="Clear"
+                  className="btn-sm max-w-min"
+                  icon_size={12}
+                  text_class_name="text-xs"
+                  Icon={MdCancel}
+                  selected={false}
+                  disabled={false}
+                />
               )}
             </div>
             <div className="flex flex-wrap gap-2">
@@ -539,6 +564,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         </div>
         {selectedSetting === "Config" && (
           <ChatConfig
+            addStatusMessage={addStatusMessage}
             production={production}
             RAGConfig={RAGConfig}
             credentials={credentials}
@@ -581,7 +607,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                         setCurrentSuggestions([]);
                       }}
                     >
-                      <p className="text-sm">
+                      <p className="text-xs lg:text-sm">
                         {suggestion.query.length > 50
                           ? suggestion.query.substring(0, 50) + "..."
                           : suggestion.query

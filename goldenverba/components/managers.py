@@ -458,9 +458,12 @@ class WeaviateManager:
             )
 
             if response.total_count == 0:
-                return []
+                return [], 0
+
+            total_count = response.total_count
 
             if query == "":
+                total_count = response.total_count
                 response = await document_collection.query.fetch_objects(
                     limit=pageSize,
                     offset=offset,
@@ -484,7 +487,7 @@ class WeaviateManager:
                     "labels": doc.properties["labels"],
                 }
                 for doc in response.objects
-            ]
+            ], total_count
 
     async def get_document(
         self, client: WeaviateAsyncClient, uuid: str, properties: list[str] = None

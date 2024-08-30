@@ -4,20 +4,25 @@ import React, { useState, useEffect } from "react";
 import { Credentials, Suggestion } from "@/app/types";
 import { IoTrash, IoDocumentSharp, IoReload, IoCopy } from "react-icons/io5";
 import { FaWrench } from "react-icons/fa";
-import {
-  deleteAllDocuments,
-  fetchAllSuggestions,
-  deleteSuggestion,
-} from "@/app/api";
+import { fetchAllSuggestions, deleteSuggestion } from "@/app/api";
 import UserModalComponent from "../Navigation/UserModal";
 import { FaArrowAltCircleRight, FaArrowAltCircleLeft } from "react-icons/fa";
 import { formatDistanceToNow, parseISO } from "date-fns";
 
+import VerbaButton from "../Navigation/VerbaButton";
+
 interface SuggestionViewProps {
   credentials: Credentials;
+  addStatusMessage: (
+    message: string,
+    type: "INFO" | "WARNING" | "SUCCESS" | "ERROR"
+  ) => void;
 }
 
-const SuggestionView: React.FC<SuggestionViewProps> = ({ credentials }) => {
+const SuggestionView: React.FC<SuggestionViewProps> = ({
+  credentials,
+  addStatusMessage,
+}) => {
   const [page, setPage] = useState(1);
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [totalCount, setTotalCount] = useState(0);
@@ -78,6 +83,7 @@ const SuggestionView: React.FC<SuggestionViewProps> = ({ credentials }) => {
   const handleDelete = async (uuid: string) => {
     await deleteSuggestion(uuid, credentials);
     await handleSuggestionFetch();
+    addStatusMessage("Suggestion deleted", "SUCCESS");
   };
 
   const handleCopy = (query: string) => {
@@ -91,14 +97,12 @@ const SuggestionView: React.FC<SuggestionViewProps> = ({ credentials }) => {
     <div className="flex flex-col w-full h-full p-4">
       <div className="flex justify-between items-center mb-4">
         <p className="text-2xl font-bold">Manage Suggestions ({totalCount})</p>
-        <button
+        <VerbaButton
+          title="Refresh"
+          className="max-w-min"
           onClick={handleRefresh}
-          className="btn border-none shadow-none flex items-center gap-2 p-3 text-text-alt-verba hover:text-text-verba bg-button-verba hover:bg-button-hover-verba"
-          title="Refresh suggestions"
-        >
-          <IoReload size={15} />
-          <p>Refresh</p>
-        </button>
+          Icon={IoReload}
+        />
       </div>
       <div className="flex-grow overflow-y-auto">
         <div className="gap-4 flex flex-col p-4 text-text-verba">
@@ -120,22 +124,16 @@ const SuggestionView: React.FC<SuggestionViewProps> = ({ credentials }) => {
                   </p>
                 </div>
                 <div className="flex gap-2">
-                  <button
+                  <VerbaButton
                     onClick={() => handleCopy(suggestion.query)}
-                    className="p-3 btn-square border-none shadow-none btn text-text-alt-verba hover:text-text-verba bg-button-verba hover:bg-button-hover-verba"
-                    title="Copy to clipboard"
-                  >
-                    <IoCopy size={15} />
-                  </button>
-                  <button
+                    Icon={IoCopy}
+                  />
+                  <VerbaButton
                     onClick={() =>
                       openModal("remove_suggestion" + suggestion.uuid)
                     }
-                    className="p-3 btn-square border-none shadow-none btn text-text-alt-verba hover:text-text-verba bg-button-verba hover:bg-warning-verba"
-                    title="Delete suggestion"
-                  >
-                    <IoTrash size={15} />
-                  </button>
+                    Icon={IoTrash}
+                  />
                 </div>
                 <UserModalComponent
                   modal_id={"remove_suggestion" + suggestion.uuid}
@@ -152,21 +150,21 @@ const SuggestionView: React.FC<SuggestionViewProps> = ({ credentials }) => {
       </div>
       {suggestions.length > 0 && (
         <div className="flex justify-center items-center gap-2 p-3 bg-bg-alt-verba">
-          <button
+          <VerbaButton
+            title="Previous Page"
             onClick={previousPage}
-            className={`flex gap-2 items-center p-3 bg-button-verba hover:bg-button-hover-verba rounded-full w-fit`}
-          >
-            <FaArrowAltCircleLeft size={12} />
-            <p className="text-xs flex text-text-verba">Previous Page</p>
-          </button>
+            className="btn-sm min-w-min max-w-[200px]"
+            text_class_name="text-xs"
+            Icon={FaArrowAltCircleLeft}
+          />
           <p className="text-xs flex text-text-verba">Page {page}</p>
-          <button
+          <VerbaButton
+            title="Next Page"
             onClick={nextPage}
-            className="flex gap-2 items-center p-3 bg-button-verba hover:bg-button-hover-verba rounded-full w-fit"
-          >
-            <FaArrowAltCircleRight size={12} />
-            <p className="text-xs flex text-text-verba">Next Page</p>
-          </button>
+            className="btn-sm min-w-min max-w-[200px]"
+            text_class_name="text-xs"
+            Icon={FaArrowAltCircleRight}
+          />
         </div>
       )}
     </div>

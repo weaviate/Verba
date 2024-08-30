@@ -20,6 +20,8 @@ import {
 } from "@/app/types";
 import { fetchContent } from "@/app/api";
 
+import VerbaButton from "../Navigation/VerbaButton";
+
 interface ContentViewProps {
   document: VerbaDocument | null;
   selectedTheme: Theme;
@@ -227,7 +229,7 @@ const ContentView: React.FC<ContentViewProps> = ({
             <div className="flex gap-4 w-full justify-between">
               <div className="flex gap-4 items-center">
                 {isFetching && (
-                  <div className="flex items-center justify-center text-text-alt-verba gap-2">
+                  <div className="flex items-center justify-center text-text-verba gap-2">
                     <span className="loading loading-spinner loading-sm"></span>
                   </div>
                 )}
@@ -238,14 +240,15 @@ const ContentView: React.FC<ContentViewProps> = ({
                   {document.title}
                 </p>
               </div>
-              <div className="gap-2 grid grid-cols-3">
+              <div className="gap-2 flex flex-wrap">
                 {Object.entries(document.labels).map(([key, label]) => (
-                  <div
+                  <VerbaButton
                     key={document.title + key + label}
-                    className="flex bg-bg-verba min-w-[8vw] p-2 text-sm text-text-verba justify-center text-center items-center rounded-xl"
-                  >
-                    <p>{label}</p>
-                  </div>
+                    title={label}
+                    text_size="text-xs"
+                    text_class_name="truncate max-w-[200px]"
+                    className="btn-sm min-w-min max-w-[200px]"
+                  />
                 ))}
               </div>
             </div>
@@ -263,30 +266,26 @@ const ContentView: React.FC<ContentViewProps> = ({
 
           {/* Navigation div */}
 
-          <div className="flex justify-center gap-2 p-3 bg-bg-alt-verba">
-            <button
+          <div className="flex justify-center items-center gap-2 p-3 bg-bg-alt-verba">
+            <VerbaButton
+              title={"Previous " + (chunkScores ? "Chunk" : "Page")}
               onClick={previousPage}
-              className="flex gap-2 items-center p-3 bg-button-verba hover:bg-button-hover-verba rounded-full w-fit"
-            >
-              <FaArrowAltCircleLeft size={12} />
-              <p className="text-xs flex text-text-verba">
-                Previous {chunkScores ? "Chunk" : "Page"}
-              </p>
-            </button>
+              className="btn-sm min-w-min max-w-[200px]"
+              text_class_name="text-xs"
+              Icon={FaArrowAltCircleLeft}
+            />
             <div className="flex items-center">
               <p className="text-xs text-text-verba">
                 {chunkScores ? "Chunk " : "Page "} {page}
               </p>
             </div>
-            <button
+            <VerbaButton
+              title={"Next " + (chunkScores ? "Chunk" : "Page")}
               onClick={nextPage}
-              className="flex gap-2 items-center p-3 bg-button-verba hover:bg-button-hover-verba rounded-full w-fit"
-            >
-              <FaArrowAltCircleRight size={12} />
-              <p className="text-xs flex text-text-verba">
-                Next {chunkScores ? "Chunk" : "Page"}
-              </p>
-            </button>
+              className="btn-sm min-w-min max-w-[200px]"
+              text_class_name="text-xs"
+              Icon={FaArrowAltCircleRight}
+            />
           </div>
         </div>
       )}

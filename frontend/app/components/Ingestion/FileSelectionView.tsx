@@ -14,6 +14,8 @@ import { closeOnClick } from "@/app/util";
 
 import UserModalComponent from "../Navigation/UserModal";
 
+import VerbaButton from "../Navigation/VerbaButton";
+
 import { FileMap } from "@/app/types";
 import { RAGConfig } from "@/app/types";
 
@@ -28,12 +30,17 @@ interface FileSelectionViewProps {
   importAll: () => void;
   reconnect: () => void;
   socketStatus: "ONLINE" | "OFFLINE";
+  addStatusMessage: (
+    message: string,
+    type: "INFO" | "WARNING" | "SUCCESS" | "ERROR"
+  ) => void;
 }
 
 const FileSelectionView: React.FC<FileSelectionViewProps> = ({
   fileMap,
   setFileMap,
   RAGConfig,
+  addStatusMessage,
   setRAGConfig,
   selectedFileData,
   setSelectedFileData,
@@ -61,12 +68,14 @@ const FileSelectionView: React.FC<FileSelectionViewProps> = ({
   const handleDeleteFile = (filename: string | null) => {
     setFileMap((prevFileMap: FileMap): FileMap => {
       if (filename === null) {
+        addStatusMessage("Cleared all files", "WARNING");
         setSelectedFileData(null);
         return {};
       } else {
         if (filename === selectedFileData) {
           setSelectedFileData(null);
         }
+        addStatusMessage("Cleared selected file", "WARNING");
         const newFileMap: FileMap = { ...prevFileMap };
         delete newFileMap[filename];
         return newFileMap;
@@ -91,6 +100,8 @@ const FileSelectionView: React.FC<FileSelectionViewProps> = ({
       const selectedReader = isDirectory
         ? selectedDirReader
         : selectedFileReader;
+
+      addStatusMessage("Added new files", "SUCCESS");
 
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
@@ -145,6 +156,8 @@ const FileSelectionView: React.FC<FileSelectionViewProps> = ({
       const filename = "New " + URLReader + " Job";
       const fileID = now.toISOString();
       const extension = "URL";
+
+      addStatusMessage("Added new URL Job", "SUCCESS");
 
       newFileMap[fileID] = {
         fileID,
@@ -207,23 +220,22 @@ const FileSelectionView: React.FC<FileSelectionViewProps> = ({
   return (
     <div className="flex flex-col gap-2 w-full">
       {/* FileSelection Header */}
-      <div className="bg-bg-alt-verba rounded-2xl flex gap-2 p-6 items-center justify-between h-min w-full">
-        <div className="flex gap-2 justify-start ">
+      <div className="bg-bg-alt-verba rounded-2xl flex gap-2 p-6 items-center justify-end lg:justify-between h-min w-full">
+        <div className="hidden lg:flex gap-2 justify-start ">
           <InfoComponent
             tooltip_text="Upload your data through this interface into Verba. You can select individual files, directories or add URL to fetch data from."
             display_text="File Selection"
           />
         </div>
-        <div className="flex gap-3 justify-end">
-          <div className="dropdown dropdown-bottom">
-            <button
-              tabIndex={0}
-              className="flex btn border-none text-text-verba bg-button-verba hover:bg-button-hover-verba gap-2"
-            >
-              <IoMdAddCircle size={15} />
-              <p>Add Files</p>
-              <IoMdArrowDropdown size={15} />
-            </button>
+        <div className="flex gap-3 justify-center lg:justify-end">
+          <div className="dropdown dropdown-hover">
+            <label tabIndex={0}>
+              <VerbaButton
+                title="Files"
+                Icon={IoMdAddCircle}
+                onClick={() => document.getElementById("files_upload")?.click()}
+              />
+            </label>
             <ul
               tabIndex={0}
               className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
@@ -252,15 +264,11 @@ const FileSelectionView: React.FC<FileSelectionViewProps> = ({
             className="hidden"
             multiple
           />
-          <div className="dropdown dropdown-bottom">
-            <button
-              tabIndex={0}
-              className="flex btn border-none text-text-verba bg-button-verba hover:bg-button-hover-verba gap-2"
-            >
-              <GoFileDirectoryFill size={15} />
-              <p>Add Directory</p>
-              <IoMdArrowDropdown size={15} />
-            </button>
+
+          <div className="dropdown dropdown-hover">
+            <label tabIndex={0}>
+              <VerbaButton title="Directory" Icon={GoFileDirectoryFill} />
+            </label>
             <ul
               tabIndex={0}
               className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
@@ -290,15 +298,12 @@ const FileSelectionView: React.FC<FileSelectionViewProps> = ({
             className="hidden"
             multiple
           />
-          <div className="dropdown dropdown-bottom">
-            <button
-              tabIndex={0}
-              className="flex btn border-none text-text-verba bg-button-verba hover:bg-button-hover-verba gap-2"
-            >
-              <IoMdAddCircle size={15} />
-              <p>Add URL</p>
-              <IoMdArrowDropdown size={15} />
-            </button>
+
+          <div className="dropdown dropdown-hover">
+            <label tabIndex={0}>
+              <VerbaButton title="URL" Icon={IoMdAddCircle} />
+            </label>
+            <input id={"url_upload"} type="file" className="hidden" />
             <ul
               tabIndex={0}
               className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
@@ -332,7 +337,6 @@ const FileSelectionView: React.FC<FileSelectionViewProps> = ({
             selectedFileData={selectedFileData}
             setSelectedFileData={setSelectedFileData}
             fileMap={fileMap}
-            setFileMap={setFileMap}
           />
         ))}
       </div>
@@ -340,30 +344,25 @@ const FileSelectionView: React.FC<FileSelectionViewProps> = ({
       {/* Import Footer */}
       {socketStatus === "ONLINE" ? (
         <div className="bg-bg-alt-verba rounded-2xl flex gap-2 p-6 items-center justify-end h-min w-full">
-          <div className="flex gap-3 justify-end">
+          <div className="flex flex-wrap gap-3 justify-end">
             {selectedFileData && (
-              <button
+              <VerbaButton
+                title="Import Selected"
+                Icon={FaFileImport}
                 onClick={importSelected}
-                className="flex btn border-none text-text-verba bg-secondary-verba hover:bg-button-hover-verba gap-2"
-              >
-                <FaFileImport size={15} />
-                <p>Import Selected</p>
-              </button>
+              />
             )}
-            <button
+            <VerbaButton
+              title="Import All"
+              Icon={FaFileImport}
               onClick={importAll}
-              className="flex btn border-none text-text-verba bg-button-verba hover:bg-button-hover-verba gap-2"
-            >
-              <FaFileImport size={15} />
-              <p>Import All</p>
-            </button>
-            <button
+            />
+
+            <VerbaButton
+              title="Clear Files"
+              Icon={MdCancel}
               onClick={openDeleteModal}
-              className="flex btn border-none text-text-verba bg-button-verba hover:bg-warning-verba gap-2"
-            >
-              <MdCancel size={15} />
-              <p>Clear Files</p>
-            </button>
+            />
           </div>
         </div>
       ) : (

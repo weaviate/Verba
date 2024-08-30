@@ -30,7 +30,7 @@ const InfoComponent: React.FC<InfoComponentProps> = ({
           button_size="btn-xs"
         />
         <div
-          className={`absolute left-full z-10 p-4 bg-bg-verba text-text-alt-verba text-xs rounded-xl shadow-md w-[300px] transition-opacity duration-300 ${
+          className={`absolute left-full z-30 p-4 bg-bg-verba text-text-alt-verba text-xs rounded-xl shadow-md w-[300px] transition-opacity duration-300 ${
             showTooltip ? "opacity-100" : "opacity-0 pointer-events-none"
           }`}
         >

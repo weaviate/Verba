@@ -17,12 +17,17 @@ interface IngestionViewProps {
   credentials: Credentials;
   RAGConfig: RAGConfig | null;
   setRAGConfig: React.Dispatch<React.SetStateAction<RAGConfig | null>>;
+  addStatusMessage: (
+    message: string,
+    type: "INFO" | "WARNING" | "SUCCESS" | "ERROR"
+  ) => void;
 }
 
 const IngestionView: React.FC<IngestionViewProps> = ({
   credentials,
   RAGConfig,
   setRAGConfig,
+  addStatusMessage,
 }) => {
   const [fileMap, setFileMap] = useState<FileMap>({});
   const [selectedFileData, setSelectedFileData] = useState<string | null>(null);
@@ -130,6 +135,13 @@ const IngestionView: React.FC<IngestionViewProps> = ({
   };
 
   const updateStatus = (data: StatusReport) => {
+    console.log("Update status", data);
+    if (data.status === "DONE") {
+      addStatusMessage("File " + data.fileID + " imported", "SUCCESS");
+    }
+    if (data.status === "ERROR") {
+      addStatusMessage("File " + data.fileID + " import failed", "ERROR");
+    }
     setFileMap((prevFileMap) => {
       if (data && data.fileID in prevFileMap) {
         const newFileData: FileData = JSON.parse(
@@ -164,6 +176,7 @@ const IngestionView: React.FC<IngestionViewProps> = ({
   };
 
   const importSelected = () => {
+    addStatusMessage("Importing selected file", "INFO");
     if (
       selectedFileData &&
       ["READY", "DONE", "ERROR"].includes(fileMap[selectedFileData].status) &&
@@ -177,6 +190,7 @@ const IngestionView: React.FC<IngestionViewProps> = ({
   };
 
   const importAll = () => {
+    addStatusMessage("Importing all files", "INFO");
     for (const fileID in fileMap) {
       if (
         ["READY", "DONE", "ERROR"].includes(fileMap[fileID].status) &&
@@ -229,6 +243,7 @@ const IngestionView: React.FC<IngestionViewProps> = ({
       >
         <FileSelectionView
           fileMap={fileMap}
+          addStatusMessage={addStatusMessage}
           setFileMap={setFileMap}
           RAGConfig={RAGConfig}
           setRAGConfig={setRAGConfig}
@@ -246,6 +261,7 @@ const IngestionView: React.FC<IngestionViewProps> = ({
       >
         {selectedFileData && (
           <ConfigurationView
+            addStatusMessage={addStatusMessage}
             selectedFileData={selectedFileData}
             RAGConfig={RAGConfig}
             credentials={credentials}

@@ -17,6 +17,8 @@ import {
   Credentials,
 } from "@/app/types";
 
+import VerbaButton from "@/app/components/Navigation/VerbaButton";
+
 import { HexColorPicker } from "react-colorful";
 
 import { FaCheckCircle } from "react-icons/fa";
@@ -30,6 +32,10 @@ interface SettingsComponentProps {
   setThemes: React.Dispatch<React.SetStateAction<Themes>>;
   setSelectedTheme: React.Dispatch<React.SetStateAction<Theme>>;
   credentials: Credentials;
+  addStatusMessage: (
+    message: string,
+    type: "INFO" | "WARNING" | "SUCCESS" | "ERROR"
+  ) => void;
 }
 
 const SettingsComponent: React.FC<SettingsComponentProps> = ({
@@ -38,6 +44,7 @@ const SettingsComponent: React.FC<SettingsComponentProps> = ({
   credentials,
   setSelectedTheme,
   themes,
+  addStatusMessage,
 }) => {
   const [imageURL, setImageURL] = useState("");
 
@@ -49,10 +56,12 @@ const SettingsComponent: React.FC<SettingsComponentProps> = ({
       WCD: WCDTheme,
     });
     setSelectedTheme(WeaviateTheme);
+    addStatusMessage("Themes reset", "SUCCESS");
   };
 
   const saveTheme = async () => {
     await updateThemeConfig(themes, selectedTheme, credentials);
+    addStatusMessage(`Changes to ${selectedTheme.theme_name} saved`, "SUCCESS");
   };
 
   const updateValue = (title: keyof Theme, value: any) => {
@@ -164,7 +173,7 @@ const SettingsComponent: React.FC<SettingsComponentProps> = ({
             </select>
           )}
           {setting_type.type === "color" && (
-            <div className="flex flex-col gap-1 h-[15vh]">
+            <div className="flex flex-col gap-1 h-[15vh] z-10">
               <label className="input bg-bg-verba input-sm input-bordered flex items-center gap-2 w-full">
                 <input
                   type="text"
@@ -178,6 +187,7 @@ const SettingsComponent: React.FC<SettingsComponentProps> = ({
               </label>
               <HexColorPicker
                 color={(selectedTheme as any)[title].color}
+                className="z-1"
                 onChange={(newColor: string) => {
                   updateValue(title, newColor);
                 }}
@@ -199,20 +209,16 @@ const SettingsComponent: React.FC<SettingsComponentProps> = ({
               </div>
               <div className="flex justify-between items-center gap-4">
                 <div className="flex flex-col gap-2">
-                  <button
+                  <VerbaButton
+                    title="Set Link"
                     onClick={() => updateValue(title, imageURL)}
-                    className="btn border-none shadow-none bg-button-verba hover:bg-button-hover-verba"
-                  >
-                    Set Link
-                  </button>
-                  <button
+                  />
+                  <VerbaButton
+                    title="Upload Image"
                     onClick={() =>
                       document.getElementById(`${title}ImageInput`)?.click()
                     }
-                    className="btn border-none shadow-none bg-button-verba hover:bg-button-hover-verba"
-                  >
-                    Upload Image
-                  </button>
+                  />
                   <input
                     id={`${title}ImageInput`}
                     type="file"
@@ -286,20 +292,18 @@ const SettingsComponent: React.FC<SettingsComponentProps> = ({
         </div>
       </div>
       <div className="flex justify-end gap-2 mt-3">
-        <button
+        <VerbaButton
+          title="Save"
           onClick={saveTheme}
-          className="btn flex items-center justify-center border-none text-text-verba bg-secondary-verba hover:bg-button-hover-verba"
-        >
-          <FaCheckCircle />
-          <p className="">Save</p>
-        </button>
-        <button
+          className="max-w-min"
+          Icon={FaCheckCircle}
+        />
+        <VerbaButton
+          title="Reset"
           onClick={resetThemes}
-          className="btn flex items-center justify-center border-none text-text-verba bg-warning-verba hover:bg-button-hover-verba"
-        >
-          <MdCancel />
-          <p className="">Reset</p>
-        </button>
+          className="max-w-min"
+          Icon={MdCancel}
+        />
       </div>
     </div>
   );

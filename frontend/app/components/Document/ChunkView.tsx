@@ -14,6 +14,8 @@ import { FaArrowAltCircleRight, FaArrowAltCircleLeft } from "react-icons/fa";
 import { fetch_chunks } from "@/app/api";
 import { Credentials } from "@/app/types";
 
+import VerbaButton from "../Navigation/VerbaButton";
+
 interface ChunkViewProps {
   selectedDocument: string | null;
   selectedTheme: Theme;
@@ -120,9 +122,8 @@ const ChunkView: React.FC<ChunkViewProps> = ({
     return (
       <div>
         {isFetching && (
-          <div className="flex items-center justify-center text-text-alt-verba gap-2 h-full">
+          <div className="flex items-center justify-center text-text-verba gap-2 h-full">
             <span className="loading loading-spinner loading-sm"></span>
-            <p>Loading Chunks</p>
           </div>
         )}
       </div>
@@ -179,24 +180,22 @@ const ChunkView: React.FC<ChunkViewProps> = ({
 
           {/* Navigation div */}
           {chunks.length > 1 && (
-            <div className="flex justify-center gap-2 p-3 bg-bg-alt-verba">
-              <button
+            <div className="flex justify-center items-center gap-2 p-3 bg-bg-alt-verba">
+              <VerbaButton
+                title={"Previous Chunk"}
                 onClick={previousChunk}
-                className={`flex gap-2 items-center p-3 bg-button-verba hover:bg-button-hover-verba rounded-full w-fit ${
-                  isPreviousDisabled ? "cursor-not-allowed opacity-50" : ""
-                }`}
+                className="btn-sm min-w-min max-w-[200px]"
+                text_class_name="text-xs"
                 disabled={isPreviousDisabled}
-              >
-                <FaArrowAltCircleLeft size={12} />
-                <p className="text-xs flex text-text-verba">Previous Chunk</p>
-              </button>
-              <button
+                Icon={FaArrowAltCircleLeft}
+              />
+              <VerbaButton
+                title={"Next Chunk"}
                 onClick={nextChunk}
-                className="flex gap-2 items-center p-3 bg-button-verba hover:bg-button-hover-verba rounded-full w-fit"
-              >
-                <FaArrowAltCircleRight size={12} />
-                <p className="text-xs flex text-text-verba">Next Chunk</p>
-              </button>
+                className="btn-sm min-w-min max-w-[200px]"
+                text_class_name="text-xs"
+                Icon={FaArrowAltCircleRight}
+              />
             </div>
           )}
         </div>

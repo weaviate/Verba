@@ -11,6 +11,8 @@ interface UserModalComponentProps {
   triggerString?: string | null;
 }
 
+import VerbaButton from "./VerbaButton";
+
 const UserModalComponent: React.FC<UserModalComponentProps> = ({
   title,
   modal_id,
@@ -27,18 +29,20 @@ const UserModalComponent: React.FC<UserModalComponentProps> = ({
         <div className="modal-action">
           <form method="dialog" className="flex gap-2">
             {triggerAccept && triggerString && (
-              <button
-                className="btn text-text-alt-verba hover:text-text-verba bg-button-verba border-none hover:bg-primary-verba"
+              <VerbaButton
+                type="submit"
+                title={triggerString}
                 onClick={() => {
                   triggerAccept(triggerValue);
                 }}
-              >
-                {triggerString}
-              </button>
+              />
             )}
-            <button className="btn text-text-alt-verba hover:text-text-verba bg-button-verba border-none hover:bg-warning-verba">
-              Cancel
-            </button>
+            <VerbaButton
+              type="submit"
+              title="Cancel"
+              selected_color="bg-warning-verba"
+              selected={true}
+            />
           </form>
         </div>
       </div>

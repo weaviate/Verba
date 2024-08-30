@@ -620,7 +620,7 @@ async def get_chunk(payload: GetChunkPayload):
 async def get_all_documents(payload: SearchQueryPayload):
     try:
         client = await client_manager.connect(payload.credentials)
-        documents = await manager.weaviate_manager.get_documents(
+        documents, total_count = await manager.weaviate_manager.get_documents(
             client,
             payload.query,
             payload.pageSize,
@@ -636,6 +636,7 @@ async def get_all_documents(payload: SearchQueryPayload):
                 "documents": documents,
                 "labels": labels,
                 "error": "",
+                "totalDocuments": total_count,
             }
         )
     except Exception as e:
@@ -645,6 +646,7 @@ async def get_all_documents(payload: SearchQueryPayload):
                 "documents": [],
                 "label": [],
                 "error": f"All Document retrieval failed: {str(e)}",
+                "totalDocuments": 0,
             }
         )
 

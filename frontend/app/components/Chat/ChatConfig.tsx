@@ -7,11 +7,17 @@ import { RAGConfig, RAGComponentConfig, Credentials } from "@/app/types";
 import { updateRAGConfig } from "@/app/api";
 import ComponentView from "../Ingestion/ComponentView";
 
+import VerbaButton from "../Navigation/VerbaButton";
+
 interface ChatConfigProps {
   RAGConfig: RAGConfig | null;
   setRAGConfig: React.Dispatch<React.SetStateAction<RAGConfig | null>>;
   onSave: () => void; // New parameter for handling save
   onReset: () => void; // New parameter for handling reset
+  addStatusMessage: (
+    message: string,
+    type: "INFO" | "WARNING" | "SUCCESS" | "ERROR"
+  ) => void;
   credentials: Credentials;
   production: "Local" | "Demo" | "Production";
 }
@@ -19,6 +25,7 @@ interface ChatConfigProps {
 const ChatConfig: React.FC<ChatConfigProps> = ({
   RAGConfig,
   setRAGConfig,
+  addStatusMessage,
   onSave,
   credentials,
   onReset,
@@ -66,6 +73,8 @@ const ChatConfig: React.FC<ChatConfigProps> = ({
     ) => {
       if (!RAGConfig) return;
 
+      addStatusMessage("Saving " + selected_component + " Config", "SUCCESS");
+
       const newRAGConfig = JSON.parse(JSON.stringify(RAGConfig));
       newRAGConfig[component_n].selected = selected_component;
       newRAGConfig[component_n].components[selected_component] =
@@ -80,50 +89,52 @@ const ChatConfig: React.FC<ChatConfigProps> = ({
 
   if (RAGConfig) {
     return (
-      <div className="flex flex-col justify-start gap-3 rounded-2xl p-1 w-full p-6 ">
-        <ComponentView
-          RAGConfig={RAGConfig}
-          component_name="Embedder"
-          selectComponent={selectComponent}
-          updateConfig={updateConfig}
-          saveComponentConfig={saveComponentConfig}
-          blocked={production == "Demo"}
-        />
-        <ComponentView
-          RAGConfig={RAGConfig}
-          component_name="Generator"
-          selectComponent={selectComponent}
-          updateConfig={updateConfig}
-          saveComponentConfig={saveComponentConfig}
-          blocked={production == "Demo"}
-        />
-        <ComponentView
-          RAGConfig={RAGConfig}
-          component_name="Retriever"
-          selectComponent={selectComponent}
-          updateConfig={updateConfig}
-          saveComponentConfig={saveComponentConfig}
-          blocked={production == "Demo"}
-        />
+      <div className="flex flex-col justify-start rounded-2xl w-full p-4 ">
+        <div className="sticky flex flex-col gap-2 w-full top-0 z-20 justify-end">
+          {/* Add Save and Reset buttons */}
+          <div className="flex justify-end w-full gap-2 p-4 bg-bg-alt-verba rounded-lg">
+            <VerbaButton
+              Icon={IoSettingsSharp}
+              title="Save Config"
+              onClick={onSave}
+              className="max-w-[150px]"
+              disabled={production == "Demo"}
+            />
+            <VerbaButton
+              Icon={MdCancel}
+              title="Reset"
+              onClick={onReset}
+              className="max-w-[150px]"
+              disabled={production == "Demo"}
+            />
+          </div>
+        </div>
 
-        {/* Add Save and Reset buttons */}
-        <div className="flex justify-end gap-2 mt-4">
-          <button
-            onClick={onSave}
-            disabled={production == "Demo"}
-            className="flex btn border-none text-text-verba bg-button-verba hover:bg-button-hover-verba gap-2"
-          >
-            <IoSettingsSharp size={15} />
-            <p>Save Config</p>
-          </button>
-          <button
-            onClick={onReset}
-            disabled={production == "Demo"}
-            className="flex btn border-none text-text-verba bg-button-verba hover:bg-warning-verba gap-2"
-          >
-            <MdCancel size={15} />
-            <p>Reset</p>
-          </button>
+        <div className="flex flex-col justify-start gap-3 rounded-2xl w-full p-6 ">
+          <ComponentView
+            RAGConfig={RAGConfig}
+            component_name="Embedder"
+            selectComponent={selectComponent}
+            updateConfig={updateConfig}
+            saveComponentConfig={saveComponentConfig}
+            blocked={production == "Demo"}
+          />
+          <ComponentView
+            RAGConfig={RAGConfig}
+            component_name="Generator"
+            selectComponent={selectComponent}
+            updateConfig={updateConfig}
+            saveComponentConfig={saveComponentConfig}
+            blocked={production == "Demo"}
+          />
+          <ComponentView
+            RAGConfig={RAGConfig}
+            component_name="Retriever"
+            selectComponent={selectComponent}
+            updateConfig={updateConfig}
+            saveComponentConfig={saveComponentConfig}
+            blocked={production == "Demo"}
+          />
         </div>
       </div>
     );

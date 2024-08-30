@@ -7,52 +7,80 @@ import { FaWrench } from "react-icons/fa";
 import { deleteAllDocuments, fetchMeta } from "@/app/api";
 import UserModalComponent from "../Navigation/UserModal";
 
+import VerbaButton from "../Navigation/VerbaButton";
+
 interface InfoViewProps {
   credentials: Credentials;
+  addStatusMessage: (
+    message: string,
+    type: "INFO" | "WARNING" | "SUCCESS" | "ERROR"
+  ) => void;
 }
 
-const InfoView: React.FC<InfoViewProps> = ({ credentials }) => {
+const InfoView: React.FC<InfoViewProps> = ({
+  credentials,
+  addStatusMessage,
+}) => {
   const [nodePayload, setNodePayload] = useState<NodePayload | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [collectionPayload, setCollectionPayload] =
     useState<CollectionPayload | null>(null);
 
   const fetchMetadata = async () => {
+    setIsLoading(true);
     const metaData = await fetchMeta(credentials);
     if (metaData?.error === "") {
       setNodePayload(metaData.node_payload);
       setCollectionPayload(metaData.collection_payload);
+      setIsLoading(false);
+    } else {
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
+    setIsLoading(true);
     fetchMetadata();
+    setIsLoading(false);
   }, []);
 
   const resetDocuments = async () => {
     const response = await deleteAllDocuments("DOCUMENTS", credentials);
     if (response) {
+      addStatusMessage("All documents reset", "SUCCESS");
       fetchMetadata();
+    } else {
+      addStatusMessage("Failed to reset documents", "ERROR");
     }
   };
 
   const resetVerba = async () => {
     const response = await deleteAllDocuments("ALL", credentials);
     if (response) {
+      addStatusMessage("Verba reset", "SUCCESS");
       fetchMetadata();
+    } else {
+      addStatusMessage("Failed to reset Verba", "ERROR");
     }
   };
 
   const resetConfig = async () => {
     const response = await deleteAllDocuments("CONFIG", credentials);
     if (response) {
+      addStatusMessage("Config reset", "SUCCESS");
       fetchMetadata();
+    } else {
+      addStatusMessage("Failed to reset config", "ERROR");
     }
   };
 
   const resetSuggestions = async () => {
     const response = await deleteAllDocuments("SUGGESTIONS", credentials);
     if (response) {
+      addStatusMessage("Suggestions reset", "SUCCESS");
       fetchMetadata();
+    } else {
+      addStatusMessage("Failed to reset suggestions", "ERROR");
     }
   };
 
@@ -67,87 +95,88 @@ const InfoView: React.FC<InfoViewProps> = ({ credentials }) => {
     <div className="flex flex-col w-full h-full p-4">
       <div className="flex justify-between items-center mb-4">
         <p className="text-2xl font-bold">Admin Panel</p>
+        <VerbaButton
+          title="Refresh"
+          loading={isLoading}
+          onClick={fetchMetadata}
+          className="max-w-min"
+          Icon={IoReload}
+        />
       </div>
       <div className="flex-grow overflow-y-auto">
         <div className="gap-4 flex flex-col p-4 text-text-verba">
           <p className="font-bold text-lg">Resetting Verba</p>
-          <div className="flex gap-2 justify-between">
-            <div className="flex gap-2">
-              <button
+          <div className="flex flex-wrap gap-2 justify-between">
+            <div className="flex flex-wrap gap-2">
+              <VerbaButton
+                title="Clear Documents"
                 onClick={() => openModal("reset-documents")}
-                className="btn border-none hover:text-text-verba text-text-alt-verba shadow-none bg-button-verba hover:bg-button-hover-verba"
-              >
-                <IoDocumentSharp size={16} />
-                <p>Clear Documents</p>
-              </button>
-              <button
+                Icon={IoDocumentSharp}
+              />
+              <VerbaButton
+                title="Clear Config"
                 onClick={() => openModal("reset-configs")}
-                className="btn border-none hover:text-text-verba text-text-alt-verba shadow-none bg-button-verba hover:bg-button-hover-verba"
-              >
-                <FaWrench size={16} />
-                <p>Clear Config</p>
-              </button>
-              <button
+                Icon={FaWrench}
+              />
+              <VerbaButton
+                title="Clear Everything"
                 onClick={() => openModal("reset-verba")}
-                className="btn border-none hover:text-text-verba text-text-alt-verba shadow-none bg-button-verba hover:bg-button-hover-verba"
-              >
-                <IoTrash size={16} />
-                <p>Clear Everything</p>
-              </button>
-              <button
+                Icon={IoTrash}
+              />
+              <VerbaButton
+                title="Clear Suggestions"
                 onClick={() => openModal("reset-suggestions")}
-                className="btn border-none hover:text-text-verba text-text-alt-verba shadow-none bg-button-verba hover:bg-button-hover-verba"
-              >
-                <IoTrash size={16} />
-                <p>Clear Suggestions</p>
-              </button>
+                Icon={IoTrash}
+              />
             </div>
-            <button
-              onClick={fetchMetadata}
-              className="btn border-none hover:text-text-verba text-text-alt-verba shadow-none bg-button-verba hover:bg-button-hover-verba"
-            >
-              <IoReload size={16} />
-              <p>Reload Metadata</p>
-            </button>
           </div>
           <p className="font-bold text-lg">Weaviate Information</p>
-          <div className="flex border-2 border-bg-verba shadow-sm p-4 rounded-lg">
-            <p className="w-32 font-semibold">Connected to</p>
-            <p className="font-mono text-text-verba">{credentials.url}</p>
-          </div>
-          <div className="flex border-2 border-bg-verba shadow-sm p-4 rounded-lg">
-            <p className="w-32 font-semibold">Deployment</p>
-            <p className="font-mono text-text-verba">
-              {credentials.deployment}
+
+          <div className="flex flex-col border-2 gap-2 border-bg-verba shadow-sm p-4 rounded-lg">
+            <p className="text-sm lg:text-base font-semibold text-text-alt-verba">
+              Connected to
             </p>
+            <p className="   text-text-verba">{credentials.url}</p>
           </div>
-          <div className="flex border-2 border-secondary-verba shadow-sm p-4 rounded-lg">
-            <p className="w-32 font-semibold">Version</p>
+
+          <div className="flex flex-col border-2 gap-2 border-bg-verba shadow-sm p-4 rounded-lg">
+            <p className="text-sm lg:text-base font-semibold text-text-alt-verba">
+              Deployment
+            </p>
+            <p className=" text-text-verba">{credentials.deployment}</p>
+          </div>
+
+          <div className="flex flex-col border-2 gap-2 border-secondary-verba shadow-sm p-4 rounded-lg">
+            <p className="text-sm lg:text-base font-semibold text-text-alt-verba">
+              Version
+            </p>
             {nodePayload ? (
-              <p className="font-mono text-text-verba">
-                {nodePayload.weaviate_version}
-              </p>
+              <p className="text-text-verba">{nodePayload.weaviate_version}</p>
             ) : (
               <span className="loading loading-spinner loading-sm"></span>
             )}
           </div>
+
           <div className="flex flex-col border-2 border-bg-verba shadow-sm p-4 rounded-lg">
-            <div className="flex">
-              <p className="w-32 font-semibold">Nodes</p>
+            <div className="flex gap-2 items-center">
+              <p className="text-text-alt-verba text-sm lg:text-base font-semibold">
+                Nodes
+              </p>
               {nodePayload ? (
-                <p className="font-mono text-text-verba">
+                <p className="text-text-alt-verba text-sm lg:text-base font-semibold">
                   {nodePayload.node_count}
                 </p>
               ) : (
                 <span className="loading loading-spinner loading-sm"></span>
               )}
             </div>
+
             {nodePayload ? (
               <ul className="flex flex-col mt-2 list-disc list-inside">
                 {nodePayload.nodes.map((node) => (
                   <li
                     key={"Node" + node.name}
-                    className="font-mono text-text-verba flex justify-between"
+                    className="text-sm text-text-verba flex justify-between"
                   >
                     <span className="w-64 truncate">{node.name}</span>
                     <span>
@@ -160,23 +189,27 @@ const InfoView: React.FC<InfoViewProps> = ({ credentials }) => {
               <span className="loading loading-dots loading-sm mt-2"></span>
             )}
           </div>
+
           <div className="flex flex-col border-2 border-bg-verba shadow-sm p-4 rounded-lg">
-            <div className="flex">
-              <p className="w-32 font-semibold">Collections</p>
+            <div className="flex gap-2 items-center">
+              <p className="text-text-alt-verba text-sm lg:text-base font-semibold">
+                Collections
+              </p>
               {collectionPayload ? (
-                <p className="font-mono text-text-verba">
+                <p className="text-text-alt-verba text-sm lg:text-base font-semibold">
                   {collectionPayload.collection_count}
                 </p>
               ) : (
                 <span className="loading loading-spinner loading-sm"></span>
               )}
             </div>
+
             {collectionPayload ? (
               <ul className="flex flex-col mt-2 list-disc list-inside">
                 {collectionPayload.collections.map((collection) => (
                   <li
                     key={"Collection" + collection.name}
-                    className="font-mono text-text-verba flex justify-between"
+                    className="text-sm text-text-verba flex justify-between"
                   >
                     <span className="w-128 truncate">{collection.name}</span>
                     <span>{collection.count} objects</span>

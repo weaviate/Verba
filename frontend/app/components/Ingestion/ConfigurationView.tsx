@@ -16,6 +16,8 @@ import { RAGConfig } from "@/app/types";
 
 import { Credentials, RAGComponentConfig } from "@/app/types";
 
+import VerbaButton from "../Navigation/VerbaButton";
+
 import BasicSettingView from "./BasicSettingView";
 import ComponentView from "./ComponentView";
 
@@ -26,6 +28,10 @@ interface ConfigurationViewProps {
   setSelectedFileData: (f: string | null) => void;
   fileMap: FileMap;
   credentials: Credentials;
+  addStatusMessage: (
+    message: string,
+    type: "INFO" | "WARNING" | "SUCCESS" | "ERROR"
+  ) => void;
 
   setFileMap: React.Dispatch<React.SetStateAction<FileMap>>;
 }
@@ -33,6 +39,7 @@ interface ConfigurationViewProps {
 const ConfigurationView: React.FC<ConfigurationViewProps> = ({
   selectedFileData,
   fileMap,
+  addStatusMessage,
   setFileMap,
   RAGConfig,
   setRAGConfig,
@@ -44,6 +51,7 @@ const ConfigurationView: React.FC<ConfigurationViewProps> = ({
   >("Basic");
 
   const applyToAll = () => {
+    addStatusMessage("Applying config to all files", "INFO");
     setFileMap((prevFileMap) => {
       if (selectedFileData) {
         const newRAGConfig: RAGConfig = JSON.parse(
@@ -68,6 +76,7 @@ const ConfigurationView: React.FC<ConfigurationViewProps> = ({
   };
 
   const setAsDefault = async () => {
+    addStatusMessage("Setting current config as default", "SUCCESS");
     if (selectedFileData) {
       const response = await updateRAGConfig(
         fileMap[selectedFileData].rag_config,
@@ -85,6 +94,7 @@ const ConfigurationView: React.FC<ConfigurationViewProps> = ({
   };
 
   const resetConfig = () => {
+    addStatusMessage("Resetting pipeline settings", "WARNING");
     setFileMap((prevFileMap) => {
       if (selectedFileData && RAGConfig) {
         const newFileMap: FileMap = { ...prevFileMap };
@@ -177,6 +187,8 @@ const ConfigurationView: React.FC<ConfigurationViewProps> = ({
     ) => {
       if (!RAGConfig) return;
 
+      addStatusMessage("Saving " + selected_component + " config", "SUCCESS");
+
       const newRAGConfig = JSON.parse(JSON.stringify(RAGConfig));
       newRAGConfig[component_n].selected = selected_component;
       newRAGConfig[component_n].components[selected_component] =
@@ -200,34 +212,32 @@ const ConfigurationView: React.FC<ConfigurationViewProps> = ({
           />
         </div>
         <div className="flex gap-3 justify-end">
-          <button
+          <VerbaButton
+            title="Overview"
+            selected={selectedSetting === "Basic"}
+            selected_color="bg-secondary-verba"
             onClick={() => {
               setSelectedSetting("Basic");
             }}
-            className={`flex ${selectedSetting === "Basic" ? "bg-primary-verba hover:bg-button-hover-verba" : "bg-button-verba hover:bg-button-hover-verba"} border-none btn text-text-verba gap-2`}
-          >
-            <IoSettingsSharp size={15} />
-            <p>Overview</p>
-          </button>
+            Icon={IoSettingsSharp}
+          />
 
-          <button
+          <VerbaButton
+            title="Config"
+            selected={selectedSetting === "Pipeline"}
+            selected_color="bg-secondary-verba"
             onClick={() => {
               setSelectedSetting("Pipeline");
             }}
-            className={`flex ${selectedSetting === "Pipeline" ? "bg-primary-verba hover:bg-button-hover-verba" : "bg-button-verba hover:bg-button-hover-verba"} border-none btn text-text-verba gap-2`}
-          >
-            <FaHammer size={15} />
-            <p>Config</p>
-          </button>
+            Icon={FaHammer}
+          />
 
-          <button
+          <VerbaButton
             onClick={() => {
               setSelectedFileData(null);
             }}
-            className="flex btn btn-square border-none text-text-verba bg-button-verba hover:bg-warning-verba gap-2"
-          >
-            <MdCancel size={15} />
-          </button>
+            Icon={MdCancel}
+          />
         </div>
       </div>
 
@@ -236,6 +246,7 @@ const ConfigurationView: React.FC<ConfigurationViewProps> = ({
         {selectedSetting === "Basic" && (
           <BasicSettingView
             selectedFileData={selectedFileData}
+            addStatusMessage={addStatusMessage}
             fileMap={fileMap}
             selectComponent={selectComponent}
             updateConfig={updateConfig}
@@ -273,27 +284,19 @@ const ConfigurationView: React.FC<ConfigurationViewProps> = ({
       {/* Import Footer */}
       <div className="bg-bg-alt-verba rounded-2xl flex gap-2 p-6 items-center justify-end h-min w-full">
         <div className="flex gap-3 justify-end">
-          <button
+          <VerbaButton
+            title="Apply to All"
             onClick={openApplyAllModal}
-            className="flex btn border-none text-text-verba bg-secondary-verba hover:bg-button-hover-verba gap-2"
-          >
-            <VscSaveAll size={15} />
-            <p>Apply to All Files</p>
-          </button>
-          <button
+            Icon={VscSaveAll}
+          />
+
+          <VerbaButton
+            title="Save Config"
             onClick={openDefaultModal}
-            className="flex btn border-none text-text-verba bg-primary-verba hover:bg-button-hover-verba gap-2"
-          >
-            <IoSettingsSharp size={15} />
-            <p>Save Config</p>
-          </button>
-          <button
-            onClick={openResetModal}
-            className="flex btn border-none text-text-verba bg-button-verba hover:bg-warning-verba gap-2"
-          >
-            <MdCancel size={15} />
-            <p>Reset</p>
-          </button>
+            Icon={IoSettingsSharp}
+          />
+
+          <VerbaButton title="Reset" onClick={openResetModal} Icon={MdCancel} />
         </div>
       </div>
       <UserModalComponent

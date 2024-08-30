@@ -133,7 +133,7 @@ const Navbar: React.FC<NavbarProps> = ({
                 </li>
               )}
               {production != "Demo" && (
-                <li key={"Menu Button4"}>
+                <li key={"Menu Button5"}>
                   <a
                     className={currentPage === "SETTINGS" ? "font-bold" : ""}
                     onClick={() => {

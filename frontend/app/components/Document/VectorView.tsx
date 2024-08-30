@@ -313,29 +313,35 @@ const VectorView: React.FC<VectorViewProps> = ({
         <div className="flex w-full items-start justify-between">
           {/* Left */}
           <div className="flex flex-col gap-2">
-            <div className="flex gap-1 items-center">
+            <div className="flex gap-2 items-center">
               {isFetching && (
                 <div className="flex items-center justify-center text-text-alt-verba gap-2 h-full">
-                  <span className="loading loading-spinner loading-sm"></span>
+                  <span className="loading loading-spinner loading-xs lg:loading-sm"></span>
                 </div>
               )}
-              <p className="text-text-alt-verba text-sm font-bold">
+              <p className="text-text-alt-verba text-xs lg:text-sm font-bold">
                 Embedding Model:
               </p>
-              <p className="text-text-alt-verba text-sm">{embedder}</p>
+              <p className="text-text-alt-verba text-xs lg:text-sm">
+                {embedder}
+              </p>
             </div>
             <div className="flex gap-1 items-center">
-              <p className="text-text-alt-verba text-sm font-bold">Hover:</p>
+              <p className="text-text-alt-verba text-xs lg:text-sm font-bold">
+                Hover:
+              </p>
               <p
-                className="text-sm text-text-alt-verba truncate max-w-[300px]"
+                className="text-xs lg:text-sm text-text-alt-verba truncate max-w-[100px] lg:max-w-[300px]"
                 title={hoverTitleState ?? ""}
               >
                 {hoverTitleState ?? ""}
               </p>
             </div>
             <div className="flex gap-1 items-center">
-              <p className="text-text-alt-verba text-sm font-bold">Vectors:</p>
-              <p className="text-sm text-text-alt-verba">
+              <p className="text-text-alt-verba text-xs lg:text-sm font-bold">
+                Vectors:
+              </p>
+              <p className="text-xs lg:text-sm text-text-alt-verba">
                 {vectors.length} x {getVectorCount()} x {currentDimensions}
               </p>
             </div>

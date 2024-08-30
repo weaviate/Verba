@@ -1,21 +1,18 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { FileData, FileMap, statusColorMap, statusTextMap } from "@/app/types";
+import React from "react";
+import { FileData, FileMap, statusTextMap } from "@/app/types";
 import { FaTrash } from "react-icons/fa";
-import { GoTriangleDown } from "react-icons/go";
 import { FaCheckCircle } from "react-icons/fa";
 import { MdError } from "react-icons/md";
 
 import UserModalComponent from "../Navigation/UserModal";
-import { RAGConfig } from "@/app/types";
 
-import { closeOnClick } from "@/app/util";
+import VerbaButton from "../Navigation/VerbaButton";
 
 interface FileComponentProps {
   fileData: FileData;
   fileMap: FileMap;
-  setFileMap: (f: FileMap) => void;
   handleDeleteFile: (name: string) => void;
   selectedFileData: string | null;
   setSelectedFileData: (f: string | null) => void;
@@ -24,26 +21,10 @@ interface FileComponentProps {
 const FileComponent: React.FC<FileComponentProps> = ({
   fileData,
   fileMap,
-  setFileMap,
   handleDeleteFile,
   selectedFileData,
   setSelectedFileData,
 }) => {
-  const [URLValue, setURLValue] = useState("New Link");
-  const [editURL, setEditURL] = useState(true);
-
-  useEffect(() => {
-    if (selectedFileData) {
-      if (fileMap[selectedFileData].isURL) {
-        setURLValue(
-          fileMap[selectedFileData].content
-            ? fileMap[selectedFileData].content
-            : ""
-        );
-      }
-    }
-  }, [fileMap, selectedFileData]);
-
   const openDeleteModal = () => {
     const modal = document.getElementById(
       "remove_file_" + fileMap[fileData.fileID].filename
@@ -53,102 +34,70 @@ const FileComponent: React.FC<FileComponentProps> = ({
     }
   };
 
-  const changeReader = (r: string) => {
-    const newFileData: FileData = JSON.parse(
-      JSON.stringify(fileMap[fileData.fileID])
-    );
-    const newRAGConfig: RAGConfig = JSON.parse(
-      JSON.stringify(fileMap[fileData.fileID].rag_config)
-    );
-    newRAGConfig["Reader"].selected = r;
-    newFileData.rag_config = newRAGConfig;
-    const newFileMap: FileMap = { ...fileMap };
-    newFileMap[fileData.fileID] = newFileData;
-    setFileMap(newFileMap);
-
-    if (
-      selectedFileData &&
-      selectedFileData === fileMap[fileData.fileID].filename
-    ) {
-      setSelectedFileData(fileData.fileID);
-    }
-  };
-
-  function renderUploadComponents(
-    rag_config: RAGConfig,
-    changeReader: (r: string) => void,
-    closeOnClick: () => void,
-    filter: "FILE" | "URL"
-  ) {
-    return Object.entries(rag_config["Reader"].components)
-      .filter(([key, component]) => component.type === filter)
-      .map(([key, component]) => (
-        <li
-          key={"Dropdown_" + component.name}
-          onClick={() => {
-            changeReader(component.name);
-            closeOnClick();
-          }}
-        >
-          <a>{component.name}</a>
-        </li>
-      ));
-  }
-
   return (
     <div className="flex justify-between items-center gap-2 rounded-2xl p-1 w-full">
       {fileMap[fileData.fileID].status != "READY" ? (
-        <button
-          className={`min-w-[11vw] flex gap-2 items-center justify-center text-text-verba ${statusColorMap[fileMap[fileData.fileID].status]} hover:bg-button-hover-verba rounded-lg p-3`}
-        >
+        <div className="flex gap-2">
           {fileMap[fileData.fileID].status != "DONE" &&
-          fileMap[fileData.fileID].status != "ERROR" ? (
-            <span className="loading loading-spinner loading-sm"></span>
-          ) : (
-            ""
+            fileMap[fileData.fileID].status != "ERROR" && (
+              <VerbaButton
+                title={statusTextMap[fileMap[fileData.fileID].status]}
+                text_class_name="text-xs"
+                className="w-[120px]"
+              />
+            )}
+          {fileMap[fileData.fileID].status == "DONE" && (
+            <VerbaButton
+              title={statusTextMap[fileMap[fileData.fileID].status]}
+              Icon={FaCheckCircle}
+              selected={true}
+              className="w-[120px]"
+              selected_color={"bg-secondary-verba"}
+            />
           )}
-          {fileMap[fileData.fileID].status === "DONE" && (
-            <FaCheckCircle size={15} />
+          {fileMap[fileData.fileID].status == "ERROR" && (
+            <VerbaButton
+              title={statusTextMap[fileMap[fileData.fileID].status]}
+              Icon={MdError}
+              className="w-[120px]"
+              selected={true}
+              selected_color={"bg-warning-verba"}
+            />
           )}
-          {fileMap[fileData.fileID].status === "ERROR" && <MdError size={15} />}
-          <p className="text-sm">
-            {statusTextMap[fileMap[fileData.fileID].status]}
-          </p>
-        </button>
+        </div>
       ) : (
-        <div className="flex justify-center items-center min-w-[9vw]">
-          <div className="btn bg-button-verba hover:bg-button-hover-verba text-text-verba w-full flex justify-center border-none">
-            <p>{fileMap[fileData.fileID].rag_config["Reader"].selected}</p>
-          </div>
+        <div className="flex gap-2">
+          <VerbaButton
+            title={fileMap[fileData.fileID].rag_config["Reader"].selected}
+            className="w-[120px]"
+            text_class_name="truncate w-[100px]"
+          />
         </div>
       )}
 
-      <button
+      <VerbaButton
+        title={
+          fileMap[fileData.fileID].filename
+            ? fileMap[fileData.fileID].filename
+            : "No Filename"
+        }
+        selected={selectedFileData === fileMap[fileData.fileID].fileID}
+        selected_color="bg-secondary-verba"
+        className="w-[200px] lg:w-[350px]"
+        text_class_name="truncate max-w-[150px] lg:max-w-[300px]"
         onClick={() => {
           setSelectedFileData(fileData.fileID);
         }}
-        className={`flex ${
-          selectedFileData &&
-          selectedFileData === fileMap[fileData.fileID].fileID
-            ? "bg-secondary-verba hover:bg-button-hover-verba"
-            : "bg-button-verba hover:bg-secondary-verba"
-        } w-full p-3 rounded-lg transition-colors duration-300 ease-in-out border-none overflow-hidden`}
-      >
-        <p className="text-text-verba truncate">
-          {fileMap[fileData.fileID].filename
-            ? fileMap[fileData.fileID].filename
-            : "No Filename"}
-        </p>
-      </button>
+      />
 
-      <div className="flex justify-end items-center">
-        <button
-          onClick={openDeleteModal}
-          className="btn btn-square bg-button-verba border-none hover:bg-warning-verba text-text-verba"
-        >
-          <FaTrash size={15} />
-        </button>
-      </div>
+      <VerbaButton
+        Icon={FaTrash}
+        onClick={openDeleteModal}
+        className="w-[120px] max-w-min"
+        selected={selectedFileData === fileMap[fileData.fileID].fileID}
+        selected_color="bg-warning-verba"
+      />
+
       <UserModalComponent
         modal_id={"remove_file_" + fileMap[fileData.fileID].filename}
         title={"Remove File"}

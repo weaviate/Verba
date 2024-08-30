@@ -22,6 +22,12 @@ export type ConnectPayload = {
   themes: Themes;
 };
 
+export type StatusMessage = {
+  message: string;
+  timestamp: string;
+  type: "INFO" | "WARNING" | "SUCCESS" | "ERROR";
+};
+
 export type Suggestion = {
   query: string;
   timestamp: string;
@@ -348,6 +354,7 @@ export type DocumentsPreviewPayload = {
   error: string;
   documents: DocumentPreview[];
   labels: string[];
+  totalDocuments: number;
 };
 
 export type DocumentPreview = {

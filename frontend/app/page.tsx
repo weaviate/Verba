@@ -11,12 +11,14 @@ import LoginView from "./components/Login/LoginView";
 import ChatView from "./components/Chat/ChatView";
 import SettingsView from "./components/Settings/SettingsView";
 import GettingStartedComponent from "./components/Login/GettingStarted";
+import StatusMessengerComponent from "./components/Navigation/StatusMessenger";
 
 // Types
 import {
   Credentials,
   RAGConfig,
   Theme,
+  StatusMessage,
   LightTheme,
   Themes,
   DarkTheme,
@@ -63,6 +65,8 @@ export default function Home() {
   const [RAGConfig, setRAGConfig] = useState<null | RAGConfig>(null);
 
   const [documentFilter, setDocumentFilter] = useState<DocumentFilter[]>([]);
+
+  const [statusMessages, setStatusMessages] = useState<StatusMessage[]>([]);
 
   const initialFetch = useCallback(async () => {
     try {
@@ -124,12 +128,28 @@ export default function Home() {
 
   useEffect(updateCSSVariables, [selectedTheme]);
 
+  const addStatusMessage = (
+    message: string,
+    type: "INFO" | "WARNING" | "SUCCESS" | "ERROR"
+  ) => {
+    console.log("Adding status message:", message, type);
+    setStatusMessages((prevMessages) => [
+      ...prevMessages,
+      { message, type, timestamp: new Date().toISOString() },
+    ]);
+  };
+
   return (
     <main
-      className={`min-h-screen bg-bg-verba text-text-verba ${fontClassName}`}
+      className={`min-h-screen bg-bg-verba text-text-verba min-w-screen ${fontClassName}`}
       data-theme={selectedTheme.theme}
     >
       {gtag !== "" && <GoogleAnalytics gaId={gtag} />}
+
+      <StatusMessengerComponent
+        status_messages={statusMessages}
+        set_status_messages={setStatusMessages}
+      />
 
       {!isLoggedIn && isHealthy && (
         <LoginView
@@ -164,6 +184,7 @@ export default function Home() {
 
             <div className={`${currentPage === "CHAT" ? "" : "hidden"}`}>
               <ChatView
+                addStatusMessage={addStatusMessage}
                 credentials={credentials}
                 RAGConfig={RAGConfig}
                 setRAGConfig={setRAGConfig}
@@ -177,6 +198,7 @@ export default function Home() {
 
             {currentPage === "DOCUMENTS" && (
               <DocumentView
+                addStatusMessage={addStatusMessage}
                 credentials={credentials}
                 production={production}
                 selectedTheme={selectedTheme}
@@ -194,6 +216,7 @@ export default function Home() {
                 RAGConfig={RAGConfig}
                 setRAGConfig={setRAGConfig}
                 credentials={credentials}
+                addStatusMessage={addStatusMessage}
               />
             </div>
 
@@ -206,6 +229,7 @@ export default function Home() {
             >
               <SettingsView
                 credentials={credentials}
+                addStatusMessage={addStatusMessage}
                 selectedTheme={selectedTheme}
                 setSelectedTheme={setSelectedTheme}
                 themes={themes}
@@ -214,17 +238,13 @@ export default function Home() {
             </div>
           </div>
 
-          <footer
-            className={`footer footer-center p-4 mt-8 bg-bg-verba text-text-alt-verba transition-all duration-1500 delay-1000 ${
-              isLoggedIn
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-4"
-            }`}
+          <div
+            className={`footer footer-center p-4 mt-8 bg-bg-verba text-text-alt-verba transition-all duration-1500 delay-1000`}
           >
             <aside>
               <p>Build with ♥ and Weaviate © 2024</p>
             </aside>
-          </footer>
+          </div>
         </div>
       )}
 

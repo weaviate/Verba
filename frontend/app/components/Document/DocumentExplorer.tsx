@@ -23,6 +23,8 @@ import {
   DocumentFilter,
 } from "@/app/types";
 
+import VerbaButton from "../Navigation/VerbaButton";
+
 import { fetchSelectedDocument } from "@/app/api";
 
 interface DocumentExplorerProps {
@@ -33,6 +35,10 @@ interface DocumentExplorerProps {
   selectedTheme: Theme;
   documentFilter: DocumentFilter[];
   setDocumentFilter: React.Dispatch<React.SetStateAction<DocumentFilter[]>>;
+  addStatusMessage: (
+    message: string,
+    type: "INFO" | "WARNING" | "SUCCESS" | "ERROR"
+  ) => void;
 }
 
 const DocumentExplorer: React.FC<DocumentExplorerProps> = ({
@@ -43,6 +49,7 @@ const DocumentExplorer: React.FC<DocumentExplorerProps> = ({
   selectedTheme,
   documentFilter,
   setDocumentFilter,
+  addStatusMessage,
 }) => {
   const [selectedSetting, setSelectedSetting] = useState<
     "Content" | "Chunks" | "Metadata" | "Config" | "Vector Space" | "Graph"
@@ -105,44 +112,36 @@ const DocumentExplorer: React.FC<DocumentExplorerProps> = ({
           />
         </div>
         <div className="flex gap-3 justify-end">
-          <button
-            onClick={() => {
-              setSelectedSetting("Content");
-            }}
-            className={`flex ${selectedSetting === "Content" ? "bg-primary-verba hover:bg-button-hover-verba text-text-verba" : "bg-button-verba hover:text-text-verba hover:bg-button-hover-verba"} border-none btn text-text-alt-verba gap-2`}
-          >
-            <MdContentPaste size={15} />
-            <p>Content</p>
-          </button>
+          <VerbaButton
+            title="Content"
+            Icon={MdContentPaste}
+            onClick={() => setSelectedSetting("Content")}
+            selected={selectedSetting === "Content"}
+            selected_color="bg-secondary-verba"
+          />
 
-          <button
-            onClick={() => {
-              setSelectedSetting("Chunks");
-            }}
-            className={`flex ${selectedSetting === "Chunks" ? "bg-primary-verba hover:bg-button-hover-verba text-text-verba" : "bg-button-verba hover:text-text-verba hover:bg-button-hover-verba"} border-none btn text-text-alt-verba gap-2`}
-          >
-            <MdContentCopy size={15} />
-            <p>Chunks</p>
-          </button>
+          <VerbaButton
+            title="Chunks"
+            Icon={MdContentCopy}
+            onClick={() => setSelectedSetting("Chunks")}
+            selected={selectedSetting === "Chunks"}
+            selected_color="bg-secondary-verba"
+          />
 
-          <button
-            onClick={() => {
-              setSelectedSetting("Vector Space");
-            }}
-            className={`flex ${selectedSetting === "Vector Space" ? "bg-primary-verba hover:bg-button-hover-verba text-text-verba" : "bg-button-verba hover:text-text-verba hover:bg-button-hover-verba"} border-none btn text-text-alt-verba gap-2`}
-          >
-            <TbVectorTriangle size={15} />
-            <p>Vector</p>
-          </button>
+          <VerbaButton
+            title="Vector"
+            Icon={TbVectorTriangle}
+            onClick={() => setSelectedSetting("Vector Space")}
+            selected={selectedSetting === "Vector Space"}
+            selected_color="bg-secondary-verba"
+          />
 
-          <button
+          <VerbaButton
+            Icon={MdCancel}
             onClick={() => {
               setSelectedDocument(null);
             }}
-            className="flex btn btn-square border-none text-text-verba bg-warning-verba hover:bg-button-hover-verba gap-2"
-          >
-            <MdCancel size={15} />
-          </button>
+          />
         </div>
       </div>
 
@@ -188,55 +187,51 @@ const DocumentExplorer: React.FC<DocumentExplorerProps> = ({
           {documentFilter.some(
             (filter) => filter.uuid === selectedDocument
           ) && (
-            <button
+            <VerbaButton
+              title="Delete from Chat"
+              Icon={MdCancel}
+              selected={true}
+              selected_color="bg-warning-verba"
               onClick={() => {
                 setDocumentFilter(
                   documentFilter.filter((f) => f.uuid !== selectedDocument)
                 );
+                addStatusMessage("Removed document from Chat", "INFO");
               }}
-              className="btn border-none shadow-none text-text-verba bg-warning-verba hover:bg-button-hover-verba"
-            >
-              <MdCancel size={15} />
-              <p>Remove from Chat</p>
-            </button>
+            />
           )}
           {!documentFilter.some((filter) => filter.uuid === selectedDocument) &&
             document && (
-              <button
+              <VerbaButton
+                title="Add to Chat"
+                Icon={IoMdAddCircle}
                 onClick={() => {
                   setDocumentFilter([
                     ...documentFilter,
                     { uuid: selectedDocument, title: document.title },
                   ]);
+                  addStatusMessage("Added document to Chat", "SUCCESS");
                 }}
-                className="btn border-none shadow-none text-text-verba bg-primary-verba hover:bg-button-hover-verba"
-              >
-                <IoMdAddCircle size={15} />
-                <p>Add to Chat</p>
-              </button>
+              />
             )}
         </div>
         <div className="flex gap-3">
           {selectedDocument && document && document.source && (
-            <button
+            <VerbaButton
+              title="Go To Source"
+              Icon={FaExternalLinkAlt}
               onClick={() => {
                 handleSourceClick(document.source);
               }}
-              className="flex btn border-none text-text-alt-verba hover:text-text-verba bg-button-verba hover:bg-button-hover-verba gap-2"
-            >
-              <FaExternalLinkAlt size={15} />
-              <p>View Source</p>
-            </button>
+            />
           )}
-          <button
-            onClick={() => {
-              setSelectedSetting("Metadata");
-            }}
-            className={`flex ${selectedSetting === "Metadata" ? "bg-primary-verba hover:bg-button-hover-verba text-text-verba" : "bg-button-verba hover:text-text-verba hover:bg-button-hover-verba"} border-none btn text-text-alt-verba gap-2`}
-          >
-            <FaInfoCircle size={15} />
-            <p>View Metadata</p>
-          </button>
+          <VerbaButton
+            title="Document Info"
+            Icon={FaInfoCircle}
+            onClick={() => setSelectedSetting("Metadata")}
+            selected={selectedSetting === "Metadata"}
+            selected_color="bg-secondary-verba"
+          />
         </div>
       </div>
     </div>

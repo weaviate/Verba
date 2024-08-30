@@ -23,6 +23,7 @@
     "date-fns": "^3.6.0",
     "eslint": "8.47.0",
     "eslint-config-next": "^14.2.6",
+    "framer-motion": "^11.3.31",
     "lil-gui": "^0.19.2",
     "next": "^14.2.6",
     "postcss": "8.4.27",
