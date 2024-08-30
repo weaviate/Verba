@@ -46,11 +46,19 @@ const VerbaThree = ({
 
   const material = useMemo(
     () =>
+      new THREE.MeshMatcapMaterial({
+        color: "#ffe229",
+        matcap: new THREE.TextureLoader().load(prefix + "/fire_cap.png"), // Add this line
+      }),
+    []
+  );
+
+  const material1 = useMemo(
+    () =>
       new THREE.MeshPhysicalMaterial({
-        metalness: 1,
-        roughness: 0.075,
-        color: "#f1ff33",
-        transmission: 1, // Set to 1 for glass-like transmission
+        metalness: 0.4,
+        roughness: 0.4,
+        color: "#ffe229",
         ior: 1,
         thickness: 1,
         transparent: false,
@@ -89,9 +97,11 @@ const VerbaThree = ({
         if (!useMaterial) {
           child.material = material;
         } else {
-          child.material.roughness = 0.2;
-          child.material.metalness = 0.6;
+          child.material.roughness = 0.3;
+          child.material.metalness = 0.2;
         }
+        child.castShadow = true;
+        child.receiveShadow = true;
       }
     });
   }, [verba_model, material]);
@@ -107,215 +117,20 @@ const VerbaThree = ({
         config={{ mass: 2, tension: 400 }}
         snap={{ mass: 4, tension: 400 }}
       >
-        <Float speed={1} rotationIntensity={0.4}>
+        <Float speed={2} rotationIntensity={1}>
           <primitive
             object={verba_model.scene}
-            position-y={-0.1}
-            position-x={0.15}
-            position-z={-1}
+            position-y={0}
+            position-x={0}
+            rotation-y={0.2}
+            rotation-x={-0.2}
+            position-z={0}
             scale={0.6}
           />
         </Float>
       </PresentationControls>
     </>
   );
-};
-
-const CoolShape = memo(
-  ({
-    startPosition,
-    endPosition,
-    size,
-    colorA,
-    colorB,
-  }: {
-    startPosition: [number, number, number];
-    endPosition: [number, number, number];
-    size: number;
-    colorA: string;
-    colorB: string;
-  }) => {
-    const uniforms = useMemo(
-      () => ({
-        uTime: { value: 0 },
-        uPositionFrequency: { value: 0.677 },
-        uTimeFrequency: { value: 0.041 },
-        uStrength: { value: 0.557 },
-
-        uWarpPositionFrequency: { value: 0.267 },
-        uWarpTimeFrequency: { value: 0.135 },
-        uWarpStrength: { value: 0.238 },
-
-        uColorA: { value: new THREE.Color(colorA) },
-        uColorB: { value: new THREE.Color(colorB) },
-
-        // New uniforms for glass effect
-        uRefractionStrength: { value: 0.1 },
-        uFresnelPower: { value: 2.0 },
-        uTransparency: { value: 0.5 },
-      }),
-      []
-    );
-
-    const material = useMemo(
-      () =>
-        new CustomShaderMaterial({
-          baseMaterial: THREE.MeshPhysicalMaterial,
-          metalness: 1,
-          roughness: 0.914,
-          uniforms,
-          color: "#ffffff",
-          transmission: 1, // Set to 1 for glass-like transmission
-          ior: 1.5,
-          thickness: 1,
-          silent: true,
-          transparent: true,
-          wireframe: false,
-          clearcoat: 1,
-          clearcoatRoughness: 0.0,
-          vertexShader: wobbleVertexShader,
-          fragmentShader: wobbleFragmentShader,
-        }),
-      []
-    );
-
-    const depth_material = useMemo(
-      () =>
-        new CustomShaderMaterial({
-          baseMaterial: THREE.MeshDepthMaterial,
-          silent: true,
-          vertexShader: wobbleVertexShader,
-          depthPacking: THREE.RGBADepthPacking,
-        }),
-      []
-    );
-
-    const meshRef = useRef<THREE.Mesh>(null);
-    const initialPositionRef = useRef<THREE.Vector3 | null>(null);
-    const targetPosition = new THREE.Vector3(...endPosition);
-
-    useEffect(() => {
-      if (meshRef.current) {
-        initialPositionRef.current = new THREE.Vector3(...startPosition);
-        meshRef.current.position.copy(initialPositionRef.current);
-      }
-    }, [startPosition]);
-
-    useEffect(() => {
-      const enableGUI = false; // Set this to true to re-enable the GUI
-
-      if (enableGUI) {
-        const gui = new GUI();
-        const materialFolder = gui.addFolder("Material");
-
-        materialFolder
-          .add(uniforms.uPositionFrequency, "value", 0, 1)
-          .name("uPositionFrequency");
-        materialFolder
-          .add(uniforms.uTimeFrequency, "value", 0, 1)
-          .name("uTimeFrequency");
-        materialFolder.add(uniforms.uStrength, "value", 0, 1).name("uStrength");
-        materialFolder
-          .add(uniforms.uWarpPositionFrequency, "value", 0, 1)
-          .name("uWarpPositionFrequency");
-        materialFolder
-          .add(uniforms.uWarpTimeFrequency, "value", 0, 1)
-          .name("uWarpTimeFrequency");
-        materialFolder
-          .add(uniforms.uWarpStrength, "value", 0, 1)
-          .name("uWarpStrength");
-        materialFolder
-          .addColor(uniforms.uColorA, "value")
-          .name("uColorA")
-          .onChange((value: string | number[] | THREE.Color) => {
-            if (value instanceof THREE.Color) {
-              uniforms.uColorA.value.copy(value);
-            } else if (Array.isArray(value)) {
-              uniforms.uColorA.value.setRGB(value[0], value[1], value[2]);
-            } else {
-              uniforms.uColorA.value.set(value);
-            }
-          });
-        materialFolder
-          .addColor(uniforms.uColorB, "value")
-          .name("uColorB")
-          .onChange((value: string | number[] | THREE.Color) => {
-            if (value instanceof THREE.Color) {
-              uniforms.uColorB.value.copy(value);
-            } else if (Array.isArray(value)) {
-              uniforms.uColorB.value.setRGB(value[0], value[1], value[2]);
-            } else {
-              uniforms.uColorB.value.set(value);
-            }
-          });
-        materialFolder.add(material, "roughness", 0, 1).name("roughness");
-        materialFolder.add(material, "metalness", 0, 1).name("metalness");
-        materialFolder.add(material, "clearcoat", 0, 1).name("clearcoat");
-        materialFolder
-          .add(material, "clearcoatRoughness", 0, 1)
-          .name("clearcoatRoughness");
-
-        // Add new GUI controls for glass effect
-        materialFolder
-          .add(uniforms.uRefractionStrength, "value", 0, 1)
-          .name("Refraction Strength");
-        materialFolder
-          .add(uniforms.uFresnelPower, "value", 0, 10)
-          .name("Fresnel Power");
-        materialFolder
-          .add(uniforms.uTransparency, "value", 0, 1)
-          .name("Transparency");
-
-        return () => {
-          gui.destroy();
-        };
-      }
-    }, [material]);
-
-    useFrame((state, delta) => {
-      uniforms.uTime.value = state.clock.elapsedTime;
-
-      if (meshRef.current && initialPositionRef.current) {
-        meshRef.current.position.lerp(targetPosition, 0.02);
-
-        // Stop the animation when close enough to the target
-        if (meshRef.current.position.distanceTo(targetPosition) < 0.01) {
-          initialPositionRef.current = null;
-        }
-      }
-    });
-
-    const geometry = new THREE.IcosahedronGeometry(size, 30);
-    const mergedGeometry = mergeVertices(geometry);
-    mergedGeometry.computeTangents();
-    return (
-      <mesh
-        ref={meshRef}
-        material={material}
-        receiveShadow={true}
-        castShadow={true}
-        customDepthMaterial={depth_material}
-      >
-        <bufferGeometry attach="geometry" {...mergedGeometry} />
-      </mesh>
-    );
-  }
-);
-
-CoolShape.displayName = "CoolShape";
-
-const EnvironmentMap = () => {
-  const { scene } = useThree();
-
-  useEffect(() => {
-    const rgbeLoader = new RGBELoader();
-    rgbeLoader.load(prefix + "/alps_field_1k.hdr", (environmentMap) => {
-      environmentMap.mapping = THREE.EquirectangularReflectionMapping;
-      scene.environment = environmentMap;
-    });
-  }, [scene]);
-
-  return null;
 };
 
 interface LoginViewProps {
@@ -391,28 +206,6 @@ const LoginView: React.FC<LoginViewProps> = ({
     setIsConnecting(false);
   };
 
-  const coolShapes = useMemo(
-    () => (
-      <>
-        <CoolShape
-          startPosition={[-3.3, -0.8, -1]}
-          endPosition={[-1.3, -1, -4]}
-          size={2}
-          colorA="#00ffbf"
-          colorB="#00ff01"
-        />
-        <CoolShape
-          startPosition={[1.5, 10, -6]}
-          endPosition={[1.5, 1, -5]}
-          size={1}
-          colorA="#00c0ff"
-          colorB="#00c0ff"
-        />
-      </>
-    ),
-    []
-  );
-
   return (
     <div className="w-screen h-screen bg-white">
       <div
@@ -422,14 +215,29 @@ const LoginView: React.FC<LoginViewProps> = ({
       >
         <div className="hidden md:flex md:w-1/2 lg:w-3/5 h-full">
           <Canvas
-            camera={{ position: [0, -0.25, 3], fov: 50 }}
+            camera={{ position: [0, 0, 4], fov: 50 }}
             className="w-full h-full touch-none"
           >
             <color attach="background" args={["#FAFAFA"]} />
-            <EnvironmentMap />
             <ambientLight intensity={0.5} />
-            <directionalLight position={[5, 5, 5]} intensity={1.5} />
-            {/**coolShapes**/}
+            <directionalLight
+              castShadow
+              position={[-1, 1, 1]}
+              intensity={1}
+              shadow-mapSize={1024}
+            />
+            <directionalLight
+              castShadow
+              position={[1, 1, -1]}
+              intensity={1}
+              shadow-mapSize={1024}
+            />
+            <directionalLight
+              castShadow
+              position={[0, 1, 1]}
+              intensity={1}
+              shadow-mapSize={1024}
+            />
             <VerbaThree
               color="#FAFAFA"
               useMaterial={production == "Local" ? false : true}
@@ -440,13 +248,13 @@ const LoginView: React.FC<LoginViewProps> = ({
           </Canvas>
         </div>
         <div className="w-full md:flex md:w-1/2 lg:w-2/5 h-full flex justify-center items-center p-5">
-          <div className="flex flex-col gap-8 items-start justify-center w-4/5">
-            <div className="flex flex-col items-start gap-2">
+          <div className="flex flex-col gap-8 items-center md:items-start justify-center w-4/5">
+            <div className="flex flex-col items-center md:items-start gap-2">
               <div className="flex items-center gap-3">
-                <p className="font-light text-2xl lg:text-4xl text-text-alt-verba">
+                <p className="font-light text-3xl md:text-4xl text-text-alt-verba">
                   Welcome to
                 </p>
-                <p className="font-light text-2xl lg:text-4xl text-text-verba">
+                <p className="font-light text-3xl md:text-4xl text-text-verba">
                   Verba
                 </p>
               </div>

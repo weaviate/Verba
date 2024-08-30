@@ -448,8 +448,10 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                   title={label}
                   key={"FilterLabel" + index}
                   Icon={MdCancel}
-                  className="btn-sm min-w-min"
+                  className="btn-sm min-w-min max-w-[200px]"
                   icon_size={12}
+                  selected_color="bg-primary-verba"
+                  selected={true}
                   text_class_name="truncate max-w-[200px]"
                   text_size="text-xs"
                   onClick={() => {
@@ -462,10 +464,12 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                   title={filter.title}
                   key={"DocumentFilter" + index}
                   Icon={MdCancel}
-                  className="btn-sm min-w-min"
+                  className="btn-sm min-w-min max-w-[200px]"
                   icon_size={12}
+                  selected_color="bg-secondary-verba"
+                  selected={true}
                   text_size="text-xs"
-                  text_class_name="truncate md:max-w-[100px] lg:max-w-[200px]"
+                  text_class_name="truncate md:max-w-[100px] lg:max-w-[150px]"
                   onClick={() => {
                     setDocumentFilter(
                       documentFilter.filter((f) => f.uuid !== filter.uuid)

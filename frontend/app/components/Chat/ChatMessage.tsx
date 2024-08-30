@@ -13,6 +13,8 @@ import {
   oneLight,
 } from "react-syntax-highlighter/dist/cjs/styles/prism";
 
+import VerbaButton from "../Navigation/VerbaButton";
+
 import { Theme } from "@/app/types";
 
 interface ChatMessageProps {
@@ -123,8 +125,9 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
             </div>
           </button>
         ))}
-        <button
-          className="btn btn-sm btn-square focus:outline-none text-text-alt-verba bg-button-verba hover:bg-button-hover-verba hover:text-text-verba border-none shadow-none"
+        <VerbaButton
+          Icon={IoDocumentAttach}
+          className="btn-sm btn-square"
           onClick={() =>
             (
               document.getElementById(
@@ -132,9 +135,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
               ) as HTMLDialogElement
             ).showModal()
           }
-        >
-          <IoDocumentAttach size={15} />
-        </button>
+        />
         <dialog id={"context-modal-" + message_index} className="modal">
           <div className="modal-box">
             <h3 className="font-bold text-lg">Context</h3>
