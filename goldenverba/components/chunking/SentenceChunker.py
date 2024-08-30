@@ -59,10 +59,11 @@ class SentenceChunker(Chunker):
                         content=document.content,
                         chunk_id=0,
                         start_i=0,
-                        end_i=len(doc),
+                        end_i=len(document.content),
                         content_without_overlap=document.content,
                     )
                 )
+                continue
 
             if overlap >= units:
                 msg.warn(
@@ -72,19 +73,29 @@ class SentenceChunker(Chunker):
 
             i = 0
             split_id_counter = 0
+            char_end_i = -1
             while i < len(sentences):
+
+                # index at the sentence level
                 start_i = i
                 end_i = min(i + units, len(sentences))
-                overlap_start = max(0, end_i - overlap)
 
-                chunk_text = "".join(sentences[start_i:end_i])
-                chunk_text_without_overlap = "".join(sentences[start_i:overlap_start])
+                overlap_start = max(0, end_i - overlap)
+                chunk_text = " ".join(sentences[start_i:end_i])
+                chunk_text_without_overlap = " ".join(sentences[start_i:overlap_start])
+
+                # need to convert to index at the character level
+                char_start_i = char_end_i + 1
+                if i > 0:
+                    char_start_i -= sum([len(s) for s in sentences[start_i:(start_i + overlap)]]) + 1
+                char_end_i = char_start_i + len(chunk_text)
+
 
                 doc_chunk = Chunk(
                     content=chunk_text,
                     chunk_id=split_id_counter,
-                    start_i=start_i,
-                    end_i=end_i,
+                    start_i=char_start_i,
+                    end_i=char_end_i,
                     content_without_overlap=chunk_text_without_overlap,
                 )
 
@@ -92,7 +103,7 @@ class SentenceChunker(Chunker):
                 split_id_counter += 1
 
                 # Exit loop if this was the last possible chunk
-                if end_i == len(doc):
+                if end_i == len(sentences):
                     break
 
                 i += units - overlap  # Step forward, considering overlap

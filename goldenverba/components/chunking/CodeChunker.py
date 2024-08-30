@@ -30,6 +30,18 @@ class CodeChunker(Chunker):
                 description="Select programming language",
                 values=[e.value for e in Language],
             ),
+            "Chunk Size": InputConfig(
+                type="number",
+                value=500,
+                description="Choose how many characters per chunk",
+                values=[],
+            ),
+            "Chunk Overlap": InputConfig(
+                type="number",
+                value=50,
+                description="Choose how many characters overlap between chunks",
+                values=[],
+            ),
         }
 
     async def chunk(
@@ -40,24 +52,35 @@ class CodeChunker(Chunker):
         embedder_config: dict | None = None,
     ) -> list[Document]:
 
-        Language = config["Language"].value
+        language = config["Language"].value
+        chunk_size = config["Chunk Size"].value
+        chunk_overlap = config["Chunk Overlap"].value
 
-        text_splitter = RecursiveCharacterTextSplitter.from_language(language=Language)
+        text_splitter = RecursiveCharacterTextSplitter.from_language(language=language, chunk_size=chunk_size, chunk_overlap=chunk_overlap)
 
         for document in documents:
 
             # Skip if document already contains chunks
             if len(document.chunks) > 0:
                 continue
-
+            
+            char_end_i = -1
             for i, chunk in enumerate(text_splitter.split_text(document.content)):
+                
+                if chunk_overlap == 0:
+                    char_start_i = char_end_i + 1
+                    char_end_i = char_start_i + len(chunk)
+                else:
+                    # not implemented, requires complex calculations as to whether the overlap contained a 'good' chunk
+                    char_start_i = None
+                    char_end_i = None
 
                 document.chunks.append(
                     Chunk(
                         content=chunk,
                         chunk_id=i,
-                        start_i=0,
-                        end_i=0,
+                        start_i=char_start_i,
+                        end_i=char_end_i,
                         content_without_overlap=chunk,
                     )
                 )
