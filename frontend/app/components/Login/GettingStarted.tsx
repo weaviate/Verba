@@ -7,11 +7,16 @@ import { FaYoutube } from "react-icons/fa";
 import { IoDocumentTextSharp } from "react-icons/io5";
 import { FaHeart } from "react-icons/fa";
 
-interface GettingStartedComponentProps {}
+interface GettingStartedComponentProps {
+  addStatusMessage: (
+    message: string,
+    type: "INFO" | "WARNING" | "SUCCESS" | "ERROR"
+  ) => void;
+}
 
-const GettingStartedComponent: React.FC<
-  GettingStartedComponentProps
-> = ({}) => {
+const GettingStartedComponent: React.FC<GettingStartedComponentProps> = ({
+  addStatusMessage,
+}) => {
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
@@ -92,6 +97,12 @@ const GettingStartedComponent: React.FC<
               title="Let's get started"
               type="submit"
               selected={true}
+              onClick={() => {
+                addStatusMessage(
+                  "Achievement unlocked: Welcome to Verba!",
+                  "SUCCESS"
+                );
+              }}
               selected_color="bg-primary-verba"
               Icon={FaHeart}
             />

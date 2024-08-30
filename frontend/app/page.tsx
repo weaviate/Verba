@@ -74,6 +74,7 @@ export default function Home() {
 
       if (health_data) {
         setProduction(health_data.production);
+
         setGtag(health_data.gtag);
         setIsHealthy(true);
         setCredentials({
@@ -107,24 +108,48 @@ export default function Home() {
     }
   }, [isLoggedIn]);
 
+  const isValidTheme = (theme: Theme): boolean => {
+    const requiredAttributes = [
+      "primary_color",
+      "secondary_color",
+      "warning_color",
+      "bg_color",
+      "bg_alt_color",
+      "text_color",
+      "text_alt_color",
+      "button_color",
+      "button_hover_color",
+      "button_text_color",
+      "button_text_alt_color",
+    ];
+    return requiredAttributes.every(
+      (attr) =>
+        typeof theme[attr as keyof Theme] === "object" &&
+        "color" in (theme[attr as keyof Theme] as object)
+    );
+  };
+
   const updateCSSVariables = useCallback(() => {
+    const themeToUse = isValidTheme(selectedTheme)
+      ? selectedTheme
+      : themes["Light"];
     const cssVars = {
-      "--primary-verba": selectedTheme.primary_color.color,
-      "--secondary-verba": selectedTheme.secondary_color.color,
-      "--warning-verba": selectedTheme.warning_color.color,
-      "--bg-verba": selectedTheme.bg_color.color,
-      "--bg-alt-verba": selectedTheme.bg_alt_color.color,
-      "--text-verba": selectedTheme.text_color.color,
-      "--text-alt-verba": selectedTheme.text_alt_color.color,
-      "--button-verba": selectedTheme.button_color.color,
-      "--button-hover-verba": selectedTheme.button_hover_color.color,
-      "--text-verba-button": selectedTheme.button_text_color.color,
-      "--text-alt-verba-button": selectedTheme.button_text_alt_color.color,
+      "--primary-verba": themeToUse.primary_color.color,
+      "--secondary-verba": themeToUse.secondary_color.color,
+      "--warning-verba": themeToUse.warning_color.color,
+      "--bg-verba": themeToUse.bg_color.color,
+      "--bg-alt-verba": themeToUse.bg_alt_color.color,
+      "--text-verba": themeToUse.text_color.color,
+      "--text-alt-verba": themeToUse.text_alt_color.color,
+      "--button-verba": themeToUse.button_color.color,
+      "--button-hover-verba": themeToUse.button_hover_color.color,
+      "--text-verba-button": themeToUse.button_text_color.color,
+      "--text-alt-verba-button": themeToUse.button_text_alt_color.color,
     };
     Object.entries(cssVars).forEach(([key, value]) => {
       document.documentElement.style.setProperty(key, value);
     });
-  }, [selectedTheme]);
+  }, [selectedTheme, themes]);
 
   useEffect(updateCSSVariables, [selectedTheme]);
 
@@ -169,7 +194,7 @@ export default function Home() {
             isLoaded ? "opacity-100" : "opacity-0"
           } flex flex-col gap-2 p-5`}
         >
-          <GettingStartedComponent />
+          <GettingStartedComponent addStatusMessage={addStatusMessage} />
 
           <div>
             <Navbar

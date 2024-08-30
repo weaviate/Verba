@@ -385,7 +385,7 @@ const LoginView: React.FC<LoginViewProps> = ({
                             />
                             <VerbaButton
                               Icon={FaBackspace}
-                              title="Back to Deployments"
+                              title="Back"
                               type="button"
                               button_size="btn-sm"
                               text_size="text-xs"

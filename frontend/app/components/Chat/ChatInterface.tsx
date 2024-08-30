@@ -393,16 +393,18 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
             disabled={false}
             selected_color="bg-secondary-verba"
           />
-          <VerbaButton
-            title="Config"
-            Icon={FaHammer}
-            onClick={() => {
-              setSelectedSetting("Config");
-            }}
-            selected={selectedSetting === "Config"}
-            disabled={false}
-            selected_color="bg-secondary-verba"
-          />
+          {production != "Demo" && (
+            <VerbaButton
+              title="Config"
+              Icon={FaHammer}
+              onClick={() => {
+                setSelectedSetting("Config");
+              }}
+              selected={selectedSetting === "Config"}
+              disabled={false}
+              selected_color="bg-secondary-verba"
+            />
+          )}
         </div>
       </div>
 

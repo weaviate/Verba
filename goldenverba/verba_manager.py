@@ -791,6 +791,9 @@ class ClientManager:
             time_difference = current_time - client_data["timestamp"]
             if time_difference.total_seconds() / 60 > self.max_time:
                 clients_to_remove.append(cred_hash)
+            client: WeaviateAsyncClient = client_data["client"]
+            if not await client.is_ready():
+                clients_to_remove.append(cred_hash)
 
         for cred_hash in clients_to_remove:
             await self.manager.disconnect(self.clients[cred_hash]["client"])

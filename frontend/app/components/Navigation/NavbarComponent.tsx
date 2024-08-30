@@ -161,14 +161,16 @@ const Navbar: React.FC<NavbarProps> = ({
             setCurrentPage={setCurrentPage}
             setPage="CHAT"
           />
-          <NavbarButton
-            hide={production == "Demo"}
-            Icon={IoMdAddCircle}
-            title="Import Data"
-            currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
-            setPage="ADD"
-          />
+          {production != "Demo" && (
+            <NavbarButton
+              hide={false}
+              Icon={IoMdAddCircle}
+              title="Import Data"
+              currentPage={currentPage}
+              setCurrentPage={setCurrentPage}
+              setPage="ADD"
+            />
+          )}
           <NavbarButton
             hide={false}
             Icon={IoDocumentSharp}
@@ -177,14 +179,16 @@ const Navbar: React.FC<NavbarProps> = ({
             setCurrentPage={setCurrentPage}
             setPage="DOCUMENTS"
           />
-          <NavbarButton
-            hide={production == "Demo"}
-            Icon={IoSettingsSharp}
-            title="Settings"
-            currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
-            setPage="SETTINGS"
-          />
+          {production != "Demo" && (
+            <NavbarButton
+              hide={false}
+              Icon={IoSettingsSharp}
+              title="Settings"
+              currentPage={currentPage}
+              setCurrentPage={setCurrentPage}
+              setPage="SETTINGS"
+            />
+          )}
           <div
             className={`sm:h-[3vh] lg:h-[5vh] mx-1 hidden md:block bg-text-alt-verba w-px`}
           ></div>
