@@ -53,14 +53,18 @@ class JSONChunker(Chunker):
             if len(document.chunks) > 0:
                 continue
 
+            char_end_i = -1
             for i, chunk in enumerate(text_splitter.split_text(json_obj)):
+
+                char_start_i = char_end_i + 1
+                char_end_i = char_start_i + len(chunk)
 
                 document.chunks.append(
                     Chunk(
                         content=chunk,
                         chunk_id=i,
-                        start_i=0,
-                        end_i=0,
+                        start_i=None, # not implemented as the splitter modifies the outputs
+                        end_i=None,
                         content_without_overlap=chunk,
                     )
                 )

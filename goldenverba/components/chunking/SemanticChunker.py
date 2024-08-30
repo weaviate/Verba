@@ -10,7 +10,6 @@ from goldenverba.components.interfaces import Chunker
 from goldenverba.components.document import Document
 from goldenverba.components.types import InputConfig
 from goldenverba.components.interfaces import Embedding
-from goldenverba.components.interfaces import Embedding
 
 import numpy as np
 
@@ -49,6 +48,7 @@ class SemanticChunker(Chunker):
         embedder: Embedding | None = None,
         embedder_config: dict | None = None,
     ) -> list[Document]:
+        
 
         breakpoint_percentile_threshold = int(
             config["Breakpoint Percentile Threshold"].value
@@ -67,6 +67,19 @@ class SemanticChunker(Chunker):
                 for i, sent in enumerate(document.spacy_doc.sents)
             ]
             sentences = self.combine_sentences(sentences)
+
+            # If there's only one sentence, create a single chunk
+            if len(sentences) == 1:
+                document.chunks.append(
+                    Chunk(
+                        content=sentences[0]["sentence"],
+                        chunk_id=0,
+                        start_i=0,
+                        end_i=len(document.content),
+                        content_without_overlap=sentences[0]["sentence"]
+                    )
+                )
+                continue
 
             msg.info(f"Generated {len(sentences)} sentences")
 
@@ -87,30 +100,41 @@ class SemanticChunker(Chunker):
 
             chunks = []
             current_chunk = []
+            char_is = []
             sentence_count = 0
-
+            char_end_i = -1
             for i, sentence in enumerate(sentences):
                 current_chunk.append(sentence["sentence"])
                 sentence_count += 1
 
+                # new chunk found (distance breakpoint not reached or reached max sentences)
                 if (
                     i < len(distances) and distances[i] > breakpoint_distance_threshold
                 ) or sentence_count >= max_sentences:
-                    chunks.append(" ".join(current_chunk))
+                    
+                    chunk_text = " ".join(current_chunk)
+                    chunks.append(chunk_text)
+
+                    char_start_i = char_end_i + 1
+                    char_end_i = char_start_i + len(chunk_text)
+                    char_is.append((char_start_i, char_end_i))
+
                     current_chunk = []
                     sentence_count = 0
 
             # Add any remaining sentences as the last chunk
             if current_chunk:
-                chunks.append(" ".join(current_chunk))
+                chunk_text = " ".join(current_chunk)
+                chunks.append(chunk_text)
+                char_is.append((char_end_i + 1, char_end_i + 1 + len(chunk_text)))
 
             for i, chunk in enumerate(chunks):
                 document.chunks.append(
                     Chunk(
                         content=chunk,
                         chunk_id=i,
-                        start_i=0,
-                        end_i=0,
+                        start_i=char_is[i][0],
+                        end_i=char_is[i][1],
                         content_without_overlap=chunk,
                     )
                 )

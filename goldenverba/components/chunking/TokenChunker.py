@@ -57,10 +57,11 @@ class TokenChunker(Chunker):
                         content=document.content,
                         chunk_id=0,
                         start_i=0,
-                        end_i=len(doc),
+                        end_i=len(document.content),
                         content_without_overlap=document.content,
                     )
                 )
+                continue
 
             if overlap >= units:
                 msg.warn(
@@ -78,11 +79,17 @@ class TokenChunker(Chunker):
                 chunk_text = doc[start_i:end_i].text
                 chunk_text_without_overlap = doc[start_i:overlap_start].text
 
+                # char_start_i = doc[start_i].idx
+                if end_i == len(doc):
+                    char_end_i = doc[-1].idx + 1
+                else:
+                    char_end_i = doc[end_i].idx
+
                 doc_chunk = Chunk(
                     content=chunk_text,
                     chunk_id=split_id_counter,
-                    start_i=start_i,
-                    end_i=end_i,
+                    start_i=doc[start_i].idx,
+                    end_i=char_end_i,
                     content_without_overlap=chunk_text_without_overlap,
                 )
 
