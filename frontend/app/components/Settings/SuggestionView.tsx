@@ -26,7 +26,7 @@ const SuggestionView: React.FC<SuggestionViewProps> = ({
   const [page, setPage] = useState(1);
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [totalCount, setTotalCount] = useState(0);
-  const pageSize = 3;
+  const pageSize = 20;
 
   const handleSuggestionFetch = async () => {
     const suggestions = await fetchAllSuggestions(page, pageSize, credentials);

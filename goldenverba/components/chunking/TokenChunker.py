@@ -73,8 +73,11 @@ class TokenChunker(Chunker):
             split_id_counter = 0
             while i < len(doc):
                 start_i = i
-                end_i = min(i + units, len(doc))
-                overlap_start = max(0, end_i - overlap)
+                end_i = min(i + units + overlap, len(doc))
+                if end_i == len(doc):
+                    overlap_start = end_i
+                else:
+                    overlap_start = min(i + units, end_i)
 
                 chunk_text = doc[start_i:end_i].text
                 chunk_text_without_overlap = doc[start_i:overlap_start].text
@@ -100,6 +103,6 @@ class TokenChunker(Chunker):
                 if end_i == len(doc):
                     break
 
-                i += units - overlap  # Step forward, considering overlap
+                i += units  # Step forward, considering overlap
 
         return documents

@@ -94,7 +94,7 @@ class VerbaManager:
     # Import
 
     async def import_document(
-        self, client, fileConfig: FileConfig, logger: LoggerManager
+        self, client, fileConfig: FileConfig, logger: LoggerManager = LoggerManager()
     ):
         try:
             loop = asyncio.get_running_loop()
@@ -445,7 +445,7 @@ class VerbaManager:
                             )
                             return False
 
-                        if a_setting["values"] != b_setting["values"]:
+                        if sorted(a_setting["values"]) != sorted(b_setting["values"]):
                             msg.fail(
                                 f"Config Validation Failed, values mismatch: {a_setting['values']} != {b_setting['values']}"
                             )
@@ -707,6 +707,7 @@ class VerbaManager:
         labels: list[str] = [],
         document_uuids: list[str] = [],
     ):
+
         retriever = rag_config["Retriever"].selected
         embedder = rag_config["Embedder"].selected
 

@@ -87,6 +87,8 @@ class WindowRetriever(Retriever):
                 document = await weaviate_manager.get_document(
                     client, chunk.properties["doc_uuid"]
                 )
+                if document is None:
+                    continue
                 doc_map[chunk.properties["doc_uuid"]] = {
                     "title": document["title"],
                     "chunks": [],
@@ -103,7 +105,6 @@ class WindowRetriever(Retriever):
             )
             doc_map[chunk.properties["doc_uuid"]]["score"] += chunk.metadata.score
             scores.append(chunk.metadata.score)
-
         min_score = min(scores)
         max_score = max(scores)
 

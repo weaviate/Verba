@@ -585,7 +585,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                 className="textarea textarea-bordered w-full bg-bg-verba placeholder-text-alt-verb min-h min-h-[40px] max-h-[150px] overflow-y-auto"
                 placeholder={
                   currentDatacount > 0
-                    ? `Chatting with ${currentDatacount} documents...`
+                    ? currentDatacount >= 100
+                      ? `Chatting with more than 100 documents...`
+                      : `Chatting with ${currentDatacount} documents...`
                     : `No documents detected...`
                 }
                 onKeyDown={handleKeyDown}

@@ -11,6 +11,7 @@ class Chunk:
         end_i: int = 0,
     ):
         self.content = content
+        self.title = ""
         self.chunk_id = chunk_id
         self.vector = None
         self.doc_uuid = None
@@ -26,6 +27,7 @@ class Chunk:
             "content": self.content,
             "chunk_id": self.chunk_id,
             "doc_uuid": self.doc_uuid,
+            "title": self.title,
             "pca": self.pca,
             "start_i": self.start_i,
             "end_i": self.end_i,
@@ -38,6 +40,7 @@ class Chunk:
         """Construct a Chunk object from a dictionary."""
         chunk = cls(
             content=data.get("content", ""),
+            title=data.get("title", ""),
             chunk_id=data.get("chunk_id", 0),
             start_i=data.get("start_i", 0),
             end_i=data.get("end_i", 0),

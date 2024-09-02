@@ -64,7 +64,6 @@ const ContentView: React.FC<ContentViewProps> = ({
     if (document) {
       handleFetchContent();
       setPage(1);
-      setMaxPage(1);
     } else {
       setContent([]);
       setPage(1);

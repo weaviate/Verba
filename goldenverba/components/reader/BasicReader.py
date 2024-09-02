@@ -80,10 +80,14 @@ class BasicReader(Reader):
         Load and process a file based on its extension.
         """
         msg.info(f"Loading {fileConfig.filename} ({fileConfig.extension.lower()})")
-        decoded_bytes = base64.b64decode(fileConfig.content)
+
+        if fileConfig.extension != "":
+            decoded_bytes = base64.b64decode(fileConfig.content)
 
         try:
-            if fileConfig.extension.lower() == "json":
+            if fileConfig.extension == "":
+                file_content = fileConfig.content
+            elif fileConfig.extension.lower() == "json":
                 return await self.load_json_file(decoded_bytes, fileConfig)
             elif fileConfig.extension.lower() == "pdf":
                 file_content = await self.load_pdf_file(decoded_bytes)

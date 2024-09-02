@@ -167,7 +167,8 @@ const ComponentView: React.FC<ComponentViewProps> = ({
     Object.entries(
       RAGConfig[component_name].components[RAGConfig[component_name].selected]
         .config
-    ).length == 0
+    ).length == 0 &&
+    skip_component
   ) {
     return <></>;
   }

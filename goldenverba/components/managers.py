@@ -6,6 +6,7 @@ from weaviate.auth import AuthApiKey
 from weaviate.classes.query import Filter, Sort, MetadataQuery
 from weaviate.collections.classes.data import DataObject
 from weaviate.classes.aggregate import GroupByAggregate
+from weaviate.classes.init import AdditionalConfig, Timeout
 
 import os
 import asyncio
@@ -154,17 +155,29 @@ class WeaviateManager:
             return weaviate.use_async_with_weaviate_cloud(
                 cluster_url=w_url,
                 auth_credentials=AuthApiKey(w_key),
+                additional_config=AdditionalConfig(
+                    timeout=Timeout(init=60, query=300, insert=300)
+                ),
             )
         else:
             raise Exception("No URL or API Key provided")
 
     async def connect_to_docker(self, w_url):
         msg.info(f"Connecting to Weaviate Docker")
-        return weaviate.use_async_with_local(host=w_url)
+        return weaviate.use_async_with_local(
+            host=w_url,
+            additional_config=AdditionalConfig(
+                timeout=Timeout(init=60, query=300, insert=300)
+            ),
+        )
 
     async def connect_to_embedded(self):
         msg.info(f"Connecting to Weaviate Embedded")
-        return weaviate.use_async_with_embedded()
+        return weaviate.use_async_with_embedded(
+            additional_config=AdditionalConfig(
+                timeout=Timeout(init=60, query=300, insert=300)
+            )
+        )
 
     async def connect(
         self, deployment: str, weaviateURL: str, weaviateAPIKey: str
@@ -343,6 +356,7 @@ class WeaviateManager:
                 for chunk in document.chunks:
                     chunk.doc_uuid = doc_uuid
                     chunk.labels = document.labels
+                    chunk.title = document.title
 
                 chunk_response = await embedder_collection.data.insert_many(
                     [
@@ -501,6 +515,7 @@ class WeaviateManager:
                 )
                 return response.properties
             else:
+                msg.warn(f"Document not found ({uuid})")
                 return None
 
     ### Labels
@@ -724,6 +739,7 @@ class WeaviateManager:
                 chunks = await embedder_collection.query.hybrid(
                     query=query,
                     vector=vector,
+                    alpha=0.5,
                     auto_limit=limit,
                     return_metadata=MetadataQuery(score=True, explain_score=False),
                     filters=apply_filters,
@@ -732,6 +748,7 @@ class WeaviateManager:
                 chunks = await embedder_collection.query.hybrid(
                     query=query,
                     vector=vector,
+                    alpha=0.5,
                     limit=limit,
                     return_metadata=MetadataQuery(score=True, explain_score=False),
                     filters=apply_filters,

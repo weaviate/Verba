@@ -10,33 +10,35 @@ from wasabi import msg
 
 
 class LoggerManager:
-    def __init__(self, socket: WebSocket):
+    def __init__(self, socket: WebSocket = None):
         self.socket = socket
 
     async def send_report(
         self, file_Id: str, status: FileStatus, message: str, took: float
     ):
         msg.info(f"{status} | {file_Id} | {message} | {took}")
-        payload: StatusReport = {
-            "fileID": file_Id,
-            "status": status,
-            "message": message,
-            "took": took,
-        }
+        if self.socket is not None:
+            payload: StatusReport = {
+                "fileID": file_Id,
+                "status": status,
+                "message": message,
+                "took": took,
+            }
 
-        await self.socket.send_json(payload)
+            await self.socket.send_json(payload)
 
     async def create_new_document(
         self, new_file_id: str, document_name: str, original_file_id: str
     ):
         msg.info(f"Creating new file {new_file_id} from {original_file_id}")
-        payload: CreateNewDocument = {
-            "new_file_id": new_file_id,
-            "filename": document_name,
-            "original_file_id": original_file_id,
-        }
+        if self.socket is not None:
+            payload: CreateNewDocument = {
+                "new_file_id": new_file_id,
+                "filename": document_name,
+                "original_file_id": original_file_id,
+            }
 
-        await self.socket.send_json(payload)
+            await self.socket.send_json(payload)
 
 
 class BatchManager:
