@@ -393,6 +393,8 @@ class VerbaManager:
     def verify_config(self, a: dict, b: dict) -> bool:
         # Check Settings ( RAG & Settings )
         try:
+            if os.getenv("VERBA_PRODUCTION") == "Demo":
+                return True
             for a_component_key, b_component_key in zip(a, b):
                 if a_component_key != b_component_key:
                     msg.fail(
