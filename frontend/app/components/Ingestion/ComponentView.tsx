@@ -128,8 +128,9 @@ const ComponentView: React.FC<ComponentViewProps> = ({
   skip_component,
 }) => {
   function renderComponents(rag_config: RAGConfig) {
-    return Object.entries(rag_config[component_name].components).map(
-      ([key, component]) => (
+    return Object.entries(rag_config[component_name].components)
+      .filter(([key, component]) => component.available)
+      .map(([key, component]) => (
         <li
           key={"ComponentDropdown_" + component.name}
           onClick={() => {
@@ -141,8 +142,7 @@ const ComponentView: React.FC<ComponentViewProps> = ({
         >
           <a>{component.name}</a>
         </li>
-      )
-    );
+      ));
   }
   function renderConfigOptions(rag_config: RAGConfig, configKey: string) {
     return rag_config[component_name].components[

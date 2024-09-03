@@ -91,8 +91,8 @@ if production != "Production":
         JSONChunker(),
     ]
     embedders = [
-        SentenceTransformersEmbedder(),
         OllamaEmbedder(),
+        SentenceTransformersEmbedder(),
         WeaviateEmbedder(),
         VoyageAIEmbedder(),
         CohereEmbedder(),
