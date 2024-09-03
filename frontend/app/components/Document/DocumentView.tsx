@@ -45,6 +45,7 @@ const DocumentView: React.FC<DocumentViewProps> = ({
         className={`${selectedDocument ? "md:w-[55vw] w-full flex" : "hidden md:flex md:w-[55vw]"}`}
       >
         <DocumentExplorer
+          production={production}
           credentials={credentials}
           addStatusMessage={addStatusMessage}
           setSelectedDocument={setSelectedDocument}

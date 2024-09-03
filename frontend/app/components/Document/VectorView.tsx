@@ -160,11 +160,13 @@ interface VectorViewProps {
   credentials: Credentials;
   selectedDocument: string | null;
   chunkScores?: ChunkScore[];
+  production: "Local" | "Demo" | "Production";
 }
 
 const VectorView: React.FC<VectorViewProps> = ({
   credentials,
   selectedDocument,
+  production,
   chunkScores,
 }) => {
   const refs = useRef<(THREE.Mesh | null)[]>([]);
@@ -349,19 +351,21 @@ const VectorView: React.FC<VectorViewProps> = ({
 
           <div className="flex gap-10 items-center justify-between min-w-[20vw]">
             <div className="flex flex-col gap-2 w-full">
-              <div className="flex gap-2 items-center justify-between">
-                <p className="text-xs text-text-alt-verba">
-                  Show All Documents
-                </p>
-                <input
-                  type="checkbox"
-                  className="toggle"
-                  checked={showAll}
-                  onChange={(e) => {
-                    setShowAll(e.target.checked);
-                  }}
-                />
-              </div>
+              {production != "Demo" && (
+                <div className="flex gap-2 items-center justify-between">
+                  <p className="text-xs text-text-alt-verba">
+                    Show All Documents
+                  </p>
+                  <input
+                    type="checkbox"
+                    className="toggle"
+                    checked={showAll}
+                    onChange={(e) => {
+                      setShowAll(e.target.checked);
+                    }}
+                  />
+                </div>
+              )}
 
               <div className="flex gap-2 items-center justify-between">
                 <p className="text-xs text-text-alt-verba">Dynamic Coloring</p>

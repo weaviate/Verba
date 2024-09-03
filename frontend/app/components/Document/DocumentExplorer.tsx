@@ -33,6 +33,7 @@ interface DocumentExplorerProps {
   chunkScores?: ChunkScore[];
   credentials: Credentials;
   selectedTheme: Theme;
+  production: "Local" | "Demo" | "Production";
   documentFilter: DocumentFilter[];
   setDocumentFilter: React.Dispatch<React.SetStateAction<DocumentFilter[]>>;
   addStatusMessage: (
@@ -46,6 +47,7 @@ const DocumentExplorer: React.FC<DocumentExplorerProps> = ({
   selectedDocument,
   setSelectedDocument,
   chunkScores,
+  production,
   selectedTheme,
   documentFilter,
   setDocumentFilter,
@@ -170,6 +172,7 @@ const DocumentExplorer: React.FC<DocumentExplorerProps> = ({
             credentials={credentials}
             selectedDocument={selectedDocument}
             chunkScores={chunkScores}
+            production={production}
           />
         )}
 

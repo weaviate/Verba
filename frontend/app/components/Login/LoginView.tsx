@@ -47,8 +47,8 @@ const VerbaThree = ({
   const material = useMemo(
     () =>
       new THREE.MeshMatcapMaterial({
-        color: "#ffe229",
-        matcap: new THREE.TextureLoader().load(prefix + "/fire_cap.png"), // Add this line
+        color: "#e6e6e6",
+        matcap: new THREE.TextureLoader().load(prefix + "/ice_cap.png"), // Add this line
       }),
     []
   );

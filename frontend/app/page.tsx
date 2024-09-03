@@ -130,21 +130,33 @@ export default function Home() {
   };
 
   const updateCSSVariables = useCallback(() => {
-    const themeToUse = isValidTheme(selectedTheme)
-      ? selectedTheme
-      : themes["Light"];
+    const themeToUse = selectedTheme;
     const cssVars = {
-      "--primary-verba": themeToUse.primary_color.color,
-      "--secondary-verba": themeToUse.secondary_color.color,
-      "--warning-verba": themeToUse.warning_color.color,
-      "--bg-verba": themeToUse.bg_color.color,
-      "--bg-alt-verba": themeToUse.bg_alt_color.color,
-      "--text-verba": themeToUse.text_color.color,
-      "--text-alt-verba": themeToUse.text_alt_color.color,
-      "--button-verba": themeToUse.button_color.color,
-      "--button-hover-verba": themeToUse.button_hover_color.color,
-      "--text-verba-button": themeToUse.button_text_color.color,
-      "--text-alt-verba-button": themeToUse.button_text_alt_color.color,
+      "--primary-verba":
+        themeToUse.primary_color?.color || WeaviateTheme.primary_color.color,
+      "--secondary-verba":
+        themeToUse.secondary_color?.color ||
+        WeaviateTheme.secondary_color.color,
+      "--warning-verba":
+        themeToUse.warning_color?.color || WeaviateTheme.warning_color.color,
+      "--bg-verba": themeToUse.bg_color?.color || WeaviateTheme.bg_color.color,
+      "--bg-alt-verba":
+        themeToUse.bg_alt_color?.color || WeaviateTheme.bg_alt_color.color,
+      "--text-verba":
+        themeToUse.text_color?.color || WeaviateTheme.text_color.color,
+      "--text-alt-verba":
+        themeToUse.text_alt_color?.color || WeaviateTheme.text_alt_color.color,
+      "--button-verba":
+        themeToUse.button_color?.color || WeaviateTheme.button_color.color,
+      "--button-hover-verba":
+        themeToUse.button_hover_color?.color ||
+        WeaviateTheme.button_hover_color.color,
+      "--text-verba-button":
+        themeToUse.button_text_color?.color ||
+        WeaviateTheme.button_text_color.color,
+      "--text-alt-verba-button":
+        themeToUse.button_text_alt_color?.color ||
+        WeaviateTheme.button_text_alt_color.color,
     };
     Object.entries(cssVars).forEach(([key, value]) => {
       document.documentElement.style.setProperty(key, value);

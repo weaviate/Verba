@@ -3,14 +3,14 @@ import requests
 import aiohttp
 import json
 
-from goldenverba.components.interfaces import Embedder
+from goldenverba.components.interfaces import Embedding
 from goldenverba.components.types import InputConfig
 from goldenverba.components.util import get_environment
 
 from wasabi import msg
 
 
-class CohereEmbedder(Embedder):
+class CohereEmbedder(Embedding):
     """
     CohereEmbedder for Verba.
     """
@@ -22,14 +22,12 @@ class CohereEmbedder(Embedder):
         self.url = os.getenv("COHERE_BASE_URL", "https://api.cohere.com/v1")
         models = get_models(self.url, os.getenv("COHERE_API_KEY", None), "embed")
 
-        self.config = {
-            "Model": InputConfig(
-                type="dropdown",
-                value=models[0],
-                description="Select a Cohere Embedding Model",
-                values=models,
-            )
-        }
+        self.config["Model"] = InputConfig(
+            type="dropdown",
+            value=models[0],
+            description="Select a Cohere Embedding Model",
+            values=models,
+        )
 
         if os.getenv("COHERE_API_KEY") is None:
             self.config["API Key"] = InputConfig(

@@ -30,14 +30,14 @@ class WeaviateEmbedder(Embedding):
             ),
         }
 
-        if api_key is None:
+        if api_key == None:
             self.config["API Key"] = InputConfig(
                 type="password",
                 value="",
                 description="Weaviate Embedding Service Key (or set EMBEDDING_SERVICE_KEY env var)",
                 values=[],
             )
-        if base_url is "":
+        if base_url == "":
             self.config["URL"] = InputConfig(
                 type="text",
                 value="",  # Use empty string as default value

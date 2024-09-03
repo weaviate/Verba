@@ -69,6 +69,7 @@ const ChatView: React.FC<ChatViewProps> = ({
         <DocumentExplorer
           addStatusMessage={addStatusMessage}
           credentials={credentials}
+          production={production}
           documentFilter={documentFilter}
           setDocumentFilter={setDocumentFilter}
           setSelectedDocument={setSelectedDocument}
