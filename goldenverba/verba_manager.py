@@ -85,7 +85,7 @@ class VerbaManager:
         return modified_documents, logging
 
     def reader_set_reader(self, reader: str) -> bool:
-        self.reader_manager.set_reader(reader)
+        return self.reader_manager.set_reader(reader)
 
     def reader_get_readers(self) -> dict[str, Reader]:
         return self.reader_manager.get_readers()

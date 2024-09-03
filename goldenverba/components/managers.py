@@ -91,12 +91,14 @@ class ReaderManager:
 
         return documents, logging
 
-    def set_reader(self, reader: str):
+    def set_reader(self, reader: str) -> bool:
         if reader in self.readers:
             msg.info(f"Setting READER to {reader}")
             self.selected_reader = reader
+            return True
         else:
             msg.warn(f"Reader {reader} not found")
+            return False
 
     def get_readers(self) -> dict[str, Reader]:
         return self.readers
