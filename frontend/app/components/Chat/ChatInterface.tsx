@@ -1,107 +1,140 @@
 "use client";
+
 import React, { useState, useEffect, useRef } from "react";
-import PulseLoader from "react-spinners/PulseLoader";
-import { IoMdSend } from "react-icons/io";
-import { DocumentChunk } from "../Document/types";
-import { Message, QueryPayload } from "./types";
-import { getWebSocketApiHost } from "./util";
+import { MdCancel, MdOutlineRefresh } from "react-icons/md";
+import { TbPlugConnected } from "react-icons/tb";
+import { IoChatbubbleSharp } from "react-icons/io5";
+import { FaHammer } from "react-icons/fa";
+import { IoIosSend } from "react-icons/io";
+import { BiError } from "react-icons/bi";
+import { IoMdAddCircle } from "react-icons/io";
+import VerbaButton from "../Navigation/VerbaButton";
+
+import {
+  updateRAGConfig,
+  sendUserQuery,
+  fetchDatacount,
+  fetchRAGConfig,
+  fetchSuggestions,
+  fetchLabels,
+} from "@/app/api";
+import { getWebSocketApiHost } from "@/app/util";
+import {
+  Credentials,
+  QueryPayload,
+  Suggestion,
+  DataCountPayload,
+  ChunkScore,
+  Message,
+  LabelsResponse,
+  RAGConfig,
+  Theme,
+  DocumentFilter,
+} from "@/app/types";
+
+import InfoComponent from "../Navigation/InfoComponent";
+import ChatConfig from "./ChatConfig";
 import ChatMessage from "./ChatMessage";
-import { SettingsConfiguration } from "../Settings/types";
-import { IoIosRefresh } from "react-icons/io";
-import { AiFillRobot } from "react-icons/ai";
 
-import StatusLabel from "./StatusLabel";
-
-import ComponentStatus from "../Status/ComponentStatus";
-
-import { RAGConfig } from "../RAG/types";
-
-interface ChatInterfaceComponentProps {
-  settingConfig: SettingsConfiguration;
-  APIHost: string | null;
-  setChunks: (c: DocumentChunk[]) => void;
-  setChunkTime: (t: number) => void;
-  setCurrentPage: (p: any) => void;
-  setContext: (c: string) => void;
+interface ChatInterfaceProps {
+  credentials: Credentials;
+  setSelectedDocument: (s: string | null) => void;
+  setSelectedChunkScore: (c: ChunkScore[]) => void;
+  currentPage: string;
   RAGConfig: RAGConfig | null;
-  production: boolean;
+  setRAGConfig: React.Dispatch<React.SetStateAction<RAGConfig | null>>;
+  selectedTheme: Theme;
+  production: "Local" | "Demo" | "Production";
+  addStatusMessage: (
+    message: string,
+    type: "INFO" | "WARNING" | "SUCCESS" | "ERROR"
+  ) => void;
+  documentFilter: DocumentFilter[];
+  setDocumentFilter: React.Dispatch<React.SetStateAction<DocumentFilter[]>>;
 }
 
-const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
-  APIHost,
-  settingConfig,
-  setChunks,
-  setChunkTime,
-  setCurrentPage,
-  setContext,
+const ChatInterface: React.FC<ChatInterfaceProps> = ({
   production,
+  credentials,
+  setSelectedDocument,
+  setSelectedChunkScore,
+  currentPage,
   RAGConfig,
+  selectedTheme,
+  setRAGConfig,
+  addStatusMessage,
+  documentFilter,
+  setDocumentFilter,
 }) => {
-  const [previewText, setPreviewText] = useState("");
-  const lastMessageRef = useRef<null | HTMLDivElement>(null);
+  const [selectedSetting, setSelectedSetting] = useState("Chat");
 
-  const [socket, setSocket] = useState<WebSocket | null>(null);
-
-  const [userInput, setUserInput] = useState("");
-  const [messages, setMessages] = useState<Message[]>([]);
   const isFetching = useRef<boolean>(false);
   const [fetchingStatus, setFetchingStatus] = useState<
     "DONE" | "CHUNKS" | "RESPONSE"
   >("DONE");
-  const [isFetchingSuggestion, setIsFetchingSuggestions] = useState(false);
-  const [suggestions, setSuggestions] = useState<string[]>([]);
 
-  const [showNotification, setShowNotification] = useState(false);
-  const [notificationText, setNotificationText] = useState("");
-  const [notificationState, setNotificationState] = useState<"GOOD" | "BAD">(
-    "GOOD"
+  const [previewText, setPreviewText] = useState("");
+  const lastMessageRef = useRef<null | HTMLDivElement>(null);
+  const [socket, setSocket] = useState<WebSocket | null>(null);
+  const [socketOnline, setSocketOnline] = useState(false);
+  const [reconnect, setReconnect] = useState(false);
+
+  const [currentSuggestions, setCurrentSuggestions] = useState<Suggestion[]>(
+    []
   );
 
-  const handleCopyToBillboard = (text: string) => {
-    navigator.clipboard.writeText(text).then(
-      function () {
-        triggerNotification("Copied message");
-      },
-      function (err) {
-        console.error("Unable to copy text: ", err);
-      }
-    );
-  };
+  const [labels, setLabels] = useState<string[]>([]);
+  const [filterLabels, setFilterLabels] = useState<string[]>([]);
 
-  const triggerNotification = (text: string, warning?: boolean) => {
-    if (warning) {
-      setNotificationState("BAD");
-    } else {
-      setNotificationState("GOOD");
-    }
+  const [selectedDocumentScore, setSelectedDocumentScore] = useState<
+    string | null
+  >(null);
 
-    if (showNotification) {
-      setNotificationText(text);
-      return;
-    }
+  const [currentDatacount, setCurrentDatacount] = useState(0);
 
-    setNotificationText(text);
-    setShowNotification(true);
+  const [userInput, setUserInput] = useState("");
+  const [messages, setMessages] = useState<Message[]>([]);
+  const currentEmbedding = RAGConfig
+    ? (RAGConfig["Embedder"].components[RAGConfig["Embedder"].selected].config[
+        "Model"
+      ].value as string)
+    : "No Config found";
+  useState("No Embedding Model");
 
-    // Hide the notification after 3 seconds
-    setTimeout(() => {
-      setShowNotification(false);
-      setNotificationText("");
-    }, 3000);
-  };
-
-  // Setup WebSocket and messages
   useEffect(() => {
-    setMessages(getMessagesFromLocalStorage("VERBA_CONVERSATION"));
-    setChunks(getChunksFromLocalStorage("VERBA_CHUNKS"));
-    setContext(getContextFromLocalStorage("VERBA_CONTEXT"));
+    setReconnect(true);
+  }, []);
 
+  useEffect(() => {
+    if (RAGConfig) {
+      retrieveDatacount();
+    } else {
+      setCurrentDatacount(0);
+    }
+  }, [currentEmbedding, currentPage, documentFilter]);
+
+  useEffect(() => {
+    setMessages((prev) => {
+      if (prev.length === 0) {
+        return [
+          {
+            type: "system",
+            content: selectedTheme.intro_message.text,
+          },
+        ];
+      }
+      return prev;
+    });
+  }, [selectedTheme.intro_message.text]);
+
+  // Setup WebSocket and messages to /ws/generate_stream
+  useEffect(() => {
     const socketHost = getWebSocketApiHost();
     const localSocket = new WebSocket(socketHost);
 
     localSocket.onopen = () => {
       console.log("WebSocket connection opened to " + socketHost);
-      triggerNotification("WebSocket Online");
+      setSocketOnline(true);
     };
 
     localSocket.onmessage = (event) => {
@@ -118,12 +151,14 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
         console.error("Received data is not valid JSON:", event.data);
         return; // Exit early if data isn't valid JSON
       }
+
       const newMessageContent = data.message;
       setPreviewText((prev) => prev + newMessageContent);
 
       if (data.finish_reason === "stop") {
         isFetching.current = false;
         setFetchingStatus("DONE");
+        addStatusMessage("Finished generation", "SUCCESS");
         const full_text = data.full_text;
         if (data.cached) {
           const distance = data.distance;
@@ -148,9 +183,10 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
 
     localSocket.onerror = (error) => {
       console.error("WebSocket Error:", error);
-      triggerNotification("WebSocket Error: " + error, true);
+      setSocketOnline(false);
       isFetching.current = false;
       setFetchingStatus("DONE");
+      setReconnect((prev) => !prev);
     };
 
     localSocket.onclose = (event) => {
@@ -161,9 +197,10 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
       } else {
         console.error("WebSocket connection died");
       }
-      triggerNotification("WebSocket Connection Offline", true);
+      setSocketOnline(false);
       isFetching.current = false;
       setFetchingStatus("DONE");
+      setReconnect((prev) => !prev);
     };
 
     setSocket(localSocket);
@@ -173,38 +210,106 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
         localSocket.close();
       }
     };
-  }, []);
+  }, [reconnect]);
 
-  // Scroll to latest message
   useEffect(() => {
-    if (messages.length > 1) {
-      saveMessagesToLocalStorage("VERBA_CONVERSATION", messages);
+    if (RAGConfig) {
+      retrieveDatacount();
+    } else {
+      setCurrentDatacount(0);
     }
-    if (lastMessageRef.current) {
-      const lastMessage = messages[messages.length - 1];
-      lastMessageRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [messages]);
+  }, [RAGConfig]);
 
-  const cancelGeneration = () => {
-    triggerNotification("Canceled Generation", true);
-    setPreviewText("");
+  const retrieveRAGConfig = async () => {
+    const config = await fetchRAGConfig(credentials);
+    if (config) {
+      setRAGConfig(config.rag_config);
+    } else {
+      addStatusMessage("Failed to fetch RAG Config", "ERROR");
+    }
+  };
+
+  const sendUserMessage = async () => {
+    if (isFetching.current || !userInput.trim()) return;
+
+    const sendInput = userInput;
+    setUserInput("");
+    isFetching.current = true;
+    setCurrentSuggestions([]);
+    setFetchingStatus("CHUNKS");
+    setMessages((prev) => [...prev, { type: "user", content: sendInput }]);
+
+    try {
+      addStatusMessage("Sending query...", "INFO");
+      const data = await sendUserQuery(
+        sendInput,
+        RAGConfig,
+        filterLabels,
+        documentFilter,
+        credentials
+      );
+
+      if (!data || data.error) {
+        handleErrorResponse(data ? data.error : "No data received");
+      } else {
+        handleSuccessResponse(data, sendInput);
+      }
+    } catch (error) {
+      handleErrorResponse("Failed to fetch from API");
+      console.error("Failed to fetch from API:", error);
+    }
+  };
+
+  const handleErrorResponse = (errorMessage: string) => {
+    addStatusMessage("Query failed", "ERROR");
+    setMessages((prev) => [...prev, { type: "error", content: errorMessage }]);
     isFetching.current = false;
     setFetchingStatus("DONE");
   };
 
-  const handleSuggestionClick = async (suggestion: string) => {
-    // Update the userInput with the clicked suggestion
-    setUserInput(suggestion);
-    setSuggestions([]);
+  const handleSuccessResponse = (data: QueryPayload, sendInput: string) => {
+    setMessages((prev) => [
+      ...prev,
+      { type: "retrieval", content: data.documents, context: data.context },
+    ]);
+
+    addStatusMessage(
+      "Received " + Object.entries(data.documents).length + " documents",
+      "SUCCESS"
+    );
+
+    if (data.documents.length > 0) {
+      const firstDoc = data.documents[0];
+      setSelectedDocument(firstDoc.uuid);
+      setSelectedDocumentScore(
+        `${firstDoc.uuid}${firstDoc.score}${firstDoc.chunks.length}`
+      );
+      setSelectedChunkScore(firstDoc.chunks);
+
+      if (data.context) {
+        streamResponses(sendInput, data.context);
+        setFetchingStatus("RESPONSE");
+      }
+    } else {
+      handleErrorResponse("We couldn't find any chunks to your query");
+    }
   };
 
   const streamResponses = (query?: string, context?: string) => {
     if (socket?.readyState === WebSocket.OPEN) {
+      const filteredMessages = messages
+        .slice(1) // Skip the first message
+        .filter((msg) => msg.type === "user" || msg.type === "system")
+        .map((msg) => ({
+          type: msg.type,
+          content: msg.content,
+        }));
+
       const data = JSON.stringify({
         query: query,
         context: context,
-        conversation: messages,
+        conversation: filteredMessages,
+        rag_config: RAGConfig,
       });
       socket.send(data);
     } else {
@@ -215,393 +320,360 @@ const ChatInterfaceComponent: React.FC<ChatInterfaceComponentProps> = ({
   const handleKeyDown = (e: any) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault(); // Prevent new line
-      handleSendMessage(e); // Submit form
+      sendUserMessage(); // Submit form
     }
   };
 
-  const saveMessagesToLocalStorage = (key: string, value: Message[]) => {
-    if (typeof window !== "undefined") {
-      // Check if window is defined
-      localStorage.setItem(key, JSON.stringify(value));
-    }
-  };
-
-  const saveContextToLocalStorage = (key: string, value: string) => {
-    if (typeof window !== "undefined") {
-      // Check if window is defined
-      localStorage.setItem(key, value);
-    }
-  };
-
-  const getMessagesFromLocalStorage = (key: string) => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem(key);
-      if (saved && JSON.parse(saved).length > 0) {
-        return JSON.parse(saved);
-      }
-    }
-    return [
-      {
-        type: "system",
-        content: settingConfig.Customization.settings.intro_message.text,
-      },
-    ]; // Return a default value or null if not found
-  };
-
-  const removeMessagesFromLocalStorage = (key: string) => {
-    if (typeof window !== "undefined") {
-      localStorage.removeItem(key);
-    }
-  };
-
-  const saveChunksToLocalStorage = (key: string, value: DocumentChunk[]) => {
-    if (typeof window !== "undefined") {
-      // Check if window is defined
-      localStorage.setItem(key, JSON.stringify(value));
-    }
-  };
-
-  const getChunksFromLocalStorage = (key: string) => {
+  const retrieveDatacount = async () => {
     try {
-      if (typeof window !== "undefined") {
-        const saved = localStorage.getItem(key);
-        if (saved && JSON.parse(saved).length > 0) {
-          return JSON.parse(saved);
-        }
-      }
-    } catch (e) {
-      console.error("Failed to load chunks from local storage:", e);
-      return []; // Exit early if data isn't valid JSON
-    }
-    return []; // Return a default value or null if not found
-  };
-
-  const getContextFromLocalStorage = (key: string) => {
-    try {
-      if (typeof window !== "undefined") {
-        const saved = localStorage.getItem(key);
-        if (saved) {
-          return saved;
-        }
-      }
-    } catch (e) {
-      console.error("Failed to load context from local storage:", e);
-      return ""; // Exit early if data isn't valid JSON
-    }
-    return ""; // Return a default value or null if not found
-  };
-
-  const removeChunksFromLocalStorage = (key: string) => {
-    if (typeof window !== "undefined") {
-      localStorage.removeItem(key);
-    }
-  };
-
-  const handleSendMessage = async (e?: React.FormEvent) => {
-    e?.preventDefault();
-
-    setSuggestions([]);
-
-    if (APIHost === null) {
-      triggerNotification("No connection to server");
-      return;
-    }
-
-    if (isFetching.current) {
-      return;
-    }
-
-    const sendInput = userInput;
-
-    if (sendInput.trim()) {
-      setMessages((prev) => [...prev, { type: "user", content: sendInput }]);
-      setUserInput("");
-
-      const textarea = document.getElementById("reset");
-      if (textarea !== null) {
-        // Check if the element is not null
-        textarea.style.height = ""; // Reset height
-        textarea.style.width = ""; // Reset width
-      } else {
-        console.error('The element with ID "target" was not found in the DOM.');
-      }
-
-      try {
-        // Start the API call
-        isFetching.current = true;
-        setFetchingStatus("CHUNKS");
-
-        // Start both API calls in parallel
-        const response = await fetch(APIHost + "/api/query", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ query: sendInput }),
-        });
-
-        const data: QueryPayload = await response.json();
-        if (data) {
-          if (data.error !== "") {
-            triggerNotification(data.error, true);
-            isFetching.current = false;
-            setFetchingStatus("DONE");
-            return;
-          }
-
-          setChunks(data.chunks);
-          saveChunksToLocalStorage("VERBA_CHUNKS", data.chunks);
-          setSuggestions([]);
-          setChunkTime(data.took);
-
-          if (data.context) {
-            streamResponses(sendInput, data.context);
-            setContext(data.context);
-            saveContextToLocalStorage("VERBA_CONTEXT", data.context);
-            setFetchingStatus("RESPONSE");
-          }
-        } else {
-          triggerNotification(
-            "Failed to fetch from API: No data received",
-            true
-          );
-          isFetching.current = false;
-          setFetchingStatus("DONE");
-        }
-      } catch (error) {
-        console.error("Failed to fetch from API:", error);
-        triggerNotification("Failed to fetch from API: " + error, true);
-        isFetching.current = false;
-        setFetchingStatus("DONE");
-      }
-    }
-  };
-
-  const fetchSuggestions = async (query: string) => {
-    if (
-      isFetchingSuggestion ||
-      query === "" ||
-      isFetching.current ||
-      !settingConfig.Chat.settings.suggestion.checked
-    ) {
-      setSuggestions([]);
-      return;
-    }
-
-    try {
-      setIsFetchingSuggestions(true);
-      const response = await fetch(APIHost + "/api/suggestions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ query }),
-      });
-
-      const data = await response.json();
-
+      const data: DataCountPayload | null = await fetchDatacount(
+        currentEmbedding,
+        documentFilter,
+        credentials
+      );
+      const labels: LabelsResponse | null = await fetchLabels(credentials);
       if (data) {
-        setSuggestions(data.suggestions);
-        setIsFetchingSuggestions(false);
-      } else {
-        setIsFetchingSuggestions(false);
+        setCurrentDatacount(data.datacount);
+      }
+      if (labels) {
+        setLabels(labels.labels);
       }
     } catch (error) {
-      console.error("Failed to fetch suggestions:", error);
-      setIsFetchingSuggestions(false);
+      console.error("Failed to fetch from API:", error);
+      addStatusMessage("Failed to fetch datacount: " + error, "ERROR");
     }
   };
 
-  const escapeRegExp = (string: string) => {
-    return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
+  const reconnectToVerba = () => {
+    setReconnect((prevState) => !prevState);
   };
 
-  const renderBoldedSuggestion = (suggestion: string, userInput: string) => {
-    const escapedUserInput = escapeRegExp(userInput);
-    const parts = suggestion.split(new RegExp(`(${escapedUserInput})`, "gi"));
-    return (
-      <div className="flex flex-row gap-1">
-        {parts.map((part, i) => (
-          <p
-            key={i}
-            className={
-              part.toLowerCase() === userInput.toLowerCase()
-                ? "font-bold text-sm"
-                : ""
-            }
-          >
-            {part}
-          </p>
-        ))}
-      </div>
-    );
+  const onSaveConfig = async () => {
+    addStatusMessage("Saved Config", "SUCCESS");
+    await updateRAGConfig(RAGConfig, credentials);
+  };
+
+  const onResetConfig = async () => {
+    addStatusMessage("Reset Config", "WARNING");
+    retrieveRAGConfig();
+  };
+
+  const handleSuggestions = async () => {
+    if (
+      RAGConfig &&
+      RAGConfig["Retriever"].components[RAGConfig["Retriever"].selected].config[
+        "Suggestion"
+      ].value
+    ) {
+      const suggestions = await fetchSuggestions(userInput, 3, credentials);
+      if (suggestions) {
+        setCurrentSuggestions(suggestions.suggestions);
+      }
+    }
   };
 
   return (
-    <div className="flex flex-col gap-2">
-      {/*Chat Messages*/}
-      <div className="flex flex-col bg-bg-alt-verba rounded-lg shadow-lg p-2 md:p-5 text-text-verba gap-5 h-[55vh] overflow-auto">
-        <div className="flex gap-1 md:gap-2 items-center">
-          {RAGConfig && (
-            <div className="flex gap-2 items-center">
-              <ComponentStatus
-                disable={production}
-                component_name={
-                  RAGConfig ? RAGConfig["Generator"].selected : ""
-                }
-                Icon={AiFillRobot}
-                changeTo={"RAG"}
-                changePage={setCurrentPage}
-              />
-            </div>
-          )}
-          <div className="hidden sm:block md:h-[3vh] lg:h-[2vh] bg-text-alt-verba w-px mx-0 md:mx-1"></div>
-          <StatusLabel
-            status={
-              APIHost !== null &&
-              socket !== null &&
-              socket.readyState === WebSocket.OPEN
-            }
-            true_text="Online"
-            false_text="Connecting..."
-          />
-          <StatusLabel
-            status={settingConfig.Chat.settings.caching.checked}
-            true_text="Caching"
-            false_text="No Caching"
-          />
-          <StatusLabel
-            status={settingConfig.Chat.settings.suggestion.checked}
-            true_text="Suggestions"
-            false_text="No Suggestions"
+    <div className="flex flex-col gap-2 w-full">
+      {/* Header */}
+      <div className="bg-bg-alt-verba rounded-2xl flex gap-2 p-6 items-center justify-between h-min w-full">
+        <div className="hidden md:flex gap-2 justify-start items-center">
+          <InfoComponent
+            tooltip_text="Use the Chat interface to interact with your data and perform Retrieval Augmented Generation (RAG). This interface allows you to ask questions, analyze sources, and generate responses based on your stored documents."
+            display_text={"Chat"}
           />
         </div>
-
-        <div className="flex flex-col">
-          {messages.map((message, index) => (
-            <div
-              ref={index === messages.length - 1 ? lastMessageRef : null}
-              key={index}
-              className={`mb-4 ${message.type === "user" ? "text-right" : ""}`}
-            >
-              <ChatMessage
-                message={message}
-                handleCopyToBillboard={handleCopyToBillboard}
-                settingConfig={settingConfig}
-              />
-            </div>
-          ))}
-          {/* Render the preview message if available */}
-          {previewText && (
-            <ChatMessage
-              settingConfig={settingConfig}
-              message={{ type: "system", content: previewText, cached: false }}
-              handleCopyToBillboard={handleCopyToBillboard}
+        <div className="w-full md:w-fit flex gap-3 justify-end items-center">
+          <VerbaButton
+            title="Chat"
+            Icon={IoChatbubbleSharp}
+            onClick={() => {
+              setSelectedSetting("Chat");
+            }}
+            selected={selectedSetting === "Chat"}
+            disabled={false}
+            selected_color="bg-secondary-verba"
+          />
+          {production != "Demo" && (
+            <VerbaButton
+              title="Config"
+              Icon={FaHammer}
+              onClick={() => {
+                setSelectedSetting("Config");
+              }}
+              selected={selectedSetting === "Config"}
+              disabled={false}
+              selected_color="bg-secondary-verba"
             />
           )}
         </div>
+      </div>
 
-        {isFetching.current && (
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center pl-4 mb-4 gap-3">
-              <PulseLoader
-                color={settingConfig.Customization.settings.text_color.color}
-                loading={true}
-                size={10}
-                speedMultiplier={0.75}
-              />
-              <p>
-                {fetchingStatus === "CHUNKS" && "Retrieving chunks"}
-                {fetchingStatus === "RESPONSE" && "Generating answer"}
-              </p>
+      <div className="bg-bg-alt-verba rounded-2xl flex flex-col h-[50vh] md:h-full w-full overflow-y-auto overflow-x-hidden relative">
+        {/* New fixed tab */}
+        {selectedSetting == "Chat" && (
+          <div className="sticky flex flex-col gap-2 top-0 z-9 p-4 backdrop-blur-sm bg-opacity-30 bg-bg-alt-verba rounded-lg">
+            <div className="flex gap-2 justify-start items-center">
+              <div className="flex gap-2">
+                <div className="dropdown dropdown-hover">
+                  <label tabIndex={0}>
+                    <VerbaButton
+                      title="Label"
+                      className="btn-sm min-w-min"
+                      icon_size={12}
+                      text_class_name="text-xs"
+                      Icon={IoMdAddCircle}
+                      selected={false}
+                      disabled={false}
+                    />
+                  </label>
+                  <ul
+                    tabIndex={0}
+                    className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+                  >
+                    {labels.map((label, index) => (
+                      <li key={"Label" + index}>
+                        <a
+                          onClick={() => {
+                            if (!filterLabels.includes(label)) {
+                              setFilterLabels([...filterLabels, label]);
+                            }
+                            const dropdownElement =
+                              document.activeElement as HTMLElement;
+                            dropdownElement.blur();
+                            const dropdown = dropdownElement.closest(
+                              ".dropdown"
+                            ) as HTMLElement;
+                            if (dropdown) dropdown.blur();
+                          }}
+                        >
+                          {label}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+              {(filterLabels.length > 0 || documentFilter.length > 0) && (
+                <VerbaButton
+                  onClick={() => {
+                    setFilterLabels([]);
+                    setDocumentFilter([]);
+                  }}
+                  title="Clear"
+                  className="btn-sm max-w-min"
+                  icon_size={12}
+                  text_class_name="text-xs"
+                  Icon={MdCancel}
+                  selected={false}
+                  disabled={false}
+                />
+              )}
             </div>
-            <div className="items-center justify-center flex">
-              <button
-                onClick={cancelGeneration}
-                className="btn btn-sm text-sm bg-button-verba hover:bg-button-hover-verba text-text-verba"
-              >
-                Cancel
-              </button>
+            <div className="flex flex-wrap gap-2">
+              {filterLabels.map((label, index) => (
+                <VerbaButton
+                  title={label}
+                  key={"FilterLabel" + index}
+                  Icon={MdCancel}
+                  className="btn-sm min-w-min max-w-[200px]"
+                  icon_size={12}
+                  selected_color="bg-primary-verba"
+                  selected={true}
+                  text_class_name="truncate max-w-[200px]"
+                  text_size="text-xs"
+                  onClick={() => {
+                    setFilterLabels(filterLabels.filter((l) => l !== label));
+                  }}
+                />
+              ))}
+              {documentFilter.map((filter, index) => (
+                <VerbaButton
+                  title={filter.title}
+                  key={"DocumentFilter" + index}
+                  Icon={MdCancel}
+                  className="btn-sm min-w-min max-w-[200px]"
+                  icon_size={12}
+                  selected_color="bg-secondary-verba"
+                  selected={true}
+                  text_size="text-xs"
+                  text_class_name="truncate md:max-w-[100px] lg:max-w-[150px]"
+                  onClick={() => {
+                    setDocumentFilter(
+                      documentFilter.filter((f) => f.uuid !== filter.uuid)
+                    );
+                  }}
+                />
+              ))}
             </div>
           </div>
         )}
+        <div
+          className={`${selectedSetting === "Chat" ? "flex flex-col gap-3 p-4" : "hidden"}`}
+        >
+          <div className="flex w-full justify-start items-center text-text-alt-verba gap-2">
+            {currentDatacount === 0 && <BiError size={15} />}
+            {currentDatacount === 0 && (
+              <p className="text-text-alt-verba text-sm items-center flex">{`${currentDatacount} documents embedded by ${currentEmbedding}`}</p>
+            )}
+          </div>
+          {messages.map((message, index) => (
+            <div
+              key={"Message_" + index}
+              className={`${message.type === "user" ? "text-right" : ""}`}
+            >
+              <ChatMessage
+                message={message}
+                message_index={index}
+                selectedTheme={selectedTheme}
+                selectedDocument={selectedDocumentScore}
+                setSelectedDocumentScore={setSelectedDocumentScore}
+                setSelectedDocument={setSelectedDocument}
+                setSelectedChunkScore={setSelectedChunkScore}
+              />
+            </div>
+          ))}
+          {previewText && (
+            <ChatMessage
+              message={{ type: "system", content: previewText, cached: false }}
+              message_index={-1}
+              selectedTheme={selectedTheme}
+              selectedDocument={selectedDocumentScore}
+              setSelectedDocumentScore={setSelectedDocumentScore}
+              setSelectedDocument={setSelectedDocument}
+              setSelectedChunkScore={setSelectedChunkScore}
+            />
+          )}
+          {isFetching.current && (
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-3">
+                <span className="text-text-alt-verba loading loading-dots loading-md"></span>
+                <p className="text-text-alt-verba">
+                  {fetchingStatus === "CHUNKS" && "Retrieving..."}
+                  {fetchingStatus === "RESPONSE" && "Generating..."}
+                </p>
+                <button
+                  onClick={() => {
+                    setFetchingStatus("DONE");
+                    isFetching.current = false;
+                  }}
+                  className="btn btn-circle btn-sm bg-bg-alt-verba hover:bg-warning-verba hover:text-text-verba text-text-alt-verba shadow-none border-none text-sm"
+                >
+                  <MdCancel size={15} />
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+        {selectedSetting === "Config" && (
+          <ChatConfig
+            addStatusMessage={addStatusMessage}
+            production={production}
+            RAGConfig={RAGConfig}
+            credentials={credentials}
+            setRAGConfig={setRAGConfig}
+            onReset={onResetConfig}
+            onSave={onSaveConfig}
+          />
+        )}
       </div>
 
-      {/*Chat Input*/}
-      <div className="flex flex-col bg-bg-alt-verba rounded-lg shadow-lg p-5 text-text-verba gap-5 min-h-[9.3vh]">
-        <form
-          className="flex justify-between w-full items-center gap-3"
-          onSubmit={handleSendMessage}
-        >
-          <textarea
-            id={"reset"}
-            rows={1}
-            cols={10}
-            onKeyDown={handleKeyDown}
-            value={userInput}
-            onChange={(e) => {
-              setUserInput(e.target.value);
-              fetchSuggestions(e.target.value);
-            }}
-            className=" bg-bg-alt-verba textarea textarea-xs p-2 text-sm md:text-base w-full"
-            placeholder={`Ask ${settingConfig.Customization.settings.title.text} anything`}
-          ></textarea>
-          <button
-            type="submit"
-            className="btn btn-circle border-none shadow-none bg-bg-alt-verba hover:bg-secondary-verba"
-          >
-            <IoMdSend size={18} />
-          </button>
-          <div
-            className="tooltip text-text-verba"
-            data-tip="Reset Conversation"
-          >
-            <button
+      <div className="bg-bg-alt-verba rounded-2xl flex gap-2 p-6 items-center justify-end h-min w-full">
+        {socketOnline ? (
+          <div className="flex gap-2 items-center justify-end w-full relative">
+            <div className="relative w-full">
+              <textarea
+                className="textarea textarea-bordered w-full bg-bg-verba placeholder-text-alt-verb min-h min-h-[40px] max-h-[150px] overflow-y-auto"
+                placeholder={
+                  currentDatacount > 0
+                    ? currentDatacount >= 100
+                      ? `Chatting with more than 100 documents...`
+                      : `Chatting with ${currentDatacount} documents...`
+                    : `No documents detected...`
+                }
+                onKeyDown={handleKeyDown}
+                value={userInput}
+                onChange={(e) => {
+                  const newValue = e.target.value;
+                  setUserInput(newValue);
+                  if ((newValue.length - 1) % 3 === 0) {
+                    handleSuggestions();
+                  }
+                }}
+              />
+              {currentSuggestions.length > 0 && (
+                <ul className="absolute flex gap-2 justify-between top-full left-0 w-full mt-2 z-10 max-h-40 overflow-y-auto">
+                  {currentSuggestions.map((suggestion, index) => (
+                    <li
+                      key={index}
+                      className="p-3 bg-button-verba hover:bg-secondary-verba text-text-alt-verba rounded-xl w-full hover:text-text-verba cursor-pointer"
+                      onClick={() => {
+                        setUserInput(suggestion.query);
+                        setCurrentSuggestions([]);
+                      }}
+                    >
+                      <p className="text-xs lg:text-sm">
+                        {suggestion.query.length > 50
+                          ? suggestion.query.substring(0, 50) + "..."
+                          : suggestion.query
+                              .split(new RegExp(`(${userInput})`, "gi"))
+                              .map((part, i) =>
+                                part.toLowerCase() ===
+                                userInput.toLowerCase() ? (
+                                  <strong key={i}>{part}</strong>
+                                ) : (
+                                  part
+                                )
+                              )}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+            <VerbaButton
               type="button"
+              Icon={IoIosSend}
               onClick={() => {
-                removeMessagesFromLocalStorage("VERBA_CONVERSATION");
-                removeChunksFromLocalStorage("VERBA_CHUNKS");
-                removeChunksFromLocalStorage("VERBA_CONTEXT");
-                setChunks([]);
+                sendUserMessage();
+              }}
+              disabled={false}
+              selected_color="bg-primary-verba"
+            />
+            <VerbaButton
+              type="button"
+              Icon={MdOutlineRefresh}
+              onClick={() => {
+                setSelectedDocument(null);
+                setSelectedChunkScore([]);
+                setUserInput("");
+                setSelectedDocumentScore(null);
+                setCurrentSuggestions([]);
                 setMessages([
                   {
                     type: "system",
-                    content:
-                      settingConfig.Customization.settings.intro_message.text,
+                    content: selectedTheme.intro_message.text,
                   },
                 ]);
-                setUserInput("");
-                setSuggestions([]);
-                setContext("");
               }}
-              className="btn btn-circle border-none shadow-none bg-bg-alt-verba hover:bg-secondary-verba"
+              disabled={false}
+              selected_color="bg-primary-verba"
+            />
+          </div>
+        ) : (
+          <div className="flex gap-2 items-center justify-end w-full">
+            <button
+              onClick={reconnectToVerba}
+              className="flex btn border-none text-text-verba bg-button-verba hover:bg-button-hover-verba gap-2 items-center"
             >
-              <IoIosRefresh size={18} />
+              <TbPlugConnected size={15} />
+              <p>Reconnecting...</p>
+              <span className="loading loading-spinner loading-xs"></span>
             </button>
           </div>
-        </form>
-      </div>
-
-      <div className="flex flex-col gap-2">
-        {suggestions.map((suggestion, index) => (
-          <button
-            key={index + suggestion}
-            className="btn sm:btn-sm md:btn-md border:none bg-button-verba hover:bg-button-hover-verba text-sm font-normal"
-            onClick={() => handleSuggestionClick(suggestion)}
-          >
-            {renderBoldedSuggestion(suggestion, userInput)}
-          </button>
-        ))}
-      </div>
-
-      {/*Chat Notification*/}
-      <div
-        className={`animate-pop-in ${showNotification ? "opacity-100" : "opacity-0"} ${notificationState === "GOOD" ? "bg-secondary-verba" : "bg-warning-verba"} text-text-verba p-3 rounded text-sm transition-opacity`}
-      >
-        <p>{notificationText}</p>
+        )}
       </div>
     </div>
   );
 };
 
-export default ChatInterfaceComponent;
+export default ChatInterface;

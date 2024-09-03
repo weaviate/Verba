@@ -1,5 +1,4 @@
 ---
-version: '3.4'
 
 services:
   verba:
@@ -18,9 +17,6 @@ services:
       - UNSTRUCTURED_API_KEY=$UNSTRUCTURED_API_KEY
       - UNSTRUCTURED_API_URL=$UNSTRUCTURED_API_URL
       - GITHUB_TOKEN=$GITHUB_TOKEN
-      ## IF YOU WANT AUTHENTICATION, UNCOMENT BELLOW 
-      ## AND ADD WEAVIATE SERVICE
-      #- WEAVIATE_API_KEY_VERBA=adminkey
 
     volumes:
       - ./data:/data/
@@ -42,7 +38,7 @@ services:
       - '8080'
       - --scheme
       - http
-    image: semitechnologies/weaviate:1.24.2
+    image: semitechnologies/weaviate:1.25.10
     ports:
       - 8080:8080
       - 3000:8080
@@ -61,15 +57,8 @@ services:
       QUERY_DEFAULTS_LIMIT: 25
       AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: 'true'
       PERSISTENCE_DATA_PATH: '/var/lib/weaviate'
-      ENABLE_MODULES: 'text2vec-openai, generative-openai, qna-openai, text2vec-cohere'
+      ENABLE_MODULES: 'e'
       CLUSTER_HOSTNAME: 'node1'
-      #######IF YOU WANT AUTHENTICATION UNCOMMENT BELOW########
-      # AUTHENTICATION_APIKEY_ENABLED: 'true'
-      # AUTHENTICATION_APIKEY_ALLOWED_KEYS: 'readonlykey,adminkey'
-      # AUTHENTICATION_APIKEY_USERS: 'jane@doe.com,john@doe.com'
-      # AUTHORIZATION_ADMINLIST_ENABLED: 'true'
-      # AUTHORIZATION_ADMINLIST_USERS: 'john@doe.com'
-      # AUTHORIZATION_ADMINLIST_READONLY_USERS: 'jane@doe.com'
 
 volumes:
   weaviate_data: {}

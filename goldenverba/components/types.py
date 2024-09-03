@@ -1,20 +1,8 @@
 from pydantic import BaseModel
-from typing import Literal
+from typing import Literal, Union
 
-
-class InputText(BaseModel):
-    type: Literal["text"]
-    text: str
+class InputConfig(BaseModel):
+    type: Literal["number", "text", "dropdown", "password", "bool", "multi"]
+    value: Union[int, str, bool]
     description: str
-
-
-class InputNumber(BaseModel):
-    type: Literal["number"]
-    value: int
-    description: str
-
-
-class FileData(BaseModel):
-    filename: str
-    extension: str
-    content: str
+    values: list[str]

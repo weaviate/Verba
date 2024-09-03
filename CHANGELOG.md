@@ -2,6 +2,44 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.0] Importastic
+
+## Added
+
+- Async Ingestion with realtime logging
+- Migrated to Weaviate v4 Client
+- Added new File Selection Interface
+- Add Directory Upload
+- Control Settings per file/url individually
+- Import indivdual files or all
+- Overwrite existing files
+- Add multiple labels to documents
+- More configuration for readers, chunkers, and embedders
+- Improved Document Search UI
+- Add Config Validation
+- Add HTML Reader
+- Add Recursive Chunker
+- HTML Chunker
+- Markdown Chunker
+- Code Import
+- Code Chunking
+- Semantic Chunking
+- Label Filter
+- Document Filter (Add document to chat)
+- Add more themes
+- Reworked Admin Interface
+- Added Suggestion View
+- Reworked Suggestion logic
+- Added VoyageAI
+- Added DocumentExplorer with
+  - Content View
+  - Chunk View
+  - Vector View
+    - Visualize vectors of chunks of one or multiple documents
+    - PCA
+    - t-SNE
+    - UMAP
+
 ## [1.0.3]
 
 ## Added

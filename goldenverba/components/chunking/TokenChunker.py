@@ -1,87 +1,108 @@
-import contextlib
-
-from tqdm import tqdm
 from wasabi import msg
-
-with contextlib.suppress(Exception):
-    import tiktoken
 
 from goldenverba.components.chunk import Chunk
 from goldenverba.components.interfaces import Chunker
 from goldenverba.components.document import Document
+from goldenverba.components.types import InputConfig
+from goldenverba.components.interfaces import Embedding
 
 
 class TokenChunker(Chunker):
     """
-    TokenChunker for Verba built with tiktoken.
+    TokenChunker for Verba built with spacy.
     """
 
     def __init__(self):
         super().__init__()
-        self.name = "TokenChunker"
-        self.requires_library = ["tiktoken"]
-        self.description = "Chunks documents by word tokens. Choose between the chunk size and their overlap."
-        self.encoding = tiktoken.encoding_for_model("gpt-3.5-turbo")
+        self.name = "Token"
+        self.description = "Splits documents based on word tokens"
+        self.config = {
+            "Tokens": InputConfig(
+                type="number",
+                value=250,
+                description="Choose how many Token per chunks",
+                values=[],
+            ),
+            "Overlap": InputConfig(
+                type="number",
+                value=50,
+                description="Choose how many Tokens should overlap between chunks",
+                values=[],
+            ),
+        }
 
-    def chunk(self, documents: list[Document], logging: list[dict]) -> list[Document]:
+    async def chunk(
+        self,
+        config: dict[str, InputConfig],
+        documents: list[Document],
+        embedder: Embedding | None = None,
+        embedder_config: dict | None = None,
+    ) -> list[Document]:
 
-        for document in tqdm(
-            documents, total=len(documents), desc="Chunking documents"
-        ):
+        units = int(config["Tokens"].value)
+        overlap = int(config["Overlap"].value)
+
+        for document in documents:
+
+            doc = document.spacy_doc
+
             # Skip if document already contains chunks
             if len(document.chunks) > 0:
                 continue
 
-            encoded_tokens = self.encoding.encode(document.text, disallowed_special=())
-
-            if (
-                self.config["units"].value > len(encoded_tokens)
-                or self.config["units"].value < 1
-            ):
-                doc_chunk = Chunk(
-                    text=document.text,
-                    doc_name=document.name,
-                    doc_type=document.type,
-                    chunk_id=0,
+            # If Split Size is higher than actual Token Count or if Split Size is Zero
+            if units > len(doc) or units == 0:
+                document.chunks.append(
+                    Chunk(
+                        content=document.content,
+                        chunk_id=0,
+                        start_i=0,
+                        end_i=len(document.content),
+                        content_without_overlap=document.content,
+                    )
                 )
+                continue
 
-            if self.config["overlap"].value >= self.config["units"].value:
+            if overlap >= units:
                 msg.warn(
-                    f"Overlap value is greater than unit (Units {self.config['units'].value}/ Overlap {self.config['overlap'].value})"
+                    f"Overlap value is greater than unit (Units {config['Tokens'].value}/ Overlap {config['Overlap'].value})"
                 )
-                logging.append(
-                    {
-                        "type": "ERROR",
-                        "message": f"Overlap value is greater than unit (Units {self.config['units'].value}/ Overlap {self.config['overlap'].value})",
-                    }
-                )
-                self.config["overlap"].value = self.config["units"].value - 1
+                overlap = units - 1
 
             i = 0
             split_id_counter = 0
-            while i < len(encoded_tokens):
-                # Overlap
+            while i < len(doc):
                 start_i = i
-                end_i = min(i + self.config["units"].value, len(encoded_tokens))
+                end_i = min(i + units + overlap, len(doc))
+                if end_i == len(doc):
+                    overlap_start = end_i
+                else:
+                    overlap_start = min(i + units, end_i)
 
-                chunk_tokens = encoded_tokens[start_i:end_i]
-                chunk_text = self.encoding.decode(chunk_tokens)
+                chunk_text = doc[start_i:end_i].text
+                chunk_text_without_overlap = doc[start_i:overlap_start].text
+
+                # char_start_i = doc[start_i].idx
+                if end_i == len(doc):
+                    char_end_i = doc[-1].idx + 1
+                else:
+                    char_end_i = doc[end_i].idx
 
                 doc_chunk = Chunk(
-                    text=chunk_text,
-                    doc_name=document.name,
-                    doc_type=document.type,
+                    content=chunk_text,
                     chunk_id=split_id_counter,
+                    start_i=doc[start_i].idx,
+                    end_i=char_end_i,
+                    content_without_overlap=chunk_text_without_overlap,
                 )
+
                 document.chunks.append(doc_chunk)
                 split_id_counter += 1
 
                 # Exit loop if this was the last possible chunk
-                if end_i == len(encoded_tokens):
+                if end_i == len(doc):
                     break
 
-                i += (
-                    self.config["units"].value - self.config["overlap"].value
-                )  # Step forward, considering overlap
+                i += units  # Step forward, considering overlap
 
-        return documents, logging
+        return documents

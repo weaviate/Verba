@@ -1,93 +1,105 @@
+from goldenverba.server.types import FileConfig
 from goldenverba.components.chunk import Chunk
+from spacy.tokens import Doc
+from spacy.language import Language
+import spacy
+import json
 
 
 class Document:
     def __init__(
         self,
-        text: str = "",
-        type: str = "",
-        name: str = "",
-        path: str = "",
-        link: str = "",
-        timestamp: str = "",
-        reader: str = "",
-        meta: dict = None,
+        title: str = "",
+        content: str = "",
+        extension: str = "",
+        fileSize: int = 0,
+        labels: list[str] = [],
+        source: str = "",
+        meta: dict = {},
+        metadata: str = "",
     ):
-        if meta is None:
-            meta = {}
-        self._text = text
-        self._type = type
-        self._name = name
-        self._path = path
-        self._link = link
-        self._timestamp = timestamp
-        self._reader = reader
-        self._meta = meta
+        self.title = title
+        self.content = content
+        self.extension = extension
+        self.fileSize = fileSize
+        self.labels = labels
+        self.source = source
+        self.meta = meta
+        self.metadata = metadata
         self.chunks: list[Chunk] = []
 
-    @property
-    def text(self):
-        return self._text
+        MAX_BATCH_SIZE = 500000
 
-    @property
-    def type(self):
-        return self._type
+        nlp = spacy.blank("en")
+        nlp.add_pipe("sentencizer", config={"punct_chars": None})
 
-    @property
-    def name(self):
-        return self._name
+        if nlp and len(content) > MAX_BATCH_SIZE:
+            # Process content in batches
+            docs = []
+            for i in range(0, len(content), MAX_BATCH_SIZE):
+                batch = content[i : i + MAX_BATCH_SIZE]
+                docs.append(nlp(batch))
 
-    @property
-    def path(self):
-        return self._path
+            # Merge all processed docs
+            doc = Doc.from_docs(docs)
+        else:
+            doc = nlp(content) if nlp else None
 
-    @property
-    def link(self):
-        return self._link
-
-    @property
-    def timestamp(self):
-        return self._timestamp
-
-    @property
-    def reader(self):
-        return self._reader
-
-    @property
-    def meta(self):
-        return self._meta
+        self.spacy_doc = doc
 
     @staticmethod
     def to_json(document) -> dict:
         """Convert the Document object to a JSON dict."""
         doc_dict = {
-            "text": document.text,
-            "type": document.type,
-            "name": document.name,
-            "path": document.path,
-            "link": document.link,
-            "timestamp": document.timestamp,
-            "reader": document.reader,
-            "meta": document.meta,
-            "chunks": [chunk.to_dict() for chunk in document.chunks],
+            "title": document.title,
+            "content": document.content,
+            "extension": document.extension,
+            "fileSize": document.fileSize,
+            "labels": document.labels,
+            "source": document.source,
+            "meta": json.dumps(document.meta),
+            "metadata": document.metadata,
         }
         return doc_dict
 
     @staticmethod
-    def from_json(doc_dict: dict):
+    def from_json(doc_dict: dict, nlp):
         """Convert a JSON string to a Document object."""
-        document = Document(
-            text=doc_dict.get("text", ""),
-            type=doc_dict.get("type", ""),
-            name=doc_dict.get("name", ""),
-            path=doc_dict.get("path", ""),
-            link=doc_dict.get("link", ""),
-            timestamp=doc_dict.get("timestamp", ""),
-            reader=doc_dict.get("reader", ""),
-            meta=doc_dict.get("meta", {}),
-        )
-        # Assuming Chunk has a from_dict method
-        document.chunks = [
-            Chunk.from_dict(chunk_data) for chunk_data in doc_dict.get("chunks", [])
-        ]
-        return document
+
+        if (
+            "title" in doc_dict
+            and "content" in doc_dict
+            and "extension" in doc_dict
+            and "fileSize" in doc_dict
+            and "labels" in doc_dict
+            and "source" in doc_dict
+            and "meta" in doc_dict
+            and "metadata" in doc_dict
+        ):
+            document = Document(
+                title=doc_dict.get("title", ""),
+                content=doc_dict.get("content", ""),
+                extension=doc_dict.get("extension", ""),
+                fileSize=doc_dict.get("fileSize", 0),
+                labels=doc_dict.get("labels", []),
+                source=doc_dict.get("source", ""),
+                meta=doc_dict.get("meta", {}),
+                metadata=doc_dict.get("metadata", ""),
+            )
+            return document
+        else:
+            return None
+
+
+def create_document(content: str, fileConfig: FileConfig) -> Document:
+    """Create a Document object from the file content."""
+    return Document(
+        title=fileConfig.filename,
+        content=content,
+        extension=fileConfig.extension,
+        labels=fileConfig.labels,
+        source=fileConfig.source,
+        fileSize=fileConfig.file_size,
+        metadata=fileConfig.metadata,
+        meta={},
+    )

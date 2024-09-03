@@ -1,7 +1,11 @@
-from fastapi import FastAPI, WebSocket, status
+from fastapi import FastAPI, WebSocket, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
+from contextlib import asynccontextmanager
 from fastapi.staticfiles import StaticFiles
+import asyncio
+
+from goldenverba.server.helpers import LoggerManager, BatchManager
 
 import os
 from pathlib import Path
@@ -9,51 +13,105 @@ from pathlib import Path
 from dotenv import load_dotenv
 from starlette.websockets import WebSocketDisconnect
 from wasabi import msg  # type: ignore[import]
-import time
 
 from goldenverba import verba_manager
+
 from goldenverba.server.types import (
     ResetPayload,
-    ConfigPayload,
     QueryPayload,
     GeneratePayload,
+    Credentials,
     GetDocumentPayload,
+    ConnectPayload,
+    DatacountPayload,
+    GetSuggestionsPayload,
+    GetAllSuggestionsPayload,
+    DeleteSuggestionPayload,
+    GetContentPayload,
+    SetThemeConfigPayload,
+    SetUserConfigPayload,
     SearchQueryPayload,
-    ImportPayload,
+    SetRAGConfigPayload,
+    GetChunkPayload,
+    GetVectorPayload,
+    DataBatchPayload,
+    ChunksPayload,
 )
-from goldenverba.server.util import get_config, set_config, setup_managers
 
 load_dotenv()
 
 # Check if runs in production
-production_key = os.environ.get("VERBA_PRODUCTION", "")
+production_key = os.environ.get("VERBA_PRODUCTION")
 tag = os.environ.get("VERBA_GOOGLE_TAG", "")
-if production_key == "True":
-    msg.info("API runs in Production Mode")
-    production = True
+
+
+if production_key:
+    msg.info(f"Verba runs in {production_key} mode")
+    production = production_key
 else:
-    production = False
+    production = "Local"
 
 manager = verba_manager.VerbaManager()
-setup_managers(manager)
+
+client_manager = verba_manager.ClientManager()
+
+### Lifespan
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    yield
+    await client_manager.disconnect()
+
 
 # FastAPI App
-app = FastAPI()
+app = FastAPI(lifespan=lifespan)
 
-origins = [
-    "http://localhost:3000",
-    "https://verba-golden-ragtriever.onrender.com",
-    "http://localhost:8000",
-]
-
-# Add middleware for handling Cross Origin Resource Sharing (CORS)
+# Allow requests only from the same origin
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],  # This will be restricted by the custom middleware
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# Custom middleware to check if the request is from the same origin
+@app.middleware("http")
+async def check_same_origin(request: Request, call_next):
+    # Allow public access to /api/health
+    if request.url.path == "/api/health":
+        return await call_next(request)
+
+    origin = request.headers.get("origin")
+    if origin == str(request.base_url).rstrip("/") or (
+        origin
+        and origin.startswith("http://localhost:")
+        and request.base_url.hostname == "localhost"
+    ):
+        return await call_next(request)
+    else:
+        # Only apply restrictions to /api/ routes (except /api/health)
+        if request.url.path.startswith("/api/"):
+            return JSONResponse(
+                status_code=403,
+                content={
+                    "error": "Not allowed",
+                    "details": {
+                        "request_origin": origin,
+                        "expected_origin": str(request.base_url),
+                        "request_method": request.method,
+                        "request_url": str(request.url),
+                        "request_headers": dict(request.headers),
+                        "expected_header": "Origin header matching the server's base URL or localhost",
+                    },
+                },
+            )
+
+        # Allow non-API routes to pass through
+        return await call_next(request)
+
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -73,98 +131,65 @@ app.mount("/static", StaticFiles(directory=BASE_DIR / "frontend/out"), name="app
 async def serve_frontend():
     return FileResponse(os.path.join(BASE_DIR, "frontend/out/index.html"))
 
-### GET
+
+### INITIAL ENDPOINTS
+
 
 # Define health check endpoint
 @app.get("/api/health")
 async def health_check():
-    try:
-        if manager.client.is_ready():
-            return JSONResponse(
-                content={"message": "Alive!", "production": production, "gtag": tag}
-            )
-        else:
-            return JSONResponse(
-                content={
-                    "message": "Database not ready!",
-                    "production": production,
-                    "gtag": tag,
-                },
-                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            )
-    except Exception as e:
-        msg.fail(f"Healthcheck failed with {str(e)}")
-        return JSONResponse(
-            content={
-                "message": f"Healthcheck failed with {str(e)}",
-                "production": production,
-                "gtag": tag,
-            },
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-        )
 
-# Get Status meta data
-@app.get("/api/get_status")
-async def get_status():
-    try:
-        schemas = manager.get_schemas()
-        sorted_schemas = dict(
-            sorted(schemas.items(), key=lambda item: item[1], reverse=True)
-        )
+    await client_manager.clean_up()
 
-        sorted_libraries = dict(
-            sorted(
-                manager.installed_libraries.items(),
-                key=lambda item: (not item[1], item[0]),
-            )
-        )
-        sorted_variables = dict(
-            sorted(
-                manager.environment_variables.items(),
-                key=lambda item: (not item[1], item[0]),
-            )
-        )
+    if production == "Local":
+        deployments = await manager.get_deployments()
+    else:
+        deployments = {"WEAVIATE_URL_VERBA": "", "WEAVIATE_API_KEY_VERBA": ""}
 
-        data = {
-            "type": manager.weaviate_type,
-            "libraries": sorted_libraries,
-            "variables": sorted_variables,
-            "schemas": sorted_schemas,
-            "error": "",
+    return JSONResponse(
+        content={
+            "message": "Alive!",
+            "production": production,
+            "gtag": tag,
+            "deployments": deployments,
         }
+    )
 
-        msg.info("Status Retrieved")
-        return JSONResponse(content=data)
-    except Exception as e:
-        data = {
-            "type": "",
-            "libraries": {},
-            "variables": {},
-            "schemas": {},
-            "error": f"Status retrieval failed: {str(e)}",
-        }
-        msg.fail(f"Status retrieval failed: {str(e)}")
-        return JSONResponse(content=data)
 
-# Get Configuration
-@app.get("/api/config")
-async def retrieve_config():
+@app.post("/api/connect")
+async def connect_to_verba(payload: ConnectPayload):
     try:
-        config = get_config(manager)
-        msg.info("Config Retrieved")
-        return JSONResponse(status_code=200, content={"data": config, "error": ""})
-
-    except Exception as e:
-        msg.warn(f"Could not retrieve configuration: {str(e)}")
+        client = await client_manager.connect(payload.credentials)
+        config = await manager.load_rag_config(client)
+        user_config = await manager.load_user_config(client)
+        theme, themes = await manager.load_theme_config(client)
         return JSONResponse(
-            status_code=500,
+            status_code=200,
             content={
-                "data": {},
-                "error": f"Could not retrieve configuration: {str(e)}",
+                "connected": True,
+                "error": "",
+                "rag_config": config,
+                "user_config": user_config,
+                "theme": theme,
+                "themes": themes,
             },
         )
+    except Exception as e:
+        msg.fail(f"Failed to connect to Weaviate {str(e)}")
+        return JSONResponse(
+            status_code=400,
+            content={
+                "connected": False,
+                "error": f"Failed to connect to Weaviate {str(e)}",
+                "rag_config": {},
+                "theme": {},
+                "themes": {},
+            },
+        )
+
 
 ### WEBSOCKETS
+
 
 @app.websocket("/ws/generate_stream")
 async def websocket_generate_stream(websocket: WebSocket):
@@ -174,10 +199,15 @@ async def websocket_generate_stream(websocket: WebSocket):
             data = await websocket.receive_text()
             # Parse and validate the JSON string using Pydantic model
             payload = GeneratePayload.model_validate_json(data)
+
             msg.good(f"Received generate stream call for {payload.query}")
+
             full_text = ""
             async for chunk in manager.generate_stream_answer(
-                [payload.query], [payload.context], payload.conversation
+                payload.rag_config,
+                payload.query,
+                payload.context,
+                payload.conversation,
             ):
                 full_text += chunk["message"]
                 if chunk["finish_reason"] == "stop":
@@ -195,73 +225,63 @@ async def websocket_generate_stream(websocket: WebSocket):
             )
         msg.good("Succesfully streamed answer")
 
-### POST
 
-# Reset Verba
-@app.post("/api/reset")
-async def reset_verba(payload: ResetPayload):
-    if production:
-        return JSONResponse(status_code=200, content={})
+@app.websocket("/ws/import_files")
+async def websocket_import_files(websocket: WebSocket):
 
+    if production == "Demo":
+        return
+
+    await websocket.accept()
+    logger = LoggerManager(websocket)
+    batcher = BatchManager()
+
+    while True:
+        try:
+            data = await websocket.receive_text()
+            batch_data = DataBatchPayload.model_validate_json(data)
+            fileConfig = batcher.add_batch(batch_data)
+            if fileConfig is not None:
+                client = await client_manager.connect(batch_data.credentials)
+                await asyncio.create_task(
+                    manager.import_document(client, fileConfig, logger)
+                )
+
+        except WebSocketDisconnect:
+            msg.warn("Import WebSocket connection closed by client.")
+            break
+        except Exception as e:
+            msg.fail(f"Import WebSocket Error: {str(e)}")
+            break
+
+
+### CONFIG ENDPOINTS
+
+
+# Get Configuration
+@app.post("/api/get_rag_config")
+async def retrieve_rag_config(payload: Credentials):
     try:
-        if payload.resetMode == "VERBA":
-            manager.reset()
-        elif payload.resetMode == "DOCUMENTS":
-            manager.reset_documents()
-        elif payload.resetMode == "CACHE":
-            manager.reset_cache()
-        elif payload.resetMode == "SUGGESTIONS":
-            manager.reset_suggestion()
-        elif payload.resetMode == "CONFIG":
-            manager.reset_config()
-
-        msg.info(f"Resetting Verba ({payload.resetMode})")
-
-    except Exception as e:
-        msg.warn(f"Failed to reset Verba {str(e)}")
-
-    return JSONResponse(status_code=200, content={})
-
-# Receive query and return chunks and query answer
-@app.post("/api/import")
-async def import_data(payload: ImportPayload):
-
-    logging = []
-
-    if production:
-        logging.append(
-            {"type": "ERROR", "message": "Can't import when in production mode"}
-        )
+        client = await client_manager.connect(payload)
+        config = await manager.load_rag_config(client)
         return JSONResponse(
-            content={
-                "logging": logging,
-            }
-        )
-
-    try:
-        set_config(manager, payload.config)
-        documents, logging = manager.import_data(
-            payload.data, payload.textValues, logging
-        )
-
-        return JSONResponse(
-            content={
-                "logging": logging,
-            }
+            status_code=200, content={"rag_config": config, "error": ""}
         )
 
     except Exception as e:
-        logging.append({"type": "ERROR", "message": "Unexpected error: "+str(e)})
+        msg.warn(f"Could not retrieve configuration: {str(e)}")
         return JSONResponse(
+            status_code=500,
             content={
-                "logging": logging,
-            }
+                "rag_config": {},
+                "error": f"Could not retrieve rag configuration: {str(e)}",
+            },
         )
 
-@app.post("/api/set_config")
-async def update_config(payload: ConfigPayload):
 
-    if production:
+@app.post("/api/set_rag_config")
+async def update_rag_config(payload: SetRAGConfigPayload):
+    if production == "Demo":
         return JSONResponse(
             content={
                 "status": "200",
@@ -270,77 +290,448 @@ async def update_config(payload: ConfigPayload):
         )
 
     try:
-        set_config(manager, payload.config)
+        client = await client_manager.connect(payload.credentials)
+        await manager.set_rag_config(client, payload.rag_config.model_dump())
+        return JSONResponse(
+            content={
+                "status": 200,
+            }
+        )
     except Exception as e:
-        msg.warn(f"Failed to set new Config {str(e)}")
+        msg.warn(f"Failed to set new RAG Config {str(e)}")
+        return JSONResponse(
+            content={
+                "status": 400,
+                "status_msg": f"Failed to set new RAG Config {str(e)}",
+            }
+        )
 
-    return JSONResponse(
-        content={
-            "status": "200",
-            "status_msg": "Config Updated",
-        }
-    )
+
+@app.post("/api/get_user_config")
+async def retrieve_user_config(payload: Credentials):
+    try:
+        client = await client_manager.connect(payload)
+        config = await manager.load_user_config(client)
+        return JSONResponse(
+            status_code=200, content={"user_config": config, "error": ""}
+        )
+
+    except Exception as e:
+        msg.warn(f"Could not retrieve user configuration: {str(e)}")
+        return JSONResponse(
+            status_code=500,
+            content={
+                "user_config": {},
+                "error": f"Could not retrieve rag configuration: {str(e)}",
+            },
+        )
+
+
+@app.post("/api/set_user_config")
+async def update_user_config(payload: SetUserConfigPayload):
+    if production == "Demo":
+        return JSONResponse(
+            content={
+                "status": "200",
+                "status_msg": "Config can't be updated in Production Mode",
+            }
+        )
+
+    try:
+        client = await client_manager.connect(payload.credentials)
+        await manager.set_user_config(client, payload.user_config)
+        return JSONResponse(
+            content={
+                "status": 200,
+                "status_msg": "User config updated",
+            }
+        )
+    except Exception as e:
+        msg.warn(f"Failed to set new RAG Config {str(e)}")
+        return JSONResponse(
+            content={
+                "status": 400,
+                "status_msg": f"Failed to set new RAG Config {str(e)}",
+            }
+        )
+
+
+# Get Configuration
+@app.post("/api/get_theme_config")
+async def retrieve_theme_config(payload: Credentials):
+    try:
+        client = await client_manager.connect(payload)
+        theme, themes = await manager.load_theme_config(client)
+        return JSONResponse(
+            status_code=200, content={"theme": theme, "themes": themes, "error": ""}
+        )
+
+    except Exception as e:
+        msg.warn(f"Could not retrieve configuration: {str(e)}")
+        return JSONResponse(
+            status_code=500,
+            content={
+                "theme": None,
+                "themes": None,
+                "error": f"Could not retrieve theme configuration: {str(e)}",
+            },
+        )
+
+
+@app.post("/api/set_theme_config")
+async def update_theme_config(payload: SetThemeConfigPayload):
+    if production == "Demo":
+        return JSONResponse(
+            content={
+                "status": "200",
+                "status_msg": "Config can't be updated in Production Mode",
+            }
+        )
+
+    try:
+        client = await client_manager.connect(payload.credentials)
+        await manager.set_theme_config(
+            client, {"theme": payload.theme, "themes": payload.themes}
+        )
+        return JSONResponse(
+            content={
+                "status": 200,
+            }
+        )
+    except Exception as e:
+        msg.warn(f"Failed to set new RAG Config {str(e)}")
+        return JSONResponse(
+            content={
+                "status": 400,
+                "status_msg": f"Failed to set new RAG Config {str(e)}",
+            }
+        )
+
+
+### RAG ENDPOINTS
+
 
 # Receive query and return chunks and query answer
 @app.post("/api/query")
 async def query(payload: QueryPayload):
     msg.good(f"Received query: {payload.query}")
-    start_time = time.time()  # Start timing
     try:
-        chunks, context = manager.retrieve_chunks([payload.query])
-
-        retrieved_chunks = [
-            {
-                "text": chunk.text,
-                "doc_name": chunk.doc_name,
-                "chunk_id": chunk.chunk_id,
-                "doc_uuid": chunk.doc_uuid,
-                "doc_type": chunk.doc_type,
-                "score": chunk.score,
-            }
-            for chunk in chunks
-        ]
-
-        elapsed_time = round(time.time() - start_time, 2)  # Calculate elapsed time
-        msg.good(f"Succesfully processed query: {payload.query} in {elapsed_time}s")
-
-        if len(chunks) == 0:
-            return JSONResponse(
-                content={
-                    "chunks": [],
-                    "took": 0,
-                    "context": "",
-                    "error": "No Chunks Available",
-                }
-            )
-
-        return JSONResponse(
-            content={
-                "error": "",
-                "chunks": retrieved_chunks,
-                "context": context,
-                "took": elapsed_time,
-            }
+        client = await client_manager.connect(payload.credentials)
+        documents_uuid = [document.uuid for document in payload.documentFilter]
+        documents, context = await manager.retrieve_chunks(
+            client, payload.query, payload.RAG, payload.labels, documents_uuid
         )
 
+        return JSONResponse(
+            content={"error": "", "documents": documents, "context": context}
+        )
     except Exception as e:
         msg.warn(f"Query failed: {str(e)}")
         return JSONResponse(
-            status_code=500,
+            content={"error": f"Query failed: {str(e)}", "documents": [], "context": ""}
+        )
+
+
+### DOCUMENT ENDPOINTS
+
+
+# Retrieve specific document based on UUID
+@app.post("/api/get_document")
+async def get_document(payload: GetDocumentPayload):
+    try:
+        client = await client_manager.connect(payload.credentials)
+        document = await manager.weaviate_manager.get_document(
+            client,
+            payload.uuid,
+            properties=[
+                "title",
+                "extension",
+                "fileSize",
+                "labels",
+                "source",
+                "meta",
+                "metadata",
+            ],
+        )
+        if document is not None:
+            document["content"] = ""
+            msg.good(f"Succesfully retrieved document: {document['title']}")
+            return JSONResponse(
+                content={
+                    "error": "",
+                    "document": document,
+                }
+            )
+        else:
+            msg.warn(f"Could't retrieve document")
+            return JSONResponse(
+                content={
+                    "error": "Couldn't retrieve requested document",
+                    "document": None,
+                }
+            )
+    except Exception as e:
+        msg.fail(f"Document retrieval failed: {str(e)}")
+        return JSONResponse(
             content={
-                    "chunks": [],
-                    "took": 0,
-                    "context": "",
-                    "error": f"Something went wrong: {str(e)}",
+                "error": str(e),
+                "document": None,
             }
         )
 
-# Retrieve auto complete suggestions based on user input
-@app.post("/api/suggestions")
-async def suggestions(payload: QueryPayload):
-    try:
-        suggestions = manager.get_suggestions(payload.query)
 
+@app.post("/api/get_datacount")
+async def get_document_count(payload: DatacountPayload):
+    try:
+        client = await client_manager.connect(payload.credentials)
+        document_uuids = [document.uuid for document in payload.documentFilter]
+        datacount = await manager.weaviate_manager.get_datacount(
+            client, payload.embedding_model, document_uuids
+        )
+        return JSONResponse(
+            content={
+                "datacount": datacount,
+            }
+        )
+    except Exception as e:
+        msg.fail(f"Document Count retrieval failed: {str(e)}")
+        return JSONResponse(
+            content={
+                "datacount": 0,
+            }
+        )
+
+
+@app.post("/api/get_labels")
+async def get_labels(payload: Credentials):
+    try:
+        client = await client_manager.connect(payload)
+        labels = await manager.weaviate_manager.get_labels(client)
+        return JSONResponse(
+            content={
+                "labels": labels,
+            }
+        )
+    except Exception as e:
+        msg.fail(f"Document Labels retrieval failed: {str(e)}")
+        return JSONResponse(
+            content={
+                "labels": [],
+            }
+        )
+
+
+# Retrieve specific document based on UUID
+@app.post("/api/get_content")
+async def get_content(payload: GetContentPayload):
+    try:
+        client = await client_manager.connect(payload.credentials)
+        content, maxPage = await manager.get_content(
+            client, payload.uuid, payload.page - 1, payload.chunkScores
+        )
+        msg.good(f"Succesfully retrieved content from {payload.uuid}")
+        return JSONResponse(
+            content={"error": "", "content": content, "maxPage": maxPage}
+        )
+    except Exception as e:
+        msg.fail(f"Document retrieval failed: {str(e)}")
+        return JSONResponse(
+            content={
+                "error": str(e),
+                "document": None,
+            }
+        )
+
+
+# Retrieve specific document based on UUID
+@app.post("/api/get_vectors")
+async def get_vectors(payload: GetVectorPayload):
+    try:
+        client = await client_manager.connect(payload.credentials)
+        vector_groups = await manager.weaviate_manager.get_vectors(
+            client, payload.uuid, payload.showAll
+        )
+        return JSONResponse(
+            content={
+                "error": "",
+                "vector_groups": vector_groups,
+            }
+        )
+    except Exception as e:
+        msg.fail(f"Vector retrieval failed: {str(e)}")
+        return JSONResponse(
+            content={
+                "error": str(e),
+                "payload": {"embedder": "None", "vectors": []},
+            }
+        )
+
+
+# Retrieve specific document based on UUID
+@app.post("/api/get_chunks")
+async def get_chunks(payload: ChunksPayload):
+    try:
+        client = await client_manager.connect(payload.credentials)
+        chunks = await manager.weaviate_manager.get_chunks(
+            client, payload.uuid, payload.page, payload.pageSize
+        )
+        return JSONResponse(
+            content={
+                "error": "",
+                "chunks": chunks,
+            }
+        )
+    except Exception as e:
+        msg.fail(f"Chunk retrieval failed: {str(e)}")
+        return JSONResponse(
+            content={
+                "error": str(e),
+                "chunks": None,
+            }
+        )
+
+
+# Retrieve specific document based on UUID
+@app.post("/api/get_chunk")
+async def get_chunk(payload: GetChunkPayload):
+    try:
+        client = await client_manager.connect(payload.credentials)
+        chunk = await manager.weaviate_manager.get_chunk(
+            client, payload.uuid, payload.embedder
+        )
+        return JSONResponse(
+            content={
+                "error": "",
+                "chunk": chunk,
+            }
+        )
+    except Exception as e:
+        msg.fail(f"Chunk retrieval failed: {str(e)}")
+        return JSONResponse(
+            content={
+                "error": str(e),
+                "chunk": None,
+            }
+        )
+
+
+## Retrieve and search documents imported to Weaviate
+@app.post("/api/get_all_documents")
+async def get_all_documents(payload: SearchQueryPayload):
+    try:
+        client = await client_manager.connect(payload.credentials)
+        documents, total_count = await manager.weaviate_manager.get_documents(
+            client,
+            payload.query,
+            payload.pageSize,
+            payload.page,
+            payload.labels,
+            properties=["title", "extension", "fileSize", "labels", "source", "meta"],
+        )
+        labels = await manager.weaviate_manager.get_labels(client)
+
+        msg.good(f"Succesfully retrieved document: {len(documents)} documents")
+        return JSONResponse(
+            content={
+                "documents": documents,
+                "labels": labels,
+                "error": "",
+                "totalDocuments": total_count,
+            }
+        )
+    except Exception as e:
+        msg.fail(f"Retrieving all documents failed: {str(e)}")
+        return JSONResponse(
+            content={
+                "documents": [],
+                "label": [],
+                "error": f"All Document retrieval failed: {str(e)}",
+                "totalDocuments": 0,
+            }
+        )
+
+
+# Delete specific document based on UUID
+@app.post("/api/delete_document")
+async def delete_document(payload: GetDocumentPayload):
+    if production == "Demo":
+        msg.warn("Can't delete documents when in Production Mode")
+        return JSONResponse(status_code=200, content={})
+
+    try:
+        client = await client_manager.connect(payload.credentials)
+        msg.info(f"Deleting {payload.uuid}")
+        await manager.weaviate_manager.delete_document(client, payload.uuid)
+        return JSONResponse(status_code=200, content={})
+
+    except Exception as e:
+        msg.fail(f"Deleting Document with ID {payload.uuid} failed: {str(e)}")
+        return JSONResponse(status_code=400, content={})
+
+
+### ADMIN
+
+
+@app.post("/api/reset")
+async def reset_verba(payload: ResetPayload):
+    if production == "Demo":
+        return JSONResponse(status_code=200, content={})
+
+    try:
+        client = await client_manager.connect(payload.credentials)
+        if payload.resetMode == "ALL":
+            await manager.weaviate_manager.delete_all(client)
+        elif payload.resetMode == "DOCUMENTS":
+            await manager.weaviate_manager.delete_all_documents(client)
+        elif payload.resetMode == "CONFIG":
+            await manager.weaviate_manager.delete_all_configs(client)
+        elif payload.resetMode == "SUGGESTIONS":
+            await manager.weaviate_manager.delete_all_suggestions(client)
+
+        msg.info(f"Resetting Verba in ({payload.resetMode}) mode")
+
+        return JSONResponse(status_code=200, content={})
+
+    except Exception as e:
+        msg.warn(f"Failed to reset Verba {str(e)}")
+        return JSONResponse(status_code=500, content={})
+
+
+# Get Status meta data
+@app.post("/api/get_meta")
+async def get_meta(payload: Credentials):
+    try:
+        client = await client_manager.connect(payload)
+        node_payload, collection_payload = await manager.weaviate_manager.get_metadata(
+            client
+        )
+        return JSONResponse(
+            content={
+                "error": "",
+                "node_payload": node_payload,
+                "collection_payload": collection_payload,
+            }
+        )
+    except Exception as e:
+        return JSONResponse(
+            content={
+                "error": f"Couldn't retrieve metadata {str(e)}",
+                "node_payload": {},
+                "collection_payload": {},
+            }
+        )
+
+
+### Suggestions
+
+
+@app.post("/api/get_suggestions")
+async def get_suggestions(payload: GetSuggestionsPayload):
+    try:
+        client = await client_manager.connect(payload.credentials)
+        suggestions = await manager.weaviate_manager.retrieve_suggestions(
+            client, payload.query, payload.limit
+        )
         return JSONResponse(
             content={
                 "suggestions": suggestions,
@@ -353,124 +744,44 @@ async def suggestions(payload: QueryPayload):
             }
         )
 
-# Retrieve specific document based on UUID
-@app.post("/api/get_document")
-async def get_document(payload: GetDocumentPayload):
-    # TODO Standarize Document Creation
-    msg.info(f"Document ID received: {payload.document_id}")
 
+@app.post("/api/get_all_suggestions")
+async def get_all_suggestions(payload: GetAllSuggestionsPayload):
     try:
-        document = manager.retrieve_document(payload.document_id)
-        document_properties = document.get("properties", {})
-        document_obj = {
-            "class": document.get("class", "No Class"),
-            "id": document.get("id", payload.document_id),
-            "chunks": document_properties.get("chunk_count", 0),
-            "link": document_properties.get("doc_link", ""),
-            "name": document_properties.get("doc_name", "No name"),
-            "type": document_properties.get("doc_type", "No type"),
-            "text": document_properties.get("text", "No text"),
-            "timestamp": document_properties.get("timestamp", ""),
-        }
-
-        msg.good(f"Succesfully retrieved document: {payload.document_id}")
+        client = await client_manager.connect(payload.credentials)
+        suggestions, total_count = (
+            await manager.weaviate_manager.retrieve_all_suggestions(
+                client, payload.page, payload.pageSize
+            )
+        )
         return JSONResponse(
             content={
-                "error": "",
-                "document": document_obj,
+                "suggestions": suggestions,
+                "total_count": total_count,
             }
         )
-    except Exception as e:
-        msg.fail(f"Document retrieval failed: {str(e)}")
+    except Exception:
         return JSONResponse(
             content={
-                "error": str(e),
-                "document": None,
+                "suggestions": [],
+                "total_count": 0,
             }
         )
 
-## Retrieve and search documents imported to Weaviate
-@app.post("/api/get_all_documents")
-async def get_all_documents(payload: SearchQueryPayload):
-    # TODO Standarize Document Creation
-    msg.info("Get all documents request received")
-    start_time = time.time()  # Start timing
 
+@app.post("/api/delete_suggestion")
+async def delete_suggestion(payload: DeleteSuggestionPayload):
     try:
-        if payload.query == "":
-            documents = manager.retrieve_all_documents(
-                payload.doc_type, payload.page, payload.pageSize
-            )
-        else:
-            documents = manager.search_documents(
-                payload.query, payload.doc_type, payload.page, payload.pageSize
-            )
-
-        if not documents:
-            return JSONResponse(
-                content={
-                    "documents": [],
-                    "doc_types": [],
-                    "current_embedder": manager.embedder_manager.selected_embedder,
-                    "error": f"No Results found!",
-                    "took": 0,
-                }
-            )
-
-        documents_obj = []
-        for document in documents:
-
-            _additional = document["_additional"]
-
-            documents_obj.append(
-                {
-                    "class": "No Class",
-                    "uuid": _additional.get("id", "none"),
-                    "chunks": document.get("chunk_count", 0),
-                    "link": document.get("doc_link", ""),
-                    "name": document.get("doc_name", "No name"),
-                    "type": document.get("doc_type", "No type"),
-                    "text": document.get("text", "No text"),
-                    "timestamp": document.get("timestamp", ""),
-                }
-            )
-
-        elapsed_time = round(time.time() - start_time, 2)  # Calculate elapsed time
-        msg.good(
-            f"Succesfully retrieved document: {len(documents)} documents in {elapsed_time}s"
-        )
-
-        doc_types = manager.retrieve_all_document_types()
-
+        client = await client_manager.connect(payload.credentials)
+        await manager.weaviate_manager.delete_suggestions(client, payload.uuid)
         return JSONResponse(
             content={
-                "documents": documents_obj,
-                "doc_types": list(doc_types),
-                "current_embedder": manager.embedder_manager.selected_embedder,
-                "error": "",
-                "took": elapsed_time,
+                "status": 200,
             }
         )
-    except Exception as e:
-        msg.fail(f"All Document retrieval failed: {str(e)}")
+    except Exception:
         return JSONResponse(
             content={
-                "documents": [],
-                "doc_types": [],
-                "current_embedder": manager.embedder_manager.selected_embedder,
-                "error": f"All Document retrieval failed: {str(e)}",
-                "took": 0,
+                "status": 400,
             }
         )
-
-# Delete specific document based on UUID
-@app.post("/api/delete_document")
-async def delete_document(payload: GetDocumentPayload):
-    if production:
-        msg.warn("Can't delete documents when in Production Mode")
-        return JSONResponse(status_code=200, content={})
-
-    msg.info(f"Document ID received: {payload.document_id}")
-
-    manager.delete_document_by_id(payload.document_id)
-    return JSONResponse(content={})

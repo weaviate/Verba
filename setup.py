@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="goldenverba",
-    version="1.0.4",
+    version="2.0.0",
     packages=find_packages(),
     python_requires=">=3.10.0",
     entry_points={
@@ -24,26 +24,33 @@ setup(
     ],
     include_package_data=True,
     install_requires=[
-        "weaviate-client==3.23.1",
+        "weaviate-client==4.7.1",
         "python-dotenv==1.0.0",
-        "openai==0.27.9",
         "wasabi==1.1.2",
-        "fastapi==0.102.0",
+        "fastapi==0.111.1",
         "uvicorn[standard]==0.29.0",
+        "gunicorn==22.0.0",
         "click==8.1.7",
         "asyncio==3.4.3",
         "tiktoken==0.6.0",
         "requests==2.31.0",
-        "pypdf==4.2.0",
+        "pypdf==4.3.1",
         "python-docx==1.1.2",
+        "scikit-learn==1.5.1",
+        "langchain-text-splitters==0.2.2",
+        "spacy==3.7.5",
+        "aiohttp==3.9.5",
+        "markdownify==0.13.1",
+        "aiofiles==24.1.0",
+        "beautifulsoup4==4.12.3",
     ],
     extras_require={
         "dev": ["pytest", "wheel", "twine", "black>=23.7.0", "setuptools"],
+        "google": [
+            "vertexai==1.46.0",
+        ],
         "huggingface": [
             "sentence-transformers==3.0.1",
         ],
-        "google": [
-            "vertexai==1.46.0",
-        ]
     },
 )

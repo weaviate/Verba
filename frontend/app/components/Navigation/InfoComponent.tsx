@@ -1,12 +1,10 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { FaInfo } from "react-icons/fa";
-
-import { SettingsConfiguration } from "../Settings/types";
+import VerbaButton from "./VerbaButton";
 
 interface InfoComponentProps {
-  settingConfig: SettingsConfiguration;
   tooltip_text: string;
   display_text: string;
 }
@@ -14,18 +12,37 @@ interface InfoComponentProps {
 const InfoComponent: React.FC<InfoComponentProps> = ({
   tooltip_text,
   display_text,
-  settingConfig,
 }) => {
+  const [showTooltip, setShowTooltip] = useState(false);
+
   return (
-    <div
-      className={`items-center gap-2 ${settingConfig.Chat.settings.info_button.checked ? "flex" : "hidden"}`}
-    >
-      <div className="tooltip tooltip-right text-xs" data-tip={tooltip_text}>
-        <button className="btn btn-circle btn-sm border-none bg-bg-verba hover:bg-secondary-verba text-text-verba">
-          <FaInfo />
-        </button>
+    <div className={`items-center gap-2 flex`}>
+      <div className="relative">
+        <VerbaButton
+          title=""
+          Icon={FaInfo}
+          icon_size={10}
+          disabled={false}
+          selected={false}
+          onMouseEnter={() => setShowTooltip(true)}
+          onMouseLeave={() => setShowTooltip(false)}
+          circle={true}
+          button_size="btn-xs"
+        />
+        <div
+          className={`absolute left-full z-30 p-4 bg-bg-verba text-text-alt-verba text-xs rounded-xl shadow-md w-[300px] transition-opacity duration-300 ${
+            showTooltip ? "opacity-100" : "opacity-0 pointer-events-none"
+          }`}
+        >
+          <p className="w-full whitespace-normal">{tooltip_text}</p>
+        </div>
       </div>
-      <p className="text-sm text-text-alt-verba">{display_text}</p>
+      <p
+        className="text-sm text-text-alt-verba truncate max-w-[350px]"
+        title={display_text}
+      >
+        {display_text}
+      </p>
     </div>
   );
 };

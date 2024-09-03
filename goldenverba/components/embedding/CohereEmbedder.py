@@ -1,33 +1,97 @@
-from weaviate import Client
+import os
+import requests
+import aiohttp
+import json
 
-from goldenverba.components.interfaces import Embedder
-from goldenverba.components.document import Document
+from goldenverba.components.interfaces import Embedding
+from goldenverba.components.types import InputConfig
+from goldenverba.components.util import get_environment
+
+from wasabi import msg
 
 
-class CohereEmbedder(Embedder):
+class CohereEmbedder(Embedding):
     """
     CohereEmbedder for Verba.
     """
 
     def __init__(self):
         super().__init__()
-        self.name = "CohereEmbedder"
-        self.requires_env = ["COHERE_API_KEY"]
-        self.description = (
-            "Embeds and retrieves objects using Cohere's embed-multilingual-v2.0 model"
-        )
-        self.vectorizer = "text2vec-cohere"
+        self.name = "Cohere"
+        self.description = "Vectorizes documents and queries using Cohere"
+        self.url = os.getenv("COHERE_BASE_URL", "https://api.cohere.com/v1")
+        models = get_models(self.url, os.getenv("COHERE_API_KEY", None), "embed")
 
-    def embed(
-        self,
-        documents: list[Document],
-        client: Client,
-        logging: list[dict],
-    ) -> bool:
-        """Embed verba documents and its chunks to Weaviate
-        @parameter: documents : list[Document] - List of Verba documents
-        @parameter: client : Client - Weaviate Client
-        @parameter: batch_size : int - Batch Size of Input
-        @returns bool - Bool whether the embedding what successful.
-        """
-        return self.import_data(documents, client, logging)
+        self.config["Model"] = InputConfig(
+            type="dropdown",
+            value=models[0],
+            description="Select a Cohere Embedding Model",
+            values=models,
+        )
+
+        if os.getenv("COHERE_API_KEY") is None:
+            self.config["API Key"] = InputConfig(
+                type="password",
+                value="",
+                description="You can set your Cohere API Key here or set it as environment variable `COHERE_API_KEY`",
+                values=[],
+            )
+
+    async def vectorize(self, config: dict, content: list[str]) -> list[float]:
+        model = config.get("Model", "embed-english-v3.0").value
+        api_key = get_environment(
+            config, "API Key", "COHERE_API_KEY", "No Cohere API Key found"
+        )
+
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"bearer {api_key}",
+        }
+
+        # Function to split the content into chunks of up to 96 texts
+        def chunks(lst, n):
+            for i in range(0, len(lst), n):
+                yield lst[i : i + n]
+
+        all_embeddings = []
+
+        async with aiohttp.ClientSession() as session:
+            for chunk in chunks(content, 96):
+                data = {"texts": chunk, "model": model, "input_type": "search_document"}
+                async with session.post(
+                    self.url + "/embed", data=json.dumps(data), headers=headers
+                ) as response:
+                    response.raise_for_status()
+                    response_data = await response.json()
+                    embeddings = response_data.get("embeddings", [])
+                    all_embeddings.extend(embeddings)
+
+        return all_embeddings
+
+
+def get_models(url: str, token: str, model_type: str):
+    try:
+        if token is None:
+            return [
+                "embed-english-v3.0",
+                "embed-multilingual-v3.0",
+                "embed-english-light-v3.0",
+                "embed-multilingual-light-v3.0",
+            ]
+        headers = {"Authorization": f"bearer {token}"}
+        response = requests.get(url + "/models", headers=headers)
+        data = response.json()
+        if "models" in data:
+            return [
+                model["name"]
+                for model in data["models"]
+                if model_type in model["endpoints"]
+            ]
+    except Exception as e:
+        msg.warn(f"Couldn't fetch models from Cohere endpoint: {e}")
+        return [
+            "embed-english-v3.0",
+            "embed-multilingual-v3.0",
+            "embed-english-light-v3.0",
+            "embed-multilingual-light-v3.0",
+        ]

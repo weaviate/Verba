@@ -1,287 +1,290 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import Navbar from "./components/Navigation/NavbarComponent";
-import SettingsComponent from "./components/Settings/SettingsComponent";
-import ChatComponent from "./components/Chat/ChatComponent";
-import DocumentViewerComponent from "./components/Document/DocumentViewerComponent";
-import StatusComponent from "./components/Status/StatusComponent";
-import { Settings, BaseSettings } from "./components/Settings/types";
-import RAGComponent from "./components/RAG/RAGComponent";
-import { HealthPayload } from "./components/Status/types";
-import { RAGConfig, RAGResponse } from "./components/RAG/types";
-import { detectHost } from "./api";
+import React, { useState, useEffect, useCallback } from "react";
 import { GoogleAnalytics } from "@next/third-parties/google";
-import { fonts, FontKey } from "./info";
-import PulseLoader from "react-spinners/PulseLoader";
+
+// Components
+import Navbar from "./components/Navigation/NavbarComponent";
+import DocumentView from "./components/Document/DocumentView";
+import IngestionView from "./components/Ingestion/IngestionView";
+import LoginView from "./components/Login/LoginView";
+import ChatView from "./components/Chat/ChatView";
+import SettingsView from "./components/Settings/SettingsView";
+import GettingStartedComponent from "./components/Login/GettingStarted";
+import StatusMessengerComponent from "./components/Navigation/StatusMessenger";
+
+// Types
+import {
+  Credentials,
+  RAGConfig,
+  Theme,
+  StatusMessage,
+  LightTheme,
+  Themes,
+  DarkTheme,
+  DocumentFilter,
+  WCDTheme,
+  WeaviateTheme,
+} from "./types";
+
+// Utilities
+import { fetchHealth } from "./api";
+import { fonts, FontKey } from "./util";
 
 export default function Home() {
   // Page States
-  const [currentPage, setCurrentPage] = useState<
-    "CHAT" | "DOCUMENTS" | "STATUS" | "ADD" | "SETTINGS" | "RAG"
-  >("CHAT");
-
-  const [production, setProduction] = useState(false);
+  const [currentPage, setCurrentPage] = useState("CHAT");
+  const [production, setProduction] = useState<"Local" | "Demo" | "Production">(
+    "Local"
+  );
   const [gtag, setGtag] = useState("");
 
   // Settings
-  const [settingTemplate, setSettingTemplate] = useState("Default");
-  const [baseSetting, setBaseSetting] = useState<Settings | null>(null);
+  const [themes, setThemes] = useState<Themes>({
+    Light: LightTheme,
+    Dark: DarkTheme,
+    Weaviate: WeaviateTheme,
+    WCD: WCDTheme,
+  });
+  const [selectedTheme, setSelectedTheme] = useState<Theme>(themes["Weaviate"]);
 
-  const fontKey = baseSetting
-    ? (baseSetting[settingTemplate].Customization.settings.font
-        .value as FontKey)
-    : null; // Safely cast if you're sure, or use a check
+  const fontKey = selectedTheme.font.value as FontKey; // Safely cast if you're sure, or use a check
   const fontClassName = fontKey ? fonts[fontKey]?.className || "" : "";
 
+  // Login States
+  const [isHealthy, setIsHealthy] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [credentials, setCredentials] = useState<Credentials>({
+    deployment: "Local",
+    url: "",
+    key: "",
+  });
+
   // RAG Config
-  const [RAGConfig, setRAGConfig] = useState<RAGConfig | null>(null);
+  const [RAGConfig, setRAGConfig] = useState<null | RAGConfig>(null);
 
-  const [APIHost, setAPIHost] = useState<string | null>(null);
+  const [documentFilter, setDocumentFilter] = useState<DocumentFilter[]>([]);
 
-  const fetchHost = async () => {
+  const [statusMessages, setStatusMessages] = useState<StatusMessage[]>([]);
+
+  const initialFetch = useCallback(async () => {
     try {
-      const host = await detectHost();
-      setAPIHost(host);
-      if (host) {
-        try {
-          const health_response = await fetch(host + "/api/health", {
-            method: "GET",
-          });
+      const [health_data] = await Promise.all([fetchHealth()]);
 
-          const health_data: HealthPayload = await health_response.json();
+      if (health_data) {
+        setProduction(health_data.production);
 
-          if (health_data) {
-            setProduction(health_data.production);
-            setGtag(health_data.gtag);
-          } else {
-            console.warn("Could not retrieve health data");
-          }
-
-          const response = await fetch(host + "/api/config", {
-            method: "GET",
-          });
-          const data: RAGResponse = await response.json();
-
-          if (data) {
-            if (data.error) {
-              console.error(data.error);
-            }
-
-            if (data.data.RAG) {
-              setRAGConfig(data.data.RAG);
-            }
-            if (data.data.SETTING.themes) {
-              setBaseSetting(data.data.SETTING.themes);
-              setSettingTemplate(data.data.SETTING.selectedTheme);
-            } else {
-              setBaseSetting(BaseSettings);
-              setSettingTemplate("Default");
-            }
-          } else {
-            console.warn("Configuration could not be retrieved");
-          }
-        } catch (error) {
-          console.error("Failed to fetch configuration:", error);
-          setRAGConfig(null);
-        }
+        setGtag(health_data.gtag);
+        setIsHealthy(true);
+        setCredentials({
+          deployment: "Local",
+          url: health_data.deployments.WEAVIATE_URL_VERBA,
+          key: health_data.deployments.WEAVIATE_API_KEY_VERBA,
+        });
+      } else {
+        console.warn("Could not retrieve health data");
+        setIsHealthy(false);
+        setIsLoggedIn(false);
       }
     } catch (error) {
-      console.error("Error detecting host:", error);
-      setAPIHost(null); // Optionally handle the error by setting the state to an empty string or a specific error message
+      console.error("Error during initial fetch:", error);
+      setIsHealthy(false);
+      setIsLoggedIn(false);
     }
-  };
-
-  useEffect(() => {
-    fetchHost();
   }, []);
 
-  const importConfig = async () => {
-    if (!APIHost || !baseSetting) {
-      return;
-    }
+  useEffect(() => {
+    initialFetch();
+  }, []);
 
-    try {
-      const payload = {
-        config: {
-          RAG: RAGConfig,
-          SETTING: { selectedTheme: settingTemplate, themes: baseSetting },
-        },
-      };
+  useEffect(() => {
+    if (isLoggedIn) {
+      const timer = setTimeout(() => {
+        setIsLoaded(true);
+      }, 1000);
 
-      const response = await fetch(APIHost + "/api/set_config", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-    } catch (error) {
-      console.error("Failed to update config:", error);
+      return () => clearTimeout(timer);
     }
+  }, [isLoggedIn]);
+
+  const isValidTheme = (theme: Theme): boolean => {
+    const requiredAttributes = [
+      "primary_color",
+      "secondary_color",
+      "warning_color",
+      "bg_color",
+      "bg_alt_color",
+      "text_color",
+      "text_alt_color",
+      "button_color",
+      "button_hover_color",
+      "button_text_color",
+      "button_text_alt_color",
+    ];
+    return requiredAttributes.every(
+      (attr) =>
+        typeof theme[attr as keyof Theme] === "object" &&
+        "color" in (theme[attr as keyof Theme] as object)
+    );
   };
 
-  useEffect(() => {
-    importConfig();
-  }, [baseSetting, settingTemplate]);
+  const updateCSSVariables = useCallback(() => {
+    const themeToUse = selectedTheme;
+    const cssVars = {
+      "--primary-verba":
+        themeToUse.primary_color?.color || WeaviateTheme.primary_color.color,
+      "--secondary-verba":
+        themeToUse.secondary_color?.color ||
+        WeaviateTheme.secondary_color.color,
+      "--warning-verba":
+        themeToUse.warning_color?.color || WeaviateTheme.warning_color.color,
+      "--bg-verba": themeToUse.bg_color?.color || WeaviateTheme.bg_color.color,
+      "--bg-alt-verba":
+        themeToUse.bg_alt_color?.color || WeaviateTheme.bg_alt_color.color,
+      "--text-verba":
+        themeToUse.text_color?.color || WeaviateTheme.text_color.color,
+      "--text-alt-verba":
+        themeToUse.text_alt_color?.color || WeaviateTheme.text_alt_color.color,
+      "--button-verba":
+        themeToUse.button_color?.color || WeaviateTheme.button_color.color,
+      "--button-hover-verba":
+        themeToUse.button_hover_color?.color ||
+        WeaviateTheme.button_hover_color.color,
+      "--text-verba-button":
+        themeToUse.button_text_color?.color ||
+        WeaviateTheme.button_text_color.color,
+      "--text-alt-verba-button":
+        themeToUse.button_text_alt_color?.color ||
+        WeaviateTheme.button_text_alt_color.color,
+    };
+    Object.entries(cssVars).forEach(([key, value]) => {
+      document.documentElement.style.setProperty(key, value);
+    });
+  }, [selectedTheme, themes]);
 
-  useEffect(() => {
-    if (baseSetting) {
-      document.documentElement.style.setProperty(
-        "--primary-verba",
-        baseSetting[settingTemplate].Customization.settings.primary_color.color
-      );
-      document.documentElement.style.setProperty(
-        "--secondary-verba",
-        baseSetting[settingTemplate].Customization.settings.secondary_color
-          .color
-      );
-      document.documentElement.style.setProperty(
-        "--warning-verba",
-        baseSetting[settingTemplate].Customization.settings.warning_color.color
-      );
-      document.documentElement.style.setProperty(
-        "--bg-verba",
-        baseSetting[settingTemplate].Customization.settings.bg_color.color
-      );
-      document.documentElement.style.setProperty(
-        "--bg-alt-verba",
-        baseSetting[settingTemplate].Customization.settings.bg_alt_color.color
-      );
-      document.documentElement.style.setProperty(
-        "--text-verba",
-        baseSetting[settingTemplate].Customization.settings.text_color.color
-      );
-      document.documentElement.style.setProperty(
-        "--text-alt-verba",
-        baseSetting[settingTemplate].Customization.settings.text_alt_color.color
-      );
-      document.documentElement.style.setProperty(
-        "--button-verba",
-        baseSetting[settingTemplate].Customization.settings.button_color.color
-      );
-      document.documentElement.style.setProperty(
-        "--button-hover-verba",
-        baseSetting[settingTemplate].Customization.settings.button_hover_color
-          .color
-      );
-      document.documentElement.style.setProperty(
-        "--bg-console-verba",
-        baseSetting[settingTemplate].Customization.settings.bg_console.color
-      );
-      document.documentElement.style.setProperty(
-        "--text-console-verba",
-        baseSetting[settingTemplate].Customization.settings.text_console.color
-      );
-    }
-  }, [baseSetting, settingTemplate]);
+  useEffect(updateCSSVariables, [selectedTheme]);
+
+  const addStatusMessage = (
+    message: string,
+    type: "INFO" | "WARNING" | "SUCCESS" | "ERROR"
+  ) => {
+    console.log("Adding status message:", message, type);
+    setStatusMessages((prevMessages) => [
+      ...prevMessages,
+      { message, type, timestamp: new Date().toISOString() },
+    ]);
+  };
 
   return (
     <main
-      className={`min-h-screen p-5 bg-bg-verba text-text-verba ${fontClassName}`}
-      data-theme={
-        baseSetting
-          ? baseSetting[settingTemplate].Customization.settings.theme
-          : "light"
-      }
+      className={`min-h-screen bg-bg-verba text-text-verba min-w-screen ${fontClassName}`}
+      data-theme={selectedTheme.theme}
     >
       {gtag !== "" && <GoogleAnalytics gaId={gtag} />}
 
-      {baseSetting ? (
-        <div>
-          <Navbar
-            APIHost={APIHost}
-            production={production}
-            title={
-              baseSetting[settingTemplate].Customization.settings.title.text
-            }
-            subtitle={
-              baseSetting[settingTemplate].Customization.settings.subtitle.text
-            }
-            imageSrc={
-              baseSetting[settingTemplate].Customization.settings.image.src
-            }
-            version="v1.0.4"
-            currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
-          />
+      <StatusMessengerComponent
+        status_messages={statusMessages}
+        set_status_messages={setStatusMessages}
+      />
 
-          {currentPage === "CHAT" && (
-            <ChatComponent
+      {!isLoggedIn && isHealthy && (
+        <LoginView
+          production={production}
+          setSelectedTheme={setSelectedTheme}
+          setThemes={setThemes}
+          credentials={credentials}
+          setIsLoggedIn={setIsLoggedIn}
+          setRAGConfig={setRAGConfig}
+          setCredentials={setCredentials}
+        />
+      )}
+
+      {isLoggedIn && isHealthy && (
+        <div
+          className={`transition-opacity duration-1000 ${
+            isLoaded ? "opacity-100" : "opacity-0"
+          } flex flex-col gap-2 p-5`}
+        >
+          <GettingStartedComponent addStatusMessage={addStatusMessage} />
+
+          <div>
+            <Navbar
               production={production}
-              settingConfig={baseSetting[settingTemplate]}
-              APIHost={APIHost}
-              RAGConfig={RAGConfig}
+              title={selectedTheme.title.text}
+              subtitle={selectedTheme.subtitle.text}
+              imageSrc={selectedTheme.image.src}
+              version="v2.0.0"
+              currentPage={currentPage}
               setCurrentPage={setCurrentPage}
             />
-          )}
 
-          {currentPage === "DOCUMENTS" && (
-            <DocumentViewerComponent
-              RAGConfig={RAGConfig}
-              production={production}
-              setCurrentPage={setCurrentPage}
-              settingConfig={baseSetting[settingTemplate]}
-              APIHost={APIHost}
-            />
-          )}
+            <div className={`${currentPage === "CHAT" ? "" : "hidden"}`}>
+              <ChatView
+                addStatusMessage={addStatusMessage}
+                credentials={credentials}
+                RAGConfig={RAGConfig}
+                setRAGConfig={setRAGConfig}
+                production={production}
+                selectedTheme={selectedTheme}
+                currentPage={currentPage}
+                documentFilter={documentFilter}
+                setDocumentFilter={setDocumentFilter}
+              />
+            </div>
 
-          {currentPage === "STATUS" && !production && (
-            <StatusComponent
-              fetchHost={fetchHost}
-              settingConfig={baseSetting[settingTemplate]}
-              APIHost={APIHost}
-            />
-          )}
+            {currentPage === "DOCUMENTS" && (
+              <DocumentView
+                addStatusMessage={addStatusMessage}
+                credentials={credentials}
+                production={production}
+                selectedTheme={selectedTheme}
+                documentFilter={documentFilter}
+                setDocumentFilter={setDocumentFilter}
+              />
+            )}
 
-          {currentPage === "ADD" && !production && (
-            <RAGComponent
-              baseSetting={baseSetting}
-              settingTemplate={settingTemplate}
-              buttonTitle="Import"
-              settingConfig={baseSetting[settingTemplate]}
-              APIHost={APIHost}
-              RAGConfig={RAGConfig}
-              setRAGConfig={setRAGConfig}
-              setCurrentPage={setCurrentPage}
-              showComponents={["Reader", "Chunker", "Embedder"]}
-            />
-          )}
+            <div
+              className={`${
+                currentPage === "ADD" && production != "Demo" ? "" : "hidden"
+              }`}
+            >
+              <IngestionView
+                RAGConfig={RAGConfig}
+                setRAGConfig={setRAGConfig}
+                credentials={credentials}
+                addStatusMessage={addStatusMessage}
+              />
+            </div>
 
-          {currentPage === "RAG" && !production && (
-            <RAGComponent
-              baseSetting={baseSetting}
-              settingTemplate={settingTemplate}
-              buttonTitle="Save"
-              settingConfig={baseSetting[settingTemplate]}
-              APIHost={APIHost}
-              RAGConfig={RAGConfig}
-              setRAGConfig={setRAGConfig}
-              setCurrentPage={setCurrentPage}
-              showComponents={["Embedder", "Retriever", "Generator"]}
-            />
-          )}
+            <div
+              className={`${
+                currentPage === "SETTINGS" && production != "Demo"
+                  ? ""
+                  : "hidden"
+              }`}
+            >
+              <SettingsView
+                credentials={credentials}
+                addStatusMessage={addStatusMessage}
+                selectedTheme={selectedTheme}
+                setSelectedTheme={setSelectedTheme}
+                themes={themes}
+                setThemes={setThemes}
+              />
+            </div>
+          </div>
 
-          {currentPage === "SETTINGS" && !production && (
-            <SettingsComponent
-              settingTemplate={settingTemplate}
-              setSettingTemplate={setSettingTemplate}
-              baseSetting={baseSetting}
-              setBaseSetting={setBaseSetting}
-            />
-          )}
-        </div>
-      ) : (
-        <div className="flex items-center justify-center h-screen gap-2">
-          <PulseLoader loading={true} size={12} speedMultiplier={0.75} />
-          <p>Loading Verba</p>
+          <div
+            className={`footer footer-center p-4 mt-8 bg-bg-verba text-text-alt-verba transition-all duration-1500 delay-1000`}
+          >
+            <aside>
+              <p>Build with ♥ and Weaviate © 2024</p>
+            </aside>
+          </div>
         </div>
       )}
-      <footer className="footer footer-center p-4 mt-8 bg-bg-verba text-text-alt-verba">
-        <aside>
-          <p>Build with ♥ and Weaviate © 2024</p>
-        </aside>
-      </footer>
+
       <img
         referrerPolicy="no-referrer-when-downgrade"
         src="https://static.scarf.sh/a.png?x-pxid=ec666e70-aee5-4e87-bc62-0935afae63ac"
