@@ -24,6 +24,13 @@ All notable changes to this project will be documented in this file.
 - Code Import
 - Code Chunking
 - Semantic Chunking
+- Label Filter
+- Document Filter (Add document to chat)
+- Add more themes
+- Reworked Admin Interface
+- Added Suggestion View
+- Reworked Suggestion logic
+- Added VoyageAI
 - Added DocumentExplorer with
   - Content View
   - Chunk View

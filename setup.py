@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="goldenverba",
-    version="2.0.0",
+    version="2.0.0rc1",
     packages=find_packages(),
     python_requires=">=3.10.0",
     entry_points={
