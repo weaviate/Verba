@@ -64,8 +64,13 @@ def start(port, host, prod, workers):
     default="",
     help="Deployment (Local, Weaviate, Docker)",
 )
+@click.option(
+    "--full_reset",
+    default=False,
+    help="Full reset (True, False)",
+)
 @cli.command()
-def reset(url, api_key, deployment):
+def reset(url, api_key, deployment, full_reset):
     """
     Run the FastAPI application.
     """
@@ -93,9 +98,12 @@ def reset(url, api_key, deployment):
             else:
                 raise ValueError("Invalid deployment")
 
-        await manager.reset_rag_config(client)
-        await manager.reset_theme_config(client)
-        await manager.reset_user_config(client)
+        if not full_reset:
+            await manager.reset_rag_config(client)
+            await manager.reset_theme_config(client)
+            await manager.reset_user_config(client)
+        else:
+            await manager.weaviate_manager.delete_all(client)
 
         await client.close()
 

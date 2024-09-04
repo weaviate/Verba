@@ -31,14 +31,16 @@ All notable changes to this project will be documented in this file.
 - Added Suggestion View
 - Reworked Suggestion logic
 - Added VoyageAI
+- Added custom metadata
 - Added DocumentExplorer with
+
   - Content View
   - Chunk View
   - Vector View
     - Visualize vectors of chunks of one or multiple documents
     - PCA
-    - t-SNE
-    - UMAP
+
+-
 
 ## [1.0.3]
 
