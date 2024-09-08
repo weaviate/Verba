@@ -1,7 +1,6 @@
 import json
 import os
 import aiohttp
-from dotenv import load_dotenv
 from typing import Any, AsyncGenerator, List, Dict
 from wasabi import msg
 import requests
@@ -9,8 +8,6 @@ import requests
 from goldenverba.components.interfaces import Generator
 from goldenverba.components.types import InputConfig
 from goldenverba.components.util import get_environment
-
-load_dotenv()
 
 GROQ_BASE_URL = "https://api.groq.com/openai/v1/"
 DEFAULT_TEMPERATURE = 0.2
