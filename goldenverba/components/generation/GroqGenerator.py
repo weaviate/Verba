@@ -194,6 +194,9 @@ def filter_models(models: List[str]) -> List[str]:
     Filters out models that are not LLMs
     (As Groq API doesn't provide a way to identify them, this function will probably evolve with custom filtering rules)
     """
-    # filter out whisper models (they are STT models)
-    filtered_models = list(filter(lambda model: "whisper" not in model, models))
+
+    def is_valid_model(model):
+        return ("whisper" not in model) and ("llava" not in model)
+
+    filtered_models = list(filter(is_valid_model, models))
     return filtered_models
