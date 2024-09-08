@@ -94,6 +94,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
   const [userInput, setUserInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
+  const [isComposing, setIsComposing] = useState(false);
+
   const currentEmbedding = RAGConfig
     ? (RAGConfig["Embedder"].components[RAGConfig["Embedder"].selected].config[
         "Model"
@@ -317,8 +319,16 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     }
   };
 
+  const handleCompositionStart = () => {
+    setIsComposing(true);
+  }
+
+  const handleCompositionEnd = () => {
+    setIsComposing(false);
+  }
+
   const handleKeyDown = (e: any) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey && !isComposing) {
       e.preventDefault(); // Prevent new line
       sendUserMessage(); // Submit form
     }
@@ -591,6 +601,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                     : `No documents detected...`
                 }
                 onKeyDown={handleKeyDown}
+                onCompositionStart={handleCompositionStart}
+                onCompositionEnd={handleCompositionEnd}
                 value={userInput}
                 onChange={(e) => {
                   const newValue = e.target.value;
