@@ -239,8 +239,8 @@ pip install `.[huggingface]`
 
 To use Groq LPUs as generation engine, you need to get an API key from [Groq](https://console.groq.com/keys).
 
->Although you can provide it in the graphical interface when verba is up, it is recommended to specify it as `GROQ_API_KEY` environment variable before you launch the application.  
-It will allow you to choose the model you want to use in an up-to-date available models list.
+>Although you can provide it in the graphical interface when Verba is up, it is recommended to specify it as `GROQ_API_KEY` environment variable before you launch the application.  
+It will allow you to choose the generation model in an up-to-date available models list.
 
 # How to deploy with pip
 
