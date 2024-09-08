@@ -23,6 +23,7 @@ pip install goldenverba
   - [Unstructured](#unstructured)
   - [OpenAI](#openai)
   - [HuggingFace](#huggingface)
+  - [Groq](#groq)
 - [Quickstart: Deploy with pip](#how-to-deploy-with-pip)
 - [Quickstart: Build from Source](#how-to-build-from-source)
 - [Quickstart: Deploy with Docker](#how-to-install-verba-with-docker)
@@ -233,6 +234,13 @@ pip install `.[huggingface]`
 ```
 
 > If you're using Docker, modify the Dockerfile accordingly
+
+## Groq
+
+To use Groq LPUs as generation engine, you need to get an API key from [Groq](https://console.groq.com/keys).
+
+>Although you can provide it in the graphical interface when verba is up, it is recommended to specify it as `GROQ_API_KEY` environment variable before you launch the application.  
+It will allow you to choose the model you want to use in an up-to-date available models list.
 
 # How to deploy with pip
 
