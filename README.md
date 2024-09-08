@@ -52,6 +52,7 @@ Verba is a fully-customizable personal assistant utilizing [Retrieval Augmented 
 | Cohere (e.g. Command R+)          | ✅          | Embedding and Generation Models by Cohere               |
 | Anthrophic (e.g. Claude Sonnet)   | ✅          | Embedding and Generation Models by Anthrophic           |
 | OpenAI (e.g. GPT4)                | ✅          | Embedding and Generation Models by OpenAI               |
+| Groq (e.g. Llama3)                | ✅          | Generation Models by Groq (LPU inference)              |
 
 | 🤖 Embedding Support | Implemented | Description                              |
 | -------------------- | ----------- | ---------------------------------------- |
@@ -158,6 +159,7 @@ Below is a comprehensive list of the API keys and variables you may require:
 | OPENAI_API_KEY         | Your OpenAI Key                                            | Get Access to [OpenAI](https://openai.com/) Models                                |
 | OPENAI_BASE_URL        | URL to OpenAI instance                                     | Models                                                                            |
 | COHERE_API_KEY         | Your API Key                                               | Get Access to [Cohere](https://cohere.com/) Models                                |
+| GROQ_API_KEY         | Your Groq API Key                                               | Get Access to [Groq](https://groq.com/) Models
 | OLLAMA_URL             | URL to your Ollama instance (e.g. http://localhost:11434 ) | Get Access to [Ollama](https://ollama.com/) Models                                |
 | UNSTRUCTURED_API_KEY   | Your API Key                                               | Get Access to [Unstructured](https://docs.unstructured.io/welcome) Data Ingestion |
 | UNSTRUCTURED_API_URL   | URL to Unstructured Instance                               | Get Access to [Unstructured](https://docs.unstructured.io/welcome) Data Ingestion |
