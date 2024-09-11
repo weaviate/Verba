@@ -63,12 +63,12 @@ class AssemblyAIReader(Reader):
             ".wv",
         ]
         self.requires_env = ["ASSEMBLYAI_API_KEY"]
-        self.name = "AssemblyAI IO"
+        self.name = "AssemblyAI"
         self.description = "Uses the AssemblyAI API to import multiple file types such as plain text and documents"
         self.config = {
             "Quality": InputConfig(
                 type="dropdown",
-                value="nano",
+                value="best",
                 description="Set the transcription quality",
                 values=["nano", "best"],
             )
@@ -119,9 +119,13 @@ class AssemblyAIReader(Reader):
         try:
             transcriber = aai.Transcriber(config=aaiConfig)
             transcript = transcriber.transcribe(file_bytes)
+            if transcript.error:
+                raise Exception(
+                    f"AssemblyAI API failed to transcribe {fileConfig.filename}: {transcript.error}"
+                )
             if transcript.text is None:
                 raise Exception(
-                    f"AssemblyAI API failed to transcribe {fileConfig.filename}"
+                    f"AssemblyAI API failed to transcribe {fileConfig.filename}, no text returned"
                 )
             return [create_document(transcript.text, fileConfig)]
 

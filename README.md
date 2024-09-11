@@ -63,16 +63,15 @@ Verba is a fully-customizable personal assistant utilizing [Retrieval Augmented 
 | VoyageAI             | ✅          | Embedding Models by VoyageAI             |
 | OpenAI               | ✅          | Embedding Models by OpenAI               |
 
-| 📁 Data Support                                        | Implemented | Description                                    |
-| ------------------------------------------------------ | ----------- | -----------------------------------------------|
-| [UnstructuredIO](https://docs.unstructured.io/welcome) | ✅          | Import Data through Unstructured               |
-| [AssemblyAI](https://assemblyai.com/)                  | ✅          | Import and Transcribe Audio through AssemblyAI |
-| [Firecrawl](https://www.firecrawl.dev/)                | ✅          | Scrape and Crawl URL through Firecrawl         |
-| PDF Ingestion                                          | ✅          | Import PDF into Verba                          |
-| GitHub & GitLab                                        | ✅          | Import Files from Github and GitLab            |
-| CSV/XLSX Ingestion                                     | ✅          | Import Table Data into Verba                   |
-| .DOCX                                                  | ✅          | Import .docx files                             |
-| Multi-Modal                                            | planned ⏱️   | Import Multi-Modal Data into Verba             |
+| 📁 Data Support                                         | Implemented | Description                                    |
+| ------------------------------------------------------- | ----------- | -----------------------------------------------|
+| [UnstructuredIO](https://docs.unstructured.io/welcome)  | ✅          | Import Data through Unstructured               |
+| [Firecrawl](https://www.firecrawl.dev/)                 | ✅          | Scrape and Crawl URL through Firecrawl         |
+| PDF Ingestion                                           | ✅          | Import PDF into Verba                          |
+| GitHub & GitLab                                         | ✅          | Import Files from Github and GitLab            |
+| CSV/XLSX Ingestion                                      | ✅          | Import Table Data into Verba                   |
+| .DOCX                                                   | ✅          | Import .docx files                             |
+| Multi-Modal (using [AssemblyAI](https://assemblyai.com))| ✅          | Import and Transcribe Audio through AssemblyAI |
 
 | ✨ RAG Features         | Implemented | Description                                                               |
 | ----------------------- | ----------- | ------------------------------------------------------------------------- |
