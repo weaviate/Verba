@@ -12,6 +12,7 @@ import os
 import asyncio
 import json
 import re
+from urllib.parse import urlparse
 from datetime import datetime
 
 from sklearn.decomposition import PCA
@@ -171,6 +172,33 @@ class WeaviateManager:
             ),
         )
 
+    async def connect_to_custom(self, host, w_key):
+        # Extract the port from the host
+        parsed_url = urlparse(host)
+        port = parsed_url.port
+        if port is None:
+            raise Exception("No port specified in the host URL")
+        _host = parsed_url.hostname  # Use only the hostname part
+        msg.info(f"Connecting to Weaviate Custom")
+
+        if w_key is None or w_key == "":
+            return weaviate.use_async_with_local(
+                host=_host,
+                port=port,
+                additional_config=AdditionalConfig(
+                    timeout=Timeout(init=60, query=300, insert=300)
+                ),
+            )
+
+        return weaviate.use_async_with_custom(
+            http_host=_host,
+            http_port=port,
+            auth_credentials=AuthApiKey(w_key),
+            additional_config=AdditionalConfig(
+                timeout=Timeout(init=60, query=300, insert=300)
+            ),
+        )
+
     async def connect_to_embedded(self):
         msg.info(f"Connecting to Weaviate Embedded")
         return weaviate.use_async_with_embedded(
@@ -187,15 +215,17 @@ class WeaviateManager:
             if deployment == "Weaviate":
                 if weaviateURL == "" and os.environ.get("WEAVIATE_URL_VERBA"):
                     weaviateURL = os.environ.get("WEAVIATE_URL_VERBA")
-
                 if weaviateAPIKey == "" and os.environ.get("WEAVIATE_API_KEY_VERBA"):
                     weaviateAPIKey = os.environ.get("WEAVIATE_API_KEY_VERBA")
-
                 client = await self.connect_to_cluster(weaviateURL, weaviateAPIKey)
             elif deployment == "Docker":
                 client = await self.connect_to_docker("weaviate")
             elif deployment == "Local":
                 client = await self.connect_to_embedded()
+            elif deployment == "Custom":
+                client = await self.connect_to_custom(weaviateURL, weaviateAPIKey)
+            else:
+                raise Exception(f"Invalid deployment type: {deployment}")
 
             if client is not None:
                 await client.connect()

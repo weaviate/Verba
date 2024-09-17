@@ -751,7 +751,7 @@ class ClientManager:
     def __init__(self) -> None:
         self.clients: dict[str, dict] = {}
         self.manager: VerbaManager = VerbaManager()
-        self.max_time: int = 1
+        self.max_time: int = 5
 
     def hash_credentials(self, credentials: Credentials) -> str:
         return f"{credentials.deployment}:{credentials.url}:{credentials.key}"
