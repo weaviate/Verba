@@ -21,6 +21,7 @@ pip install goldenverba
   - [Weaviate](#weaviate)
   - [Ollama](#ollama)
   - [Unstructured](#unstructured)
+  - [AssemblyAI](#assemblyai)
   - [OpenAI](#openai)
   - [HuggingFace](#huggingface)
 - [Quickstart: Deploy with pip](#how-to-deploy-with-pip)
@@ -62,15 +63,15 @@ Verba is a fully-customizable personal assistant utilizing [Retrieval Augmented 
 | VoyageAI             | ✅          | Embedding Models by VoyageAI             |
 | OpenAI               | ✅          | Embedding Models by OpenAI               |
 
-| 📁 Data Support                                        | Implemented | Description                            |
-| ------------------------------------------------------ | ----------- | -------------------------------------- |
-| [UnstructuredIO](https://docs.unstructured.io/welcome) | ✅          | Import Data through Unstructured       |
-| [Firecrawl](https://www.firecrawl.dev/)                | ✅          | Scrape and Crawl URL through Firecrawl |
-| PDF Ingestion                                          | ✅          | Import PDF into Verba                  |
-| GitHub & GitLab                                        | ✅          | Import Files from Github and GitLab    |
-| CSV/XLSX Ingestion                                     | ✅          | Import Table Data into Verba           |
-| .DOCX                                                  | ✅          | Import .docx files                     |
-| Multi-Modal                                            | planned ⏱️  | Import Multi-Modal Data into Verba     |
+| 📁 Data Support                                         | Implemented | Description                                    |
+| ------------------------------------------------------- | ----------- | -----------------------------------------------|
+| [UnstructuredIO](https://docs.unstructured.io/welcome)  | ✅          | Import Data through Unstructured               |
+| [Firecrawl](https://www.firecrawl.dev/)                 | ✅          | Scrape and Crawl URL through Firecrawl         |
+| PDF Ingestion                                           | ✅          | Import PDF into Verba                          |
+| GitHub & GitLab                                         | ✅          | Import Files from Github and GitLab            |
+| CSV/XLSX Ingestion                                      | ✅          | Import Table Data into Verba                   |
+| .DOCX                                                   | ✅          | Import .docx files                             |
+| Multi-Modal (using [AssemblyAI](https://assemblyai.com))| ✅          | Import and Transcribe Audio through AssemblyAI |
 
 | ✨ RAG Features         | Implemented | Description                                                               |
 | ----------------------- | ----------- | ------------------------------------------------------------------------- |
@@ -161,6 +162,7 @@ Below is a comprehensive list of the API keys and variables you may require:
 | OLLAMA_URL             | URL to your Ollama instance (e.g. http://localhost:11434 ) | Get Access to [Ollama](https://ollama.com/) Models                                |
 | UNSTRUCTURED_API_KEY   | Your API Key                                               | Get Access to [Unstructured](https://docs.unstructured.io/welcome) Data Ingestion |
 | UNSTRUCTURED_API_URL   | URL to Unstructured Instance                               | Get Access to [Unstructured](https://docs.unstructured.io/welcome) Data Ingestion |
+| ASSEMBLYAI_API_KEY     | Your API Key                                               | Get Access to [AssemblyAI](https://assemblyai.com) Data Ingestion                 |
 | GITHUB_TOKEN           | Your GitHub Token                                          | Get Access to Data Ingestion via GitHub                                           |
 | GITLAB_TOKEN           | Your GitLab Token                                          | Get Access to Data Ingestion via GitLab                                           |
 | FIRECRAWL_API_KEY      | Your Firecrawl API Key                                     | Get Access to Data Ingestion via Firecrawl                                        |
@@ -206,6 +208,12 @@ ollama run llama3
 Verba supports importing documents through Unstructured IO (e.g plain text, .pdf, .csv, and more). To use them you need the `UNSTRUCTURED_API_KEY` and `UNSTRUCTURED_API_URL` environment variable. You can get it from [Unstructured](https://unstructured.io/)
 
 > UNSTRUCTURED_API_URL is set to `https://api.unstructured.io/general/v0/general` by default
+
+## AssemblyAI
+
+Verba supports importing documents through AssemblyAI (audio files or audio from video files). To use them you need the `ASSEMBLYAI_API_KEY` environment variable. You can get it from [AssemblyAI](https://assemblyai.com)
+
+
 
 ## OpenAI
 

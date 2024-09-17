@@ -42,6 +42,7 @@ setup(
         "aiohttp==3.9.5",
         "markdownify==0.13.1",
         "aiofiles==24.1.0",
+        "assemblyai==0.33.0",
         "beautifulsoup4==4.12.3",
     ],
     extras_require={
