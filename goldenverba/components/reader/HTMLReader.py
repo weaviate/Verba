@@ -124,9 +124,10 @@ class HTMLReader(Reader):
                 file_size=size,
                 status=fileConfig.status,
                 status_report=fileConfig.status_report,
+                metadata=fileConfig.metadata,
             )
             document = await reader.load(self.config, new_file_config)
-            documents.append(document[0])
+            documents.extend(document)
 
             if recursive and current_depth < max_depth:
                 linked_urls = self.extract_links(_html, url)
