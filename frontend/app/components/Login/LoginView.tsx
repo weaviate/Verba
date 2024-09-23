@@ -406,18 +406,20 @@ const LoginView: React.FC<LoginViewProps> = ({
                               selected_color="bg-primary-verba"
                               loading={isConnecting}
                             />
-                            <VerbaButton
-                              Icon={CgWebsite}
-                              title="Register"
-                              type="button"
-                              disabled={isConnecting}
-                              onClick={() =>
-                                window.open(
-                                  "https://console.weaviate.cloud",
-                                  "_blank"
-                                )
-                              }
-                            />
+                            {selectedDeployment == "Weaviate" && (
+                              <VerbaButton
+                                Icon={CgWebsite}
+                                title="Register"
+                                type="button"
+                                disabled={isConnecting}
+                                onClick={() =>
+                                  window.open(
+                                    "https://console.weaviate.cloud",
+                                    "_blank"
+                                  )
+                                }
+                              />
+                            )}
                             <VerbaButton
                               Icon={FaBackspace}
                               title="Back"
