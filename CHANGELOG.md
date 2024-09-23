@@ -9,6 +9,10 @@ All notable changes to this project will be documented in this file.
 - Added new deployment type: Custom
 - Added new port configuration
 
+# Fixed
+
+- Catch Exception when trying to access the OpenAI API Embedding endpoint to retrieve model names
+
 ## [2.0.0] Importastic
 
 ## Added

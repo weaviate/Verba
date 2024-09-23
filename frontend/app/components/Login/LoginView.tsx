@@ -192,9 +192,11 @@ const LoginView: React.FC<LoginViewProps> = ({
       if (!("error" in response)) {
         setIsLoggedIn(false);
         setErrorText(JSON.stringify(response));
-      } else if (!("error" in response) || response.connected == false) {
+      } else if (response.connected == false) {
         setIsLoggedIn(false);
-        setErrorText(response.error);
+        setErrorText(
+          response.error == "" ? "Couldn't connect to Weaviate" : response.error
+        );
       } else {
         setIsLoggedIn(true);
         setCredentials({
