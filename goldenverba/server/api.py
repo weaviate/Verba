@@ -6,6 +6,7 @@ from fastapi.staticfiles import StaticFiles
 import asyncio
 
 from goldenverba.server.helpers import LoggerManager, BatchManager
+from weaviate.client import WeaviateAsyncClient
 
 import os
 from pathlib import Path
@@ -159,21 +160,28 @@ async def health_check():
 @app.post("/api/connect")
 async def connect_to_verba(payload: ConnectPayload):
     try:
-        client = await client_manager.connect(payload.credentials)
-        config = await manager.load_rag_config(client)
-        user_config = await manager.load_user_config(client)
-        theme, themes = await manager.load_theme_config(client)
-        return JSONResponse(
-            status_code=200,
-            content={
-                "connected": True,
-                "error": "",
-                "rag_config": config,
-                "user_config": user_config,
-                "theme": theme,
-                "themes": themes,
-            },
-        )
+        client = await client_manager.connect(payload.credentials, payload.port)
+        if isinstance(
+            client, WeaviateAsyncClient
+        ):  # Check if client is an AsyncClient object
+            config = await manager.load_rag_config(client)
+            user_config = await manager.load_user_config(client)
+            theme, themes = await manager.load_theme_config(client)
+            return JSONResponse(
+                status_code=200,
+                content={
+                    "connected": True,
+                    "error": "",
+                    "rag_config": config,
+                    "user_config": user_config,
+                    "theme": theme,
+                    "themes": themes,
+                },
+            )
+        else:
+            raise TypeError(
+                "Couldn't connect to Weaviate, client is not an AsyncClient object"
+            )
     except Exception as e:
         msg.fail(f"Failed to connect to Weaviate {str(e)}")
         return JSONResponse(

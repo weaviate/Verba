@@ -42,7 +42,7 @@ Verba is a fully-customizable personal assistant utilizing [Retrieval Augmented 
 
 ### Watch our newest Verba video here:
 
-[![VIDEO LINK](https://github.com/weaviate/Verba/blob/main/img/thumbnail.png)](https://www.youtube.com/watch?v=swKKRdLBhas&t)
+[![VIDEO LINK](https://github.com/weaviate/Verba/blob/main/img/thumbnail.png)](https://www.youtube.com/watch?v=2VCy-YjRRhA&t=40s&ab_channel=Weaviate%E2%80%A2VectorDatabase)
 
 ## Feature Lists
 
@@ -63,15 +63,15 @@ Verba is a fully-customizable personal assistant utilizing [Retrieval Augmented 
 | VoyageAI             | ✅          | Embedding Models by VoyageAI             |
 | OpenAI               | ✅          | Embedding Models by OpenAI               |
 
-| 📁 Data Support                                         | Implemented | Description                                    |
-| ------------------------------------------------------- | ----------- | -----------------------------------------------|
-| [UnstructuredIO](https://docs.unstructured.io/welcome)  | ✅          | Import Data through Unstructured               |
-| [Firecrawl](https://www.firecrawl.dev/)                 | ✅          | Scrape and Crawl URL through Firecrawl         |
-| PDF Ingestion                                           | ✅          | Import PDF into Verba                          |
-| GitHub & GitLab                                         | ✅          | Import Files from Github and GitLab            |
-| CSV/XLSX Ingestion                                      | ✅          | Import Table Data into Verba                   |
-| .DOCX                                                   | ✅          | Import .docx files                             |
-| Multi-Modal (using [AssemblyAI](https://assemblyai.com))| ✅          | Import and Transcribe Audio through AssemblyAI |
+| 📁 Data Support                                          | Implemented | Description                                    |
+| -------------------------------------------------------- | ----------- | ---------------------------------------------- |
+| [UnstructuredIO](https://docs.unstructured.io/welcome)   | ✅          | Import Data through Unstructured               |
+| [Firecrawl](https://www.firecrawl.dev/)                  | ✅          | Scrape and Crawl URL through Firecrawl         |
+| PDF Ingestion                                            | ✅          | Import PDF into Verba                          |
+| GitHub & GitLab                                          | ✅          | Import Files from Github and GitLab            |
+| CSV/XLSX Ingestion                                       | ✅          | Import Table Data into Verba                   |
+| .DOCX                                                    | ✅          | Import .docx files                             |
+| Multi-Modal (using [AssemblyAI](https://assemblyai.com)) | ✅          | Import and Transcribe Audio through AssemblyAI |
 
 | ✨ RAG Features         | Implemented | Description                                                               |
 | ----------------------- | ----------- | ------------------------------------------------------------------------- |
@@ -212,8 +212,6 @@ Verba supports importing documents through Unstructured IO (e.g plain text, .pdf
 ## AssemblyAI
 
 Verba supports importing documents through AssemblyAI (audio files or audio from video files). To use them you need the `ASSEMBLYAI_API_KEY` environment variable. You can get it from [AssemblyAI](https://assemblyai.com)
-
-
 
 ## OpenAI
 
@@ -358,6 +356,10 @@ RUN pip install -e '.'
 ```
 
 ## Verba Walkthrough
+
+### Select your Deployment
+
+The first screen you'll see is the deployment screen. Here you can select between `Local`, `Docker`, `Weaviate Cloud`, or `Custom` deployment. The `Local` deployment is using Weaviate Embedded under the hood, which initializes a Weaviate instance behind the scenes. The `Docker` deployment is using a separate Weaviate instance that is running inside the same Docker network. The `Weaviate Cloud` deployment is using a Weaviate instance that is hosted on Weaviate Cloud Services (WCS). The `Custom` deployment allows you to specify your own Weaviate instance URL, PORT, and API key.
 
 ### Import Your Data
 

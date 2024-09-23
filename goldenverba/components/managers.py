@@ -175,32 +175,32 @@ class WeaviateManager:
             ),
         )
 
-    async def connect_to_custom(self, host, w_key):
+    async def connect_to_custom(self, host, w_key, port):
         # Extract the port from the host
-        parsed_url = urlparse(host)
-        port = parsed_url.port
-        if port is None:
-            raise Exception("No port specified in the host URL")
-        _host = parsed_url.hostname  # Use only the hostname part
         msg.info(f"Connecting to Weaviate Custom")
+
+        if host is None or host == "":
+            raise Exception("No Host URL provided")
 
         if w_key is None or w_key == "":
             return weaviate.use_async_with_local(
-                host=_host,
-                port=port,
+                host=host,
+                port=int(port),
+                skip_init_checks=True,
                 additional_config=AdditionalConfig(
                     timeout=Timeout(init=60, query=300, insert=300)
                 ),
             )
-
-        return weaviate.use_async_with_custom(
-            http_host=_host,
-            http_port=port,
-            auth_credentials=AuthApiKey(w_key),
-            additional_config=AdditionalConfig(
-                timeout=Timeout(init=60, query=300, insert=300)
-            ),
-        )
+        else:
+            return weaviate.use_async_with_local(
+                host=host,
+                port=int(port),
+                skip_init_checks=True,
+                auth_credentials=AuthApiKey(w_key),
+                additional_config=AdditionalConfig(
+                    timeout=Timeout(init=60, query=300, insert=300)
+                ),
+            )
 
     async def connect_to_embedded(self):
         msg.info(f"Connecting to Weaviate Embedded")
@@ -211,7 +211,7 @@ class WeaviateManager:
         )
 
     async def connect(
-        self, deployment: str, weaviateURL: str, weaviateAPIKey: str
+        self, deployment: str, weaviateURL: str, weaviateAPIKey: str, port: str = "8080"
     ) -> WeaviateAsyncClient:
         try:
 
@@ -226,7 +226,7 @@ class WeaviateManager:
             elif deployment == "Local":
                 client = await self.connect_to_embedded()
             elif deployment == "Custom":
-                client = await self.connect_to_custom(weaviateURL, weaviateAPIKey)
+                client = await self.connect_to_custom(weaviateURL, weaviateAPIKey, port)
             else:
                 raise Exception(f"Invalid deployment type: {deployment}")
 
