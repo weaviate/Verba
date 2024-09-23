@@ -1,7 +1,34 @@
 ---
 
 services:
+  verba:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - 8000:8000
+    environment:
+      - WEAVIATE_URL_VERBA=http://weaviate:8080
+      - OPENAI_API_KEY=$OPENAI_API_KEY
+      - COHERE_API_KEY=$COHERE_API_KEY
+      - OLLAMA_URL=http://host.docker.internal:11434
+      - OLLAMA_MODEL=$OLLAMA_MODEL
+      - OLLAMA_EMBED_MODEL=$OLLAMA_EMBED_MODEL
+      - UNSTRUCTURED_API_KEY=$UNSTRUCTURED_API_KEY
+      - UNSTRUCTURED_API_URL=$UNSTRUCTURED_API_URL
+      - GITHUB_TOKEN=$GITHUB_TOKEN
 
+    volumes:
+      - ./data:/data/
+    depends_on:
+      weaviate:
+        condition: service_healthy
+    healthcheck:
+      test: wget --no-verbose --tries=3 --spider http://localhost:8000 || exit 1
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
 
   weaviate:
     command:
