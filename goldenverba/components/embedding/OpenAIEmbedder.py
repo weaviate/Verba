@@ -104,20 +104,28 @@ class OpenAIEmbedder(Embedding):
     @staticmethod
     def get_models(token: str, url: str) -> List[str]:
         """Fetch available embedding models from OpenAI API."""
-        if token is None:
+        try:
+            if token is None:
+                return [
+                    "text-embedding-ada-002",
+                    "text-embedding-3-small",
+                    "text-embedding-3-large",
+                ]
+
+            import requests  # Import here to avoid dependency if not needed
+
+            headers = {"Authorization": f"Bearer {token}"}
+            response = requests.get(f"{url}/models", headers=headers)
+            response.raise_for_status()
+            return [
+                model["id"]
+                for model in response.json()["data"]
+                if "embedding" in model["id"]
+            ]
+        except Exception as e:
+            msg.info(f"Failed to fetch OpenAI embedding models: {str(e)}")
             return [
                 "text-embedding-ada-002",
                 "text-embedding-3-small",
                 "text-embedding-3-large",
             ]
-
-        import requests  # Import here to avoid dependency if not needed
-
-        headers = {"Authorization": f"Bearer {token}"}
-        response = requests.get(f"{url}/models", headers=headers)
-        response.raise_for_status()
-        return [
-            model["id"]
-            for model in response.json()["data"]
-            if "embedding" in model["id"]
-        ]

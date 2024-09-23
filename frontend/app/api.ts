@@ -78,7 +78,8 @@ export const fetchHealth = (): Promise<HealthPayload | null> =>
 export const connectToVerba = async (
   deployment: string,
   url: string,
-  apiKey: string
+  apiKey: string,
+  port: string
 ): Promise<ConnectPayload | null> => {
   const host = await detectHost();
   const response = await fetch(`${host}/api/connect`, {
@@ -92,6 +93,7 @@ export const connectToVerba = async (
         url: url,
         key: apiKey,
       },
+      port: port,
     }),
   });
   const data = await response.json();

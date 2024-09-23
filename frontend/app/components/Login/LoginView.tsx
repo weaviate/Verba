@@ -19,6 +19,7 @@ import { GrConnect } from "react-icons/gr";
 import { CgWebsite } from "react-icons/cg";
 import { FaBackspace } from "react-icons/fa";
 import { HiMiniSparkles } from "react-icons/hi2";
+import { TbDatabaseEdit } from "react-icons/tb";
 
 import { connectToVerba } from "@/app/api";
 
@@ -161,11 +162,12 @@ const LoginView: React.FC<LoginViewProps> = ({
   const [errorText, setErrorText] = useState("");
 
   const [selectedDeployment, setSelectedDeployment] = useState<
-    "Weaviate" | "Docker" | "Local"
+    "Weaviate" | "Docker" | "Local" | "Custom"
   >("Local");
 
   const [weaviateURL, setWeaviateURL] = useState(credentials.url);
   const [weaviateAPIKey, setWeaviateAPIKey] = useState(credentials.key);
+  const [port, setPort] = useState("8080");
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -175,16 +177,22 @@ const LoginView: React.FC<LoginViewProps> = ({
     return () => clearTimeout(timer);
   }, []);
 
-  const connect = async (deployment: "Local" | "Weaviate" | "Docker") => {
+  const connect = async (
+    deployment: "Local" | "Weaviate" | "Docker" | "Custom"
+  ) => {
     setErrorText("");
     setIsConnecting(true);
     const response = await connectToVerba(
       deployment,
       weaviateURL,
-      weaviateAPIKey
+      weaviateAPIKey,
+      port
     );
     if (response) {
-      if (response.error) {
+      if (!("error" in response)) {
+        setIsLoggedIn(false);
+        setErrorText(JSON.stringify(response));
+      } else if (!("error" in response) || response.connected == false) {
         setIsLoggedIn(false);
         setErrorText(response.error);
       } else {
@@ -288,6 +296,16 @@ const LoginView: React.FC<LoginViewProps> = ({
                       loading={isConnecting && selectedDeployment == "Docker"}
                     />
                     <VerbaButton
+                      title="Custom"
+                      Icon={TbDatabaseEdit}
+                      disabled={isConnecting}
+                      onClick={() => {
+                        setSelectedDeployment("Custom");
+                        setSelectStage(false);
+                      }}
+                      loading={isConnecting && selectedDeployment == "Custom"}
+                    />
+                    <VerbaButton
                       title="Local"
                       Icon={FaLaptopCode}
                       disabled={isConnecting}
@@ -336,18 +354,35 @@ const LoginView: React.FC<LoginViewProps> = ({
                         connect(selectedDeployment);
                       }}
                     >
-                      <label className="input flex items-center gap-2 border-none shadow-md bg-bg-verba">
-                        <FaDatabase className="text-text-alt-verba" />
-                        <input
-                          type="text"
-                          name="username"
-                          value={weaviateURL}
-                          onChange={(e) => setWeaviateURL(e.target.value)}
-                          placeholder="Weaviate URL"
-                          className="grow bg-button-verba text-text-alt-verba hover:text-text-verba w-full"
-                          autoComplete="username"
-                        />
-                      </label>
+                      <div className="flex gap-2 items-center justify-between">
+                        <label className="input flex items-center gap-2 border-none shadow-md w-full bg-bg-verba">
+                          <FaDatabase className="text-text-alt-verba" />
+                          <input
+                            type="text"
+                            name="username"
+                            value={weaviateURL}
+                            onChange={(e) => setWeaviateURL(e.target.value)}
+                            placeholder="Weaviate URL"
+                            className="grow bg-button-verba text-text-alt-verba hover:text-text-verba w-full"
+                            autoComplete="username"
+                          />
+                        </label>
+                        {selectedDeployment == "Custom" && (
+                          <label className="input flex items-center gap-2 border-none shadow-md bg-bg-verba">
+                            <p className="text-text-alt-verba text-xs">Port</p>
+                            <input
+                              type="text"
+                              name="Port"
+                              value={port}
+                              onChange={(e) => setPort(e.target.value)}
+                              placeholder="Port"
+                              className="grow bg-button-verba text-text-alt-verba hover:text-text-verba w-full"
+                              autoComplete="port"
+                            />
+                          </label>
+                        )}
+                      </div>
+
                       <label className="input flex items-center gap-2 border-none shadow-md bg-bg-verba mt-4">
                         <FaKey className="text-text-alt-verba" />
                         <input
@@ -402,8 +437,10 @@ const LoginView: React.FC<LoginViewProps> = ({
               </div>
             )}
             {errorText && (
-              <div className="bg-warning-verba p-4 rounded w-full">
-                <p className="flex w-full whitespace-pre-wrap">{errorText}</p>
+              <div className="bg-warning-verba p-4 rounded w-full h-full overflow-auto">
+                <p className="flex w-full h-full whitespace-pre-wrap">
+                  {errorText}
+                </p>
               </div>
             )}
           </div>
