@@ -20,7 +20,12 @@ class CohereEmbedder(Embedding):
         self.name = "Cohere"
         self.description = "Vectorizes documents and queries using Cohere"
         self.url = os.getenv("COHERE_BASE_URL", "https://api.cohere.com/v1")
-        models = get_models(self.url, os.getenv("COHERE_API_KEY", None), "embed")
+        # Inelegant fix for .env and/or docker-compose.yaml containing
+        # empty variable which is read as a string. 
+        cohere_api_key = os.getenv("COHERE_API_KEY", "")
+        if cohere_api_key == "":
+            cohere_api_key == None
+        models = get_models(self.url, cohere_api_key, "embed")
 
         self.config["Model"] = InputConfig(
             type="dropdown",
