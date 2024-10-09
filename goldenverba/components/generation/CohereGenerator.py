@@ -6,7 +6,7 @@ from typing import List, Dict, AsyncGenerator
 from goldenverba.components.interfaces import Generator
 from goldenverba.components.types import InputConfig
 from goldenverba.components.embedding.CohereEmbedder import get_models
-from goldenverba.components.util import get_environment
+from goldenverba.components.util import get_environment, get_token
 
 
 class CohereGenerator(Generator):
@@ -21,7 +21,7 @@ class CohereGenerator(Generator):
         self.url = os.getenv("COHERE_BASE_URL", "https://api.cohere.com/v1")
         self.context_window = 10000
 
-        models = get_models(self.url, os.getenv("COHERE_API_KEY", None), "chat")
+        models = get_models(self.url, get_token("COHERE_API_KEY", None), "chat")
 
         self.config["Model"] = InputConfig(
             type="dropdown",
@@ -30,7 +30,7 @@ class CohereGenerator(Generator):
             values=models if models else [],
         )
 
-        if os.getenv("COHERE_API_KEY") is None:
+        if get_token("COHERE_API_KEY") is None:
             self.config["API Key"] = InputConfig(
                 type="password",
                 value="",
