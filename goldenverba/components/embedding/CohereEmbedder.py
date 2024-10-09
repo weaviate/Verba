@@ -24,9 +24,9 @@ class CohereEmbedder(Embedding):
 
         self.config["Model"] = InputConfig(
             type="dropdown",
-            value=models[0],
+            value=models[0] if models else "",
             description="Select a Cohere Embedding Model",
-            values=models,
+            values=models if models else [],
         )
 
         if os.getenv("COHERE_API_KEY") is None:
