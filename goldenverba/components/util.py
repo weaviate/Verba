@@ -51,6 +51,11 @@ def get_environment(config, value: str, env: str, error_msg: str) -> str:
         token = config[value].value
     else:
         token = os.environ.get(env)
-    if not token:
+    if not token or token == "":
         raise Exception(error_msg)
+    return token
+
+def get_token(env: str, default: str = None) -> str:
+    # return token, but treat empty string als None
+    token = tok if bool(tok := os.getenv(env, None)) else default
     return token
