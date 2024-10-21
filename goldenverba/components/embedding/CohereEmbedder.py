@@ -5,7 +5,7 @@ import json
 
 from goldenverba.components.interfaces import Embedding
 from goldenverba.components.types import InputConfig
-from goldenverba.components.util import get_environment
+from goldenverba.components.util import get_environment, get_token
 
 from wasabi import msg
 
@@ -20,16 +20,16 @@ class CohereEmbedder(Embedding):
         self.name = "Cohere"
         self.description = "Vectorizes documents and queries using Cohere"
         self.url = os.getenv("COHERE_BASE_URL", "https://api.cohere.com/v1")
-        models = get_models(self.url, os.getenv("COHERE_API_KEY", None), "embed")
+        models = get_models(self.url, get_token("COHERE_API_KEY", None), "embed")
 
         self.config["Model"] = InputConfig(
             type="dropdown",
-            value=models[0],
+            value=models[0] if models else "",
             description="Select a Cohere Embedding Model",
-            values=models,
+            values=models if models else [],
         )
 
-        if os.getenv("COHERE_API_KEY") is None:
+        if get_token("COHERE_API_KEY") is None:
             self.config["API Key"] = InputConfig(
                 type="password",
                 value="",
@@ -71,7 +71,7 @@ class CohereEmbedder(Embedding):
 
 def get_models(url: str, token: str, model_type: str):
     try:
-        if token is None:
+        if token is None or token == "":
             return [
                 "embed-english-v3.0",
                 "embed-multilingual-v3.0",
