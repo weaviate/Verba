@@ -1,0 +1,1364 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Generated API Spec",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/health": {
+      "get": {
+        "summary": "Fetch the health status of the Verba API server",
+        "operationId": "fetchHealth",
+        "responses": {
+          "200": {
+            "description": "Health status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthPayload"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/connect": {
+      "post": {
+        "summary": "Connect to a specific Verba deployment",
+        "operationId": "connectToVerba",
+        "requestBody": {
+          "description": "Credentials for Verba connection",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "credentials": {
+                    "$ref": "#/components/schemas/Credentials"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Connection status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectPayload"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/get_rag_config": {
+      "post": {
+        "summary": "Fetch the RAG configuration",
+        "operationId": "fetchRAGConfig",
+        "requestBody": {
+          "description": "Credentials for RAG configuration retrieval",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Credentials"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "RAG configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RAGConfigResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/set_rag_config": {
+      "post": {
+        "summary": "Update the RAG configuration",
+        "operationId": "updateRAGConfig",
+        "requestBody": {
+          "description": "New RAG configuration and credentials",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "rag_config": {
+                    "$ref": "#/components/schemas/RAGConfig"
+                  },
+                  "credentials": {
+                    "$ref": "#/components/schemas/Credentials"
+                  }
+                },
+                "required": ["rag_config", "credentials"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "RAG configuration updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/get_user_config": {
+      "post": {
+        "summary": "Fetch the user's configuration",
+        "operationId": "fetchUserConfig",
+        "requestBody": {
+          "description": "Credentials for user configuration retrieval",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Credentials"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserConfigResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/set_user_config": {
+      "post": {
+        "summary": "Update the user's configuration",
+        "operationId": "updateUserConfig",
+        "requestBody": {
+          "description": "New user configuration and credentials",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "user_config": {
+                    "$ref": "#/components/schemas/UserConfig"
+                  },
+                  "credentials": {
+                    "$ref": "#/components/schemas/Credentials"
+                  }
+                },
+                "required": ["user_config", "credentials"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User configuration updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/get_theme_config": {
+      "post": {
+        "summary": "Fetch the theme configuration",
+        "operationId": "fetchThemeConfig",
+        "requestBody": {
+          "description": "Credentials for theme configuration retrieval",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Credentials"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Theme configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ThemeConfigResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/set_theme_config": {
+      "post": {
+        "summary": "Update the theme configuration",
+        "operationId": "updateThemeConfig",
+        "requestBody": {
+          "description": "New theme configuration and credentials",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "themes": {
+                    "$ref": "#/components/schemas/Themes"
+                  },
+                  "theme": {
+                    "$ref": "#/components/schemas/Theme"
+                  },
+                  "credentials": {
+                    "$ref": "#/components/schemas/Credentials"
+                  }
+                },
+                "required": ["themes", "theme", "credentials"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Theme configuration updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/query": {
+      "post": {
+        "summary": "Send a user query",
+        "operationId": "sendUserQuery",
+        "requestBody": {
+          "description": "Query payload, RAG configuration, labels, document filters, and credentials",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "query": {
+                    "type": "string"
+                  },
+                  "RAG": {
+                    "$ref": "#/components/schemas/RAGConfig"
+                  },
+                  "labels": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "documentFilter": {
+                    "$ref": "#/components/schemas/DocumentFilter"
+                  },
+                  "credentials": {
+                    "$ref": "#/components/schemas/Credentials"
+                  }
+                },
+                "required": [
+                  "query",
+                  "RAG",
+                  "labels",
+                  "documentFilter",
+                  "credentials"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Query results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QueryPayload"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/get_document": {
+      "post": {
+        "summary": "Fetch a selected document by UUID",
+        "operationId": "fetchSelectedDocument",
+        "requestBody": {
+          "description": "UUID of the document and credentials",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "uuid": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "credentials": {
+                    "$ref": "#/components/schemas/Credentials"
+                  }
+                },
+                "required": ["uuid", "credentials"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Document payload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentPayload"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/get_datacount": {
+      "post": {
+        "summary": "Fetch the data count for the embedding model",
+        "operationId": "fetchDatacount",
+        "requestBody": {
+          "description": "Embedding model, document filters, and credentials",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "embedding_model": {
+                    "type": "string"
+                  },
+                  "documentFilter": {
+                    "$ref": "#/components/schemas/DocumentFilter"
+                  },
+                  "credentials": {
+                    "$ref": "#/components/schemas/Credentials"
+                  }
+                },
+                "required": ["embedding_model", "documentFilter", "credentials"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Datacount response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DatacountResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/get_labels": {
+      "post": {
+        "summary": "Fetch available labels",
+        "operationId": "fetchLabels",
+        "requestBody": {
+          "description": "Credentials for retrieving labels",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Credentials"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Labels response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LabelsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/get_content": {
+      "post": {
+        "summary": "Fetch content of a document by UUID and page",
+        "operationId": "fetchContent",
+        "requestBody": {
+          "description": "UUID of the document, page number, chunk scores, and credentials",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "uuid": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "page": {
+                    "type": "integer"
+                  },
+                  "chunkScores": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/ChunkScore"
+                    }
+                  },
+                  "credentials": {
+                    "$ref": "#/components/schemas/Credentials"
+                  }
+                },
+                "required": ["uuid", "page", "chunkScores", "credentials"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Content payload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContentPayload"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/get_vectors": {
+      "post": {
+        "summary": "Fetch vectors for a document by UUID",
+        "operationId": "fetch_vectors",
+        "requestBody": {
+          "description": "UUID of the document, boolean for showAll, and credentials",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "uuid": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "showAll": {
+                    "type": "boolean"
+                  },
+                  "credentials": {
+                    "$ref": "#/components/schemas/Credentials"
+                  }
+                },
+                "required": ["uuid", "showAll", "credentials"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Vectors payload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VectorsPayload"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/get_chunks": {
+      "post": {
+        "summary": "Fetch chunks of a document by UUID and pagination info",
+        "operationId": "fetch_chunks",
+        "requestBody": {
+          "description": "UUID of the document, page number, page size, and credentials",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "uuid": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "page": {
+                    "type": "integer"
+                  },
+                  "pageSize": {
+                    "type": "integer"
+                  },
+                  "credentials": {
+                    "$ref": "#/components/schemas/Credentials"
+                  }
+                },
+                "required": ["uuid", "page", "pageSize", "credentials"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Chunks payload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChunksPayload"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/get_chunk": {
+      "post": {
+        "summary": "Fetch a single chunk of a document by UUID and embedder",
+        "operationId": "fetch_chunk",
+        "requestBody": {
+          "description": "UUID of the document, embedder, and credentials",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "uuid": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "embedder": {
+                    "type": "string"
+                  },
+                  "credentials": {
+                    "$ref": "#/components/schemas/Credentials"
+                  }
+                },
+                "required": ["uuid", "embedder", "credentials"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Chunk payload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChunkPayload"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/get_all_documents": {
+      "post": {
+        "summary": "Retrieve all documents with query and labels",
+        "operationId": "retrieveAllDocuments",
+        "requestBody": {
+          "description": "Query string, labels, pagination info, and credentials",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "query": {
+                    "type": "string"
+                  },
+                  "labels": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "page": {
+                    "type": "integer"
+                  },
+                  "pageSize": {
+                    "type": "integer"
+                  },
+                  "credentials": {
+                    "$ref": "#/components/schemas/Credentials"
+                  }
+                },
+                "required": [
+                  "query",
+                  "labels",
+                  "page",
+                  "pageSize",
+                  "credentials"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Documents preview payload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentsPreviewPayload"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/delete_document": {
+      "post": {
+        "summary": "Delete a specific document by UUID",
+        "operationId": "deleteDocument",
+        "requestBody": {
+          "description": "UUID of the document and credentials",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "uuid": {
+                    "type": "string"
+                  },
+                  "credentials": {
+                    "$ref": "#/components/schemas/Credentials"
+                  }
+                },
+                "required": ["uuid", "credentials"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Document deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/reset": {
+      "post": {
+        "summary": "Delete all documents",
+        "operationId": "deleteAllDocuments",
+        "requestBody": {
+          "description": "Reset mode and credentials",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "resetMode": {
+                    "type": "string"
+                  },
+                  "credentials": {
+                    "$ref": "#/components/schemas/Credentials"
+                  }
+                },
+                "required": ["resetMode", "credentials"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "All documents deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/get_meta": {
+      "post": {
+        "summary": "Fetch metadata for the user",
+        "operationId": "fetchMeta",
+        "requestBody": {
+          "description": "User credentials",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Credentials"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Metadata payload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetadataPayload"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/get_suggestions": {
+      "post": {
+        "summary": "Fetch suggestions based on a query",
+        "operationId": "fetchSuggestions",
+        "requestBody": {
+          "description": "Query, limit, and credentials",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "query": {
+                    "type": "string"
+                  },
+                  "limit": {
+                    "type": "integer"
+                  },
+                  "credentials": {
+                    "$ref": "#/components/schemas/Credentials"
+                  }
+                },
+                "required": ["query", "limit", "credentials"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Suggestions payload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuggestionsPayload"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/delete_suggestion": {
+      "post": {
+        "summary": "Delete a specific suggestion by UUID",
+        "operationId": "deleteSuggestion",
+        "requestBody": {
+          "description": "UUID of the suggestion and credentials",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "uuid": {
+                    "type": "string"
+                  },
+                  "credentials": {
+                    "$ref": "#/components/schemas/Credentials"
+                  }
+                },
+                "required": ["uuid", "credentials"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Suggestion deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/get_all_suggestions": {
+      "post": {
+        "summary": "Fetch all suggestions with pagination",
+        "operationId": "fetchAllSuggestions",
+        "requestBody": {
+          "description": "Pagination data (page, pageSize) and credentials",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "page": {
+                    "type": "integer"
+                  },
+                  "pageSize": {
+                    "type": "integer"
+                  },
+                  "credentials": {
+                    "$ref": "#/components/schemas/Credentials"
+                  }
+                },
+                "required": ["page", "pageSize", "credentials"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "All suggestions payload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AllSuggestionsPayload"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ConnectPayload": {
+        "type": "object",
+        "properties": {
+          "connected": {
+            "type": "boolean"
+          },
+          "error": {
+            "type": "string"
+          },
+          "rag_config": {
+            "$ref": "#/definitions/RAGConfig"
+          },
+          "user_config": {
+            "$ref": "#/definitions/UserConfig"
+          },
+          "theme": {
+            "$ref": "#/definitions/Theme"
+          },
+          "themes": {
+            "$ref": "#/definitions/Themes"
+          }
+        },
+        "required": [
+          "connected",
+          "error",
+          "rag_config",
+          "user_config",
+          "theme",
+          "themes"
+        ],
+        "additionalProperties": false
+      },
+      "HealthPayload": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "production": {
+            "type": "string",
+            "enum": ["Local", "Demo", "Production"]
+          },
+          "gtag": {
+            "type": "string"
+          },
+          "deployments": {
+            "type": "object",
+            "properties": {
+              "WEAVIATE_URL_VERBA": {
+                "type": "string"
+              },
+              "WEAVIATE_API_KEY_VERBA": {
+                "type": "string"
+              }
+            },
+            "required": ["WEAVIATE_URL_VERBA", "WEAVIATE_API_KEY_VERBA"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["message", "production", "gtag", "deployments"],
+        "additionalProperties": false
+      },
+      "RAGConfig": {
+        "type": "object",
+        "additionalProperties": {
+          "$ref": "#/definitions/RAGComponentClass"
+        }
+      },
+      "QueryPayload": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "documents": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/DocumentScore"
+            }
+          },
+          "context": {
+            "type": "string"
+          }
+        },
+        "required": ["error", "documents", "context"],
+        "additionalProperties": false
+      },
+      "Credentials": {
+        "type": "object",
+        "properties": {
+          "deployment": {
+            "type": "string",
+            "enum": ["Weaviate", "Docker", "Local"]
+          },
+          "url": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          }
+        },
+        "required": ["deployment", "url", "key"],
+        "additionalProperties": false
+      },
+      "DocumentsPreviewPayload": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "documents": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/DocumentPreview"
+            }
+          },
+          "labels": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "totalDocuments": {
+            "type": "number"
+          }
+        },
+        "required": ["error", "documents", "labels", "totalDocuments"],
+        "additionalProperties": false
+      },
+      "DocumentPayload": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "document": {
+            "$ref": "#/definitions/VerbaDocument"
+          }
+        },
+        "required": ["error", "document"],
+        "additionalProperties": false
+      },
+      "ChunkScore": {
+        "type": "object",
+        "properties": {
+          "uuid": {
+            "type": "string"
+          },
+          "chunk_id": {
+            "type": "number"
+          },
+          "score": {
+            "type": "number"
+          },
+          "embedder": {
+            "type": "string"
+          }
+        },
+        "required": ["uuid", "chunk_id", "score", "embedder"],
+        "additionalProperties": false
+      },
+      "ContentPayload": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/ContentSnippet"
+            }
+          },
+          "maxPage": {
+            "type": "number"
+          }
+        },
+        "required": ["error", "content", "maxPage"],
+        "additionalProperties": false
+      },
+      "ChunksPayload": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "chunks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/VerbaChunk"
+            }
+          }
+        },
+        "required": ["error", "chunks"],
+        "additionalProperties": false
+      },
+      "RAGConfigResponse": {
+        "type": "object",
+        "properties": {
+          "rag_config": {
+            "$ref": "#/definitions/RAGConfig"
+          },
+          "error": {
+            "type": "string"
+          }
+        },
+        "required": ["rag_config", "error"],
+        "additionalProperties": false
+      },
+      "AllSuggestionsPayload": {
+        "type": "object",
+        "properties": {
+          "suggestions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/Suggestion"
+            }
+          },
+          "total_count": {
+            "type": "number"
+          }
+        },
+        "required": ["suggestions", "total_count"],
+        "additionalProperties": false
+      },
+      "MetadataPayload": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "node_payload": {
+            "$ref": "#/definitions/NodePayload"
+          },
+          "collection_payload": {
+            "$ref": "#/definitions/CollectionPayload"
+          }
+        },
+        "required": ["error", "node_payload", "collection_payload"],
+        "additionalProperties": false
+      },
+      "DatacountResponse": {
+        "type": "object",
+        "properties": {
+          "datacount": {
+            "type": "number"
+          }
+        },
+        "required": ["datacount"],
+        "additionalProperties": false
+      },
+      "SuggestionsPayload": {
+        "type": "object",
+        "properties": {
+          "suggestions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/Suggestion"
+            }
+          }
+        },
+        "required": ["suggestions"],
+        "additionalProperties": false
+      },
+      "ChunkPayload": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "chunk": {
+            "$ref": "#/definitions/VerbaChunk"
+          }
+        },
+        "required": ["error", "chunk"],
+        "additionalProperties": false
+      },
+      "DocumentFilter": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "uuid": {
+            "type": "string"
+          }
+        },
+        "required": ["title", "uuid"],
+        "additionalProperties": false
+      },
+      "VectorsPayload": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "vector_groups": {
+            "type": "object",
+            "properties": {
+              "embedder": {
+                "type": "string"
+              },
+              "groups": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/VectorGroup"
+                }
+              },
+              "dimensions": {
+                "type": "number"
+              }
+            },
+            "required": ["embedder", "groups", "dimensions"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["error", "vector_groups"],
+        "additionalProperties": false
+      },
+      "UserConfigResponse": {
+        "type": "object",
+        "properties": {
+          "user_config": {
+            "$ref": "#/definitions/UserConfig"
+          },
+          "error": {
+            "type": "string"
+          }
+        },
+        "required": ["user_config", "error"],
+        "additionalProperties": false
+      },
+      "ThemeConfigResponse": {
+        "type": "object",
+        "properties": {
+          "themes": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/Themes"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "theme": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/Theme"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "error": {
+            "type": "string"
+          }
+        },
+        "required": ["themes", "theme", "error"],
+        "additionalProperties": false
+      },
+      "Themes": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Theme"
+        }
+      },      
+      "Theme": {
+        "type": "object",
+        "properties": {
+          "theme_name": {
+            "type": "string"
+          },
+          "title": {
+            "$ref": "#/definitions/TextFieldSetting"
+          },
+          "subtitle": {
+            "$ref": "#/definitions/TextFieldSetting"
+          },
+          "intro_message": {
+            "$ref": "#/definitions/TextFieldSetting"
+          },
+          "image": {
+            "$ref": "#/definitions/ImageFieldSetting"
+          },
+          "primary_color": {
+            "$ref": "#/definitions/ColorSetting"
+          },
+          "secondary_color": {
+            "$ref": "#/definitions/ColorSetting"
+          },
+          "warning_color": {
+            "$ref": "#/definitions/ColorSetting"
+          },
+          "bg_color": {
+            "$ref": "#/definitions/ColorSetting"
+          },
+          "bg_alt_color": {
+            "$ref": "#/definitions/ColorSetting"
+          },
+          "text_color": {
+            "$ref": "#/definitions/ColorSetting"
+          },
+          "text_alt_color": {
+            "$ref": "#/definitions/ColorSetting"
+          },
+          "button_text_color": {
+            "$ref": "#/definitions/ColorSetting"
+          },
+          "button_text_alt_color": {
+            "$ref": "#/definitions/ColorSetting"
+          },
+          "button_color": {
+            "$ref": "#/definitions/ColorSetting"
+          },
+          "button_hover_color": {
+            "$ref": "#/definitions/ColorSetting"
+          },
+          "font": {
+            "$ref": "#/definitions/SelectSetting"
+          },
+          "theme": {
+            "type": "string",
+            "enum": ["light", "dark"]
+          }
+        },
+        "required": [
+          "theme_name",
+          "title",
+          "subtitle",
+          "intro_message",
+          "image",
+          "primary_color",
+          "secondary_color",
+          "warning_color",
+          "bg_color",
+          "bg_alt_color",
+          "text_color",
+          "text_alt_color",
+          "button_text_color",
+          "button_text_alt_color",
+          "button_color",
+          "button_hover_color",
+          "font",
+          "theme"
+        ],
+        "additionalProperties": false
+      },
+      "UserConfig": {
+        "type": "object",
+        "properties": {
+          "getting_started": {
+            "type": "boolean"
+          }
+        },
+        "required": ["getting_started"],
+        "additionalProperties": false
+      },
+      "LabelsResponse": {
+        "type": "object",
+        "properties": {
+          "labels": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["labels"],
+        "additionalProperties": false
+      }
+    }
+  }
+}
