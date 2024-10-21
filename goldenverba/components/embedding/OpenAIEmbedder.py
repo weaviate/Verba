@@ -8,7 +8,7 @@ from wasabi import msg
 
 from goldenverba.components.interfaces import Embedding
 from goldenverba.components.types import InputConfig
-from goldenverba.components.util import get_environment
+from goldenverba.components.util import get_environment, get_token
 
 
 class OpenAIEmbedder(Embedding):
@@ -20,7 +20,7 @@ class OpenAIEmbedder(Embedding):
         self.description = "Vectorizes documents and queries using OpenAI"
 
         # Fetch available models
-        api_key = os.getenv("OPENAI_API_KEY")
+        api_key = get_token("OPENAI_API_KEY")
         base_url = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1")
         models = self.get_models(api_key, base_url)
 

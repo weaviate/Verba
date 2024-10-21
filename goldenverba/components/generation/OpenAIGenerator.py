@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 from goldenverba.components.interfaces import Generator
 from goldenverba.components.types import InputConfig
-from goldenverba.components.util import get_environment
+from goldenverba.components.util import get_environment, get_token
 import httpx
 import json
 
@@ -29,7 +29,7 @@ class OpenAIGenerator(Generator):
             values=models,
         )
 
-        if os.getenv("OPENAI_API_KEY") is None:
+        if get_token("OPENAI_API_KEY") is None:
             self.config["API Key"] = InputConfig(
                 type="password",
                 value="",
