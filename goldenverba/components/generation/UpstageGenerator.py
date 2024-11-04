@@ -20,7 +20,7 @@ class UpstageGenerator(Generator):
     DEFAULT_BASE_URL = "https://api.upstage.ai/v1/solar"
     MODELS = ["solar-pro", "solar-mini"]
     DEFAULT_MODEL = "solar-pro"
-    CONTEXT_WINDOW = 8192
+    CONTEXT_WINDOW = 4096
 
     def __init__(self):
         super().__init__()
