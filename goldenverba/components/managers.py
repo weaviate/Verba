@@ -36,6 +36,7 @@ from goldenverba.components.reader.UnstructuredAPI import UnstructuredReader
 from goldenverba.components.reader.AssemblyAIAPI import AssemblyAIReader
 from goldenverba.components.reader.HTMLReader import HTMLReader
 from goldenverba.components.reader.FirecrawlReader import FirecrawlReader
+from goldenverba.components.reader.UpstageDocumentParse import UpstageDocumentParseReader
 
 # Import Chunkers
 from goldenverba.components.chunking.TokenChunker import TokenChunker
@@ -51,6 +52,7 @@ from goldenverba.components.chunking.SemanticChunker import SemanticChunker
 from goldenverba.components.embedding.OpenAIEmbedder import OpenAIEmbedder
 from goldenverba.components.embedding.CohereEmbedder import CohereEmbedder
 from goldenverba.components.embedding.OllamaEmbedder import OllamaEmbedder
+from goldenverba.components.embedding.UpstageEmbedder import UpstageEmbedder
 from goldenverba.components.embedding.WeaviateEmbedder import WeaviateEmbedder
 from goldenverba.components.embedding.VoyageAIEmbedder import VoyageAIEmbedder
 from goldenverba.components.embedding.SentenceTransformersEmbedder import (
@@ -66,7 +68,7 @@ from goldenverba.components.generation.AnthrophicGenerator import AnthropicGener
 from goldenverba.components.generation.OllamaGenerator import OllamaGenerator
 from goldenverba.components.generation.OpenAIGenerator import OpenAIGenerator
 from goldenverba.components.generation.GroqGenerator import GroqGenerator
-
+from goldenverba.components.generation.UpstageGenerator import UpstageGenerator
 try:
     import tiktoken
 except Exception:
@@ -83,6 +85,7 @@ if production != "Production":
         UnstructuredReader(),
         AssemblyAIReader(),
         FirecrawlReader(),
+        UpstageDocumentParseReader(),
     ]
     chunkers = [
         TokenChunker(),
@@ -98,6 +101,7 @@ if production != "Production":
         OllamaEmbedder(),
         SentenceTransformersEmbedder(),
         WeaviateEmbedder(),
+        UpstageEmbedder(),
         VoyageAIEmbedder(),
         CohereEmbedder(),
         OpenAIEmbedder(),
@@ -109,6 +113,7 @@ if production != "Production":
         AnthropicGenerator(),
         CohereGenerator(),
         GroqGenerator(),
+        UpstageGenerator(),
     ]
 else:
     readers = [
@@ -118,6 +123,7 @@ else:
         UnstructuredReader(),
         AssemblyAIReader(),
         FirecrawlReader(),
+        UpstageDocumentParseReader(),
     ]
     chunkers = [
         TokenChunker(),
@@ -132,6 +138,7 @@ else:
     embedders = [
         WeaviateEmbedder(),
         VoyageAIEmbedder(),
+        UpstageEmbedder(),
         CohereEmbedder(),
         OpenAIEmbedder(),
     ]
@@ -140,6 +147,7 @@ else:
         OpenAIGenerator(),
         AnthropicGenerator(),
         CohereGenerator(),
+        UpstageGenerator(),
     ]
 
 

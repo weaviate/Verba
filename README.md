@@ -55,6 +55,7 @@ Verba is a fully-customizable personal assistant utilizing [Retrieval Augmented 
 | Anthrophic (e.g. Claude Sonnet)   | ✅          | Embedding and Generation Models by Anthrophic           |
 | OpenAI (e.g. GPT4)                | ✅          | Embedding and Generation Models by OpenAI               |
 | Groq (e.g. Llama3)                | ✅          | Generation Models by Groq (LPU inference)              |
+| Upstage (e.g. Solar)              | ✅          | Embedding and Generation Models by Upstage              |
 
 | 🤖 Embedding Support | Implemented | Description                              |
 | -------------------- | ----------- | ---------------------------------------- |
@@ -64,11 +65,13 @@ Verba is a fully-customizable personal assistant utilizing [Retrieval Augmented 
 | Cohere               | ✅          | Embedding Models by Cohere               |
 | VoyageAI             | ✅          | Embedding Models by VoyageAI             |
 | OpenAI               | ✅          | Embedding Models by OpenAI               |
+| Upstage              | ✅          | Embedding Models by Upstage              |
 
 | 📁 Data Support                                          | Implemented | Description                                    |
 | -------------------------------------------------------- | ----------- | ---------------------------------------------- |
 | [UnstructuredIO](https://docs.unstructured.io/welcome)   | ✅          | Import Data through Unstructured               |
 | [Firecrawl](https://www.firecrawl.dev/)                  | ✅          | Scrape and Crawl URL through Firecrawl         |
+| [UpstageDocumentParse](https://upstage.ai/)              | ✅          | Parse Documents through Upstage Document AI     |
 | PDF Ingestion                                            | ✅          | Import PDF into Verba                          |
 | GitHub & GitLab                                          | ✅          | Import Files from Github and GitLab            |
 | CSV/XLSX Ingestion                                       | ✅          | Import Table Data into Verba                   |
@@ -172,6 +175,8 @@ Below is a comprehensive list of the API keys and variables you may require:
 | VOYAGE_API_KEY         | Your VoyageAI API Key                                      | Get Access to Embedding Models via VoyageAI                                       |
 | EMBEDDING_SERVICE_URL  | URL to your Embedding Service Instance                     | Get Access to Embedding Models via Weaviate Embedding Service                     |
 | EMBEDDING_SERVICE_KEY  | Your Embedding Service Key                                 | Get Access to Embedding Models via Weaviate Embedding Service                     |
+| UPSTAGE_API_KEY        | Your Upstage API Key                                       | Get Access to [Upstage](https://upstage.ai/) Models                               |
+| UPSTAGE_BASE_URL       | URL to Upstage instance                                    | Models                                                                            |
 
 ![API Keys in Verba](https://github.com/weaviate/Verba/blob/2.0.0/img/api_screen.png)
 
