@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   verba:
     build:
@@ -67,30 +65,43 @@ services:
       - verba-network
 
   ollama:
-    container_name: ollama
     image: ollama/ollama:latest
-    volumes:
-      - ./ollama/ollama:/root/.ollama
     ports:
-      - 7869:11434
-    environment:
-      - OLLAMA_KEEP_ALIVE=24h
-    healthcheck:
-      test: curl --fail http://localhost:11434/api/tags || exit 1
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
-    restart: unless-stopped
-    networks:
-      - ollama-docker
+      - "11434:11434"
     deploy:
       resources:
         reservations:
           devices:
             - driver: nvidia
               count: 1
-              capabilities: [gpu]
+              capabilities: [ gpu ]
+    volumes:
+      - ollama_data:/root/.ollama
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:11434/api/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    environment:
+      - OLLAMA_ORIGINS=*
+    command: >
+      sh -c "
+        ollama serve &
+        sleep 10 &&
+        if ! ollama list | grep -q 'mxbai-embed-large'; then
+          echo 'Pulling mxbai-embed-large...'
+          ollama pull mxbai-embed-large
+        fi &&
+        if ! ollama list | grep -q 'llama3.1:8b'; then
+          echo 'Pulling llama3.1:8b...'
+          ollama pull llama3.1:8b
+        fi &&
+        if ! ollama ps | grep -q 'llama3.1:8b'; then
+          echo 'Initializing llama3.1:8b...'
+          ollama run llama3.1:8b <<< 'exit'
+        fi &&
+        wait
+      "
 
   ollama-webui:
     image: ghcr.io/open-webui/open-webui:main
@@ -119,5 +130,5 @@ networks:
     external: false
 
 volumes:
-  weaviate_data: {}
-  ollama_data: {}
+  weaviate_data: { }
+  ollama_data: { }
