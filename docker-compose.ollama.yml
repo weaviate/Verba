@@ -51,7 +51,7 @@ services:
   ollama:
     image: ollama/ollama:latest
     ports:
-      - "11435:11434"  # This one is fine, keeping as is
+      - "11434:11434"  # This one is fine, keeping as is
     environment:
       - OLLAMA_ORIGINS=*
       - OLLAMA_GPU_LAYERS=99
