@@ -6,7 +6,7 @@ services:
     ports:
       - 8001:8000
     environment:
-      - WEAVIATE_URL_VERBA=http://weaviate:8080
+      - WEAVIATE_URL_VERBA=http://weaviate:8081
       - OPENAI_API_KEY=$OPENAI_API_KEY
       - COHERE_API_KEY=$COHERE_API_KEY
       - OLLAMA_URL=http://ollama:11434
@@ -34,18 +34,18 @@ services:
       - --host
       - 0.0.0.0
       - --port
-      - '8080'
+      - '8081'
       - --scheme
       - http
     image: semitechnologies/weaviate:1.25.10
     ports:
-      - 8081:8080
-      - 3001:8080
+      - 8081:8081
+      - 3001:8081
     volumes:
       - weaviate_data:/var/lib/weaviate
     restart: on-failure:0
     healthcheck:
-      test: wget --no-verbose --tries=3 --spider http://localhost:8080/v1/.well-known/ready || exit 1
+      test: wget --no-verbose --tries=3 --spider http://localhost:8081/v1/.well-known/ready || exit 1
       interval: 5s
       timeout: 10s
       retries: 5
@@ -71,7 +71,7 @@ services:
           devices:
             - driver: nvidia
               count: all
-              capabilities: [gpu]
+              capabilities: [ gpu ]
     healthcheck:
       test: curl --fail http://localhost:11434/api/tags || exit 1
       interval: 10s
@@ -80,5 +80,5 @@ services:
       start_period: 10s
 
 volumes:
-  weaviate_data: {}
-  ollama_data: {}
+  weaviate_data: { }
+  ollama_data: { }
