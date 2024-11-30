@@ -84,26 +84,33 @@ services:
       retries: 5
     environment:
       - OLLAMA_ORIGINS=*
-    entrypoint: ["/bin/sh", "-c"]
-    command: |
-      "ollama serve &
-       until curl -s http://localhost:11434/api/health >/dev/null; do
-         echo 'Waiting for Ollama to start...'
-         sleep 1
-       done &&
-       if ! ollama list | grep -q 'mxbai-embed-large'; then
-         echo 'Pulling mxbai-embed-large...'
-         ollama pull mxbai-embed-large
-       fi &&
-       if ! ollama list | grep -q 'llama3.1:8b'; then
-         echo 'Pulling llama3.1:8b...'
-         ollama pull llama3.1:8b
-       fi &&
-       if ! ollama ps | grep -q 'llama3.1:8b'; then
-         echo 'Initializing llama3.1:8b...'
-         ollama run llama3.1:8b <<< 'exit'
-       fi &&
-       wait"
+    entrypoint: []
+    command:
+      - /bin/sh
+      - -c
+      - |
+        ollama serve &
+        until curl -s http://localhost:11434/api/health > /dev/null 2>&1; do
+          echo 'Waiting for Ollama to start...'
+          sleep 1
+        done
+        
+        if ! ollama list | grep -q 'mxbai-embed-large'; then
+          echo 'Pulling mxbai-embed-large...'
+          ollama pull mxbai-embed-large
+        fi
+        
+        if ! ollama list | grep -q 'llama3.1:8b'; then
+          echo 'Pulling llama3.1:8b...'
+          ollama pull llama3.1:8b
+        fi
+        
+        if ! ollama ps | grep -q 'llama3.1:8b'; then
+          echo 'Initializing llama3.1:8b...'
+          echo exit | ollama run llama3.1:8b
+        fi
+        
+        tail -f /dev/null
 
   ollama-webui:
     image: ghcr.io/open-webui/open-webui:main
