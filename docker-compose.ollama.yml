@@ -86,10 +86,10 @@ services:
       - ./scripts:/scripts
     healthcheck:
       test: ["CMD-SHELL", "/scripts/healthcheck.sh"]
-      interval: 10s
-      timeout: 30s
-      retries: 5
-      start_period: 30s
+      interval: 5s
+      timeout: 10s
+      retries: 10
+      start_period: 10s
 
   ollama-setup:
     image: ollama/ollama:latest
