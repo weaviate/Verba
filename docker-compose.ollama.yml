@@ -84,11 +84,11 @@ services:
     volumes:
       - ollama_data:/root/.ollama
     healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://localhost:11434/ 2>&1 | grep -q 'Ollama is running'"]
+      test: ollama list || exit 1
       interval: 10s
-      timeout: 5s
+      timeout: 30s
       retries: 5
-    entrypoint: []
+      start_period: 10s
     command:
       - /bin/bash
       - -c
