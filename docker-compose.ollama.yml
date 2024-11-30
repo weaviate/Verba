@@ -7,8 +7,7 @@ services:
       - 8001:8000  # External:Internal
     env_file: .env.dk-carbon-staging
     environment:
-      - WEAVIATE_URL_VERBA=http://weaviate:8081
-      - WEAVIATE_PORT=8081
+      - WEAVIATE_URL_VERBA=http://weaviate:8080  # Changed to port 8080
       - OLLAMA_URL=http://ollama:11434
     depends_on:
       weaviate:
@@ -24,17 +23,17 @@ services:
       - --host
       - 0.0.0.0
       - --port
-      - '8081'
+      - '8080'  # Changed to match Verba's expectation
       - --scheme
       - http
     image: semitechnologies/weaviate:1.25.10
     ports:
-      - 8085:8081  # Changed from 8082 to 8085 to avoid conflict with traefik
+      - 8085:8080  # External:Internal (keep external port as 8085)
     volumes:
       - weaviate_data:/var/lib/weaviate
     restart: on-failure:0
     healthcheck:
-      test: wget --no-verbose --tries=3 --spider http://localhost:8081/v1/.well-known/ready || exit 1
+      test: wget --no-verbose --tries=3 --spider http://localhost:8080/v1/.well-known/ready || exit 1
       interval: 5s
       timeout: 10s
       retries: 5
@@ -51,7 +50,7 @@ services:
   ollama:
     image: ollama/ollama:latest
     ports:
-      - "11434:11434"  # This one is fine, keeping as is
+      - "11435:11434"
     environment:
       - OLLAMA_ORIGINS=*
       - OLLAMA_GPU_LAYERS=99
@@ -98,13 +97,13 @@ services:
       ollama:
         condition: service_started
     ports:
-      - 8086:8080  # Changed from 8083 to 8086 to be consistent with our port scheme
+      - 8086:8080
     environment:
       - OLLAMA_BASE_URLS=http://ollama:11434
       - ENV=dev
       - WEBUI_AUTH=False
       - WEBUI_NAME=Verba AI
-      - WEBUI_URL=http://localhost:8086  # Updated to match new port
+      - WEBUI_URL=http://localhost:8086
       - WEBUI_SECRET_KEY=t0p-s3cr3t
     restart: unless-stopped
     networks:
