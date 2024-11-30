@@ -84,7 +84,7 @@ services:
     volumes:
       - ollama_data:/root/.ollama
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:11434/"]
+      test: ["CMD", "curl", "-sf", "http://localhost:11434/", "|", "grep", "-q", "Ollama is running"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -94,10 +94,21 @@ services:
       - -c
       - |
         ollama serve &
-        until curl -sf http://localhost:11434/ > /dev/null 2>&1; do
-          echo 'Waiting for Ollama to start...'
-          sleep 1
+        SERVER_PID=$!
+        
+        for i in $(seq 1 30); do
+          if curl -sf http://localhost:11434/ 2>&1 | grep -q "Ollama is running"; then
+            echo "Ollama is ready!"
+            break
+          fi
+          echo "Waiting for Ollama to start... (attempt $i/30)"
+          sleep 2
         done
+        
+        if ! curl -sf http://localhost:11434/ > /dev/null 2>&1; then
+          echo "Failed to start Ollama after 30 attempts"
+          exit 1
+        fi
         
         if ! ollama list | grep -q 'mxbai-embed-large'; then
           echo 'Pulling mxbai-embed-large...'
@@ -114,7 +125,8 @@ services:
           echo exit | ollama run llama3.1:8b
         fi
         
-        tail -f /dev/null
+        # Monitor the server process
+        wait $SERVER_PID
 
   ollama-webui:
     image: ghcr.io/open-webui/open-webui:main
