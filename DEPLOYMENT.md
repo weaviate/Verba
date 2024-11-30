@@ -5,6 +5,7 @@ This deployment runs Verba (a web-based RAG application) integrated with Ollama 
 ## Service URLs
 
 - Verba UI: http://argon-dev.behaviorlabs.ai:8001
+- Verba API: http://argon-dev.behaviorlabs.ai:8001/docs
 - Weaviate: http://argon-dev.behaviorlabs.ai:8085
 - Ollama API: http://argon-dev.behaviorlabs.ai:11435
 - Ollama Web UI: http://argon-dev.behaviorlabs.ai:8086
