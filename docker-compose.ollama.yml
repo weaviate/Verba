@@ -84,7 +84,7 @@ services:
     volumes:
       - ollama_data:/root/.ollama
     healthcheck:
-      test: ["CMD", "curl", "-sf", "http://localhost:11434/", "|", "grep", "-q", "Ollama is running"]
+      test: ["CMD-SHELL", "curl -sf http://localhost:11434/ 2>&1 | grep -q 'Ollama is running'"]
       interval: 10s
       timeout: 5s
       retries: 5
