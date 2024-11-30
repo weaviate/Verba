@@ -90,7 +90,7 @@ services:
       retries: 5
     entrypoint: []
     command:
-      - /bin/sh
+      - /bin/bash
       - -c
       - |
         ollama serve &
