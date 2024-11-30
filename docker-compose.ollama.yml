@@ -80,43 +80,40 @@ services:
           devices:
             - driver: nvidia
               count: 1
-              capabilities: [ gpu ]
+              capabilities: [gpu]
     volumes:
       - ollama_data:/root/.ollama
+      - ./scripts:/scripts
     healthcheck:
-      test: ollama list || exit 1
+      test: ["CMD-SHELL", "/scripts/healthcheck.sh"]
       interval: 10s
       timeout: 30s
       retries: 5
       start_period: 30s
-    entrypoint: [ "/bin/sh", "-c" ]
+
+  ollama-setup:
+    image: ollama/ollama:latest
+    depends_on:
+      ollama:
+        condition: service_healthy
+    volumes:
+      - ollama_data:/root/.ollama
+    entrypoint: ["/bin/sh", "-c"]
     command: |
-      ollama serve &
-      SERVER_PID=$!
-
-      until ollama list > /dev/null 2>&1; do
-        echo "Waiting for Ollama service..."
-        sleep 2
-      done
-
-      echo "Ollama service is ready!"
-
       if ! ollama list | grep -q 'mxbai-embed-large'; then
         echo 'Pulling mxbai-embed-large...'
         ollama pull mxbai-embed-large
       fi
-
+      
       if ! ollama list | grep -q 'llama3.1:8b'; then
         echo 'Pulling llama3.1:8b...'
         ollama pull llama3.1:8b
       fi
-
+      
       if ! ollama ps | grep -q 'llama3.1:8b'; then
         echo 'Initializing llama3.1:8b...'
         echo exit | ollama run llama3.1:8b
       fi
-
-      wait $SERVER_PID
 
   ollama-webui:
     image: ghcr.io/open-webui/open-webui:main
