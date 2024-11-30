@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   verba:
     build:
@@ -28,6 +30,9 @@ services:
       timeout: 10s
       retries: 5
       start_period: 10s
+    networks:
+      - ollama-docker
+      - verba-network
 
   weaviate:
     command:
@@ -58,27 +63,61 @@ services:
       PERSISTENCE_DATA_PATH: '/var/lib/weaviate'
       ENABLE_MODULES: 'e'
       CLUSTER_HOSTNAME: 'node1'
+    networks:
+      - verba-network
 
   ollama:
+    container_name: ollama
     image: ollama/ollama:latest
-    ports:
-      - "11434:11434"
     volumes:
-      - ollama_data:/root/.ollama
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [ gpu ]
+      - ./ollama/ollama:/root/.ollama
+    ports:
+      - 7869:11434
+    environment:
+      - OLLAMA_KEEP_ALIVE=24h
     healthcheck:
       test: curl --fail http://localhost:11434/api/tags || exit 1
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 10s
+    restart: unless-stopped
+    networks:
+      - ollama-docker
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  ollama-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: ollama-webui
+    volumes:
+      - ./ollama/ollama-webui:/app/backend/data
+    depends_on:
+      - ollama
+    ports:
+      - 8082:8080  # Changed from 8080 to avoid conflict
+    environment:
+      - OLLAMA_BASE_URLS=http://ollama:11434
+      - ENV=dev
+      - WEBUI_AUTH=False
+      - WEBUI_NAME=Verba AI
+      - WEBUI_URL=http://localhost:8082  # Updated to match new port
+      - WEBUI_SECRET_KEY=t0p-s3cr3t
+    restart: unless-stopped
+    networks:
+      - ollama-docker
+
+networks:
+  ollama-docker:
+    external: false
+  verba-network:
+    external: false
 
 volumes:
-  weaviate_data: { }
-  ollama_data: { }
+  weaviate_data: {}
+  ollama_data: {}
