@@ -68,29 +68,33 @@ services:
     image: ollama/ollama:latest
     ports:
       - "11434:11434"
+    environment:
+      - OLLAMA_ORIGINS=*
+      - OLLAMA_GPU_LAYERS=99
+      - OLLAMA_CUDA_VISIBLE_DEVICES=all
+      - OLLAMA_FLASH_ATTENTION=true
+      - OLLAMA_GPU_MEMORY_UTILIZATION=0.95
     deploy:
       resources:
         reservations:
           devices:
             - driver: nvidia
               count: 1
-              capabilities: [ gpu ]
+              capabilities: [gpu]
     volumes:
       - ollama_data:/root/.ollama
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:11434/api/health" ]
+      test: ["CMD", "curl", "-f", "http://localhost:11434/"]
       interval: 10s
       timeout: 5s
       retries: 5
-    environment:
-      - OLLAMA_ORIGINS=*
     entrypoint: []
     command:
       - /bin/sh
       - -c
       - |
         ollama serve &
-        until curl -s http://localhost:11434/api/health > /dev/null 2>&1; do
+        until curl -sf http://localhost:11434/ > /dev/null 2>&1; do
           echo 'Waiting for Ollama to start...'
           sleep 1
         done
