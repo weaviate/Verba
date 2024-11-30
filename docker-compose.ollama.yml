@@ -29,7 +29,7 @@ services:
       - http
     image: semitechnologies/weaviate:1.25.10
     ports:
-      - 8082:8081  # Changed external port to avoid conflicts
+      - 8085:8081  # Changed from 8082 to 8085 to avoid conflict with traefik
     volumes:
       - weaviate_data:/var/lib/weaviate
     restart: on-failure:0
@@ -51,7 +51,7 @@ services:
   ollama:
     image: ollama/ollama:latest
     ports:
-      - "11435:11434"  # Changed external port to avoid conflicts
+      - "11435:11434"  # This one is fine, keeping as is
     environment:
       - OLLAMA_ORIGINS=*
       - OLLAMA_GPU_LAYERS=99
@@ -98,13 +98,13 @@ services:
       ollama:
         condition: service_started
     ports:
-      - 8083:8080
+      - 8086:8080  # Changed from 8083 to 8086 to be consistent with our port scheme
     environment:
       - OLLAMA_BASE_URLS=http://ollama:11434
       - ENV=dev
       - WEBUI_AUTH=False
       - WEBUI_NAME=Verba AI
-      - WEBUI_URL=http://localhost:8083
+      - WEBUI_URL=http://localhost:8086  # Updated to match new port
       - WEBUI_SECRET_KEY=t0p-s3cr3t
     restart: unless-stopped
     networks:
