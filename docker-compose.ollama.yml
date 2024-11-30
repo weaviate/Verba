@@ -20,8 +20,8 @@ services:
     depends_on:
       weaviate:
         condition: service_healthy
-      ollama:
-        condition: service_started
+      ollama-setup:
+        condition: service_completed_successfully
     healthcheck:
       test: wget --no-verbose --tries=3 --spider http://localhost:8001 || exit 1
       interval: 5s
@@ -94,8 +94,8 @@ services:
       - ollama_data:/root/.ollama
     entrypoint: ["/bin/sh", "-c"]
     command: |
-      until curl -s http://ollama:11434/api/version > /dev/null; do
-        echo "Waiting for Ollama to be ready..."
+      echo "Waiting for Ollama to be ready..."
+      while ! curl -s http://ollama:11434/api/version > /dev/null 2>&1; do
         sleep 2
       done
       
