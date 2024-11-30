@@ -5,16 +5,10 @@ services:
       dockerfile: Dockerfile
     ports:
       - 8001:8000
+    env_file: .env.dk-carbon-staging
     environment:
       - WEAVIATE_URL_VERBA=http://weaviate:8081
-      - OPENAI_API_KEY=$OPENAI_API_KEY
-      - COHERE_API_KEY=$COHERE_API_KEY
       - OLLAMA_URL=http://ollama:11434
-      - OLLAMA_MODEL=llama2:70b
-      - OLLAMA_EMBED_MODEL=$OLLAMA_EMBED_MODEL
-      - UNSTRUCTURED_API_KEY=$UNSTRUCTURED_API_KEY
-      - UNSTRUCTURED_API_URL=$UNSTRUCTURED_API_URL
-      - GITHUB_TOKEN=$GITHUB_TOKEN
     volumes:
       - ./data:/data/
     depends_on:
@@ -82,7 +76,7 @@ services:
               count: 1
               capabilities: [gpu]
     volumes:
-      - ollama_data:/root/.ollama
+      - ./ollama/ollama:/root/.ollama
     restart: unless-stopped
 
   ollama-setup:
@@ -91,7 +85,7 @@ services:
       ollama:
         condition: service_started
     volumes:
-      - ollama_data:/root/.ollama
+      - ./ollama/ollama:/root/.ollama
     entrypoint: ["/bin/sh", "-c"]
     command: |
       echo "Waiting for Ollama to be ready..."
@@ -143,4 +137,3 @@ networks:
 
 volumes:
   weaviate_data: {}
-  ollama_data: {}
