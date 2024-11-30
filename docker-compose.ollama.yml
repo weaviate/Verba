@@ -100,13 +100,13 @@ services:
     depends_on:
       - ollama
     ports:
-      - 8082:8080  # Changed from 8080 to avoid conflict
+      - 8083:8080  # Changed from 8082 to avoid conflict with traefik
     environment:
       - OLLAMA_BASE_URLS=http://ollama:11434
       - ENV=dev
       - WEBUI_AUTH=False
       - WEBUI_NAME=Verba AI
-      - WEBUI_URL=http://localhost:8082  # Updated to match new port
+      - WEBUI_URL=http://localhost:8083  # Updated to match new port
       - WEBUI_SECRET_KEY=t0p-s3cr3t
     restart: unless-stopped
     networks:
