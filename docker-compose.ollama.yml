@@ -21,7 +21,7 @@ services:
       weaviate:
         condition: service_healthy
       ollama:
-        condition: service_healthy
+        condition: service_started
     healthcheck:
       test: wget --no-verbose --tries=3 --spider http://localhost:8001 || exit 1
       interval: 5s
@@ -83,23 +83,22 @@ services:
               capabilities: [gpu]
     volumes:
       - ollama_data:/root/.ollama
-      - ./scripts:/scripts
-    healthcheck:
-      test: ["CMD-SHELL", "/scripts/healthcheck.sh"]
-      interval: 5s
-      timeout: 10s
-      retries: 10
-      start_period: 10s
+    restart: unless-stopped
 
   ollama-setup:
     image: ollama/ollama:latest
     depends_on:
       ollama:
-        condition: service_healthy
+        condition: service_started
     volumes:
       - ollama_data:/root/.ollama
     entrypoint: ["/bin/sh", "-c"]
     command: |
+      until curl -s http://ollama:11434/api/version > /dev/null; do
+        echo "Waiting for Ollama to be ready..."
+        sleep 2
+      done
+      
       if ! ollama list | grep -q 'mxbai-embed-large'; then
         echo 'Pulling mxbai-embed-large...'
         ollama pull mxbai-embed-large
@@ -121,15 +120,16 @@ services:
     volumes:
       - ./ollama/ollama-webui:/app/backend/data
     depends_on:
-      - ollama
+      ollama:
+        condition: service_started
     ports:
-      - 8083:8080  # Changed from 8082 to avoid conflict with traefik
+      - 8083:8080
     environment:
       - OLLAMA_BASE_URLS=http://ollama:11434
       - ENV=dev
       - WEBUI_AUTH=False
       - WEBUI_NAME=Verba AI
-      - WEBUI_URL=http://localhost:8083  # Updated to match new port
+      - WEBUI_URL=http://localhost:8083
       - WEBUI_SECRET_KEY=t0p-s3cr3t
     restart: unless-stopped
     networks:
@@ -142,5 +142,5 @@ networks:
     external: false
 
 volumes:
-  weaviate_data: { }
-  ollama_data: { }
+  weaviate_data: {}
+  ollama_data: {}
