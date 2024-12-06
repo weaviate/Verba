@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 - Added new port configuration
 - Added Groq
 - Language Detection for languages like chinese, english, french, german and dutch
+- Improve Markdown Chunking (https://github.com/weaviate/Verba/pull/323)
 
 # Fixed
 
