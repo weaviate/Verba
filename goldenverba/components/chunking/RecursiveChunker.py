@@ -38,7 +38,7 @@ class RecursiveChunker(Chunker):
             "Seperators": InputConfig(
                 type="multi",
                 value="",
-                description="Select seperators to split the text",
+                description="Select separators to split the text",
                 values=[
                     "\n\n",
                     "\n",
