@@ -19,6 +19,7 @@ All notable changes to this project will be documented in this file.
 - Fixed reading empty string as environment variables
 - Fixed default Unstructed URL
 - Changed Collection names to prevent conflicts with other older Verba version generated collections
+- Ensure Ollama URL is parsed correctly (https://github.com/weaviate/Verba/pull/327)
 
 ## [2.0.0] Importastic
 
