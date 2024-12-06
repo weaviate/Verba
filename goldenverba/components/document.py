@@ -13,7 +13,7 @@ SUPPORTED_LANGUAGES = {
     "zh-hant": "Traditional Chinese",
     "fr": "French",
     "de": "German",
-    "nl": "Dutch"
+    "nl": "Dutch",
 }
 
 
@@ -57,18 +57,29 @@ def detect_language(text: str) -> str:
 
 def split_text_by_language(text: str):
     """Separate text into language parts based on character ranges"""
-    chinese_simplified = ''.join([char for char in text if '\u4e00' <= char <= '\u9fff'])
-    chinese_traditional = ''.join(
-        [char for char in text if '\u3400' <= char <= '\u4dbf' or '\u4e00' <= char <= '\u9fff'])
-    english_part = ''.join([char for char in text if char.isascii()])
-    other_text = ''.join([char for char in text if not (char.isascii() or '\u4e00' <= char <= '\u9fff')])
+    chinese_simplified = "".join(
+        [char for char in text if "\u4e00" <= char <= "\u9fff"]
+    )
+    chinese_traditional = "".join(
+        [
+            char
+            for char in text
+            if "\u3400" <= char <= "\u4dbf" or "\u4e00" <= char <= "\u9fff"
+        ]
+    )
+    english_part = "".join([char for char in text if char.isascii()])
+    other_text = "".join(
+        [char for char in text if not (char.isascii() or "\u4e00" <= char <= "\u9fff")]
+    )
 
     return chinese_simplified, chinese_traditional, english_part, other_text
 
 
 def process_mixed_language(content: str):
     """Process mixed language text"""
-    chinese_simplified, chinese_traditional, english_text, other_text = split_text_by_language(content)
+    chinese_simplified, chinese_traditional, english_text, other_text = (
+        split_text_by_language(content)
+    )
 
     docs = []
 
@@ -121,19 +132,16 @@ class Document:
 
         if len(content) > MAX_BATCH_SIZE:
             # Process content in batches
+            print("TOOO BIG!")
             docs = []
+            detected_language = detect_language(content[0:MAX_BATCH_SIZE])
+            if detected_language in SUPPORTED_LANGUAGES:
+                nlp = load_nlp_for_language(detected_language)
+            else:
+                nlp = process_mixed_language
+
             for i in range(0, len(content), MAX_BATCH_SIZE):
-                batch = content[i: i + MAX_BATCH_SIZE]
-
-                # Check language for each batch
-                detected_language = detect_language(batch)
-
-                if detected_language in SUPPORTED_LANGUAGES:
-                    nlp = load_nlp_for_language(detected_language)
-                    docs.append(nlp(batch))
-                else:
-                    # Process batches of mixed languages
-                    docs.append(process_mixed_language(batch))
+                docs.append(nlp(content[i : i + MAX_BATCH_SIZE]))
 
             # Merged all processed docs
             doc = Doc.from_docs(docs)
