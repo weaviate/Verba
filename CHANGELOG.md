@@ -20,6 +20,7 @@ All notable changes to this project will be documented in this file.
 - Fixed default Unstructed URL
 - Changed Collection names to prevent conflicts with other older Verba version generated collections
 - Ensure Ollama URL is parsed correctly (https://github.com/weaviate/Verba/pull/327)
+- Fixing typos (https://github.com/weaviate/Verba/pull/329)
 
 ## [2.0.0] Importastic
 
