@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file.
 - Catch Exception when trying to access the OpenAI API Embedding endpoint to retrieve model names
 - Fixed reading empty string as environment variables
 - Fixed default Unstructed URL
+- Changed Collection names to prevent conflicts with other older Verba version generated collections
 
 ## [2.0.0] Importastic
 

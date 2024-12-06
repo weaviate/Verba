@@ -149,8 +149,8 @@ else:
 class WeaviateManager:
     def __init__(self):
         self.document_collection_name = "VERBA_DOCUMENTS"
-        self.config_collection_name = "VERBA_CONFIG"
-        self.suggestion_collection_name = "VERBA_SUGGESTION"
+        self.config_collection_name = "VERBA_CONFIGURATION"
+        self.suggestion_collection_name = "VERBA_SUGGESTIONS"
         self.embedding_table = {}
 
     ### Connection Handling
