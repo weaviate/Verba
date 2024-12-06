@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 - Added new deployment type: Custom
 - Added new port configuration
 - Added Groq
+- Language Detection for languages like chinese, dutch, french, german, italian, portuguese, spanish, russian, etc.
 
 # Fixed
 
