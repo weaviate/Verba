@@ -54,7 +54,7 @@ Verba is a fully-customizable personal assistant utilizing [Retrieval Augmented 
 | Cohere (e.g. Command R+)          | ✅          | Embedding and Generation Models by Cohere               |
 | Anthrophic (e.g. Claude Sonnet)   | ✅          | Embedding and Generation Models by Anthrophic           |
 | OpenAI (e.g. GPT4)                | ✅          | Embedding and Generation Models by OpenAI               |
-| Groq (e.g. Llama3)                | ✅          | Generation Models by Groq (LPU inference)              |
+| Groq (e.g. Llama3)                | ✅          | Generation Models by Groq (LPU inference)               |
 | Upstage (e.g. Solar)              | ✅          | Embedding and Generation Models by Upstage              |
 
 | 🤖 Embedding Support | Implemented | Description                              |
@@ -71,7 +71,7 @@ Verba is a fully-customizable personal assistant utilizing [Retrieval Augmented 
 | -------------------------------------------------------- | ----------- | ---------------------------------------------- |
 | [UnstructuredIO](https://docs.unstructured.io/welcome)   | ✅          | Import Data through Unstructured               |
 | [Firecrawl](https://www.firecrawl.dev/)                  | ✅          | Scrape and Crawl URL through Firecrawl         |
-| [UpstageDocumentParse](https://upstage.ai/)              | ✅          | Parse Documents through Upstage Document AI     |
+| [UpstageDocumentParse](https://upstage.ai/)              | ✅          | Parse Documents through Upstage Document AI    |
 | PDF Ingestion                                            | ✅          | Import PDF into Verba                          |
 | GitHub & GitLab                                          | ✅          | Import Files from Github and GitLab            |
 | CSV/XLSX Ingestion                                       | ✅          | Import Table Data into Verba                   |
@@ -164,7 +164,7 @@ Below is a comprehensive list of the API keys and variables you may require:
 | OPENAI_API_KEY         | Your OpenAI Key                                            | Get Access to [OpenAI](https://openai.com/) Models                                |
 | OPENAI_BASE_URL        | URL to OpenAI instance                                     | Models                                                                            |
 | COHERE_API_KEY         | Your API Key                                               | Get Access to [Cohere](https://cohere.com/) Models                                |
-| GROQ_API_KEY         | Your Groq API Key                                               | Get Access to [Groq](https://groq.com/) Models
+| GROQ_API_KEY           | Your Groq API Key                                          | Get Access to [Groq](https://groq.com/) Models                                    |
 | OLLAMA_URL             | URL to your Ollama instance (e.g. http://localhost:11434 ) | Get Access to [Ollama](https://ollama.com/) Models                                |
 | UNSTRUCTURED_API_KEY   | Your API Key                                               | Get Access to [Unstructured](https://docs.unstructured.io/welcome) Data Ingestion |
 | UNSTRUCTURED_API_URL   | URL to Unstructured Instance                               | Get Access to [Unstructured](https://docs.unstructured.io/welcome) Data Ingestion |
@@ -250,8 +250,8 @@ pip install `.[huggingface]`
 
 To use Groq LPUs as generation engine, you need to get an API key from [Groq](https://console.groq.com/keys).
 
->Although you can provide it in the graphical interface when Verba is up, it is recommended to specify it as `GROQ_API_KEY` environment variable before you launch the application.  
-It will allow you to choose the generation model in an up-to-date available models list.
+> Although you can provide it in the graphical interface when Verba is up, it is recommended to specify it as `GROQ_API_KEY` environment variable before you launch the application.  
+> It will allow you to choose the generation model in an up-to-date available models list.
 
 # How to deploy with pip
 
@@ -402,6 +402,10 @@ You can learn more about Verba's architecture and implementation in its [technic
   - Will be fixed in future versions, until then please use the Docker or WCS Deployment
 
 ## FAQ
+
+- **Can I use pre-existing data from my Weaviate instance?**
+
+  - No, unfortunatley not. Verba requires the data to be in a specific format to work. And as of now, this is only possible by importing data through the Verba UI.
 
 - **Is Verba Multi-Lingual?**
 
