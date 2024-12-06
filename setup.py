@@ -44,6 +44,7 @@ setup(
         "aiofiles==24.1.0",
         "assemblyai==0.33.0",
         "beautifulsoup4==4.12.3",
+        "langdetect==1.0.9",
     ],
     extras_require={
         "dev": ["pytest", "wheel", "twine", "black>=23.7.0", "setuptools"],
