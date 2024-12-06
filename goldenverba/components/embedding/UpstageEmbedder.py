@@ -17,7 +17,10 @@ class UpstageEmbedder(Embedding):
     def __init__(self):
         super().__init__()
         self.name = "Upstage"
-        self.description = "Vectorizes documents and queries using Upstage Solar Embeddings"
+        self.description = (
+            "Vectorizes documents and queries using Upstage Solar Embeddings"
+        )
+        self.max_batch_size = 100
 
         # Fetch available models
         api_key = get_token("UPSTAGE_API_KEY")

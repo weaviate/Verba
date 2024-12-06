@@ -21,7 +21,7 @@ class UpstageDocumentParseReader(Reader):
     def __init__(self):
         super().__init__()
         self.requires_env = ["UPSTAGE_API_KEY"]
-        self.name = "Upstage Document Parse"
+        self.name = "Upstage Parser"
         self.description = "Uses the Upstage Document Parse API to convert documents into structured HTML format"
 
         if os.getenv("UPSTAGE_API_KEY") is None:

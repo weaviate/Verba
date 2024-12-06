@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ## Added
 
+- Added Upstage: Reader, Embedder, Generator (https://www.upstage.ai/)
 - Added new deployment type: Custom
 - Added new port configuration
 - Added Groq
