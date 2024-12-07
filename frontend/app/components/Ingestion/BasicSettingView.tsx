@@ -7,7 +7,6 @@ import {
   statusTextMap,
   statusColorMap,
   RAGComponentConfig,
-  RAGConfig,
 } from "@/app/types";
 import VerbaButton from "../Navigation/VerbaButton";
 import { MdCancel } from "react-icons/md";
@@ -18,7 +17,6 @@ import ComponentView from "./ComponentView";
 
 import { MdError } from "react-icons/md";
 import { FaCheckCircle } from "react-icons/fa";
-import { FaCircleInfo } from "react-icons/fa6";
 
 interface BasicSettingViewProps {
   selectedFileData: string | null;

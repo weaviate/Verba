@@ -44,7 +44,6 @@ const Navbar: React.FC<NavbarProps> = ({
   production,
 }) => {
   const [gitHubStars, setGitHubStars] = useState("0");
-  const icon_size = 18;
 
   useEffect(() => {
     // Declare an asynchronous function inside the useEffect
@@ -82,13 +81,11 @@ const Navbar: React.FC<NavbarProps> = ({
       <div className="flex flex-row items-center gap-5">
         <img
           src={imageSrc}
-          className="flex rounded-lg w-[50px] md:w-[80px] md:h-[80px] object-contain"
+          className="flex rounded-lg w-[60px] object-contain [filter:drop-shadow(0_4px_3px_rgb(0_0_0_/0.07))_drop-shadow(0_2px_2px_rgb(0_0_0_/0.06))]"
         />
-        <div className="flex flex-col lg:flex-row lg:items-end justify-center lg:gap-3">
-          <p className="text-2xl md:text-3xl text-text-verba">{title}</p>
-          <p className="text-sm md:text-base text-text-alt-verba font-light">
-            {subtitle}
-          </p>
+        <div className="flex flex-col">
+          <p className="text-xl font-bold text-text-verba">{title}</p>
+          <p className="text-sm  text-text-alt-verba font-light">{subtitle}</p>
         </div>
         <div className="flex md:hidden flex-col items-center gap-3 justify-between">
           <div className="dropdown dropdown-hover">
@@ -196,9 +193,8 @@ const Navbar: React.FC<NavbarProps> = ({
             title={gitHubStars}
             Icon={FaGithub}
             onClick={handleGitHubClick}
-            className="hidden md:block"
-            text_size="text-xs"
-            icon_size={18}
+            className="flex-grow"
+            icon_size={14}
             disabled={false}
             selected={false}
           />

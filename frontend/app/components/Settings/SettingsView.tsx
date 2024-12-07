@@ -46,7 +46,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({
     <div className="flex justify-center gap-3 h-[80vh] ">
       <div className={`w-1/3 flex`}>
         <div className="flex flex-col gap-2 w-full">
-          <div className="bg-bg-alt-verba rounded-2xl flex gap-2 p-6 items-center justify-between h-min w-full">
+          <div className="bg-bg-alt-verba rounded-2xl flex gap-2 p-3 items-center justify-between h-min w-full">
             <div className="flex gap-2 justify-start ">
               <InfoComponent
                 tooltip_text="Customize Verba's Theme, reset collections, logout or report issues."
@@ -54,7 +54,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({
               />
             </div>
           </div>
-          <div className="bg-bg-alt-verba gap-2 rounded-2xl flex flex-col p-6 w-full overflow-y-auto overflow-x-hidden">
+          <div className="bg-bg-alt-verba gap-2 rounded-2xl flex flex-col p-3 w-full overflow-y-auto overflow-x-hidden">
             <VerbaButton
               title="Admin"
               onClick={() => setSettingMode("INFO")}

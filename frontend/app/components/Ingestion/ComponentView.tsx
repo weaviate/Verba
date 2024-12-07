@@ -150,7 +150,7 @@ const ComponentView: React.FC<ComponentViewProps> = ({
     ].config[configKey].values.map((configValue) => (
       <li
         key={"ConfigValue" + configValue}
-        className="lg:text-base text-sm"
+        className="text-sm"
         onClick={() => {
           if (!blocked) {
             updateConfig(component_name, configKey, configValue);
@@ -180,8 +180,6 @@ const ComponentView: React.FC<ComponentViewProps> = ({
           <p>{RAGConfig[component_name].selected} Settings</p>
           <VerbaButton
             title="Save"
-            className="btn-sm lg:text-sm text-xs"
-            text_size=""
             onClick={() => {
               saveComponentConfig(
                 component_name,
@@ -283,6 +281,20 @@ const ComponentView: React.FC<ComponentViewProps> = ({
                 </label>
               )}
 
+            {/* Text Area */}
+            {typeof config.value != "boolean" &&
+              ["textarea"].includes(config.type) && (
+                <textarea
+                  className="grow w-full text-sm min-h-[152px] bg-bg-verba rounded-lg p-2"
+                  value={config.value}
+                  onChange={(e) => {
+                    if (!blocked) {
+                      updateConfig(component_name, configTitle, e.target.value);
+                    }
+                  }}
+                />
+              )}
+
             {/* Multi Input */}
             {typeof config.value != "boolean" && config.type == "multi" && (
               <MultiInput
@@ -319,10 +331,11 @@ const ComponentView: React.FC<ComponentViewProps> = ({
               </div>
             )}
           </div>
+          {/* Description */}
           {config.type != "bool" && (
-            <div className="flex gap-2 items-center text-text-verba">
+            <div className="flex gap-2 items-center text-text-verba mt-3">
               <p className="flex min-w-[8vw]"></p>
-              <p className="lg:text-sm text-xs text-text-alt-verba text-start">
+              <p className="text-xs text-text-alt-verba text-start">
                 {config.description}
               </p>
             </div>

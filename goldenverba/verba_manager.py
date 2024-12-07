@@ -9,6 +9,7 @@ from wasabi import msg
 import asyncio
 
 from copy import deepcopy
+import hashlib
 
 from goldenverba.server.helpers import LoggerManager
 from weaviate.client import WeaviateAsyncClient
@@ -709,7 +710,6 @@ class VerbaManager:
         labels: list[str] = [],
         document_uuids: list[str] = [],
     ):
-
         retriever = rag_config["Retriever"].selected
         embedder = rag_config["Embedder"].selected
 
@@ -751,10 +751,22 @@ class ClientManager:
     def __init__(self) -> None:
         self.clients: dict[str, dict] = {}
         self.manager: VerbaManager = VerbaManager()
-        self.max_time: int = 5
+        self.max_time: int = 10
+        self.locks: dict[str, asyncio.Lock] = {}
 
     def hash_credentials(self, credentials: Credentials) -> str:
-        return f"{credentials.deployment}:{credentials.url}:{credentials.key}"
+        cred_string = f"{credentials.deployment}:{credentials.url}:{credentials.key}"
+        return hashlib.sha256(cred_string.encode()).hexdigest()
+
+    def get_or_create_lock(self, cred_hash: str) -> asyncio.Lock:
+        if cred_hash not in self.locks:
+            self.locks[cred_hash] = asyncio.Lock()
+        return self.locks[cred_hash]
+
+    def heartbeat(self):
+        msg.info(f"{len(self.clients)} clients connected")
+        for cred_hash, client in self.clients.items():
+            msg.info(f"Client {cred_hash} connected at {client['timestamp']}")
 
     async def connect(
         self, credentials: Credentials, port: str = "8080"
@@ -767,20 +779,26 @@ class ClientManager:
             _credentials.key = os.environ.get("WEAVIATE_API_KEY_VERBA", "")
 
         cred_hash = self.hash_credentials(_credentials)
-        if cred_hash in self.clients:
-            msg.info("Found existing Client")
-            return self.clients[cred_hash]["client"]
-        else:
-            msg.good("Connecting new Client")
-            try:
-                client = await self.manager.connect(_credentials, port)
-                self.clients[cred_hash] = {
-                    "client": client,
-                    "timestamp": datetime.now(),
-                }
-                return client
-            except Exception as e:
-                raise e
+
+        lock = self.get_or_create_lock(cred_hash)
+        async with lock:
+            if cred_hash in self.clients:
+                msg.info("Found existing Client")
+                return self.clients[cred_hash]["client"]
+            else:
+                msg.warn("Connecting new Client")
+                try:
+                    client = await self.manager.connect(_credentials, port)
+                    if client:
+                        self.clients[cred_hash] = {
+                            "client": client,
+                            "timestamp": datetime.now(),
+                        }
+                        return client
+                    else:
+                        raise Exception("Client not created")
+                except Exception as e:
+                    raise e
 
     async def disconnect(self):
         msg.warn("Disconnecting Clients!")
@@ -806,3 +824,4 @@ class ClientManager:
             msg.warn(f"Removed client: {cred_hash}")
 
         msg.info(f"Cleaned up {len(clients_to_remove)} clients")
+        self.heartbeat()

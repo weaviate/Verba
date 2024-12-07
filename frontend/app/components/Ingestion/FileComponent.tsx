@@ -35,14 +35,13 @@ const FileComponent: React.FC<FileComponentProps> = ({
   };
 
   return (
-    <div className="flex justify-between items-center gap-2 rounded-2xl p-1 w-full">
+    <div className="flex items-center gap-2 w-full">
       {fileMap[fileData.fileID].status != "READY" ? (
         <div className="flex gap-2">
           {fileMap[fileData.fileID].status != "DONE" &&
             fileMap[fileData.fileID].status != "ERROR" && (
               <VerbaButton
                 title={statusTextMap[fileMap[fileData.fileID].status]}
-                text_class_name="text-xs"
                 className="w-[120px]"
               />
             )}
@@ -83,7 +82,7 @@ const FileComponent: React.FC<FileComponentProps> = ({
         }
         selected={selectedFileData === fileMap[fileData.fileID].fileID}
         selected_color="bg-secondary-verba"
-        className="w-[200px] lg:w-[350px]"
+        className="flex-grow"
         text_class_name="truncate max-w-[150px] lg:max-w-[300px]"
         onClick={() => {
           setSelectedFileData(fileData.fileID);
@@ -93,7 +92,7 @@ const FileComponent: React.FC<FileComponentProps> = ({
       <VerbaButton
         Icon={FaTrash}
         onClick={openDeleteModal}
-        className="w-[120px] max-w-min"
+        className="w-[50px]"
         selected={selectedFileData === fileMap[fileData.fileID].fileID}
         selected_color="bg-warning-verba"
       />
