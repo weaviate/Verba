@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.2.0] Investing in Testing (Suffering will never end)
+
 ## [2.1.0] Importastic
 
 ## Added
