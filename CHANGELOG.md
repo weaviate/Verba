@@ -28,6 +28,7 @@ All notable changes to this project will be documented in this file.
 - System Message is now a textarea in the frontend (https://github.com/weaviate/Verba/issues/334)
 - Race Condition when multiple requests try to create same client (https://github.com/weaviate/Verba/issues/335)
 - Fix wrong data types when querying additional chunks
+- Remove legacy code (https://github.com/weaviate/Verba/issues/284)
 
 ## [2.0.0] Importastic
 
