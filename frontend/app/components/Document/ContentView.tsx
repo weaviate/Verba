@@ -127,7 +127,7 @@ const ContentView: React.FC<ContentViewProps> = ({
           ref={!chunkScores ? contentRef : null}
         >
           <ReactMarkdown
-            className="max-w-[50vw] items-center justify-center flex-wrap md:prose-base sm:prose-sm p-3 prose-pre:bg-bg-alt-verba"
+            className="max-w-[50vw] items-center justify-center flex-wrap prose-sm p-3 prose-pre:bg-bg-alt-verba"
             components={{
               code({ node, inline, className, children, ...props }) {
                 const match = /language-(\w+)/.exec(className || "");

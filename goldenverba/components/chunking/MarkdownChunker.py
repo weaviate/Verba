@@ -85,7 +85,7 @@ class MarkdownChunker(Chunker):
                     Chunk(
                         content=chunk_text,
                         chunk_id=i,
-                        start_i=None, # not implemented as text splitter augments the document
+                        start_i=None,  # not implemented as text splitter augments the document
                         end_i=None,
                         content_without_overlap=chunk_text,
                     )

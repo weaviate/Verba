@@ -153,6 +153,7 @@ async def health_check():
             "production": production,
             "gtag": tag,
             "deployments": deployments,
+            "default_deployment": os.getenv("DEFAULT_DEPLOYMENT", ""),
         }
     )
 

@@ -89,6 +89,7 @@ Verba is a fully-customizable personal assistant utilizing [Retrieval Augmented 
 | Reranking               | planned ⏱️      | Rerank results based on context for improved results                      |
 | RAG Evaluation          | planned ⏱️      | Interface for Evaluating RAG pipelines                                    |
 | Agentic RAG             | out of scope ❌ | Agentic RAG pipelines                                                     |
+| Graph RAG               | out of scope ❌ | Graph-based RAG pipelines                                                 |
 
 | 🗡️ Chunking Techniques | Implemented | Description                                             |
 | ---------------------- | ----------- | ------------------------------------------------------- |
@@ -101,11 +102,12 @@ Verba is a fully-customizable personal assistant utilizing [Retrieval Augmented 
 | Code                   | ✅          | Chunk Code files                                        |
 | JSON                   | ✅          | Chunk JSON files                                        |
 
-| 🆒 Cool Bonus         | Implemented | Description                                             |
-| --------------------- | ----------- | ------------------------------------------------------- |
-| Docker Support        | ✅          | Verba is deployable via Docker                          |
-| Customizable Frontend | ✅          | Verba's frontend is fully-customizable via the frontend |
-| Vector Viewer         | ✅          | Visualize your data in 3D                               |
+| 🆒 Cool Bonus            | Implemented     | Description                                             |
+| ------------------------ | --------------- | ------------------------------------------------------- |
+| Docker Support           | ✅              | Verba is deployable via Docker                          |
+| Customizable Frontend    | ✅              | Verba's frontend is fully-customizable via the frontend |
+| Vector Viewer            | ✅              | Visualize your data in 3D                               |
+| Multi-User Collaboration | out of scope ❌ | Multi-User Collaboration in Verba                       |
 
 | 🤝 RAG Libraries | Implemented | Description                        |
 | ---------------- | ----------- | ---------------------------------- |
@@ -139,7 +141,7 @@ pip install -e .
 
 - Use Docker for Deployment
 
-**Prerequisites**: If you're not using Docker, ensure that you have `Python >=3.10.0` installed on your system.
+**Prerequisites**: If you're not using Docker, ensure that you have `Python >=3.10.0,<3.13.0` installed on your system.
 
 ```
 git clone https://github.com/weaviate/Verba
@@ -149,7 +151,7 @@ docker compose --env-file <your-env-file> up -d --build
 
 If you're unfamiliar with Python and Virtual Environments, please read the [python tutorial guidelines](./PYTHON_TUTORIAL.md).
 
-# API Keys
+# API Keys and Environment Variables
 
 You can set all API keys in the Verba frontend, but to make your life easier, we can also prepare a `.env` file in which Verba will automatically look for the keys. Create a `.env` in the same directory you want to start Verba in. You can find an `.env.example` file in the [goldenverba](./goldenverba/.env.example) directory.
 
@@ -178,6 +180,7 @@ Below is a comprehensive list of the API keys and variables you may require:
 | EMBEDDING_SERVICE_KEY  | Your Embedding Service Key                                 | Get Access to Embedding Models via [Weaviate Embedding Service](https://weaviate.io/developers/wcs/embeddings) |
 | UPSTAGE_API_KEY        | Your Upstage API Key                                       | Get Access to [Upstage](https://upstage.ai/) Models                                                            |
 | UPSTAGE_BASE_URL       | URL to Upstage instance                                    | Models                                                                                                         |
+| DEFAULT_DEPLOYMENT     | Local, Weaviate, Custom, Docker                            | Set the default deployment mode                                                                                |
 
 ![API Keys in Verba](https://github.com/weaviate/Verba/blob/2.0.0/img/api_screen.png)
 
@@ -330,6 +333,10 @@ Visit localhost:8000
 
 Docker is a set of platform-as-a-service products that use OS-level virtualization to deliver software in packages called containers. To get started with deploying Verba using Docker, follow the steps below. If you need more detailed instructions on Docker usage, check out the [Docker Curriculum](https://docker-curriculum.com/).
 
+You can use `docker pull semitechnologies/verba` to pull the latest Verba Docker Image.
+
+If you want to build the image yourself, you can do so by cloning the Verba repository and running `docker build -t verba .` inside the Verba directory.
+
 0. **Clone the Verba repos**
    Ensure you have Git installed on your system. Then, open a terminal or command prompt and run the following command to clone the Verba repository:
 
@@ -341,7 +348,7 @@ git clone https://github.com/weaviate/Verba.git
    Make sure to set your required environment variables in the `.env` file. You can read more about how to set them up in the [API Keys Section](#api-keys)
 
 2. **Adjust the docker-compose file**
-   You can use the `docker-compose.yml` to add required environment variables under the `verba` service and can also adjust the Weaviate Docker settings to enable Authentification or change other settings of your database instance. You can read more about the Weaviate configuration in our [docker-compose documentation](https://weaviate.io/developers/weaviate/installation/docker-compose)
+   You can use the `docker-compose.yml` to add required environment variables under the `verba` service and can also adjust the Weaviate Docker settings to enable Authentification or change other settings of your database instance. You can read more about the Weaviate configuration in our [docker-compose documentation](https://weaviate.io/developers/weaviate/installation/docker-compose). You can also uncomment the `ollama` service to use Ollama within the same docker compose.
 
 > Please make sure to only add environment variables that you really need.
 
@@ -380,6 +387,8 @@ RUN pip install -e '.'
 ### Select your Deployment
 
 The first screen you'll see is the deployment screen. Here you can select between `Local`, `Docker`, `Weaviate Cloud`, or `Custom` deployment. The `Local` deployment is using Weaviate Embedded under the hood, which initializes a Weaviate instance behind the scenes. The `Docker` deployment is using a separate Weaviate instance that is running inside the same Docker network. The `Weaviate Cloud` deployment is using a Weaviate instance that is hosted on Weaviate Cloud Services (WCS). The `Custom` deployment allows you to specify your own Weaviate instance URL, PORT, and API key.
+
+You can skip this part by setting the `DEFAULT_DEPLOYMENT` environment variable to `Local`, `Docker`, `Weaviate`, or `Custom`.
 
 ### Import Your Data
 

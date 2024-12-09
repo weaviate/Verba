@@ -18,7 +18,7 @@ class RecursiveChunker(Chunker):
     def __init__(self):
         super().__init__()
         self.name = "Recursive"
-        self.requires_library = ["langchain_text_splitters "]
+        self.requires_library = ["langchain_text_splitters"]
         self.description = (
             "Recursively split documents based on predefined characters using LangChain"
         )
@@ -80,7 +80,7 @@ class RecursiveChunker(Chunker):
             # Skip if document already contains chunks
             if len(document.chunks) > 0:
                 continue
-            
+
             # char_end_i = -1
             for i, chunk in enumerate(text_splitter.split_text(document.content)):
 

@@ -10,12 +10,15 @@ All notable changes to this project will be documented in this file.
 
 - Added Upstage: Reader, Embedder, Generator (https://www.upstage.ai/)
 - Added new deployment type: Custom
-- Added new port configuration
+- Added new port configuration (https://github.com/weaviate/Verba/issues/308)
 - Added Groq (https://github.com/weaviate/Verba/pull/278)
 - AssemblyAI Reader for audio files (https://github.com/weaviate/Verba/pull/283)
 - Language Detection for languages like chinese, english, french, german and dutch (https://github.com/weaviate/Verba/pull/302)
 - Improve Markdown Chunking (https://github.com/weaviate/Verba/pull/323)
 - Upgrade to latest Weaviate Client
+- Added Ollama to Docker Compose
+- Added Verba to Docker Hub
+- Added default deployment to skip login screen (https://github.com/weaviate/Verba/issues/305)
 
 ## Fixed
 
@@ -29,6 +32,7 @@ All notable changes to this project will be documented in this file.
 - Race Condition when multiple requests try to create same client (https://github.com/weaviate/Verba/issues/335)
 - Fix wrong data types when querying additional chunks
 - Remove legacy code (https://github.com/weaviate/Verba/issues/284)
+- Change Python version range below 3.13
 
 ## [2.0.0] Importastic
 

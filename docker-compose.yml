@@ -29,6 +29,8 @@ services:
       timeout: 10s
       retries: 5
       start_period: 10s
+    networks:
+      - ollama-docker
 
   weaviate:
     command:
@@ -59,7 +61,34 @@ services:
       PERSISTENCE_DATA_PATH: '/var/lib/weaviate'
       ENABLE_MODULES: 'e'
       CLUSTER_HOSTNAME: 'node1'
+    networks:
+      - ollama-docker
+
+  # Uncomment to use Ollama within the same docker compose
+
+  # ollama:
+  #     image: ollama/ollama:latest
+  #     ports:
+  #       - 7869:11434
+  #     volumes:
+  #       - .:/code
+  #       - ./ollama/ollama:/root/.ollama
+  #     container_name: ollama
+  #     pull_policy: always
+  #     tty: true
+  #     restart: always
+  #     environment:
+  #       - OLLAMA_KEEP_ALIVE=24h
+  #       - OLLAMA_HOST=0.0.0.0
+  #     networks:
+  #       - ollama-docker
 
 volumes:
   weaviate_data: {}
+
+
+networks:
+  ollama-docker:
+    external: true
+  
 ...
