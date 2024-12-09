@@ -33,6 +33,7 @@ All notable changes to this project will be documented in this file.
 - Fix wrong data types when querying additional chunks
 - Remove legacy code (https://github.com/weaviate/Verba/issues/284)
 - Change Python version range below 3.13
+- Firecrawl Reader missing metadata (https://github.com/weaviate/Verba/issues/280)
 
 ## [2.0.0] Importastic
 

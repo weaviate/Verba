@@ -89,6 +89,6 @@ volumes:
 
 networks:
   ollama-docker:
-    external: true
+    external: false
   
 ...
