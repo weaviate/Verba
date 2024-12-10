@@ -406,6 +406,8 @@ With Data imported, you can use the `Chat` page to ask any related questions. Yo
 
 Your contributions are always welcome! Feel free to contribute ideas, feedback, or create issues and bug reports if you find any! Before contributing, please read the [Contribution Guide](./CONTRIBUTING.md). Visit our [Weaviate Community Forum](https://forum.weaviate.io/) if you need any help!
 
+Issue's labeled as `Community PR` are great features that can be implemented by the community. Feel free to contribute to them!
+
 ### Project Architecture
 
 You can learn more about Verba's architecture and implementation in its [technical documentation](./TECHNICAL.md) and [frontend documentation](./FRONTEND.md). It's recommended to have a look at them before making any contributions.
