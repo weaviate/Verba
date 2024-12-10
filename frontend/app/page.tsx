@@ -171,7 +171,6 @@ export default function Home() {
     message: string,
     type: "INFO" | "WARNING" | "SUCCESS" | "ERROR"
   ) => {
-    console.log("Adding status message:", message, type);
     setStatusMessages((prevMessages) => [
       ...prevMessages,
       { message, type, timestamp: new Date().toISOString() },

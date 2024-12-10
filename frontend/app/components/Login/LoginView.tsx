@@ -87,7 +87,6 @@ const VerbaThree = ({
   useEffect(() => {
     verba_model.scene.traverse((child) => {
       if (child instanceof THREE.Mesh) {
-        console.log("Mesh:", child.name, "Material:", child.material);
         if (!useMaterial) {
           child.material = material;
         } else {
