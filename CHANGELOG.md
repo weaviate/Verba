@@ -4,9 +4,9 @@ All notable changes to this project will be documented in this file.
 
 ## [2.2.0] Investing in Testing (Suffering will never end)
 
-## Added
-
 ## Fixed
+
+- Fixed Websocket connection issues when importing files
 
 ## [2.1.0] Fixing Bugs and Adding Friends
 

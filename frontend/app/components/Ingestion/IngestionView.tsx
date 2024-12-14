@@ -47,6 +47,7 @@ const IngestionView: React.FC<IngestionViewProps> = ({
     const socketHost = getImportWebSocketApiHost();
     const localSocket = new WebSocket(socketHost);
 
+    // Set timeouts after creation
     localSocket.onopen = () => {
       console.log("Import WebSocket connection opened to " + socketHost);
       setSocketStatus("ONLINE");
@@ -55,6 +56,13 @@ const IngestionView: React.FC<IngestionViewProps> = ({
     localSocket.onmessage = (event) => {
       setSocketStatus("ONLINE");
       try {
+        const raw_data = JSON.parse(event.data);
+
+        if (raw_data.type == "pong") {
+          console.log("Received pong");
+          return;
+        }
+
         const data: StatusReport | CreateNewDocument = JSON.parse(event.data);
         if ("new_file_id" in data) {
           setFileMap((prevFileMap) => {
@@ -78,9 +86,17 @@ const IngestionView: React.FC<IngestionViewProps> = ({
 
     localSocket.onerror = (error) => {
       console.error("Import WebSocket Error:", error);
+      console.log("WebSocket error details:", {
+        error,
+        type: error.type,
+        eventPhase: error.eventPhase,
+        timeStamp: error.timeStamp,
+        isTrusted: error.isTrusted,
+        target: error.target,
+      });
       setSocketStatus("OFFLINE");
       setSocketErrorStatus();
-      setReconnect((prev) => !prev);
+      reconnectToVerba();
     };
 
     localSocket.onclose = (event) => {
@@ -91,9 +107,9 @@ const IngestionView: React.FC<IngestionViewProps> = ({
           `Import WebSocket connection closed cleanly, code=${event.code}, reason=${event.reason}`
         );
       } else {
-        console.error("WebSocket connection died");
+        console.error("WebSocket connection died unexpectedly");
       }
-      setReconnect((prev) => !prev);
+      reconnectToVerba();
     };
 
     setSocket(localSocket);
@@ -105,7 +121,26 @@ const IngestionView: React.FC<IngestionViewProps> = ({
     };
   }, [reconnect]);
 
+  useEffect(() => {
+    let pingInterval: number | undefined;
+
+    if (socket) {
+      // Send a ping every 15 seconds
+      pingInterval = window.setInterval(() => {
+        if (socket.readyState === WebSocket.OPEN) {
+          console.log("Sending ping");
+          socket.send(JSON.stringify({ type: "ping" }));
+        }
+      }, 15000);
+    }
+
+    return () => {
+      if (pingInterval) clearInterval(pingInterval);
+    };
+  }, [socket]);
+
   const reconnectToVerba = () => {
+    console.log("TRYING TO RECONNECT TO VERBA");
     setReconnect((prevState) => !prevState);
   };
 
@@ -231,7 +266,7 @@ const IngestionView: React.FC<IngestionViewProps> = ({
       });
     } else {
       console.error("WebSocket is not open. ReadyState:", socket?.readyState);
-      setReconnect((prevState) => !prevState);
+      reconnectToVerba();
     }
   };
 
