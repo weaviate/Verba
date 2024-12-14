@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 ## Fixed
 
 - Fixed Websocket connection issues when importing files
+- Fixed tokenization with mixed language content (https://github.com/weaviate/Verba/issues/352)
 
 ## [2.1.0] Fixing Bugs and Adding Friends
 
