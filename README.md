@@ -204,6 +204,10 @@ Another local alternative is deploying Weaviate using Docker. For more details, 
 
 ![Deployment in Verba](https://github.com/weaviate/Verba/blob/2.0.0/img/verba_deployment.png)
 
+**⚙️ Custom Weaviate Deployment**
+
+If you're hosting Weaviate yourself, you can use the `Custom` deployment option in Verba. This will allow you to specify the URL, PORT, and API key of your Weaviate instance.
+
 ## Ollama
 
 Verba supports Ollama models. Download and Install Ollama on your device (https://ollama.com/download). Make sure to install your preferred LLM using `ollama run <model>`.
@@ -305,6 +309,7 @@ git clone https://github.com/weaviate/Verba.git
 
 ```
 python3 -m virtualenv venv
+source venv/bin/activate
 ```
 
 3. **Install Verba**
