@@ -255,7 +255,7 @@ or
 pip install `.[huggingface]`
 ```
 
-> If you're using Docker, modify the Dockerfile accordingly
+> If you're using Docker, modify the `Dockerfile` accordingly. It's not possible to install a custom Verba installation if you pull the Docker Image from the Docker Hub, as of now, you'd need to install the Docker deployment from the source code and modify the `Dockerfile` beforehand.
 
 ## Groq
 
@@ -338,9 +338,9 @@ Visit localhost:8000
 
 Docker is a set of platform-as-a-service products that use OS-level virtualization to deliver software in packages called containers. To get started with deploying Verba using Docker, follow the steps below. If you need more detailed instructions on Docker usage, check out the [Docker Curriculum](https://docker-curriculum.com/).
 
-You can use `docker pull semitechnologies/verba` to pull the latest Verba Docker Image.
+You can use `docker pull semitechnologies/verba` to pull the latest Verba Docker Image. Please note, that by pulling directly from Docker Hub you're only able to install the vanilla Verba version that does not include packages e.g `HuggingFace`. If you want to use Docker and `HuggingFace` please follow the steps below.
 
-If you want to build the image yourself, you can do so by cloning the Verba repository and running `docker build -t verba .` inside the Verba directory.
+To build the image yourself, you can clone the Verba repository and run `docker build -t verba .` inside the Verba directory.
 
 0. **Clone the Verba repos**
    Ensure you have Git installed on your system. Then, open a terminal or command prompt and run the following command to clone the Verba repository:
