@@ -66,6 +66,7 @@ from goldenverba.components.generation.AnthrophicGenerator import AnthropicGener
 from goldenverba.components.generation.OllamaGenerator import OllamaGenerator
 from goldenverba.components.generation.OpenAIGenerator import OpenAIGenerator
 from goldenverba.components.generation.GroqGenerator import GroqGenerator
+from goldenverba.components.generation.NovitaGenerator import NovitaGenerator
 
 try:
     import tiktoken
@@ -109,6 +110,7 @@ if production != "Production":
         AnthropicGenerator(),
         CohereGenerator(),
         GroqGenerator(),
+        NovitaGenerator(),
     ]
 else:
     readers = [
@@ -140,6 +142,7 @@ else:
         OpenAIGenerator(),
         AnthropicGenerator(),
         CohereGenerator(),
+        # NovitaGenerator(),
     ]
 
 
@@ -296,7 +299,11 @@ class WeaviateManager:
             msg.info(
                 f"Collection: {collection_name} does not exist, creating new collection."
             )
+            print(collection_name)
             await client.collections.create(name=collection_name)
+            collection = await client.collections.get(collection_name)
+            print(collection.config.properties)  # 查看属性配置
+            print(collection.config.vectorizer)  # 查看向量化配置
         return True
 
     async def verify_embedding_collection(self, client: WeaviateAsyncClient, embedder):

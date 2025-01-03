@@ -713,6 +713,9 @@ class VerbaManager:
         retriever = rag_config["Retriever"].selected
         embedder = rag_config["Embedder"].selected
 
+        print(rag_config["Embedder"].selected)  # 确认选择的 embedder
+        print(await client.collections.list_all())  # 查看所有 collections
+
         await self.weaviate_manager.add_suggestion(client, query)
 
         vector = await self.embedder_manager.vectorize_query(
