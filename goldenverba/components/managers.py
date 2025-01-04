@@ -152,7 +152,6 @@ else:
         OpenAIGenerator(),
         AnthropicGenerator(),
         CohereGenerator(),
-        NovitaGenerator(),
         UpstageGenerator(),
     ]
 

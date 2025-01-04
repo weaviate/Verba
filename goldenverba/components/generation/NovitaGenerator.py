@@ -1,9 +1,7 @@
 import os
 from dotenv import load_dotenv
-from wasabi import msg
-import requests
-import httpx
 import json
+import aiohttp
 
 from goldenverba.components.interfaces import Generator
 from goldenverba.components.types import InputConfig
@@ -49,7 +47,7 @@ class NovitaGenerator(Generator):
         conversation: list[dict] = [],
     ):
         system_message = config.get("System Message").value
-        model = config.get("Model", {"value": "gryphe/mythomax-l2-13b"}).value
+        model = config.get("Model", {"value": "meta-llama/llama-3.3-70b-instruct"}).value
         novita_key = get_environment(
             config, "API Key", "NOVITA_API_KEY", "No Novita API Key found"
         )
@@ -67,30 +65,24 @@ class NovitaGenerator(Generator):
             "stream": True,
         }
 
-        async with httpx.AsyncClient() as client:
-            async with client.stream(
-                "POST",
-                f"{novita_url}/chat/completions",
+        async with aiohttp.ClientSession() as client:
+            async with client.post(
+                url=f"{novita_url}/chat/completions",
                 json=data,
                 headers=headers,
                 timeout=None,
             ) as response:
-                async for line in response.aiter_lines():
-                    if line.startswith("data: "):
-                        if line.strip() == "data: [DONE]":
-                            break
-                        json_line = json.loads(line[6:])
+                if response.status == 200:
+                    async for line in response.content:
+                        json_line = json.loads(line)
                         choice = json_line["choices"][0]
-                        if "delta" in choice and "content" in choice["delta"]:
-                            yield {
-                                "message": choice["delta"]["content"],
-                                "finish_reason": choice.get("finish_reason"),
-                            }
-                        elif "finish_reason" in choice:
-                            yield {
-                                "message": "",
-                                "finish_reason": choice["finish_reason"],
-                            }
+                        yield {
+                            "message": choice["message"]["content"],
+                            "finish_reason": choice.get("finish_reason"),
+                        }
+                else:
+                    error_message = await response.text()
+                    yield  {"message": f"HTTP Error {response.status}: {error_message}", "finish_reason": "stop"}
 
     def prepare_messages(
         self, query: str, context: str, conversation: list[dict], system_message: str
@@ -122,8 +114,8 @@ def get_models():
         if len(models) > 0:
             return models
         else:
-            msg.info("No Novita Model detected")
-            return ["No Novita Model detected"]
+            msg.info("No Novita AI Model detected")
+            return ["No Novita AI Model detected"]
     except Exception as e:
-        msg.fail(f"Couldn't connect to Novita: {e}")
-        return [f"Couldn't connect to Novita"]
+        msg.fail(f"Couldn't connect to Novita AI: {e}")
+        return [f"Couldn't connect to Novita AI"]
