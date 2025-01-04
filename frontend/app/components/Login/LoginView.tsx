@@ -1,15 +1,8 @@
 import * as THREE from "three";
-import React, { useState, useRef, useEffect, useMemo, memo } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import React, { useState, useEffect, useMemo } from "react";
+import { Canvas } from "@react-three/fiber";
 import { PresentationControls, useGLTF, Float } from "@react-three/drei";
-import CustomShaderMaterial from "three-custom-shader-material/vanilla";
 import GUI from "lil-gui";
-import { RGBELoader } from "three/addons/loaders/RGBELoader.js";
-import { mergeVertices } from "three/addons/utils/BufferGeometryUtils.js";
-import { useThree } from "@react-three/fiber";
-
-import wobbleVertexShader from "!raw-loader!../../../public/shaders/wobble/vertex.glsl";
-import wobbleFragmentShader from "!raw-loader!../../../public/shaders/wobble/fragment.glsl";
 
 import { FaDatabase } from "react-icons/fa";
 import { FaDocker } from "react-icons/fa";
@@ -94,7 +87,6 @@ const VerbaThree = ({
   useEffect(() => {
     verba_model.scene.traverse((child) => {
       if (child instanceof THREE.Mesh) {
-        console.log("Mesh:", child.name, "Material:", child.material);
         if (!useMaterial) {
           child.material = material;
         } else {
@@ -177,6 +169,13 @@ const LoginView: React.FC<LoginViewProps> = ({
     return () => clearTimeout(timer);
   }, []);
 
+  useEffect(() => {
+    if (credentials.default_deployment) {
+      setSelectedDeployment(credentials.default_deployment);
+      connect(credentials.default_deployment);
+    }
+  }, [credentials]);
+
   const connect = async (
     deployment: "Local" | "Weaviate" | "Docker" | "Custom"
   ) => {
@@ -203,6 +202,7 @@ const LoginView: React.FC<LoginViewProps> = ({
           deployment: deployment,
           key: weaviateAPIKey,
           url: weaviateURL,
+          default_deployment: credentials.default_deployment,
         });
         setRAGConfig(response.rag_config);
         if (response.themes) {
@@ -426,7 +426,6 @@ const LoginView: React.FC<LoginViewProps> = ({
                               Icon={FaBackspace}
                               title="Back"
                               type="button"
-                              button_size="btn-sm"
                               text_size="text-xs"
                               icon_size={12}
                               onClick={() => setSelectStage(true)}

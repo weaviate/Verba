@@ -2,6 +2,7 @@ import os
 import requests
 from wasabi import msg
 import aiohttp
+from urllib.parse import urljoin
 
 from goldenverba.components.interfaces import Embedding
 from goldenverba.components.types import InputConfig
@@ -33,7 +34,7 @@ class OllamaEmbedder(Embedding):
         data = {"model": model, "input": content}
 
         async with aiohttp.ClientSession() as session:
-            async with session.post(self.url + "/api/embed", json=data) as response:
+            async with session.post(urljoin(self.url, "/api/embed"), json=data) as response:
                 response.raise_for_status()
                 data = await response.json()
                 embeddings = data.get("embeddings", [])
@@ -42,7 +43,7 @@ class OllamaEmbedder(Embedding):
 
 def get_models(url: str):
     try:
-        response = requests.get(url + "/api/tags")
+        response = requests.get(urljoin(url, "/api/tags"))
         models = [model.get("name") for model in response.json().get("models")]
         if len(models) > 0:
             return models

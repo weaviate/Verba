@@ -157,7 +157,7 @@ const DocumentSearch: React.FC<DocumentSearchComponentProps> = ({
   return (
     <div className="flex flex-col gap-2 w-full">
       {/* Search Header */}
-      <div className="bg-bg-alt-verba rounded-2xl flex gap-2 p-6 items-center justify-between h-min w-full">
+      <div className="bg-bg-alt-verba rounded-2xl flex gap-2 p-3 items-center justify-between h-min w-full">
         <div className="hidden lg:flex gap-2 justify-start w-[8vw]">
           <InfoComponent
             tooltip_text="Search and inspect different documents imported into Verba"
@@ -266,7 +266,7 @@ const DocumentSearch: React.FC<DocumentSearchComponentProps> = ({
                     selected={selectedDocument == document.uuid}
                     selected_color="bg-secondary-verba"
                     key={document.title + index}
-                    className="w-[200px] lg:w-[400px]"
+                    className="flex-grow"
                     text_class_name="truncate max-w-[150px] lg:max-w-[350px]"
                     onClick={() => setSelectedDocument(document.uuid)}
                   />
@@ -296,28 +296,26 @@ const DocumentSearch: React.FC<DocumentSearchComponentProps> = ({
         </div>
       </div>
 
-      <div className="bg-bg-alt-verba rounded-2xl flex gap-2 p-6 items-center justify-center h-min w-full">
-        <div className="flex gap-3 items-center justify-center w-full">
-          <div className="join justify-center items-center text-text-verba">
-            <div className="flex justify-center items-center gap-2 p-3 bg-bg-alt-verba">
-              <VerbaButton
-                title={"Previous Page"}
-                onClick={previousPage}
-                className="btn-sm min-w-min max-w-[200px]"
-                text_class_name="text-xs"
-                Icon={FaArrowAltCircleLeft}
-              />
-              <div className="flex items-center">
-                <p className="text-xs text-text-verba">Page {page}</p>
-              </div>
-              <VerbaButton
-                title={"Next Page"}
-                onClick={nextPage}
-                className="btn-sm min-w-min max-w-[200px]"
-                text_class_name="text-xs"
-                Icon={FaArrowAltCircleRight}
-              />
+      <div className="bg-bg-alt-verba rounded-2xl flex gap-2 p-4 items-center justify-center h-min w-full">
+        <div className="join justify-center items-center text-text-verba">
+          <div className="flex justify-center items-center gap-2 bg-bg-alt-verba">
+            <VerbaButton
+              title={"Previous Page"}
+              onClick={previousPage}
+              className="btn-sm min-w-min max-w-[200px]"
+              text_class_name="text-xs"
+              Icon={FaArrowAltCircleLeft}
+            />
+            <div className="flex items-center">
+              <p className="text-xs text-text-verba">Page {page}</p>
             </div>
+            <VerbaButton
+              title={"Next Page"}
+              onClick={nextPage}
+              className="btn-sm min-w-min max-w-[200px]"
+              text_class_name="text-xs"
+              Icon={FaArrowAltCircleRight}
+            />
           </div>
         </div>
       </div>

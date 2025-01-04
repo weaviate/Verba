@@ -17,32 +17,20 @@ const InfoComponent: React.FC<InfoComponentProps> = ({
 
   return (
     <div className={`items-center gap-2 flex`}>
-      <div className="relative">
-        <VerbaButton
-          title=""
-          Icon={FaInfo}
-          icon_size={10}
-          disabled={false}
-          selected={false}
-          onMouseEnter={() => setShowTooltip(true)}
-          onMouseLeave={() => setShowTooltip(false)}
-          circle={true}
-          button_size="btn-xs"
-        />
+      <div
+        onMouseEnter={() => setShowTooltip(true)}
+        onMouseLeave={() => setShowTooltip(false)}
+        className="relative cursor-pointer flex flex-col items-center text-text-alt-verba"
+      >
+        <p className="text-sm ml-3">{display_text}</p>
         <div
-          className={`absolute left-full z-30 p-4 bg-bg-verba text-text-alt-verba text-xs rounded-xl shadow-md w-[300px] transition-opacity duration-300 ${
+          className={`absolute top-full left-full mt-2 z-30 p-4 bg-bg-verba text-text-alt-verba text-xs rounded-xl shadow-md w-[300px] transition-opacity duration-300 ${
             showTooltip ? "opacity-100" : "opacity-0 pointer-events-none"
           }`}
         >
-          <p className="w-full whitespace-normal">{tooltip_text}</p>
+          <p className="w-full text-xs whitespace-normal">{tooltip_text}</p>
         </div>
       </div>
-      <p
-        className="text-sm text-text-alt-verba truncate max-w-[350px]"
-        title={display_text}
-      >
-        {display_text}
-      </p>
     </div>
   );
 };

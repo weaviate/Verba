@@ -81,6 +81,7 @@ class FirecrawlReader(Reader):
                 file_size=len(content_bytes),
                 status=fileConfig.status,
                 status_report=fileConfig.status_report,
+                metadata=fileConfig.metadata,
             )
             document = await reader.load(config, new_file_config)
             documents.append(document[0])

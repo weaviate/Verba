@@ -74,7 +74,6 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   >("DONE");
 
   const [previewText, setPreviewText] = useState("");
-  const lastMessageRef = useRef<null | HTMLDivElement>(null);
   const [socket, setSocket] = useState<WebSocket | null>(null);
   const [socketOnline, setSocketOnline] = useState(false);
   const [reconnect, setReconnect] = useState(false);
@@ -321,11 +320,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
   const handleCompositionStart = () => {
     setIsComposing(true);
-  }
+  };
 
   const handleCompositionEnd = () => {
     setIsComposing(false);
-  }
+  };
 
   const handleKeyDown = (e: any) => {
     if (e.key === "Enter" && !e.shiftKey && !isComposing) {
@@ -385,7 +384,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   return (
     <div className="flex flex-col gap-2 w-full">
       {/* Header */}
-      <div className="bg-bg-alt-verba rounded-2xl flex gap-2 p-6 items-center justify-between h-min w-full">
+      <div className="bg-bg-alt-verba rounded-2xl flex gap-2 p-3 items-center justify-between h-min w-full">
         <div className="hidden md:flex gap-2 justify-start items-center">
           <InfoComponent
             tooltip_text="Use the Chat interface to interact with your data and perform Retrieval Augmented Generation (RAG). This interface allows you to ask questions, analyze sources, and generate responses based on your stored documents."
@@ -642,34 +641,36 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                 </ul>
               )}
             </div>
-            <VerbaButton
-              type="button"
-              Icon={IoIosSend}
-              onClick={() => {
-                sendUserMessage();
-              }}
-              disabled={false}
-              selected_color="bg-primary-verba"
-            />
-            <VerbaButton
-              type="button"
-              Icon={MdOutlineRefresh}
-              onClick={() => {
-                setSelectedDocument(null);
-                setSelectedChunkScore([]);
-                setUserInput("");
-                setSelectedDocumentScore(null);
-                setCurrentSuggestions([]);
-                setMessages([
-                  {
-                    type: "system",
-                    content: selectedTheme.intro_message.text,
-                  },
-                ]);
-              }}
-              disabled={false}
-              selected_color="bg-primary-verba"
-            />
+            <div className="flex flex-col gap-1 items-center justify-center">
+              <VerbaButton
+                type="button"
+                Icon={IoIosSend}
+                onClick={() => {
+                  sendUserMessage();
+                }}
+                disabled={false}
+                selected_color="bg-primary-verba"
+              />
+              <VerbaButton
+                type="button"
+                Icon={MdOutlineRefresh}
+                onClick={() => {
+                  setSelectedDocument(null);
+                  setSelectedChunkScore([]);
+                  setUserInput("");
+                  setSelectedDocumentScore(null);
+                  setCurrentSuggestions([]);
+                  setMessages([
+                    {
+                      type: "system",
+                      content: selectedTheme.intro_message.text,
+                    },
+                  ]);
+                }}
+                disabled={false}
+                selected_color="bg-primary-verba"
+              />
+            </div>
           </div>
         ) : (
           <div className="flex gap-2 items-center justify-end w-full">

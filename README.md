@@ -1,11 +1,11 @@
 # Verba
 
-## The Golden RAGtriever
+## The Golden RAGtriever - Community Edition ✨
 
 [![Weaviate](https://img.shields.io/static/v1?label=powered%20by&message=Weaviate%20%E2%9D%A4&color=green&style=flat-square)](https://weaviate.io/)
 [![PyPi downloads](https://static.pepy.tech/personalized-badge/goldenverba?period=total&units=international_system&left_color=grey&right_color=orange&left_text=pip%20downloads)](https://pypi.org/project/goldenverba/) [![Docker support](https://img.shields.io/badge/Docker_support-%E2%9C%93-4c1?style=flat-square&logo=docker&logoColor=white)](https://docs.docker.com/get-started/) [![Demo](https://img.shields.io/badge/Check%20out%20the%20demo!-yellow?&style=flat-square&logo=react&logoColor=white)](https://verba.weaviate.io/)
 
-Welcome to Verba: The Golden RAGtriever, an open-source application designed to offer an end-to-end, streamlined, and user-friendly interface for Retrieval-Augmented Generation (RAG) out of the box. In just a few easy steps, explore your datasets and extract insights with ease, either locally with Ollama and Huggingface or through LLM providers such as Anthrophic, Cohere, and OpenAI.
+Welcome to Verba: The Golden RAGtriever, an community-driven open-source application designed to offer an end-to-end, streamlined, and user-friendly interface for Retrieval-Augmented Generation (RAG) out of the box. In just a few easy steps, explore your datasets and extract insights with ease, either locally with Ollama and Huggingface or through LLM providers such as Anthrophic, Cohere, and OpenAI. This project is built with and for the community, please be aware that it might not be maintained with the same urgency as other Weaviate production applications. Feel free to contribute to the project and help us make Verba even better! <3
 
 ```
 pip install goldenverba
@@ -54,7 +54,8 @@ Verba is a fully-customizable personal assistant utilizing [Retrieval Augmented 
 | Cohere (e.g. Command R+)          | ✅          | Embedding and Generation Models by Cohere               |
 | Anthrophic (e.g. Claude Sonnet)   | ✅          | Embedding and Generation Models by Anthrophic           |
 | OpenAI (e.g. GPT4)                | ✅          | Embedding and Generation Models by OpenAI               |
-| Groq (e.g. Llama3)                | ✅          | Generation Models by Groq (LPU inference)              |
+| Groq (e.g. Llama3)                | ✅          | Generation Models by Groq (LPU inference)               |
+| Upstage (e.g. Solar)              | ✅          | Embedding and Generation Models by Upstage              |
 
 | 🤖 Embedding Support | Implemented | Description                              |
 | -------------------- | ----------- | ---------------------------------------- |
@@ -64,27 +65,31 @@ Verba is a fully-customizable personal assistant utilizing [Retrieval Augmented 
 | Cohere               | ✅          | Embedding Models by Cohere               |
 | VoyageAI             | ✅          | Embedding Models by VoyageAI             |
 | OpenAI               | ✅          | Embedding Models by OpenAI               |
+| Upstage              | ✅          | Embedding Models by Upstage              |
 
 | 📁 Data Support                                          | Implemented | Description                                    |
 | -------------------------------------------------------- | ----------- | ---------------------------------------------- |
 | [UnstructuredIO](https://docs.unstructured.io/welcome)   | ✅          | Import Data through Unstructured               |
 | [Firecrawl](https://www.firecrawl.dev/)                  | ✅          | Scrape and Crawl URL through Firecrawl         |
+| [UpstageDocumentParse](https://upstage.ai/)              | ✅          | Parse Documents through Upstage Document AI    |
 | PDF Ingestion                                            | ✅          | Import PDF into Verba                          |
 | GitHub & GitLab                                          | ✅          | Import Files from Github and GitLab            |
 | CSV/XLSX Ingestion                                       | ✅          | Import Table Data into Verba                   |
 | .DOCX                                                    | ✅          | Import .docx files                             |
 | Multi-Modal (using [AssemblyAI](https://assemblyai.com)) | ✅          | Import and Transcribe Audio through AssemblyAI |
 
-| ✨ RAG Features         | Implemented | Description                                                               |
-| ----------------------- | ----------- | ------------------------------------------------------------------------- |
-| Hybrid Search           | ✅          | Semantic Search combined with Keyword Search                              |
-| Autocomplete Suggestion | ✅          | Verba suggests autocompletion                                             |
-| Filtering               | ✅          | Apply Filters (e.g. documents, document types etc.) before performing RAG |
-| Customizable Metadata   | ✅          | Free control over Metadata                                                |
-| Async Ingestion         | ✅          | Ingest data asynchronously to speed up the process                        |
-| Advanced Querying       | planned ⏱️  | Task Delegation Based on LLM Evaluation                                   |
-| Reranking               | planned ⏱️  | Rerank results based on context for improved results                      |
-| RAG Evaluation          | planned ⏱️  | Interface for Evaluating RAG pipelines                                    |
+| ✨ RAG Features         | Implemented     | Description                                                               |
+| ----------------------- | --------------- | ------------------------------------------------------------------------- |
+| Hybrid Search           | ✅              | Semantic Search combined with Keyword Search                              |
+| Autocomplete Suggestion | ✅              | Verba suggests autocompletion                                             |
+| Filtering               | ✅              | Apply Filters (e.g. documents, document types etc.) before performing RAG |
+| Customizable Metadata   | ✅              | Free control over Metadata                                                |
+| Async Ingestion         | ✅              | Ingest data asynchronously to speed up the process                        |
+| Advanced Querying       | planned ⏱️      | Task Delegation Based on LLM Evaluation                                   |
+| Reranking               | planned ⏱️      | Rerank results based on context for improved results                      |
+| RAG Evaluation          | planned ⏱️      | Interface for Evaluating RAG pipelines                                    |
+| Agentic RAG             | out of scope ❌ | Agentic RAG pipelines                                                     |
+| Graph RAG               | out of scope ❌ | Graph-based RAG pipelines                                                 |
 
 | 🗡️ Chunking Techniques | Implemented | Description                                             |
 | ---------------------- | ----------- | ------------------------------------------------------- |
@@ -97,11 +102,12 @@ Verba is a fully-customizable personal assistant utilizing [Retrieval Augmented 
 | Code                   | ✅          | Chunk Code files                                        |
 | JSON                   | ✅          | Chunk JSON files                                        |
 
-| 🆒 Cool Bonus         | Implemented | Description                                             |
-| --------------------- | ----------- | ------------------------------------------------------- |
-| Docker Support        | ✅          | Verba is deployable via Docker                          |
-| Customizable Frontend | ✅          | Verba's frontend is fully-customizable via the frontend |
-| Vector Viewer         | ✅          | Visualize your data in 3D                               |
+| 🆒 Cool Bonus            | Implemented     | Description                                             |
+| ------------------------ | --------------- | ------------------------------------------------------- |
+| Docker Support           | ✅              | Verba is deployable via Docker                          |
+| Customizable Frontend    | ✅              | Verba's frontend is fully-customizable via the frontend |
+| Vector Viewer            | ✅              | Visualize your data in 3D                               |
+| Multi-User Collaboration | out of scope ❌ | Multi-User Collaboration in Verba                       |
 
 | 🤝 RAG Libraries | Implemented | Description                        |
 | ---------------- | ----------- | ---------------------------------- |
@@ -135,7 +141,7 @@ pip install -e .
 
 - Use Docker for Deployment
 
-**Prerequisites**: If you're not using Docker, ensure that you have `Python >=3.10.0` installed on your system.
+**Prerequisites**: If you're not using Docker, ensure that you have `Python >=3.10.0,<3.13.0` installed on your system.
 
 ```
 git clone https://github.com/weaviate/Verba
@@ -145,7 +151,7 @@ docker compose --env-file <your-env-file> up -d --build
 
 If you're unfamiliar with Python and Virtual Environments, please read the [python tutorial guidelines](./PYTHON_TUTORIAL.md).
 
-# API Keys
+# API Keys and Environment Variables
 
 You can set all API keys in the Verba frontend, but to make your life easier, we can also prepare a `.env` file in which Verba will automatically look for the keys. Create a `.env` in the same directory you want to start Verba in. You can find an `.env.example` file in the [goldenverba](./goldenverba/.env.example) directory.
 
@@ -153,25 +159,28 @@ You can set all API keys in the Verba frontend, but to make your life easier, we
 
 Below is a comprehensive list of the API keys and variables you may require:
 
-| Environment Variable   | Value                                                      | Description                                                                       |
-| ---------------------- | ---------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| WEAVIATE_URL_VERBA     | URL to your hosted Weaviate Cluster                        | Connect to your [WCS](https://console.weaviate.cloud/) Cluster                    |
-| WEAVIATE_API_KEY_VERBA | API Credentials to your hosted Weaviate Cluster            | Connect to your [WCS](https://console.weaviate.cloud/) Cluster                    |
-| ANTHROPIC_API_KEY      | Your Anthropic API Key                                     | Get Access to [Anthropic](https://www.anthropic.com/) Models                      |
-| OPENAI_API_KEY         | Your OpenAI Key                                            | Get Access to [OpenAI](https://openai.com/) Models                                |
-| OPENAI_BASE_URL        | URL to OpenAI instance                                     | Models                                                                            |
-| COHERE_API_KEY         | Your API Key                                               | Get Access to [Cohere](https://cohere.com/) Models                                |
-| GROQ_API_KEY         | Your Groq API Key                                               | Get Access to [Groq](https://groq.com/) Models
-| OLLAMA_URL             | URL to your Ollama instance (e.g. http://localhost:11434 ) | Get Access to [Ollama](https://ollama.com/) Models                                |
-| UNSTRUCTURED_API_KEY   | Your API Key                                               | Get Access to [Unstructured](https://docs.unstructured.io/welcome) Data Ingestion |
-| UNSTRUCTURED_API_URL   | URL to Unstructured Instance                               | Get Access to [Unstructured](https://docs.unstructured.io/welcome) Data Ingestion |
-| ASSEMBLYAI_API_KEY     | Your API Key                                               | Get Access to [AssemblyAI](https://assemblyai.com) Data Ingestion                 |
-| GITHUB_TOKEN           | Your GitHub Token                                          | Get Access to Data Ingestion via GitHub                                           |
-| GITLAB_TOKEN           | Your GitLab Token                                          | Get Access to Data Ingestion via GitLab                                           |
-| FIRECRAWL_API_KEY      | Your Firecrawl API Key                                     | Get Access to Data Ingestion via Firecrawl                                        |
-| VOYAGE_API_KEY         | Your VoyageAI API Key                                      | Get Access to Embedding Models via VoyageAI                                       |
-| EMBEDDING_SERVICE_URL  | URL to your Embedding Service Instance                     | Get Access to Embedding Models via Weaviate Embedding Service                     |
-| EMBEDDING_SERVICE_KEY  | Your Embedding Service Key                                 | Get Access to Embedding Models via Weaviate Embedding Service                     |
+| Environment Variable   | Value                                                      | Description                                                                                                    |
+| ---------------------- | ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| WEAVIATE_URL_VERBA     | URL to your hosted Weaviate Cluster                        | Connect to your [WCS](https://console.weaviate.cloud/) Cluster                                                 |
+| WEAVIATE_API_KEY_VERBA | API Credentials to your hosted Weaviate Cluster            | Connect to your [WCS](https://console.weaviate.cloud/) Cluster                                                 |
+| ANTHROPIC_API_KEY      | Your Anthropic API Key                                     | Get Access to [Anthropic](https://www.anthropic.com/) Models                                                   |
+| OPENAI_API_KEY         | Your OpenAI Key                                            | Get Access to [OpenAI](https://openai.com/) Models                                                             |
+| OPENAI_BASE_URL        | URL to OpenAI instance                                     | Models                                                                                                         |
+| COHERE_API_KEY         | Your API Key                                               | Get Access to [Cohere](https://cohere.com/) Models                                                             |
+| GROQ_API_KEY           | Your Groq API Key                                          | Get Access to [Groq](https://groq.com/) Models                                                                 |
+| OLLAMA_URL             | URL to your Ollama instance (e.g. http://localhost:11434 ) | Get Access to [Ollama](https://ollama.com/) Models                                                             |
+| UNSTRUCTURED_API_KEY   | Your API Key                                               | Get Access to [Unstructured](https://docs.unstructured.io/welcome) Data Ingestion                              |
+| UNSTRUCTURED_API_URL   | URL to Unstructured Instance                               | Get Access to [Unstructured](https://docs.unstructured.io/welcome) Data Ingestion                              |
+| ASSEMBLYAI_API_KEY     | Your API Key                                               | Get Access to [AssemblyAI](https://assemblyai.com) Data Ingestion                                              |
+| GITHUB_TOKEN           | Your GitHub Token                                          | Get Access to Data Ingestion via GitHub                                                                        |
+| GITLAB_TOKEN           | Your GitLab Token                                          | Get Access to Data Ingestion via GitLab                                                                        |
+| FIRECRAWL_API_KEY      | Your Firecrawl API Key                                     | Get Access to Data Ingestion via Firecrawl                                                                     |
+| VOYAGE_API_KEY         | Your VoyageAI API Key                                      | Get Access to Embedding Models via VoyageAI                                                                    |
+| EMBEDDING_SERVICE_URL  | URL to your Embedding Service Instance                     | Get Access to Embedding Models via [Weaviate Embedding Service](https://weaviate.io/developers/wcs/embeddings) |
+| EMBEDDING_SERVICE_KEY  | Your Embedding Service Key                                 | Get Access to Embedding Models via [Weaviate Embedding Service](https://weaviate.io/developers/wcs/embeddings) |
+| UPSTAGE_API_KEY        | Your Upstage API Key                                       | Get Access to [Upstage](https://upstage.ai/) Models                                                            |
+| UPSTAGE_BASE_URL       | URL to Upstage instance                                    | Models                                                                                                         |
+| DEFAULT_DEPLOYMENT     | Local, Weaviate, Custom, Docker                            | Set the default deployment mode                                                                                |
 
 ![API Keys in Verba](https://github.com/weaviate/Verba/blob/2.0.0/img/api_screen.png)
 
@@ -183,6 +192,9 @@ Verba provides flexibility in connecting to Weaviate instances based on your nee
 2. **Docker Deployment**: Choose this option when you're running Verba's Dockerfile.
 3. **Cloud Deployment**: Use an existing Weaviate instance hosted on WCD to run Verba
 
+**💻 Weaviate Embedded**
+Embedded Weaviate is a deployment model that runs a Weaviate instance from your application code rather than from a stand-alone Weaviate server installation. When you run Verba in `Local Deployment`, it will setup and manage Embedded Weaviate in the background. Please note that Weaviate Embedded is not supported on Windows and is in Experimental Mode which can bring unexpected errors. We recommend using the Docker Deployment or Cloud Deployment instead. You can read more about Weaviate Embedded [here](https://weaviate.io/developers/weaviate/installation/embedded).
+
 **🌩️ Weaviate Cloud Deployment (WCD)**
 
 If you prefer a cloud-based solution, Weaviate Cloud (WCD) offers a scalable, managed environment. Learn how to set up a cloud cluster and get the API keys by following the [Weaviate Cluster Setup Guide](https://weaviate.io/developers/wcs/guides/create-instance).
@@ -191,6 +203,10 @@ If you prefer a cloud-based solution, Weaviate Cloud (WCD) offers a scalable, ma
 Another local alternative is deploying Weaviate using Docker. For more details, follow the [How to install Verba with Docker](#how-to-install-verba-with-docker) section.
 
 ![Deployment in Verba](https://github.com/weaviate/Verba/blob/2.0.0/img/verba_deployment.png)
+
+**⚙️ Custom Weaviate Deployment**
+
+If you're hosting Weaviate yourself, you can use the `Custom` deployment option in Verba. This will allow you to specify the URL, PORT, and API key of your Weaviate instance.
 
 ## Ollama
 
@@ -239,14 +255,14 @@ or
 pip install `.[huggingface]`
 ```
 
-> If you're using Docker, modify the Dockerfile accordingly
+> If you're using Docker, modify the `Dockerfile` accordingly. It's not possible to install a custom Verba installation if you pull the Docker Image from the Docker Hub, as of now, you'd need to install the Docker deployment from the source code and modify the `Dockerfile` beforehand.
 
 ## Groq
 
 To use Groq LPUs as generation engine, you need to get an API key from [Groq](https://console.groq.com/keys).
 
->Although you can provide it in the graphical interface when Verba is up, it is recommended to specify it as `GROQ_API_KEY` environment variable before you launch the application.  
-It will allow you to choose the generation model in an up-to-date available models list.
+> Although you can provide it in the graphical interface when Verba is up, it is recommended to specify it as `GROQ_API_KEY` environment variable before you launch the application.  
+> It will allow you to choose the generation model in an up-to-date available models list.
 
 # How to deploy with pip
 
@@ -256,6 +272,7 @@ It will allow you to choose the generation model in an up-to-date available mode
 
 ```
 python3 -m virtualenv venv
+source venv/bin/activate
 ```
 
 2. **Install Verba**
@@ -292,6 +309,7 @@ git clone https://github.com/weaviate/Verba.git
 
 ```
 python3 -m virtualenv venv
+source venv/bin/activate
 ```
 
 3. **Install Verba**
@@ -320,6 +338,10 @@ Visit localhost:8000
 
 Docker is a set of platform-as-a-service products that use OS-level virtualization to deliver software in packages called containers. To get started with deploying Verba using Docker, follow the steps below. If you need more detailed instructions on Docker usage, check out the [Docker Curriculum](https://docker-curriculum.com/).
 
+You can use `docker pull semitechnologies/verba` to pull the latest Verba Docker Image. Please note, that by pulling directly from Docker Hub you're only able to install the vanilla Verba version that does not include packages e.g `HuggingFace`. If you want to use Docker and `HuggingFace` please follow the steps below.
+
+To build the image yourself, you can clone the Verba repository and run `docker build -t verba .` inside the Verba directory.
+
 0. **Clone the Verba repos**
    Ensure you have Git installed on your system. Then, open a terminal or command prompt and run the following command to clone the Verba repository:
 
@@ -331,7 +353,7 @@ git clone https://github.com/weaviate/Verba.git
    Make sure to set your required environment variables in the `.env` file. You can read more about how to set them up in the [API Keys Section](#api-keys)
 
 2. **Adjust the docker-compose file**
-   You can use the `docker-compose.yml` to add required environment variables under the `verba` service and can also adjust the Weaviate Docker settings to enable Authentification or change other settings of your database instance. You can read more about the Weaviate configuration in our [docker-compose documentation](https://weaviate.io/developers/weaviate/installation/docker-compose)
+   You can use the `docker-compose.yml` to add required environment variables under the `verba` service and can also adjust the Weaviate Docker settings to enable Authentification or change other settings of your database instance. You can read more about the Weaviate configuration in our [docker-compose documentation](https://weaviate.io/developers/weaviate/installation/docker-compose). You can also uncomment the `ollama` service to use Ollama within the same docker compose.
 
 > Please make sure to only add environment variables that you really need.
 
@@ -371,6 +393,8 @@ RUN pip install -e '.'
 
 The first screen you'll see is the deployment screen. Here you can select between `Local`, `Docker`, `Weaviate Cloud`, or `Custom` deployment. The `Local` deployment is using Weaviate Embedded under the hood, which initializes a Weaviate instance behind the scenes. The `Docker` deployment is using a separate Weaviate instance that is running inside the same Docker network. The `Weaviate Cloud` deployment is using a Weaviate instance that is hosted on Weaviate Cloud Services (WCS). The `Custom` deployment allows you to specify your own Weaviate instance URL, PORT, and API key.
 
+You can skip this part by setting the `DEFAULT_DEPLOYMENT` environment variable to `Local`, `Docker`, `Weaviate`, or `Custom`.
+
 ### Import Your Data
 
 First thing you need to do is to add your data. You can do this by clicking on `Import Data` and selecting either `Add Files`, `Add Directory`, or `Add URL` tab. Here you can add all your files that you want to ingest.
@@ -398,6 +422,10 @@ You can learn more about Verba's architecture and implementation in its [technic
 
 ## FAQ
 
+- **Can I use pre-existing data from my Weaviate instance?**
+
+  - No, unfortunatley not. Verba requires the data to be in a specific format to work. And as of now, this is only possible by importing data through the Verba UI.
+
 - **Is Verba Multi-Lingual?**
 
   - This depends on your choosen Embedding and Generation Model whether they support multi-lingual data.
@@ -412,4 +440,12 @@ You can learn more about Verba's architecture and implementation in its [technic
   - You'll find the stored data here: `~/.local/share/weaviate`
 
 - **How can I specify the port?**
+
   - You can use the port and host flag `verba start --port 9000 --host 0.0.0.0`
+
+- **Can multiple users use Verba at the same time? How about role based access?**
+
+  - Verba is designed and optimized for single user usage only. There are no plans on supporting multiple users or role based access in the near future.
+
+- **Does Verba offer a API endpoint to use externally?**
+  - No, right now Verba does not offer any useful API endpoints to interact with the application. The current FastAPI setup is optimized for the internal communication between the frontend and backend. It is not recommended to use it as a API endpoint. There are plans to add user-friendly

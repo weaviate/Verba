@@ -22,7 +22,7 @@ class JSONChunker(Chunker):
     def __init__(self):
         super().__init__()
         self.name = "JSON"
-        self.requires_library = ["langchain_text_splitters "]
+        self.requires_library = ["langchain_text_splitters"]
         self.description = "Split json files using LangChain"
         self.config = {
             "Chunk Size": InputConfig(
@@ -63,7 +63,7 @@ class JSONChunker(Chunker):
                     Chunk(
                         content=chunk,
                         chunk_id=i,
-                        start_i=None, # not implemented as the splitter modifies the outputs
+                        start_i=None,  # not implemented as the splitter modifies the outputs
                         end_i=None,
                         content_without_overlap=chunk,
                     )

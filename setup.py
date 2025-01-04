@@ -4,7 +4,7 @@ setup(
     name="goldenverba",
     version="2.1.0",
     packages=find_packages(),
-    python_requires=">=3.10.0",
+    python_requires=">=3.10.0,<3.13.0",
     entry_points={
         "console_scripts": [
             "verba=goldenverba.server.cli:cli",
@@ -24,7 +24,7 @@ setup(
     ],
     include_package_data=True,
     install_requires=[
-        "weaviate-client==4.7.1",
+        "weaviate-client==4.9.6",
         "python-dotenv==1.0.0",
         "wasabi==1.1.2",
         "fastapi==0.111.1",
@@ -44,6 +44,7 @@ setup(
         "aiofiles==24.1.0",
         "assemblyai==0.33.0",
         "beautifulsoup4==4.12.3",
+        "langdetect==1.0.9",
     ],
     extras_require={
         "dev": ["pytest", "wheel", "twine", "black>=23.7.0", "setuptools"],

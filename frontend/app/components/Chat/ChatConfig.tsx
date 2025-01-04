@@ -97,14 +97,12 @@ const ChatConfig: React.FC<ChatConfigProps> = ({
               Icon={IoSettingsSharp}
               title="Save Config"
               onClick={onSave}
-              className="max-w-[150px]"
               disabled={production == "Demo"}
             />
             <VerbaButton
               Icon={MdCancel}
               title="Reset"
               onClick={onReset}
-              className="max-w-[150px]"
               disabled={production == "Demo"}
             />
           </div>

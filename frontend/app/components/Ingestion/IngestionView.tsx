@@ -135,7 +135,6 @@ const IngestionView: React.FC<IngestionViewProps> = ({
   };
 
   const updateStatus = (data: StatusReport) => {
-    console.log("Update status", data);
     if (data.status === "DONE") {
       addStatusMessage("File " + data.fileID + " imported", "SUCCESS");
     }

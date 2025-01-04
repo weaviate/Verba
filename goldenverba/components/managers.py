@@ -36,6 +36,9 @@ from goldenverba.components.reader.UnstructuredAPI import UnstructuredReader
 from goldenverba.components.reader.AssemblyAIAPI import AssemblyAIReader
 from goldenverba.components.reader.HTMLReader import HTMLReader
 from goldenverba.components.reader.FirecrawlReader import FirecrawlReader
+from goldenverba.components.reader.UpstageDocumentParse import (
+    UpstageDocumentParseReader,
+)
 
 # Import Chunkers
 from goldenverba.components.chunking.TokenChunker import TokenChunker
@@ -51,6 +54,7 @@ from goldenverba.components.chunking.SemanticChunker import SemanticChunker
 from goldenverba.components.embedding.OpenAIEmbedder import OpenAIEmbedder
 from goldenverba.components.embedding.CohereEmbedder import CohereEmbedder
 from goldenverba.components.embedding.OllamaEmbedder import OllamaEmbedder
+from goldenverba.components.embedding.UpstageEmbedder import UpstageEmbedder
 from goldenverba.components.embedding.WeaviateEmbedder import WeaviateEmbedder
 from goldenverba.components.embedding.VoyageAIEmbedder import VoyageAIEmbedder
 from goldenverba.components.embedding.SentenceTransformersEmbedder import (
@@ -67,6 +71,7 @@ from goldenverba.components.generation.OllamaGenerator import OllamaGenerator
 from goldenverba.components.generation.OpenAIGenerator import OpenAIGenerator
 from goldenverba.components.generation.GroqGenerator import GroqGenerator
 from goldenverba.components.generation.NovitaGenerator import NovitaGenerator
+from goldenverba.components.generation.UpstageGenerator import UpstageGenerator
 
 try:
     import tiktoken
@@ -84,6 +89,7 @@ if production != "Production":
         UnstructuredReader(),
         AssemblyAIReader(),
         FirecrawlReader(),
+        UpstageDocumentParseReader(),
     ]
     chunkers = [
         TokenChunker(),
@@ -99,6 +105,7 @@ if production != "Production":
         OllamaEmbedder(),
         SentenceTransformersEmbedder(),
         WeaviateEmbedder(),
+        UpstageEmbedder(),
         VoyageAIEmbedder(),
         CohereEmbedder(),
         OpenAIEmbedder(),
@@ -111,6 +118,7 @@ if production != "Production":
         CohereGenerator(),
         GroqGenerator(),
         NovitaGenerator(),
+        UpstageGenerator(),
     ]
 else:
     readers = [
@@ -120,6 +128,7 @@ else:
         UnstructuredReader(),
         AssemblyAIReader(),
         FirecrawlReader(),
+        UpstageDocumentParseReader(),
     ]
     chunkers = [
         TokenChunker(),
@@ -134,6 +143,7 @@ else:
     embedders = [
         WeaviateEmbedder(),
         VoyageAIEmbedder(),
+        UpstageEmbedder(),
         CohereEmbedder(),
         OpenAIEmbedder(),
     ]
@@ -142,7 +152,8 @@ else:
         OpenAIGenerator(),
         AnthropicGenerator(),
         CohereGenerator(),
-        # NovitaGenerator(),
+        NovitaGenerator(),
+        UpstageGenerator(),
     ]
 
 
@@ -152,8 +163,8 @@ else:
 class WeaviateManager:
     def __init__(self):
         self.document_collection_name = "VERBA_DOCUMENTS"
-        self.config_collection_name = "VERBA_CONFIG"
-        self.suggestion_collection_name = "VERBA_SUGGESTION"
+        self.config_collection_name = "VERBA_CONFIGURATION"
+        self.suggestion_collection_name = "VERBA_SUGGESTIONS"
         self.embedding_table = {}
 
     ### Connection Handling
@@ -299,28 +310,31 @@ class WeaviateManager:
             msg.info(
                 f"Collection: {collection_name} does not exist, creating new collection."
             )
-            print(collection_name)
-            await client.collections.create(name=collection_name)
-            collection = await client.collections.get(collection_name)
-            print(collection.config.properties)  # 查看属性配置
-            print(collection.config.vectorizer)  # 查看向量化配置
-        return True
+            returned_collection = await client.collections.create(name=collection_name)
+            if returned_collection:
+                return True
+            else:
+                return False
+        else:
+            return True
 
     async def verify_embedding_collection(self, client: WeaviateAsyncClient, embedder):
         if embedder not in self.embedding_table:
             self.embedding_table[embedder] = "VERBA_Embedding_" + re.sub(
                 r"[^a-zA-Z0-9]", "_", embedder
             )
-            await self.verify_collection(client, self.embedding_table[embedder])
-        return True
+            return await self.verify_collection(client, self.embedding_table[embedder])
+        else:
+            return True
 
     async def verify_cache_collection(self, client: WeaviateAsyncClient, embedder):
         if embedder not in self.embedding_table:
             self.embedding_table[embedder] = "VERBA_Cache_" + re.sub(
                 r"[^a-zA-Z0-9]", "_", embedder
             )
-            await self.verify_collection(client, self.embedding_table[embedder])
-        return True
+            return await self.verify_collection(client, self.embedding_table[embedder])
+        else:
+            return True
 
     async def verify_embedding_collections(
         self, client: WeaviateAsyncClient, environment_variables, libraries
@@ -803,14 +817,18 @@ class WeaviateManager:
     ):
         if await self.verify_embedding_collection(client, embedder):
             embedder_collection = client.collections.get(self.embedding_table[embedder])
-            weaviate_chunks = await embedder_collection.query.fetch_objects(
-                filters=(
-                    Filter.by_property("doc_uuid").equal(doc_uuid)
-                    & Filter.by_property("chunk_id").contains_any(ids)
-                ),
-                sort=Sort.by_property("chunk_id", ascending=True),
-            )
-            return weaviate_chunks.objects
+            try:
+                weaviate_chunks = await embedder_collection.query.fetch_objects(
+                    filters=(
+                        Filter.by_property("doc_uuid").equal(str(doc_uuid))
+                        & Filter.by_property("chunk_id").contains_any(list(ids))
+                    ),
+                    sort=Sort.by_property("chunk_id", ascending=True),
+                )
+                return weaviate_chunks.objects
+            except Exception as e:
+                msg.fail(f"Failed to fetch chunks: {str(e)}")
+                raise e
 
     ### Suggestion Logic
 
@@ -907,13 +925,16 @@ class WeaviateManager:
                 filters = Filter.by_property("doc_uuid").contains_any(document_uuids)
             else:
                 filters = None
-
-            response = await embedder_collection.aggregate.over_all(
-                filters=filters,
-                group_by=GroupByAggregate(prop="doc_uuid"),
-                total_count=True,
-            )
-            return len(response.groups)
+            try:
+                response = await embedder_collection.aggregate.over_all(
+                    filters=filters,
+                    group_by=GroupByAggregate(prop="doc_uuid"),
+                    total_count=True,
+                )
+                return len(response.groups)
+            except Exception as e:
+                msg.fail(f"Failed to retrieve data count: {str(e)}")
+                return 0
 
     async def get_chunk_count(
         self, client: WeaviateAsyncClient, embedder: str, doc_uuid: str

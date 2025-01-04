@@ -2,19 +2,38 @@
 
 All notable changes to this project will be documented in this file.
 
-## [2.1.0] Importastic
+## [2.2.0] Investing in Testing (Suffering will never end)
+
+## [2.1.0] Fixing Bugs and Adding Friends
 
 ## Added
 
+- Added Upstage: Reader, Embedder, Generator (https://www.upstage.ai/)
 - Added new deployment type: Custom
-- Added new port configuration
-- Added Groq
+- Added new port configuration (https://github.com/weaviate/Verba/issues/308)
+- Added Groq (https://github.com/weaviate/Verba/pull/278)
+- AssemblyAI Reader for audio files (https://github.com/weaviate/Verba/pull/283)
+- Language Detection for languages like chinese, english, french, german and dutch (https://github.com/weaviate/Verba/pull/302)
+- Improve Markdown Chunking (https://github.com/weaviate/Verba/pull/323)
+- Upgrade to latest Weaviate Client
+- Added Ollama to Docker Compose
+- Added Verba to Docker Hub
+- Added default deployment to skip login screen (https://github.com/weaviate/Verba/issues/305)
 
-# Fixed
+## Fixed
 
 - Catch Exception when trying to access the OpenAI API Embedding endpoint to retrieve model names
-- Fixed reading empty string as environment variables
-- Fixed default Unstructed URL
+- Fixed reading empty string as environment variables (https://github.com/weaviate/Verba/pull/300)
+- Fixed default Unstructed URL (https://github.com/weaviate/Verba/pull/295)
+- Changed Collection names to prevent conflicts with other older Verba version generated collections
+- Ensure Ollama URL is parsed correctly (https://github.com/weaviate/Verba/pull/327)
+- Fixing typos (https://github.com/weaviate/Verba/pull/329)
+- System Message is now a textarea in the frontend (https://github.com/weaviate/Verba/issues/334)
+- Race Condition when multiple requests try to create same client (https://github.com/weaviate/Verba/issues/335)
+- Fix wrong data types when querying additional chunks
+- Remove legacy code (https://github.com/weaviate/Verba/issues/284)
+- Change Python version range below 3.13
+- Firecrawl Reader missing metadata (https://github.com/weaviate/Verba/issues/280)
 
 ## [2.0.0] Importastic
 

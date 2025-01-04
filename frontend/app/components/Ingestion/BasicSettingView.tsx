@@ -7,7 +7,6 @@ import {
   statusTextMap,
   statusColorMap,
   RAGComponentConfig,
-  RAGConfig,
 } from "@/app/types";
 import VerbaButton from "../Navigation/VerbaButton";
 import { MdCancel } from "react-icons/md";
@@ -18,7 +17,6 @@ import ComponentView from "./ComponentView";
 
 import { MdError } from "react-icons/md";
 import { FaCheckCircle } from "react-icons/fa";
-import { FaCircleInfo } from "react-icons/fa6";
 
 interface BasicSettingViewProps {
   selectedFileData: string | null;
@@ -171,16 +169,17 @@ const BasicSettingView: React.FC<BasicSettingViewProps> = ({
 
   function renderLabelBoxes(fileData: FileData) {
     return Object.entries(fileData.labels).map(([key, label]) => (
-      <VerbaButton
-        title={label}
-        key={fileData.fileID + key + label}
-        className="btn-sm"
-        text_class_name="text-xs"
-        onClick={() => {
-          removeLabel(label);
-        }}
-        Icon={MdCancel}
-      />
+      <div key={fileData.fileID + key + label}>
+        <VerbaButton
+          title={label}
+          className="btn-sm"
+          text_class_name="text-xs"
+          onClick={() => {
+            removeLabel(label);
+          }}
+          Icon={MdCancel}
+        />
+      </div>
     ));
   }
 

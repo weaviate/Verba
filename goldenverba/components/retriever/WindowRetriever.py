@@ -54,7 +54,6 @@ class WindowRetriever(Retriever):
         labels,
         document_uuids,
     ):
-
         search_mode = config["Search Mode"].value
         limit_mode = config["Limit Mode"].value
         limit = int(config["Limit/Sensitivity"].value)
@@ -120,12 +119,16 @@ class WindowRetriever(Retriever):
 
         documents = []
         context_documents = []
+
         for doc in doc_map:
             additional_chunk_ids = []
+            chunks_above_threshold = 0
             for chunk in doc_map[doc]["chunks"]:
-                if window_threshold <= normalize_value(
+                normalized_score = normalize_value(
                     float(chunk["score"]), float(max_score), float(min_score)
-                ):
+                )
+                if window_threshold <= normalized_score:
+                    chunks_above_threshold += 1
                     additional_chunk_ids += generate_window_list(
                         chunk["chunk_id"], window
                     )
@@ -198,7 +201,6 @@ class WindowRetriever(Retriever):
         sorted_documents = sorted(documents, key=lambda x: x["score"], reverse=True)
 
         context = self.combine_context(sorted_context_documents)
-
         return (sorted_documents, context)
 
     def combine_context(self, documents: list[dict]) -> str:

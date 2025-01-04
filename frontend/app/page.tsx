@@ -59,6 +59,7 @@ export default function Home() {
     deployment: "Local",
     url: "",
     key: "",
+    default_deployment: "",
   });
 
   // RAG Config
@@ -81,6 +82,7 @@ export default function Home() {
           deployment: "Local",
           url: health_data.deployments.WEAVIATE_URL_VERBA,
           key: health_data.deployments.WEAVIATE_API_KEY_VERBA,
+          default_deployment: health_data.default_deployment,
         });
       } else {
         console.warn("Could not retrieve health data");
@@ -169,7 +171,6 @@ export default function Home() {
     message: string,
     type: "INFO" | "WARNING" | "SUCCESS" | "ERROR"
   ) => {
-    console.log("Adding status message:", message, type);
     setStatusMessages((prevMessages) => [
       ...prevMessages,
       { message, type, timestamp: new Date().toISOString() },
