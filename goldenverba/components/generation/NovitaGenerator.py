@@ -75,12 +75,21 @@ class NovitaGenerator(Generator):
             ) as response:
                 if response.status == 200:
                     async for line in response.content:
-                        json_line = json.loads(line)
-                        choice = json_line["choices"][0]
-                        yield {
-                            "message": choice["message"]["content"],
-                            "finish_reason": choice.get("finish_reason"),
-                        }
+                        if line.strip():
+                            line = line.decode("utf-8").strip()
+                            if line == "data: [DONE]":
+                                yield {"message": "", "finish_reason": "stop"}
+                            else:
+                                if line.startswith("data:"):
+                                    line = line[5:].strip()
+                                json_line = json.loads(line)
+                                choice = json_line.get("choices")[0]
+                                yield {
+                                    "message": choice.get("delta", {}).get("content", ""),
+                                    "finish_reason": (
+                                        "stop" if choice.get("finish_reason", "") == "stop" else ""
+                                    ),
+                                }
                 else:
                     error_message = await response.text()
                     yield  {"message": f"HTTP Error {response.status}: {error_message}", "finish_reason": "stop"}
@@ -115,8 +124,8 @@ def get_models():
         if len(models) > 0:
             return models
         else:
-            msg.info("No Novita AI Model detected")
+            # msg.info("No Novita AI Model detected")
             return ["No Novita AI Model detected"]
     except Exception as e:
-        msg.fail(f"Couldn't connect to Novita AI: {e}")
+        # msg.fail(f"Couldn't connect to Novita AI: {e}")
         return [f"Couldn't connect to Novita AI"]
