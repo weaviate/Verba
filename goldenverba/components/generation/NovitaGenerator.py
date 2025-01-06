@@ -2,6 +2,7 @@ import os
 from dotenv import load_dotenv
 import json
 import aiohttp
+import requests
 
 from goldenverba.components.interfaces import Generator
 from goldenverba.components.types import InputConfig
