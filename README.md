@@ -448,4 +448,8 @@ You can learn more about Verba's architecture and implementation in its [technic
   - Verba is designed and optimized for single user usage only. There are no plans on supporting multiple users or role based access in the near future.
 
 - **Does Verba offer a API endpoint to use externally?**
+
   - No, right now Verba does not offer any useful API endpoints to interact with the application. The current FastAPI setup is optimized for the internal communication between the frontend and backend. It is not recommended to use it as a API endpoint. There are plans to add user-friendly
+
+- **How to connect to your custom OpenAI Server?**
+  - Set your custom OpenAI API Key and URL in the `.env` file, this will allow Verba to start up and retrieve the models from your custom OpenAI Server. `OPENAI_BASE_URL` is set to `https://api.openai.com/v1` by default.
