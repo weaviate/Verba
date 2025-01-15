@@ -2,7 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
-## [2.2.0] Investing in Testing (Suffering will never end)
+## [2.1.1] More Bugs!
+
+## Added
+
+- Dynamic model name retrieval for OpenAI Generator based on OpenAI URL and API Key (https://github.com/weaviate/Verba/issues/123) (https://github.com/weaviate/Verba/issues/362)
 
 ## [2.1.0] Fixing Bugs and Adding Friends
 

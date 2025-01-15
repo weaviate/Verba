@@ -184,7 +184,6 @@ def get_models(url: str, api_key: str) -> List[str]:
         return models
 
     except Exception as e:
-        msg.info(f"Couldn't connect to Groq ({url})")
         return DEFAULT_MODEL_LIST
 
 
