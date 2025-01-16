@@ -70,6 +70,7 @@ from goldenverba.components.generation.AnthrophicGenerator import AnthropicGener
 from goldenverba.components.generation.OllamaGenerator import OllamaGenerator
 from goldenverba.components.generation.OpenAIGenerator import OpenAIGenerator
 from goldenverba.components.generation.GroqGenerator import GroqGenerator
+from goldenverba.components.generation.NovitaGenerator import NovitaGenerator
 from goldenverba.components.generation.UpstageGenerator import UpstageGenerator
 
 try:
@@ -116,6 +117,7 @@ if production != "Production":
         AnthropicGenerator(),
         CohereGenerator(),
         GroqGenerator(),
+        NovitaGenerator(),
         UpstageGenerator(),
     ]
 else:
