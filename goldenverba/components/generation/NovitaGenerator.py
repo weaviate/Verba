@@ -48,7 +48,7 @@ class NovitaGenerator(Generator):
         conversation: list[dict] = [],
     ):
         system_message = config.get("System Message").value
-        model = config.get("Model", {"value": "meta-llama/llama-3.3-70b-instruct"}).value
+        model = config.get("Model", {"value": "deepseek/deepseek_v3"}).value
         novita_key = get_environment(
             config, "API Key", "NOVITA_API_KEY", "No Novita API Key found"
         )
