@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.1.2] Adding Novita!
+
+## Added
+
+- Added Novita Generator (https://www.novita.ai/)
+- Added basic tests for Document class
+
+## Fixed
+
+- spaCy Language Issues (https://github.com/weaviate/Verba/issues/359#issuecomment-2612233766) (https://github.com/weaviate/Verba/issues/352)
+
 ## [2.1.1] More Bugs!
 
 ## Added

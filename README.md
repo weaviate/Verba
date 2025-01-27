@@ -25,6 +25,7 @@ pip install goldenverba
   - [OpenAI](#openai)
   - [HuggingFace](#huggingface)
   - [Groq](#groq)
+  - [Novita AI](#novitaai)
 - [Quickstart: Deploy with pip](#how-to-deploy-with-pip)
 - [Quickstart: Build from Source](#how-to-build-from-source)
 - [Quickstart: Deploy with Docker](#how-to-install-verba-with-docker)
@@ -55,6 +56,7 @@ Verba is a fully-customizable personal assistant utilizing [Retrieval Augmented 
 | Anthrophic (e.g. Claude Sonnet)   | ✅          | Embedding and Generation Models by Anthrophic           |
 | OpenAI (e.g. GPT4)                | ✅          | Embedding and Generation Models by OpenAI               |
 | Groq (e.g. Llama3)                | ✅          | Generation Models by Groq (LPU inference)               |
+| Novita AI (e.g. Llama3.3)         | ✅          | Generation Models by Novita AI                          |
 | Upstage (e.g. Solar)              | ✅          | Embedding and Generation Models by Upstage              |
 
 | 🤖 Embedding Support | Implemented | Description                              |
@@ -168,6 +170,7 @@ Below is a comprehensive list of the API keys and variables you may require:
 | OPENAI_BASE_URL        | URL to OpenAI instance                                     | Models                                                                                                         |
 | COHERE_API_KEY         | Your API Key                                               | Get Access to [Cohere](https://cohere.com/) Models                                                             |
 | GROQ_API_KEY           | Your Groq API Key                                          | Get Access to [Groq](https://groq.com/) Models                                                                 |
+| NOVITA_API_KEY         | Your Novita API Key                                        | Get Access to [Novita AI](https://novita.ai?utm_source=github_verba&utm_medium=github_readme&utm_campaign=github_link) Models                                                              |
 | OLLAMA_URL             | URL to your Ollama instance (e.g. http://localhost:11434 ) | Get Access to [Ollama](https://ollama.com/) Models                                                             |
 | UNSTRUCTURED_API_KEY   | Your API Key                                               | Get Access to [Unstructured](https://docs.unstructured.io/welcome) Data Ingestion                              |
 | UNSTRUCTURED_API_URL   | URL to Unstructured Instance                               | Get Access to [Unstructured](https://docs.unstructured.io/welcome) Data Ingestion                              |
@@ -263,6 +266,11 @@ To use Groq LPUs as generation engine, you need to get an API key from [Groq](ht
 
 > Although you can provide it in the graphical interface when Verba is up, it is recommended to specify it as `GROQ_API_KEY` environment variable before you launch the application.  
 > It will allow you to choose the generation model in an up-to-date available models list.
+
+## Novita
+
+To use Novita AI as generation engine, you need to get an API key from [Novita AI](https://novita.ai/settings/key-management?utm_source=github_verba&utm_medium=github_readme&utm_campaign=github_link).
+
 
 # How to deploy with pip
 
