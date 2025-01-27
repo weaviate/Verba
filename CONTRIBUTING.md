@@ -8,7 +8,7 @@ Open source is at the heart of Verba. We appreciate feedback, ideas, and enhance
 
 ## 📚 Before You Begin
 
-Before contributing, please take a moment to read through the [README](https://github.com/weaviate/Verba/README.md) and the [Technical Documentation](https://github.com/weaviate/Verba/TECHNICAL.md). These documents provide a comprehensive understanding of the project and are essential reading to ensure that we're all on the same page.
+Before contributing, please take a moment to read through the [README](https://github.com/weaviate/Verba/README.md) and the [Technical Documentation](https://github.com/weaviate/Verba/TECHNICAL.md). These documents provide a comprehensive understanding of the project and are essential reading to ensure that we're all on the same page. Please note that the technical documentation is a work in progress and will be updated as we progress.
 
 ## 🐛 Reporting Issues
 
@@ -22,6 +22,16 @@ If you've identified a bug or have an idea for an enhancement, please begin by c
 
 We welcome all ideas and feedback. If you're not ready to open an Issue or if you're just looking for a place to discuss ideas, head over to our [GitHub Discussions](https://github.com/weaviate/Verba/discussions) or the [Weaviate Support Page](https://forum.weaviate.io/).
 
+## 🧪 Testing
+
+We use [pytest](https://docs.pytest.org) for testing. Please note that the tests are WIP and some are missing. We still encourage you to run the tests and add more tests as you see fit.
+
+To run the tests, use the following command:
+
+```bash
+pytest goldenverba/tests
+```
+
 ## 📝 Pull Requests
 
 If you're ready to contribute code or documentation, please submit a Pull Request (PR) to the dev branch. Here's the process:
@@ -33,13 +43,6 @@ If you're ready to contribute code or documentation, please submit a Pull Reques
 - Make sure your code lints (mypy compatibility is optional but encouraged).
 - Include a clear description of your changes in the PR.
 - Link to the Issue in your PR description.
-
-### 🧪 Tests and Formatting
-
-To maintain the quality of the codebase, we ask that all contributors:
-
-- Run unit tests to ensure that nothing is broken.
-- Use [Black](https://github.com/psf/black) to format your code before submitting.
 
 ### 🔄 Pull Request Process
 

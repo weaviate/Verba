@@ -12,6 +12,7 @@ load_dotenv()
 
 base_url = "https://api.novita.ai/v3/openai"
 
+
 class NovitaGenerator(Generator):
     """
     Novita Generator.
@@ -85,14 +86,21 @@ class NovitaGenerator(Generator):
                                 json_line = json.loads(line)
                                 choice = json_line.get("choices")[0]
                                 yield {
-                                    "message": choice.get("delta", {}).get("content", ""),
+                                    "message": choice.get("delta", {}).get(
+                                        "content", ""
+                                    ),
                                     "finish_reason": (
-                                        "stop" if choice.get("finish_reason", "") == "stop" else ""
+                                        "stop"
+                                        if choice.get("finish_reason", "") == "stop"
+                                        else ""
                                     ),
                                 }
                 else:
                     error_message = await response.text()
-                    yield  {"message": f"HTTP Error {response.status}: {error_message}", "finish_reason": "stop"}
+                    yield {
+                        "message": f"HTTP Error {response.status}: {error_message}",
+                        "finish_reason": "stop",
+                    }
 
     def prepare_messages(
         self, query: str, context: str, conversation: list[dict], system_message: str
