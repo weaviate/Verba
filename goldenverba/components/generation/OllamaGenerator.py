@@ -23,7 +23,7 @@ class OllamaGenerator(Generator):
         # Configure the model selection dropdown
         self.config["Model"] = InputConfig(
             type="dropdown",
-            value=models[0] if models else "",
+            value=os.getenv("OLLAMA_MODEL") or models[0] if models else "",
             description=f"Select an installed Ollama model from {self.url}.",
             values=models,
         )
