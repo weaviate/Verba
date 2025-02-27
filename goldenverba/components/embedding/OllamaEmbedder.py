@@ -21,7 +21,7 @@ class OllamaEmbedder(Embedding):
         self.config = {
             "Model": InputConfig(
                 type="dropdown",
-                value=models[0],
+                value=os.getenv("OLLAMA_EMBED_MODEL") or models[0],
                 description=f"Select a installed Ollama model from {self.url}. You can change the URL by setting the OLLAMA_URL environment variable. ",
                 values=models,
             ),
