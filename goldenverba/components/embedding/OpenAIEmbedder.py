@@ -138,7 +138,7 @@ class OpenAIEmbedder(Embedding):
             response = requests.get(f"{url}/models", headers=headers)
             response.raise_for_status()
             fetch_models = [model["id"] for model in response.json()["data"]]
-            if not os.getenv("CUSTOM_OPENAI_EMBED", False):
+            if not os.getenv("OPENAI_CUSTOM_EMBED", False):
                 # this is not a custom OpenAI so we can filter out non-embedding OpenAI models
                 fetch_models = [
                     model_id for model_id in fetch_models if "embedding" in model_id
