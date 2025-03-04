@@ -19,16 +19,25 @@ class OpenAIEmbedder(Embedding):
         self.name = "OpenAI"
         self.description = "Vectorizes documents and queries using OpenAI"
 
+        # If a different key is set for the OpenAI embedding, use it
+        api_key = get_token("OPENAI_EMBED_API_KEY")
+        api_key = api_key if api_key else get_token("OPENAI_API_KEY")
+
         # Fetch available models
-        api_key = get_token("OPENAI_API_KEY")
-        base_url = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1")
+        base_url = os.getenv("OPENAI_EMBED_BASE_URL")
+        base_url = (
+            base_url
+            if base_url
+            else os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1")
+        )
         models = self.get_models(api_key, base_url)
 
         # Set up configuration
+        default_model = os.getenv("OPENAI_EMBED_MODEL", "text-embedding-3-small")
         self.config = {
             "Model": InputConfig(
                 type="dropdown",
-                value="text-embedding-3-small",
+                value=default_model,
                 description="Select an OpenAI Embedding Model",
                 values=models,
             )
@@ -39,10 +48,13 @@ class OpenAIEmbedder(Embedding):
             self.config["API Key"] = InputConfig(
                 type="password",
                 value="",
-                description="OpenAI API Key (or set OPENAI_API_KEY env var)",
+                description="OpenAI API Key (or set OPENAI_EMBED_API_KEY or OPENAI_API_KEY env var)",
                 values=[],
             )
-        if os.getenv("OPENAI_BASE_URL") is None:
+        if (
+            os.getenv("OPENAI_EMBED_BASE_URL") is None
+            and os.getenv("OPENAI_BASE_URL") is None
+        ):
             self.config["URL"] = InputConfig(
                 type="text",
                 value=base_url,
@@ -53,12 +65,20 @@ class OpenAIEmbedder(Embedding):
     async def vectorize(self, config: dict, content: List[str]) -> List[List[float]]:
         """Vectorize the input content using OpenAI's API."""
         model = config.get("Model", {"value": "text-embedding-ada-002"}).value
+        key_name = (
+            "OPENAI_EMBED_API_KEY"
+            if get_token("OPENAI_EMBED_API_KEY")
+            else "OPENAI_API_KEY"
+        )
         api_key = get_environment(
-            config, "API Key", "OPENAI_API_KEY", "No OpenAI API Key found"
+            config, "API Key", key_name, "No OpenAI API Key found"
         )
-        base_url = get_environment(
-            config, "URL", "OPENAI_BASE_URL", "No OpenAI URL found"
+        base_url_name = (
+            "OPENAI_EMBED_BASE_URL"
+            if os.getenv("OPENAI_EMBED_BASE_URL")
+            else "OPENAI_BASE_URL"
         )
+        base_url = get_environment(config, "URL", base_url_name, "No OpenAI URL found")
 
         headers = {
             "Content-Type": "application/json",
@@ -117,11 +137,13 @@ class OpenAIEmbedder(Embedding):
             headers = {"Authorization": f"Bearer {token}"}
             response = requests.get(f"{url}/models", headers=headers)
             response.raise_for_status()
-            return [
-                model["id"]
-                for model in response.json()["data"]
-                if "embedding" in model["id"]
-            ]
+            fetch_models = [model["id"] for model in response.json()["data"]]
+            if not os.getenv("OPENAI_CUSTOM_EMBED", False):
+                # this is not a custom OpenAI so we can filter out non-embedding OpenAI models
+                fetch_models = [
+                    model_id for model_id in fetch_models if "embedding" in model_id
+                ]
+            return fetch_models
         except Exception as e:
             msg.info(f"Failed to fetch OpenAI embedding models: {str(e)}")
             return [

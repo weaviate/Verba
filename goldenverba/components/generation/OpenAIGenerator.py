@@ -25,11 +25,12 @@ class OpenAIGenerator(Generator):
         api_key = get_token("OPENAI_API_KEY")
         base_url = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1")
         models = self.get_models(api_key, base_url)
+        default_model = os.getenv("OPENAI_MODEL", models[0])
 
         self.config["Model"] = InputConfig(
             type="dropdown",
-            value=models[0],
-            description="Select an OpenAI Embedding Model",
+            value=default_model,
+            description="Select an OpenAI Model",
             values=models,
         )
 
