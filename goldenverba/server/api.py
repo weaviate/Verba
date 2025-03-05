@@ -35,6 +35,7 @@ from goldenverba.server.types import (
     SetRAGConfigPayload,
     GetChunkPayload,
     GetVectorPayload,
+    GetSummaryPayload,
     DataBatchPayload,
     ChunksPayload,
 )
@@ -575,6 +576,28 @@ async def get_vectors(payload: GetVectorPayload):
             }
         )
 
+@app.post("/api/get_summary")
+async def get_summary(payload: GetSummaryPayload):
+    try:
+        client = await client_manager.connect(payload.credentials)
+        summary = await manager.weaviate_manager.get_summary(
+            client, payload.uuid
+        )
+        return JSONResponse(
+            content={
+                "error": "",
+                "summary": summary,
+            }
+        )
+    except Exception as e:
+        msg.fail(f"Summary retrieval failed: {str(e)}")
+        return JSONResponse(
+            content={
+                "error": str(e),
+                "summary": None,
+            }
+        )
+
 
 # Retrieve specific document based on UUID
 @app.post("/api/get_chunks")
@@ -622,7 +645,6 @@ async def get_chunk(payload: GetChunkPayload):
                 "chunk": None,
             }
         )
-
 
 ## Retrieve and search documents imported to Weaviate
 @app.post("/api/get_all_documents")

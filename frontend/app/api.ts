@@ -8,6 +8,7 @@ import {
   DocumentPayload,
   ChunkScore,
   ContentPayload,
+  SummaryPayload,
   ChunksPayload,
   RAGConfigResponse,
   AllSuggestionsPayload,
@@ -407,6 +408,35 @@ export const fetch_vectors = async (
       }),
     });
     const data: VectorsPayload | null = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error retrieving content", error);
+    return null;
+  }
+};
+
+// Endpoint /api/get_summary
+export const fetch_summary = async (
+  uuid: string | null,
+  credentials: Credentials
+): Promise<SummaryPayload | null> => {
+  if (!uuid) {
+    return null;
+  }
+
+  try {
+    const host = await detectHost();
+    const response = await fetch(`${host}/api/get_summary`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        uuid: uuid,
+        credentials: credentials,
+      }),
+    });
+    const data: SummaryPayload | null = await response.json();
     return data;
   } catch (error) {
     console.error("Error retrieving content", error);

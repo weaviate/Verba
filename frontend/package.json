@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build && cp -r out/* ../goldenverba/server/frontend/out/ && rm -r out",
+    "build": "rm -rf ../goldenverba/server/frontend/out && next build && mkdir -p ../goldenverba/server/frontend/out && cp -r out/* ../goldenverba/server/frontend/out/ && rm -r out/",
     "start": "next start -H 0.0.0.0 -p 8080",
     "lint": "next lint"
   },

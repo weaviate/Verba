@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { FaInfoCircle } from "react-icons/fa";
 import VectorView from "./VectorView";
 import ChunkView from "./ChunkView";
+import SummaryView from "./SummaryView";
 import InfoComponent from "../Navigation/InfoComponent";
 
 import DocumentMetaView from "./DocumentMetaView";
@@ -54,7 +55,7 @@ const DocumentExplorer: React.FC<DocumentExplorerProps> = ({
   addStatusMessage,
 }) => {
   const [selectedSetting, setSelectedSetting] = useState<
-    "Content" | "Chunks" | "Metadata" | "Config" | "Vector Space" | "Graph"
+    "Content" | "Summary" | "Chunks" | "Metadata" | "Config" | "Vector Space" | "Graph"
   >("Content");
 
   const [isFetching, setIsFetching] = useState(false);
@@ -123,6 +124,14 @@ const DocumentExplorer: React.FC<DocumentExplorerProps> = ({
           />
 
           <VerbaButton
+            title="Summary"
+            Icon={MdContentCopy}
+            onClick={() => setSelectedSetting("Summary")}
+            selected={selectedSetting === "Summary"}
+            selected_color="bg-secondary-verba"
+          />
+
+          <VerbaButton
             title="Chunks"
             Icon={MdContentCopy}
             onClick={() => setSelectedSetting("Chunks")}
@@ -161,6 +170,14 @@ const DocumentExplorer: React.FC<DocumentExplorerProps> = ({
 
         {selectedSetting === "Chunks" && (
           <ChunkView
+            selectedTheme={selectedTheme}
+            credentials={credentials}
+            selectedDocument={selectedDocument}
+          />
+        )}
+
+        {selectedSetting === "Summary" && (
+          <SummaryView
             selectedTheme={selectedTheme}
             credentials={credentials}
             selectedDocument={selectedDocument}

@@ -43,7 +43,7 @@ services:
     image: semitechnologies/weaviate:1.25.10
     ports:
       - 8080:8080
-      - 3000:8080
+      - 3001:8080
     volumes:
       - weaviate_data:/var/lib/weaviate
     restart: on-failure:0

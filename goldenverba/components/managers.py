@@ -12,6 +12,7 @@ import os
 import asyncio
 import json
 import re
+import requests
 from urllib.parse import urlparse
 from datetime import datetime
 
@@ -403,6 +404,7 @@ class WeaviateManager:
 
             ### Import Document
             document_obj = Document.to_json(document)
+            document_obj["summary"] = document.meta.get("summary", "No summary available")  # Add summary
             doc_uuid = await document_collection.data.insert(document_obj)
 
             chunk_ids = []
@@ -585,9 +587,19 @@ class WeaviateManager:
                 aggregation_group.grouped_by.value
                 for aggregation_group in aggregation.groups
             ]
-
+        
+    ###Summary Retrieval
+    async def get_summary(
+            self, client: WeaviateAsyncClient, uuid: str
+    ) -> str:
+        """Retrieve the summary for a document."""
+        if await self.verify_collection(client, self.document_collection_name):
+            document = await self.get_document(client, uuid, properties=["summary"])
+            if document and "summary" in document:
+                return document["summary"]
+        return "No summary available."
+    
     ### Chunks Retrieval
-
     async def get_chunk(
         self, client: WeaviateAsyncClient, uuid: str, embedder: str
     ) -> list[dict]:
@@ -1084,6 +1096,18 @@ class EmbeddingManager:
                         document.metadata + "\n" + chunk.content
                         for chunk in document.chunks
                     ]
+
+                    #Generate a summary for the entire document
+                    summary = await self.generate_summary("\n".join(content))
+                    document.meta["summary"] = summary  #Store summary in metadata
+
+                    #Log summary generation
+                    await logger.send_report(
+                        fileConfig.fileID,
+                        FileStatus.SUMMARIZING,
+                        f"Generated summary: {summary[:100]}...",
+                        took=round(loop.time() - start_time, 2),
+                    )
                     embeddings = await self.batch_vectorize(embedder, config, content)
 
                     if len(embeddings) >= 3:
@@ -1122,7 +1146,7 @@ class EmbeddingManager:
                 raise Exception(f"{embedder} Embedder not found")
         except Exception as e:
             raise e
-
+        
     async def batch_vectorize(
         self, embedder: str, config: dict, content: list[str]
     ) -> list[list[float]]:
@@ -1172,6 +1196,40 @@ class EmbeddingManager:
         except Exception as e:
             raise e
 
+    async def generate_summary(self, text: str) -> str:
+        """
+        Generate a summary using the Ollama model specified in the environment variables.
+
+        Args:
+            text (str): The text to summarize.
+
+        Returns:
+            str: The generated summary.
+        """
+        OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2:1b")  # Default model
+        OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434")  # Default API URL
+        ollama_url = f"{OLLAMA_URL}/api/generate"  # Use environment variable
+        ollama_model = OLLAMA_MODEL  # Get model from env
+
+        payload = {
+            "model": ollama_model,
+            "prompt": f"""
+            Summarize the following document in Markdown format, ensuring it is well-structured and formatted for readability:
+
+            {text}
+
+            Provide only the structured summary in Markdown format, without any introduction or explanations.
+            """,
+            "stream": False  # Set to True if you want a streaming response
+        }
+
+        try:
+            response = requests.post(ollama_url, json=payload)
+            response.raise_for_status()  # Raise an error if request fails
+            summary = response.json().get("response", "").strip()
+            return summary if summary else "Summary generation failed."
+        except requests.RequestException as e:
+            return f"Error in summary generation: {str(e)}"
 
 class RetrieverManager:
     def __init__(self):

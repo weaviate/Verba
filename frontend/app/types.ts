@@ -8,6 +8,7 @@ export type Credentials = {
 export type DocumentFilter = {
   title: string;
   uuid: string;
+  children?: DocumentFilter[];
 };
 
 export type UserConfig = {
@@ -310,6 +311,11 @@ export type ChunkPayload = {
   chunk: VerbaChunk;
 };
 
+export type SummaryPayload = {
+  error: string;
+  summary: string | null;
+};
+
 export type ContentPayload = {
   error: string;
   content: ContentSnippet[];
@@ -482,19 +488,19 @@ export interface Theme {
 
 export const LightTheme: Theme = {
   theme_name: "Light",
-  title: { text: "Verba", type: "text", description: "Title" },
+  title: { text: "vijil.ai", type: "text", description: "Title" },
   subtitle: {
     text: "The Golden RAGtriever",
     type: "text",
     description: "Subtitle",
   },
   intro_message: {
-    text: "Welcome to Verba, your open-source RAG application!",
+    text: "Welcome to vijil.ai RAG Agent",
     type: "text",
     description: "First Message",
   },
   image: {
-    src: "https://github.com/weaviate/Verba/blob/main/img/verba_icon.png?raw=true",
+    src: "/vijilLogo.svg",
     type: "image",
     description: "Logo",
   },
@@ -556,15 +562,15 @@ export const LightTheme: Theme = {
 export const DarkTheme: Theme = {
   ...LightTheme,
   theme_name: "Dark",
-  title: { ...LightTheme.title, text: "Verba" },
+  title: { ...LightTheme.title, text: "vijil.ai" },
   subtitle: { ...LightTheme.subtitle, text: "The Dark RAGtriever" },
   intro_message: {
     ...LightTheme.intro_message,
-    text: "Welcome to Verba, your open-source RAG application!",
+    text: "Welcome to vijil.ai RAG Agent",
   },
   image: {
     ...LightTheme.image,
-    src: "https://github.com/weaviate/Verba/blob/main/img/verba_icon.png?raw=true",
+    src: "/vijilLogo.svg",
   },
   primary_color: { ...LightTheme.primary_color, color: "#BB86FC" },
   secondary_color: { ...LightTheme.secondary_color, color: "#008F82" },
@@ -587,15 +593,15 @@ export const DarkTheme: Theme = {
 export const WCDTheme: Theme = {
   ...LightTheme,
   theme_name: "WCD",
-  title: { ...LightTheme.title, text: "Verba" },
+  title: { ...LightTheme.title, text: "vijil.ai" },
   subtitle: { ...LightTheme.subtitle, text: "Weaviate Chatbot" },
   intro_message: {
     ...LightTheme.intro_message,
-    text: "Welcome to Verba, your open-source RAG application!",
+    text: "Welcome to vijil.ai RAG Agent",
   },
   image: {
     ...LightTheme.image,
-    src: "https://github.com/weaviate/Verba/blob/1.0.0/frontend/public/weaviate.png?raw=true",
+    src: "/vijilLogo.svg",
   },
   primary_color: { ...LightTheme.primary_color, color: "#BF40C5" },
   secondary_color: { ...LightTheme.secondary_color, color: "#28395B" },
@@ -618,15 +624,15 @@ export const WCDTheme: Theme = {
 export const WeaviateTheme: Theme = {
   ...LightTheme,
   theme_name: "Weaviate",
-  title: { ...LightTheme.title, text: "Verba" },
+  title: { ...LightTheme.title, text: "vijil.ai" },
   subtitle: { ...LightTheme.subtitle, text: "Weaviate Chatbot" },
   intro_message: {
     ...LightTheme.intro_message,
-    text: "Welcome to Verba, your open-source RAG application!",
+    text: "Welcome to vijil.ai RAG Agent",
   },
   image: {
     ...LightTheme.image,
-    src: "https://github.com/weaviate/Verba/blob/1.0.0/frontend/public/weaviate.png?raw=true",
+    src: "/vijilLogo.svg",
   },
   primary_color: { ...LightTheme.primary_color, color: "#9bfc88" },
   secondary_color: { ...LightTheme.secondary_color, color: "#8bffe7" },

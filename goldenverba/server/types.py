@@ -26,6 +26,9 @@ class GetChunkPayload(BaseModel):
     embedder: str
     credentials: Credentials
 
+class GetSummaryPayload(BaseModel):
+    uuid: str
+    credentials: Credentials
 
 class GetVectorPayload(BaseModel):
     uuid: str

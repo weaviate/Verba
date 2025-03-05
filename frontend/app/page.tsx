@@ -207,7 +207,7 @@ export default function Home() {
             isLoaded ? "opacity-100" : "opacity-0"
           } flex flex-col gap-2 p-5`}
         >
-          <GettingStartedComponent addStatusMessage={addStatusMessage} />
+          {/* <GettingStartedComponent addStatusMessage={addStatusMessage} /> */}
 
           <div>
             <Navbar
