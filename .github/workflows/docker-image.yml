@@ -7,7 +7,7 @@ on:
     branches: ["flexai-main"]
 
 env:
-  REGISTRY: rg.fr-par.scw.cloud/experience
+  REGISTRY: rg.fr-par.scw.cloud/rag-app
 
 jobs:
   build-and-push:
