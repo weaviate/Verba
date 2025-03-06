@@ -6,20 +6,20 @@ services:
     ports:
       - "8000:8000"
     env_file:
-      - .env
+      - .docker.env
     volumes:
       - ./data:/data/
     depends_on:
       weaviate:
         condition: service_healthy
-      ollama:
-        condition: service_started
     healthcheck:
       test: wget --no-verbose --tries=3 --spider http://localhost:8000 || exit 1
       interval: 5s
       timeout: 10s
       retries: 5
       start_period: 10s
+    extra_hosts:
+      - "host.docker.internal:host-gateway"  # Map Docker to local machine
     networks:
       - ollama-docker
 
@@ -49,25 +49,34 @@ services:
     networks:
       - ollama-docker
 
-  ollama:
-    image: ollama/ollama:latest
-    ports:
-      - "7869:11434"
-    volumes:
-      - ./ollama/ollama:/root/.ollama
-    container_name: ollama
-    pull_policy: always
-    tty: true
-    restart: always
-    environment:
-      - OLLAMA_KEEP_ALIVE=24h
-      - OLLAMA_HOST=0.0.0.0
-    networks:
-      - ollama-docker
-
 volumes:
   weaviate_data: {}
 
 networks:
   ollama-docker:
     external: false
+
+
+  # ollama:
+  #   image: ollama/ollama:latest
+  #   ports:
+  #     - "7869:11434"
+  #   volumes:
+  #     - ./ollama/ollama:/root/.ollama
+  #   container_name: ollama
+  #   pull_policy: always
+  #   tty: true
+  #   restart: always
+  #   environment:
+  #     - OLLAMA_KEEP_ALIVE=24h
+  #     - OLLAMA_HOST=0.0.0.0
+  #   networks:
+  #     - ollama-docker
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         memory: 6G  # Maximum 6GB RAM for Ollama
+  #         cpus: "3.0" # Maximum 3 CPU cores
+  #       reservations:
+  #         memory: 3G  # At least 3GB RAM allocated
+  #         cpus: "1.5" # At least 1.5 CPU cores reserved
