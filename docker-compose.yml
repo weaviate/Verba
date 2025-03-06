@@ -62,8 +62,6 @@ services:
     environment:
       - OLLAMA_KEEP_ALIVE=24h
       - OLLAMA_HOST=0.0.0.0
-    command: >
-      /bin/sh -c "ollama pull llama3.2:1b"
     networks:
       - ollama-docker
 
