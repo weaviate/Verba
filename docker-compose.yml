@@ -12,6 +12,8 @@ services:
     depends_on:
       weaviate:
         condition: service_healthy
+      ollama:
+        condition: service_started
     healthcheck:
       test: wget --no-verbose --tries=3 --spider http://localhost:8000 || exit 1
       interval: 5s
@@ -44,6 +46,24 @@ services:
       start_period: 10s
     env_file:
       - .env
+    networks:
+      - ollama-docker
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ./ollama/ollama:/root/.ollama
+    container_name: ollama
+    pull_policy: always
+    tty: true
+    restart: always
+    environment:
+      - OLLAMA_KEEP_ALIVE=24h
+      - OLLAMA_HOST=0.0.0.0
+    command: >
+      /bin/sh -c "ollama pull llama3.2:1b"
     networks:
       - ollama-docker
 
