@@ -186,18 +186,6 @@ const Navbar: React.FC<NavbarProps> = ({
               setPage="SETTINGS"
             />
           )}
-          <div
-            className={`sm:h-[3vh] lg:h-[5vh] mx-1 hidden md:block bg-text-alt-verba w-px`}
-          ></div>
-          <VerbaButton
-            title={gitHubStars}
-            Icon={FaGithub}
-            onClick={handleGitHubClick}
-            className="flex-grow"
-            icon_size={14}
-            disabled={false}
-            selected={false}
-          />
         </div>
       </div>
     </div>

@@ -8,7 +8,6 @@ export type Credentials = {
 export type DocumentFilter = {
   title: string;
   uuid: string;
-  children?: DocumentFilter[];
 };
 
 export type UserConfig = {
@@ -490,7 +489,7 @@ export const LightTheme: Theme = {
   theme_name: "Light",
   title: { text: "vijil.ai", type: "text", description: "Title" },
   subtitle: {
-    text: "The Golden RAGtriever",
+    text: "Demo Build",
     type: "text",
     description: "Subtitle",
   },
@@ -500,7 +499,7 @@ export const LightTheme: Theme = {
     description: "First Message",
   },
   image: {
-    src: "/vijilLogo.svg",
+    src: "static/vijilLogo.svg",
     type: "image",
     description: "Logo",
   },
@@ -563,14 +562,14 @@ export const DarkTheme: Theme = {
   ...LightTheme,
   theme_name: "Dark",
   title: { ...LightTheme.title, text: "vijil.ai" },
-  subtitle: { ...LightTheme.subtitle, text: "The Dark RAGtriever" },
+  subtitle: { ...LightTheme.subtitle, text: "Demo Build" },
   intro_message: {
     ...LightTheme.intro_message,
     text: "Welcome to vijil.ai RAG Agent",
   },
   image: {
     ...LightTheme.image,
-    src: "/vijilLogo.svg",
+    src: "static/vijilLogo.svg",
   },
   primary_color: { ...LightTheme.primary_color, color: "#BB86FC" },
   secondary_color: { ...LightTheme.secondary_color, color: "#008F82" },
@@ -594,14 +593,14 @@ export const WCDTheme: Theme = {
   ...LightTheme,
   theme_name: "WCD",
   title: { ...LightTheme.title, text: "vijil.ai" },
-  subtitle: { ...LightTheme.subtitle, text: "Weaviate Chatbot" },
+  subtitle: { ...LightTheme.subtitle, text: "Demo Build" },
   intro_message: {
     ...LightTheme.intro_message,
     text: "Welcome to vijil.ai RAG Agent",
   },
   image: {
     ...LightTheme.image,
-    src: "/vijilLogo.svg",
+    src: "static/vijilLogo.svg",
   },
   primary_color: { ...LightTheme.primary_color, color: "#BF40C5" },
   secondary_color: { ...LightTheme.secondary_color, color: "#28395B" },
@@ -625,14 +624,14 @@ export const WeaviateTheme: Theme = {
   ...LightTheme,
   theme_name: "Weaviate",
   title: { ...LightTheme.title, text: "vijil.ai" },
-  subtitle: { ...LightTheme.subtitle, text: "Weaviate Chatbot" },
+  subtitle: { ...LightTheme.subtitle, text: "Demo Build" },
   intro_message: {
     ...LightTheme.intro_message,
     text: "Welcome to vijil.ai RAG Agent",
   },
   image: {
     ...LightTheme.image,
-    src: "/vijilLogo.svg",
+    src: "static/vijilLogo.svg",
   },
   primary_color: { ...LightTheme.primary_color, color: "#9bfc88" },
   secondary_color: { ...LightTheme.secondary_color, color: "#8bffe7" },

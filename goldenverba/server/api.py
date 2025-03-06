@@ -236,6 +236,8 @@ async def websocket_generate_stream(websocket: WebSocket):
         msg.good("Succesfully streamed answer")
 
 
+import asyncio
+
 @app.websocket("/ws/import_files")
 async def websocket_import_files(websocket: WebSocket):
 
@@ -245,28 +247,35 @@ async def websocket_import_files(websocket: WebSocket):
     await websocket.accept()
     logger = LoggerManager(websocket)
     batcher = BatchManager()
+    tasks = set()  # Store active tasks
 
-    while True:
-        try:
+    try:
+        while True:
             data = await websocket.receive_text()
             batch_data = DataBatchPayload.model_validate_json(data)
             fileConfig = batcher.add_batch(batch_data)
+
             if fileConfig is not None:
                 client = await client_manager.connect(batch_data.credentials)
-                await asyncio.create_task(
-                    manager.import_document(client, fileConfig, logger)
-                )
 
-        except WebSocketDisconnect:
-            msg.warn("Import WebSocket connection closed by client.")
-            break
-        except Exception as e:
-            msg.fail(f"Import WebSocket Error: {str(e)}")
-            break
+                # Run import process as a task
+                task = asyncio.create_task(manager.import_document(client, fileConfig, logger))
+                tasks.add(task)
+                task.add_done_callback(lambda t: tasks.discard(t))  # Remove completed tasks
 
+    except WebSocketDisconnect:
+        msg.warn("WebSocket disconnected. Waiting for tasks to finish...")
+        await asyncio.gather(*tasks, return_exceptions=True)  # Allow active imports to complete
+        msg.warn("All tasks completed. Closing WebSocket.")
+
+    except Exception as e:
+        msg.fail(f"Import WebSocket Error: {str(e)}")
+
+    finally:
+        await asyncio.gather(*tasks, return_exceptions=True)  # Ensure all imports complete
+        await websocket.close()
 
 ### CONFIG ENDPOINTS
-
 
 # Get Configuration
 @app.post("/api/get_rag_config")
