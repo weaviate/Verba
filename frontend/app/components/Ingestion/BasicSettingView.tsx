@@ -282,7 +282,7 @@ const BasicSettingView: React.FC<BasicSettingViewProps> = ({
 
         {/* Labels */}
         <div className="flex gap-2 justify-between items-center text-text-verba">
-          <p className="flex min-w-[8vw]">Labels</p>
+          <p className="flex min-w-[8vw]">Folder Name</p>
           <label className="input flex items-center gap-2 w-full bg-bg-verba">
             <input
               type="text"
@@ -314,7 +314,7 @@ const BasicSettingView: React.FC<BasicSettingViewProps> = ({
         <div className="flex gap-2 items-center text-text-verba">
           <p className="flex min-w-[8vw]"></p>
           <p className="text-sm text-text-alt-verba text-start">
-            Add or remove labels for Document Filtering
+            Use default folder name or create a new one 
           </p>
         </div>
 
