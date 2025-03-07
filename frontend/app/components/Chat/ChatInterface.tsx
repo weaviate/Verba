@@ -221,6 +221,10 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     }
   }, [RAGConfig]);
 
+  useEffect(() => {
+    retrieveDatacount();
+  }, [filterLabels]);
+
   const retrieveRAGConfig = async () => {
     const config = await fetchRAGConfig(credentials);
     if (config) {
