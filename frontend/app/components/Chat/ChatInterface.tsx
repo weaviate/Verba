@@ -600,7 +600,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                   currentDatacount > 0
                     ? currentDatacount >= 100
                       ? `Chatting with more than 100 documents...`
-                      : `Chatting with ${currentDatacount} documents...`
+                      : `Enter query to chat with your documents...`
                     : `No documents detected...`
                 }
                 onKeyDown={handleKeyDown}
