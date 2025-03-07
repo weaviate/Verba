@@ -1215,20 +1215,21 @@ class EmbeddingManager:
             "model": ollama_model,
             "prompt": f"""
             Summarize the following legal document in well-structured Markdown format. 
-            Ensure the summary maintains legal accuracy while being concise, clear, and logically organized. 
 
-            Use appropriate Markdown elements such as:
-            - **Headers (##)** for major sections
-            - **Bullet points (-)** for key provisions
-            - **Bold text** for important terms
-            - `Inline code` for references to laws or cases if applicable
+            ### Formatting Instructions:
+            - Use **headers (##)** for major sections.
+            - Use **bullet points (-)** for key provisions.
+            - Use **bold text** for important terms.
+            - Use `inline code` for legal references (if applicable).
+            - Do **not** include any explanations, reasoning process, or preamble—only the structured summary.
 
-            Maintain the original meaning, avoid redundancy, and ensure consistency in structure.
-
-            Provide only the structured summary in Markdown format, without any introduction, explanations, or additional commentary.
-
-            **Legal Document:**
+            **Legal Document:**  
             {text}
+
+            ### Output Requirements:
+            - Provide only the structured summary in Markdown format.
+            - Exclude any explanations, internal thoughts, or reasoning steps.
+            - Do not prefix with phrases like "Here's your summary"—return only the summary itself.
             """,
             "stream": False  # Set to True if you want a streaming response
         }
