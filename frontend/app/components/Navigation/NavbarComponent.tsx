@@ -152,11 +152,11 @@ const Navbar: React.FC<NavbarProps> = ({
         <div className="hidden md:flex flex-row items-center gap-3 justify-between">
           <NavbarButton
             hide={false}
-            Icon={IoChatbubbleSharp}
-            title="Chat"
+            Icon={IoDocumentSharp}
+            title="Documents"
             currentPage={currentPage}
             setCurrentPage={setCurrentPage}
-            setPage="CHAT"
+            setPage="DOCUMENTS"
           />
           {production != "Demo" && (
             <NavbarButton
@@ -170,11 +170,11 @@ const Navbar: React.FC<NavbarProps> = ({
           )}
           <NavbarButton
             hide={false}
-            Icon={IoDocumentSharp}
-            title="Documents"
+            Icon={IoChatbubbleSharp}
+            title="Chat"
             currentPage={currentPage}
             setCurrentPage={setCurrentPage}
-            setPage="DOCUMENTS"
+            setPage="CHAT"
           />
           {production != "Demo" && (
             <NavbarButton

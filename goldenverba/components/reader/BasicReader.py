@@ -87,6 +87,8 @@ class BasicReader(Reader):
         try:
             if fileConfig.extension == "":
                 file_content = fileConfig.content
+            # elif fileConfig.extension.lower() == "jsonl":
+            #     return await self.load_json_file(decoded_bytes, fileConfig)
             elif fileConfig.extension.lower() == "json":
                 return await self.load_json_file(decoded_bytes, fileConfig)
             elif fileConfig.extension.lower() == "pdf":
@@ -122,6 +124,21 @@ class BasicReader(Reader):
         self, decoded_bytes: bytes, fileConfig: FileConfig
     ) -> list[Document]:
         """Load and parse a JSON file."""
+        try:
+            json_obj = json.loads(decoded_bytes.decode("utf-8"))
+            document = Document.from_json(json_obj, self.nlp)
+            return (
+                [document]
+                if document
+                else [create_document(json.dumps(json_obj, indent=2), fileConfig)]
+            )
+        except json.JSONDecodeError as e:
+            raise ValueError(f"Invalid JSON in {fileConfig.filename}: {str(e)}")
+    
+    async def load_jsonl_file(
+        self, decoded_bytes: bytes, fileConfig: FileConfig
+    ) -> list[Document]:
+        """Load and parse a JSONL file."""
         try:
             json_obj = json.loads(decoded_bytes.decode("utf-8"))
             document = Document.from_json(json_obj, self.nlp)

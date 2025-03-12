@@ -40,7 +40,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({
 }) => {
   const [settingMode, setSettingMode] = useState<
     "INFO" | "ADMIN" | "THEME" | "SUGGESTIONS" | "CACHE"
-  >("INFO");
+  >("THEME");
 
   return (
     <div className="flex justify-center gap-3 h-[80vh] ">
@@ -69,15 +69,15 @@ const SettingsView: React.FC<SettingsViewProps> = ({
               selected_color="bg-secondary-verba"
               Icon={FaPaintBrush}
             />
-            <VerbaButton
+            {/* <VerbaButton
               title="Manage Suggestions"
               onClick={() => setSettingMode("SUGGESTIONS")}
               selected={settingMode === "SUGGESTIONS"}
               selected_color="bg-secondary-verba"
               Icon={IoChatboxEllipsesSharp}
-            />
+            /> */}
           </div>
-          <div className="bg-bg-alt-verba gap-2 rounded-2xl flex flex-col p-6 w-full overflow-y-auto overflow-x-hidden">
+          {/* <div className="bg-bg-alt-verba gap-2 rounded-2xl flex flex-col p-6 w-full overflow-y-auto overflow-x-hidden">
             <VerbaButton
               title="Logout"
               onClick={() => window.location.reload()}
@@ -93,7 +93,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({
               }
               Icon={BiSolidCommentError}
             />
-          </div>
+          </div> */}
         </div>
       </div>
 

@@ -10,7 +10,7 @@ import IngestionView from "./components/Ingestion/IngestionView";
 import LoginView from "./components/Login/LoginView";
 import ChatView from "./components/Chat/ChatView";
 import SettingsView from "./components/Settings/SettingsView";
-import GettingStartedComponent from "./components/Login/GettingStarted";
+// import GettingStartedComponent from "./components/Login/GettingStarted";
 import StatusMessengerComponent from "./components/Navigation/StatusMessenger";
 
 // Types
@@ -23,8 +23,8 @@ import {
   Themes,
   DarkTheme,
   DocumentFilter,
-  WCDTheme,
-  WeaviateTheme,
+  // WCDTheme,
+  // WeaviateTheme,
 } from "./types";
 
 // Utilities
@@ -33,7 +33,7 @@ import { fonts, FontKey } from "./util";
 
 export default function Home() {
   // Page States
-  const [currentPage, setCurrentPage] = useState("CHAT");
+  const [currentPage, setCurrentPage] = useState("DOCUMENTS");
   const [production, setProduction] = useState<"Local" | "Demo" | "Production">(
     "Local"
   );
@@ -43,10 +43,10 @@ export default function Home() {
   const [themes, setThemes] = useState<Themes>({
     Light: LightTheme,
     Dark: DarkTheme,
-    Weaviate: WeaviateTheme,
-    WCD: WCDTheme,
+    // Weaviate: WeaviateTheme,
+    // WCD: WCDTheme,
   });
-  const [selectedTheme, setSelectedTheme] = useState<Theme>(themes["Weaviate"]);
+  const [selectedTheme, setSelectedTheme] = useState<Theme>(themes["Light"]);
 
   const fontKey = selectedTheme.font.value as FontKey; // Safely cast if you're sure, or use a check
   const fontClassName = fontKey ? fonts[fontKey]?.className || "" : "";
@@ -135,30 +135,30 @@ export default function Home() {
     const themeToUse = selectedTheme;
     const cssVars = {
       "--primary-verba":
-        themeToUse.primary_color?.color || WeaviateTheme.primary_color.color,
+        themeToUse.primary_color?.color || LightTheme.primary_color.color,
       "--secondary-verba":
         themeToUse.secondary_color?.color ||
-        WeaviateTheme.secondary_color.color,
+        LightTheme.secondary_color.color,
       "--warning-verba":
-        themeToUse.warning_color?.color || WeaviateTheme.warning_color.color,
-      "--bg-verba": themeToUse.bg_color?.color || WeaviateTheme.bg_color.color,
+        themeToUse.warning_color?.color || LightTheme.warning_color.color,
+      "--bg-verba": themeToUse.bg_color?.color || LightTheme.bg_color.color,
       "--bg-alt-verba":
-        themeToUse.bg_alt_color?.color || WeaviateTheme.bg_alt_color.color,
+        themeToUse.bg_alt_color?.color || LightTheme.bg_alt_color.color,
       "--text-verba":
-        themeToUse.text_color?.color || WeaviateTheme.text_color.color,
+        themeToUse.text_color?.color || LightTheme.text_color.color,
       "--text-alt-verba":
-        themeToUse.text_alt_color?.color || WeaviateTheme.text_alt_color.color,
+        themeToUse.text_alt_color?.color || LightTheme.text_alt_color.color,
       "--button-verba":
-        themeToUse.button_color?.color || WeaviateTheme.button_color.color,
+        themeToUse.button_color?.color || LightTheme.button_color.color,
       "--button-hover-verba":
         themeToUse.button_hover_color?.color ||
-        WeaviateTheme.button_hover_color.color,
+        LightTheme.button_hover_color.color,
       "--text-verba-button":
         themeToUse.button_text_color?.color ||
-        WeaviateTheme.button_text_color.color,
+        LightTheme.button_text_color.color,
       "--text-alt-verba-button":
         themeToUse.button_text_alt_color?.color ||
-        WeaviateTheme.button_text_alt_color.color,
+        LightTheme.button_text_alt_color.color,
     };
     Object.entries(cssVars).forEach(([key, value]) => {
       document.documentElement.style.setProperty(key, value);

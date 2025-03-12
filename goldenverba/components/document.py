@@ -54,6 +54,7 @@ class Document:
         source: str = "",
         meta: dict = {},
         metadata: str = "",
+        summary: str = "",
     ):
         self.title = title
         self.content = content
@@ -63,6 +64,7 @@ class Document:
         self.source = source
         self.meta = meta
         self.metadata = metadata
+        self.summary = summary
         self.chunks: list[Chunk] = []
 
         MAX_BATCH_SIZE = 500000
@@ -98,6 +100,7 @@ class Document:
             "source": document.source,
             "meta": json.dumps(document.meta),
             "metadata": document.metadata,
+            "summary": document.summary,
         }
         return doc_dict
 
@@ -114,6 +117,7 @@ class Document:
             and "source" in doc_dict
             and "meta" in doc_dict
             and "metadata" in doc_dict
+            and "summary" in doc_dict
         ):
             document = Document(
                 title=doc_dict.get("title", ""),
@@ -124,6 +128,7 @@ class Document:
                 source=doc_dict.get("source", ""),
                 meta=doc_dict.get("meta", {}),
                 metadata=doc_dict.get("metadata", ""),
+                summary=doc_dict.get("summary", ""),
             )
             return document
         else:
@@ -140,5 +145,6 @@ def create_document(content: str, fileConfig: FileConfig) -> Document:
         source=fileConfig.source,
         fileSize=fileConfig.file_size,
         metadata=fileConfig.metadata,
+        summary="",
         meta={},
     )

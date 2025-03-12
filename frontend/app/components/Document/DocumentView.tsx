@@ -48,6 +48,7 @@ const DocumentView: React.FC<DocumentViewProps> = ({
 
         {/* Tree View */}
         <TreeView
+          selectedTheme={selectedTheme}
           credentials={credentials}
           selectedDocument={selectedDocument}
           onSelectDocument={setSelectedDocument}

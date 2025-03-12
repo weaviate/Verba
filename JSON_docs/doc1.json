@@ -1,0 +1,11 @@
+{
+  "title": "Legal Contract",
+  "content": "This is a legal contract between two parties...",
+  "extension": "pdf",
+  "fileSize": 51234,
+  "labels": ["Imported"],
+  "source": "Uploaded by user",
+  "meta": "{\"author\": \"John Doe\", \"date\": \"2024-03-12\"}",
+  "metadata": "Confidential",
+  "summary": "This contract defines the obligations of both parties."
+}

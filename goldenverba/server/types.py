@@ -29,6 +29,7 @@ class GetChunkPayload(BaseModel):
 class GetSummaryPayload(BaseModel):
     uuid: str
     credentials: Credentials
+    forceGenerate: bool
 
 class GetVectorPayload(BaseModel):
     uuid: str

@@ -418,7 +418,8 @@ export const fetch_vectors = async (
 // Endpoint /api/get_summary
 export const fetch_summary = async (
   uuid: string | null,
-  credentials: Credentials
+  credentials: Credentials,
+  forceGenerate: boolean
 ): Promise<SummaryPayload | null> => {
   if (!uuid) {
     return null;
@@ -426,7 +427,7 @@ export const fetch_summary = async (
 
   try {
     const host = await detectHost();
-    const response = await fetch(`${host}/api/get_summary`, {
+    const response = await fetch(`${host}/api/get_or_regenerate_summary`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -434,6 +435,7 @@ export const fetch_summary = async (
       body: JSON.stringify({
         uuid: uuid,
         credentials: credentials,
+        forceGenerate: forceGenerate
       }),
     });
     const data: SummaryPayload | null = await response.json();

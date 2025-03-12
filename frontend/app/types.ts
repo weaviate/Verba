@@ -571,37 +571,6 @@ export const DarkTheme: Theme = {
     ...LightTheme.image,
     src: "static/vijilLogo.svg",
   },
-  primary_color: { ...LightTheme.primary_color, color: "#BB86FC" },
-  secondary_color: { ...LightTheme.secondary_color, color: "#008F82" },
-  warning_color: { ...LightTheme.warning_color, color: "#FF8399" },
-  bg_color: { ...LightTheme.bg_color, color: "#202020" },
-  bg_alt_color: { ...LightTheme.bg_alt_color, color: "#2F2929" },
-  text_color: { ...LightTheme.text_color, color: "#ffffff" },
-  text_alt_color: { ...LightTheme.text_alt_color, color: "#999999" },
-  button_text_color: { ...LightTheme.button_text_color, color: "#ffffff" },
-  button_text_alt_color: {
-    ...LightTheme.button_text_alt_color,
-    color: "#999999",
-  },
-  button_color: { ...LightTheme.button_color, color: "#3C3C3C" },
-  button_hover_color: { ...LightTheme.button_hover_color, color: "#2C2C2C" },
-  font: { ...LightTheme.font, value: "Open_Sans" },
-  theme: "dark",
-};
-
-export const WCDTheme: Theme = {
-  ...LightTheme,
-  theme_name: "WCD",
-  title: { ...LightTheme.title, text: "vijil.ai" },
-  subtitle: { ...LightTheme.subtitle, text: "Demo Build" },
-  intro_message: {
-    ...LightTheme.intro_message,
-    text: "Welcome to vijil.ai RAG Agent",
-  },
-  image: {
-    ...LightTheme.image,
-    src: "static/vijilLogo.svg",
-  },
   primary_color: { ...LightTheme.primary_color, color: "#BF40C5" },
   secondary_color: { ...LightTheme.secondary_color, color: "#28395B" },
   warning_color: { ...LightTheme.warning_color, color: "#EA3A31" },
@@ -620,36 +589,67 @@ export const WCDTheme: Theme = {
   theme: "dark",
 };
 
-export const WeaviateTheme: Theme = {
-  ...LightTheme,
-  theme_name: "Weaviate",
-  title: { ...LightTheme.title, text: "vijil.ai" },
-  subtitle: { ...LightTheme.subtitle, text: "Demo Build" },
-  intro_message: {
-    ...LightTheme.intro_message,
-    text: "Welcome to vijil.ai RAG Agent",
-  },
-  image: {
-    ...LightTheme.image,
-    src: "static/vijilLogo.svg",
-  },
-  primary_color: { ...LightTheme.primary_color, color: "#9bfc88" },
-  secondary_color: { ...LightTheme.secondary_color, color: "#8bffe7" },
-  warning_color: { ...LightTheme.warning_color, color: "#f77579" },
-  bg_color: { ...LightTheme.bg_color, color: "#FEF7F7" },
-  bg_alt_color: { ...LightTheme.bg_alt_color, color: "#ffffff" },
-  text_color: { ...LightTheme.text_color, color: "#130C49" },
-  text_alt_color: { ...LightTheme.text_alt_color, color: "#929292" },
-  button_text_color: { ...LightTheme.button_text_color, color: "#130C49" },
-  button_text_alt_color: {
-    ...LightTheme.button_text_alt_color,
-    color: "#929292",
-  },
-  button_color: { ...LightTheme.button_color, color: "#eeeeee" },
-  button_hover_color: { ...LightTheme.button_hover_color, color: "#7dfffb" },
-  font: { ...LightTheme.font, value: "Plus_Jakarta_Sans" },
-  theme: "light",
-};
+// export const WCDTheme: Theme = {
+//   ...LightTheme,
+//   theme_name: "WCD",
+//   title: { ...LightTheme.title, text: "vijil.ai" },
+//   subtitle: { ...LightTheme.subtitle, text: "Demo Build" },
+//   intro_message: {
+//     ...LightTheme.intro_message,
+//     text: "Welcome to vijil.ai RAG Agent",
+//   },
+//   image: {
+//     ...LightTheme.image,
+//     src: "static/vijilLogo.svg",
+//   },
+//   primary_color: { ...LightTheme.primary_color, color: "#BF40C5" },
+//   secondary_color: { ...LightTheme.secondary_color, color: "#28395B" },
+//   warning_color: { ...LightTheme.warning_color, color: "#EA3A31" },
+//   bg_color: { ...LightTheme.bg_color, color: "#0C1428" },
+//   bg_alt_color: { ...LightTheme.bg_alt_color, color: "#192136" },
+//   text_color: { ...LightTheme.text_color, color: "#ffffff" },
+//   text_alt_color: { ...LightTheme.text_alt_color, color: "#AAAAAA" },
+//   button_text_color: { ...LightTheme.button_text_color, color: "#ffffff" },
+//   button_text_alt_color: {
+//     ...LightTheme.button_text_alt_color,
+//     color: "#AAAAAA",
+//   },
+//   button_color: { ...LightTheme.button_color, color: "#1D253A" },
+//   button_hover_color: { ...LightTheme.button_hover_color, color: "#313749" },
+//   font: { ...LightTheme.font, value: "Open_Sans" },
+//   theme: "dark",
+// };
+
+// export const WeaviateTheme: Theme = {
+//   ...LightTheme,
+//   theme_name: "Weaviate",
+//   title: { ...LightTheme.title, text: "vijil.ai" },
+//   subtitle: { ...LightTheme.subtitle, text: "Demo Build" },
+//   intro_message: {
+//     ...LightTheme.intro_message,
+//     text: "Welcome to vijil.ai RAG Agent",
+//   },
+//   image: {
+//     ...LightTheme.image,
+//     src: "static/vijilLogo.svg",
+//   },
+//   primary_color: { ...LightTheme.primary_color, color: "#9bfc88" },
+//   secondary_color: { ...LightTheme.secondary_color, color: "#8bffe7" },
+//   warning_color: { ...LightTheme.warning_color, color: "#f77579" },
+//   bg_color: { ...LightTheme.bg_color, color: "#FEF7F7" },
+//   bg_alt_color: { ...LightTheme.bg_alt_color, color: "#ffffff" },
+//   text_color: { ...LightTheme.text_color, color: "#130C49" },
+//   text_alt_color: { ...LightTheme.text_alt_color, color: "#929292" },
+//   button_text_color: { ...LightTheme.button_text_color, color: "#130C49" },
+//   button_text_alt_color: {
+//     ...LightTheme.button_text_alt_color,
+//     color: "#929292",
+//   },
+//   button_color: { ...LightTheme.button_color, color: "#eeeeee" },
+//   button_hover_color: { ...LightTheme.button_hover_color, color: "#7dfffb" },
+//   font: { ...LightTheme.font, value: "Plus_Jakarta_Sans" },
+//   theme: "light",
+// };
 
 export interface Themes {
   [key: string]: Theme;

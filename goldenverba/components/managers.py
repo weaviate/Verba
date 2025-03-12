@@ -404,7 +404,7 @@ class WeaviateManager:
 
             ### Import Document
             document_obj = Document.to_json(document)
-            document_obj["summary"] = document.meta.get("summary", "No summary available")  # Add summary
+            document_obj["summary"] = document.summary # Add summary
             doc_uuid = await document_collection.data.insert(document_obj)
 
             chunk_ids = []
@@ -961,7 +961,30 @@ class WeaviateManager:
                 return response.groups[0].total_count
             else:
                 return 0
+        
+    async def store_summary(self, client: WeaviateAsyncClient, uuid: str, summary: str):
+        """
+        Store or update the summary of a document in Weaviate.
 
+        Args:
+            client (WeaviateAsyncClient): The Weaviate client.
+            uuid (str): The document UUID.
+            summary (str): The generated summary.
+        """
+        if await self.verify_collection(client, self.document_collection_name):
+            document_collection = client.collections.get(self.document_collection_name)
+
+            # Check if the document exists
+            if await document_collection.data.exists(uuid):
+                # Update the existing summary
+                await document_collection.data.update(
+                    uuid=uuid,
+                    properties={"summary": summary}
+                )
+                msg.good(f"Updated summary for document: {uuid}")
+            else:
+                msg.warn(f"Document {uuid} not found. Cannot store summary.")
+                raise Exception(f"Document {uuid} does not exist in Weaviate.")
 
 class ReaderManager:
     def __init__(self):
@@ -979,6 +1002,7 @@ class ReaderManager:
                     config, fileConfig
                 )
                 for document in documents:
+                    document.meta = json.loads(document.meta) if isinstance(document.meta, str) else document.meta
                     document.meta["Reader"] = (
                         fileConfig.rag_config["Reader"].components[reader].model_dump()
                     )
@@ -1097,17 +1121,20 @@ class EmbeddingManager:
                         for chunk in document.chunks
                     ]
 
-                    #Generate a summary for the entire document
-                    summary = await self.generate_summary("\n".join(content))
-                    document.meta["summary"] = summary  #Store summary in metadata
+                    if not document.summary:
+                        document.summary = await self.generate_summary("\n".join(content))
+                        summary_status = f"Generated summary: {document.summary[:100]}..."
+                    else:
+                        summary_status = f"Using existing summary: {document.summary[:100]}..."
 
-                    #Log summary generation
+                    # Log summary generation or usage
                     await logger.send_report(
                         fileConfig.fileID,
                         FileStatus.SUMMARIZING,
-                        f"Generated summary: {summary[:100]}...",
+                        summary_status,
                         took=round(loop.time() - start_time, 2),
                     )
+                        
                     embeddings = await self.batch_vectorize(embedder, config, content)
 
                     if len(embeddings) >= 3:
@@ -1206,11 +1233,29 @@ class EmbeddingManager:
         Returns:
             str: The generated summary.
         """
-        OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2:1b")  # Default model
         OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434")  # Default API URL
-        ollama_url = f"{OLLAMA_URL}/api/generate"  # Use environment variable
-        ollama_model = OLLAMA_MODEL  # Get model from env
+        model_list_url = f"{OLLAMA_URL}/api/tags"
+        ollama_url = f"{OLLAMA_URL}/api/generate"
 
+        try:
+            # Fetch available models
+            response = requests.get(model_list_url)
+            response.raise_for_status()
+            models = response.json().get("models", [])
+            available_models = {model["name"] for model in models}
+
+            # Get model from environment
+            ollama_model = os.getenv("OLLAMA_MODEL")
+
+            # Validate if OLLAMA_MODEL exists locally
+            if not ollama_model or ollama_model not in available_models:
+                if available_models:
+                    ollama_model = next(iter(available_models))  # Pick first available model
+                else:
+                    return "Error: No local Ollama models available."
+
+        except requests.RequestException as e:
+            return f"Error fetching available models: {str(e)}"
         payload = {
             "model": ollama_model,
             "prompt": f"""

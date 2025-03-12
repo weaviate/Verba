@@ -8,6 +8,8 @@ import asyncio
 from goldenverba.server.helpers import LoggerManager, BatchManager
 from weaviate.client import WeaviateAsyncClient
 
+from goldenverba.components.managers import EmbeddingManager, WeaviateManager
+
 import os
 from pathlib import Path
 
@@ -576,27 +578,36 @@ async def get_vectors(payload: GetVectorPayload):
             }
         )
 
-@app.post("/api/get_summary")
-async def get_summary(payload: GetSummaryPayload):
+@app.post("/api/get_or_regenerate_summary")
+async def get_or_regenerate_summary(payload: GetSummaryPayload):
     try:
         client = await client_manager.connect(payload.credentials)
-        summary = await manager.weaviate_manager.get_summary(
-            client, payload.uuid
-        )
-        return JSONResponse(
-            content={
-                "error": "",
-                "summary": summary,
-            }
-        )
+
+        # If forceGenerate is False, try fetching existing summary
+        if not payload.forceGenerate:
+            summary = await manager.weaviate_manager.get_summary(client, payload.uuid)
+            if summary:  # Return existing summary if found
+                return JSONResponse(content={"error": "", "summary": summary})
+
+        # If forceGenerate is True or no summary exists, regenerate the summary
+        document_data = await manager.weaviate_manager.get_document(client, payload.uuid)
+        if not document_data or "content" not in document_data:
+            return JSONResponse(content={"error": "Document not found", "summary": None})
+
+        document_text = document_data["content"]
+
+        # Generate new summary using Ollama
+        new_summary = await manager.embedder_manager.generate_summary(document_text)
+        if not new_summary:
+            return JSONResponse(content={"error": "Failed to generate summary", "summary": None})
+
+        # Store the new summary in Weaviate
+        await manager.weaviate_manager.store_summary(client, payload.uuid, new_summary)
+
+        return JSONResponse(content={"error": "", "summary": new_summary})
+
     except Exception as e:
-        msg.fail(f"Summary retrieval failed: {str(e)}")
-        return JSONResponse(
-            content={
-                "error": str(e),
-                "summary": None,
-            }
-        )
+        return JSONResponse(content={"error": str(e), "summary": None})
 
 
 # Retrieve specific document based on UUID
