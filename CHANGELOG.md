@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.1.3] Making Verba stable again!
+
+## Added
+
+- Added `OLLAMA_MODEL` and `OLLAMA_EMBED_MODEL` environment variables (https://github.com/weaviate/Verba/pull/372)
+
 ## [2.1.2] Adding Novita!
 
 ## Added
