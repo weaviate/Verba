@@ -167,7 +167,12 @@ Below is a comprehensive list of the API keys and variables you may require:
 | WEAVIATE_API_KEY_VERBA | API Credentials to your hosted Weaviate Cluster            | Connect to your [WCS](https://console.weaviate.cloud/) Cluster                                                                |
 | ANTHROPIC_API_KEY      | Your Anthropic API Key                                     | Get Access to [Anthropic](https://www.anthropic.com/) Models                                                                  |
 | OPENAI_API_KEY         | Your OpenAI Key                                            | Get Access to [OpenAI](https://openai.com/) Models                                                                            |
+| OPENAI_EMBED_API_KEY         | Your OpenAI Key                                            | Use a different endpoint for embeddings                                                                            |
 | OPENAI_BASE_URL        | URL to OpenAI instance                                     | Models                                                                                                                        |
+| OPENAI_EMBED_BASE_URL        | URL to OpenAI instance                                     | Use a different endpoint for embeddings                                                                                                                        |
+| OPENAI_MODEL        | The name of the model to be used when selecting OpenAI as a Generator                                    | Default: the first model in the list returned by the endpoint                                                                                                                        |
+| OPENAI_EMBED_MODEL        | The name of the OpenAI embedding model to be used when selecting OpenAI as an Embedder                                    | Default: `text-embedding-3-small`                                                                                                                        |
+| OPENAI_CUSTOM_EMBED        | `true` \| `false`                                    | Allow Verba to recognize custom embedding model names (not only OpenAI ones)                                                                            |
 | COHERE_API_KEY         | Your API Key                                               | Get Access to [Cohere](https://cohere.com/) Models                                                                            |
 | GROQ_API_KEY           | Your Groq API Key                                          | Get Access to [Groq](https://groq.com/) Models                                                                                |
 | NOVITA_API_KEY         | Your Novita API Key                                        | Get Access to [Novita AI](https://novita.ai?utm_source=github_verba&utm_medium=github_readme&utm_campaign=github_link) Models |
@@ -184,6 +189,7 @@ Below is a comprehensive list of the API keys and variables you may require:
 | UPSTAGE_API_KEY        | Your Upstage API Key                                       | Get Access to [Upstage](https://upstage.ai/) Models                                                                           |
 | UPSTAGE_BASE_URL       | URL to Upstage instance                                    | Models                                                                                                                        |
 | DEFAULT_DEPLOYMENT     | Local, Weaviate, Custom, Docker                            | Set the default deployment mode                                                                                               |
+| SYSYEM_MESSAGE_PROMPT     | Prompt text value                            | Default value starts with: "You are Verba, a chatbot for..."                                                                                               |
 | OLLAMA_MODEL           | Your Ollama Model                                          | Set the default Ollama model to use                                                                                           |
 | OLLAMA_EMBED_MODEL     | Your Ollama Embedding Model                                | Set the default Ollama embedding model to use                                                                                 |
 
@@ -246,6 +252,11 @@ You can also add a `OPENAI_BASE_URL` to use proxies such as LiteLLM (https://git
 ```
 OPENAI_BASE_URL=YOUR-OPENAI_BASE_URL
 ```
+### OpenAI Embeddings
+
+To specify a different endpoint for your embeddings, set the `OPENAI_EMBED_API_KEY` and `OPENAI_EMBED_BASE_URL` environment variables.
+
+If you are using a custom OpenAI Server for embeddings, ensure you set `OPENAI_CUSTOM_EMBED=true`. This will allow Verba to recognize custom embedding model names instead of the default OpenAI embedding model names.
 
 ## HuggingFace
 
@@ -463,6 +474,7 @@ You can learn more about Verba's architecture and implementation in its [technic
 - **How to connect to your custom OpenAI Server?**
 
   - Set your custom OpenAI API Key and URL in the `.env` file, this will allow Verba to start up and retrieve the models from your custom OpenAI Server. `OPENAI_BASE_URL` is set to `https://api.openai.com/v1` by default.
+  - You can also set a different endpoint for your embeddings by configuring the `OPENAI_EMBED_API_KEY` and `OPENAI_EMBED_BASE_URL` environment variables and setting `OPENAI_CUSTOM_EMBED=true`. For more details, see [OpenAI Embeddings](#openai-embeddings).
 
 - **How to upload custom JSON files to Verba?**
   - Right now Verba does not support custom JSON structure. Instead the whole JSON will simply be dumped into the content field of the Verba document. You can read more about the Verba JSON Structure in the Technical Documentation [here](./TECHNICAL.md).
