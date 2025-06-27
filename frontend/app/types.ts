@@ -480,31 +480,31 @@ export interface Theme {
   theme: "light" | "dark";
 }
 
-export const LightTheme: Theme = {
-  theme_name: "Light",
-  title: { text: "Verba", type: "text", description: "Title" },
+export const HIPPATheme: Theme = {
+  theme_name: "HIPAA",
+  title: { text: "HIPAA", type: "text", description: "Title" },
   subtitle: {
-    text: "The Golden RAGtriever",
+    text: "Health Insurance Portability and Accountability Act",
     type: "text",
     description: "Subtitle",
   },
   intro_message: {
-    text: "Welcome to Verba, your open-source RAG application!",
+    text: "Welcome to Weaviate, your HIPAA compliant RAG application!",
     type: "text",
     description: "First Message",
   },
   image: {
-    src: "https://github.com/weaviate/Verba/blob/main/img/verba_icon.png?raw=true",
+    src: "https://wac-cdn.atlassian.com/dam/jcr:0c20d164-2210-4602-8077-cc5103f8174e/hippa-logo.png?cdnVersion=2805",
     type: "image",
     description: "Logo",
   },
   primary_color: {
-    color: "#FDFF91",
+    color: "#ffffff",
     type: "color",
     description: "Primary",
   },
   secondary_color: {
-    color: "#90FFA8",
+    color: "#b6cdef",
     type: "color",
     description: "Secondary",
   },
@@ -514,7 +514,7 @@ export const LightTheme: Theme = {
     description: "Warning",
   },
   bg_color: {
-    color: "#FEF7F7",
+    color: "#f0f0f0",
     type: "color",
     description: "Background",
   },
@@ -523,24 +523,97 @@ export const LightTheme: Theme = {
     type: "color",
     description: "Alt. Background",
   },
-  text_color: { color: "#161616", type: "color", description: "Text" },
+  text_color: { color: "#000000", type: "color", description: "Text" },
   text_alt_color: {
-    color: "#8E8E8E",
+    color: "#303030",
     type: "color",
     description: "Alt. Text",
   },
   button_text_color: {
-    color: "#161616",
+    color: "#000000",
     type: "color",
     description: "Button Text",
   },
   button_text_alt_color: {
-    color: "#8E8E8E",
+    color: "#616161",
     type: "color",
     description: "Button Alt. Text",
   },
   button_color: {
-    color: "#EFEFEF",
+    color: "#e6e6e6",
+    type: "color",
+    description: "Button",
+  },
+  button_hover_color: {
+    color: "#DCDCDC",
+    type: "color",
+    description: "Button Hover",
+  },
+  font: BaseFonts,
+  theme: "light",
+};
+
+export const LightTheme: Theme = {
+  theme_name: "Light",
+  title: { text: "HIPAA", type: "text", description: "Title" },
+  subtitle: {
+    text: "Health Insurance Portability and Accountability Act",
+    type: "text",
+    description: "Subtitle",
+  },
+  intro_message: {
+    text: "Welcome to Weaviate, your HIPAA compliant RAG application!",
+    type: "text",
+    description: "First Message",
+  },
+  image: {
+    src: "static/hippa-logo.png",
+    type: "image",
+    description: "Logo",
+  },
+  primary_color: {
+    color: "#ffffff",
+    type: "color",
+    description: "Primary",
+  },
+  secondary_color: {
+    color: "#b6cdef",
+    type: "color",
+    description: "Secondary",
+  },
+  warning_color: {
+    color: "#FF8399",
+    type: "color",
+    description: "Warning",
+  },
+  bg_color: {
+    color: "#f0f0f0",
+    type: "color",
+    description: "Background",
+  },
+  bg_alt_color: {
+    color: "#FFFFFF",
+    type: "color",
+    description: "Alt. Background",
+  },
+  text_color: { color: "#000000", type: "color", description: "Text" },
+  text_alt_color: {
+    color: "#303030",
+    type: "color",
+    description: "Alt. Text",
+  },
+  button_text_color: {
+    color: "#000000",
+    type: "color",
+    description: "Button Text",
+  },
+  button_text_alt_color: {
+    color: "#616161",
+    type: "color",
+    description: "Button Alt. Text",
+  },
+  button_color: {
+    color: "#e6e6e6",
     type: "color",
     description: "Button",
   },

@@ -19,6 +19,7 @@ import {
   RAGConfig,
   Theme,
   StatusMessage,
+  HIPPATheme,
   LightTheme,
   Themes,
   DarkTheme,
@@ -41,12 +42,13 @@ export default function Home() {
 
   // Settings
   const [themes, setThemes] = useState<Themes>({
+    HIPAA: HIPPATheme,
     Light: LightTheme,
     Dark: DarkTheme,
     Weaviate: WeaviateTheme,
     WCD: WCDTheme,
   });
-  const [selectedTheme, setSelectedTheme] = useState<Theme>(themes["Weaviate"]);
+  const [selectedTheme, setSelectedTheme] = useState<Theme>(themes["HIPAA"]);
 
   const fontKey = selectedTheme.font.value as FontKey; // Safely cast if you're sure, or use a check
   const fontClassName = fontKey ? fonts[fontKey]?.className || "" : "";
