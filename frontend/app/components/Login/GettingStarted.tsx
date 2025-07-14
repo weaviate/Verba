@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import VerbaButton from "../Navigation/VerbaButton";
 import { FaGithub } from "react-icons/fa";
 import { FaYoutube } from "react-icons/fa";
@@ -18,12 +18,32 @@ const GettingStartedComponent: React.FC<GettingStartedComponentProps> = ({
   addStatusMessage,
 }) => {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const [shouldShow, setShouldShow] = useState(false);
 
   useEffect(() => {
-    if (dialogRef.current) {
-      dialogRef.current.showModal();
+    // Check if getting_started variable exists in localStorage
+    const gettingStartedSeen = localStorage.getItem("getting_started");
+
+    // Show modal if getting_started doesn't exist or is set to false
+    if (!gettingStartedSeen || gettingStartedSeen === "false") {
+      setShouldShow(true);
+      if (dialogRef.current) {
+        dialogRef.current.showModal();
+      }
     }
   }, []);
+
+  // If we shouldn't show the component, return null
+  if (!shouldShow) {
+    return null;
+  }
+
+  const handleGetStarted = () => {
+    // Set getting_started to true in localStorage
+    localStorage.setItem("getting_started", "true");
+    setShouldShow(false);
+    addStatusMessage("Achievement unlocked: Welcome to Verba!", "SUCCESS");
+  };
 
   return (
     <dialog id={"Getting-Started-Modal"} className="modal" ref={dialogRef}>
@@ -97,12 +117,7 @@ const GettingStartedComponent: React.FC<GettingStartedComponentProps> = ({
               title="Let's get started"
               type="submit"
               selected={true}
-              onClick={() => {
-                addStatusMessage(
-                  "Achievement unlocked: Welcome to Verba!",
-                  "SUCCESS"
-                );
-              }}
+              onClick={handleGetStarted}
               selected_color="bg-primary-verba"
               Icon={FaHeart}
             />

@@ -2,11 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
-## [2.1.3] Making Verba stable again!
+## [2.1.3] More data types
 
 ## Added
 
 - Added `OLLAMA_MODEL` and `OLLAMA_EMBED_MODEL` environment variables (https://github.com/weaviate/Verba/pull/372)
+- Hiding `Getting Started` display after showing once
+- Added support for `csv` `xlsx` `xls` for the `DefaultReader`
 
 ## [2.1.2] Adding Novita!
 

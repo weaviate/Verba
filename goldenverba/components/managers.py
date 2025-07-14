@@ -12,7 +12,6 @@ import os
 import asyncio
 import json
 import re
-from urllib.parse import urlparse
 from datetime import datetime
 
 from sklearn.decomposition import PCA

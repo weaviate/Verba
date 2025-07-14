@@ -26,11 +26,13 @@ setup(
     install_requires=[
         "weaviate-client==4.9.6",
         "python-dotenv==1.0.0",
+        "openpyxl==3.1.5",
         "wasabi==1.1.2",
         "fastapi==0.111.1",
         "uvicorn[standard]==0.29.0",
         "gunicorn==22.0.0",
         "click==8.1.7",
+        "xlrd==2.0.2",
         "asyncio==3.4.3",
         "tiktoken==0.6.0",
         "requests==2.31.0",
