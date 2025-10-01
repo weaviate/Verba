@@ -46,6 +46,9 @@ def start(port, host, prod, workers):
         port=port,
         reload=(not prod),
         workers=workers,
+        timeout_keep_alive=500,  # Keep-alive timeout in seconds
+        ws_ping_interval=10,  # Ping interval in seconds
+        ws_ping_timeout=120,  # Ping timeout in seconds
     )
 
 

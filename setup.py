@@ -6,7 +6,7 @@ setup(
     packages=find_packages(),
     python_requires=">=3.10.0,<3.13.0",
     entry_points={
-        "console_scripts": [
+            "console_scripts": [
             "verba=goldenverba.server.cli:cli",
         ],
     },

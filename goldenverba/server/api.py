@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from contextlib import asynccontextmanager
 from fastapi.staticfiles import StaticFiles
+from starlette.websockets import WebSocketState
 import asyncio
 
 from goldenverba.server.helpers import LoggerManager, BatchManager
@@ -237,31 +238,42 @@ async def websocket_generate_stream(websocket: WebSocket):
 
 @app.websocket("/ws/import_files")
 async def websocket_import_files(websocket: WebSocket):
-
-    if production == "Demo":
-        return
-
     await websocket.accept()
     logger = LoggerManager(websocket)
     batcher = BatchManager()
 
-    while True:
-        try:
-            data = await websocket.receive_text()
-            batch_data = DataBatchPayload.model_validate_json(data)
+    try:
+        while True:
+            data = await websocket.receive_json()
+
+            # Check if it's a ping message from the client
+            if data.get("type") == "ping":
+                msg.good("Received ping, sending pong")
+                if websocket.client_state == WebSocketState.CONNECTED:
+                    await websocket.send_json({"type": "pong"})
+                continue
+
+            # Handle actual import data batches
+            batch_data = DataBatchPayload.model_validate(data)
             fileConfig = batcher.add_batch(batch_data)
             if fileConfig is not None:
                 client = await client_manager.connect(batch_data.credentials)
-                await asyncio.create_task(
-                    manager.import_document(client, fileConfig, logger)
-                )
+                await manager.import_document(client, fileConfig, logger)
 
-        except WebSocketDisconnect:
-            msg.warn("Import WebSocket connection closed by client.")
-            break
-        except Exception as e:
-            msg.fail(f"Import WebSocket Error: {str(e)}")
-            break
+    except WebSocketDisconnect:
+        msg.warn("Import WebSocket connection closed by client.")
+    except Exception as e:
+        msg.fail(f"Import WebSocket Error: {str(e)}")
+        try:
+            if websocket.client_state != WebSocketState.CONNECTED:
+                await websocket.send_json(
+                    {"status": "error", "message": f"Import failed: {str(e)}"}
+                )
+        except:
+            pass
+    finally:
+        if websocket.client_state == WebSocketState.CONNECTED:
+            await websocket.close()
 
 
 ### CONFIG ENDPOINTS

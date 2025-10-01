@@ -27,6 +27,11 @@ All notable changes to this project will be documented in this file.
 
 - Dynamic model name retrieval for OpenAI Generator based on OpenAI URL and API Key (https://github.com/weaviate/Verba/issues/123) (https://github.com/weaviate/Verba/issues/362)
 
+## Fixed
+
+- Fixed Websocket connection issues when importing files
+- Fixed tokenization with mixed language content (https://github.com/weaviate/Verba/issues/352)
+
 ## [2.1.0] Fixing Bugs and Adding Friends
 
 ## Added

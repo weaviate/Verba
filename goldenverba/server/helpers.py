@@ -1,4 +1,5 @@
 from fastapi import WebSocket
+from starlette.websockets import WebSocketState
 from goldenverba.server.types import (
     FileStatus,
     StatusReport,
@@ -17,7 +18,10 @@ class LoggerManager:
         self, file_Id: str, status: FileStatus, message: str, took: float
     ):
         msg.info(f"{status} | {file_Id} | {message} | {took}")
-        if self.socket is not None:
+        if (
+            self.socket is not None
+            and self.socket.client_state == WebSocketState.CONNECTED
+        ):
             payload: StatusReport = {
                 "fileID": file_Id,
                 "status": status,
@@ -26,12 +30,19 @@ class LoggerManager:
             }
 
             await self.socket.send_json(payload)
+        else:
+            msg.warn(
+                f"Trying to send report to a closed socket {self.socket.client_state}",
+            )
 
     async def create_new_document(
         self, new_file_id: str, document_name: str, original_file_id: str
     ):
         msg.info(f"Creating new file {new_file_id} from {original_file_id}")
-        if self.socket is not None:
+        if (
+            self.socket is not None
+            and self.socket.client_state == WebSocketState.CONNECTED
+        ):
             payload: CreateNewDocument = {
                 "new_file_id": new_file_id,
                 "filename": document_name,
@@ -39,6 +50,10 @@ class LoggerManager:
             }
 
             await self.socket.send_json(payload)
+        else:
+            msg.warn(
+                f"Trying to send report to a closed socket {self.socket.client_state}",
+            )
 
 
 class BatchManager:

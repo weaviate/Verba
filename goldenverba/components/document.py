@@ -71,8 +71,10 @@ class Document:
             # Process content in batches
             docs = []
             detected_language = detect_language(content[0:MAX_BATCH_SIZE])
-            nlp = load_nlp_for_language(detected_language)
-
+            if detected_language in SUPPORTED_LANGUAGES:
+                nlp = load_nlp_for_language(detected_language)
+            else:
+                nlp = load_nlp_for_language("en")
             for i in range(0, len(content), MAX_BATCH_SIZE):
                 docs.append(nlp(content[i : i + MAX_BATCH_SIZE]))
 

@@ -39,15 +39,15 @@ export const detectHost = async (): Promise<string> => {
   const localUrl = "http://localhost:8000/api/health";
   const rootUrl = "/api/health";
 
-  const isLocalHealthy = await checkUrl(localUrl);
-  if (isLocalHealthy) {
-    return "http://localhost:8000";
-  }
-
   const isRootHealthy = await checkUrl(rootUrl);
   if (isRootHealthy) {
     const root = window.location.origin;
     return root;
+  }
+
+  const isLocalHealthy = await checkUrl(localUrl);
+  if (isLocalHealthy) {
+    return "http://localhost:8000";
   }
 
   throw new Error("Both health checks failed, please check the Verba Server");
