@@ -182,7 +182,7 @@ class DeepSeekGenerator(Generator):
             import requests
 
             headers = {"Authorization": f"Bearer {token}"}
-            response = requests.get(f"{url}/models", headers=headers)
+            response = requests.get(f"{url}/models", headers=headers, timeout=10)
             response.raise_for_status()
             return [model["id"] for model in response.json()["data"]]
         except Exception as e:
