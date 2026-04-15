@@ -40,12 +40,13 @@ class Chunk:
         """Construct a Chunk object from a dictionary."""
         chunk = cls(
             content=data.get("content", ""),
-            title=data.get("title", ""),
             chunk_id=data.get("chunk_id", 0),
             start_i=data.get("start_i", 0),
             end_i=data.get("end_i", 0),
             content_without_overlap=data.get("content_without_overlap", ""),
-            labels=data.get("labels", []),
         )
-        chunk.doc_uuid = (data.get("doc_uuid", ""),)
+        chunk.title = data.get("title", "")
+        chunk.labels = data.get("labels", [])
+        chunk.pca = data.get("pca", [0, 0, 0])
+        chunk.doc_uuid = data.get("doc_uuid", "")
         return chunk
