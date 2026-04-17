@@ -39,7 +39,7 @@ setup(
         "pypdf==4.3.1",
         "python-docx==1.1.2",
         "scikit-learn==1.5.1",
-        "langchain-text-splitters==0.2.2",
+        "langchain-text-splitters==1.1.2",
         "spacy==3.7.5",
         "aiohttp==3.9.5",
         "markdownify==0.13.1",
