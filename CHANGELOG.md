@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.0.0] - Unreleased
+
+## Added
+
+- DeepSeek generator with reasoning model (R1) support (https://github.com/weaviate/Verba/pull/395)
+- LM Studio integration for local embedding and generation (https://github.com/weaviate/Verba/pull/391)
+
+## Fixed
+
+- Chunk deserialization from JSON: `doc_uuid` was stored as a tuple instead of a string; `title`, `labels`, and `pca` were dropped on round-trip (https://github.com/weaviate/Verba/pull/398)
+- CORS misconfiguration: `allow_credentials=True` with `allow_origins=["*"]` is rejected by browsers per spec (fixes https://github.com/weaviate/Verba/issues/393)
+
+## Changed
+
+- Automated PyPI publishing via GitHub Actions on version tag push (replaces manual `pypi_commands.sh`)
+- Docker image now also tagged with version (e.g. `semitechnologies/verba:v3.0.0`) in addition to `:latest`
+- Upgraded GitHub Actions Docker build to use build cache for faster CI
+
+## Infrastructure
+
+- Added CI workflow: pytest on Python 3.11/3.12, ruff linting, and ESLint on every PR
+- Added `ruff.toml` for Python linting and formatting config
+- Added `.pre-commit-config.yaml` (ruff, prettier, file hygiene hooks)
+- Added Dependabot for automated weekly dep updates (pip, npm, GitHub Actions)
+- Added `SECURITY.md` with responsible disclosure policy
+
+---
+
 ## [2.1.3] More data types
 
 ## Added
