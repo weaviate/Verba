@@ -6,27 +6,28 @@ All notable changes to this project will be documented in this file.
 
 ## Added
 
-- DeepSeek generator with reasoning model (R1) support (https://github.com/weaviate/Verba/pull/395)
-- LM Studio integration for local embedding and generation (https://github.com/weaviate/Verba/pull/391)
+- **DeepSeek generator** with reasoning model (R1) support — supports `deepseek-chat` and `deepseek-reasoner` via DeepSeek's OpenAI-compatible API. R1 thinking process shown in a collapsible section with a "Show Reasoning" toggle. Dynamic model discovery at startup. Env vars: `DEEPSEEK_API_KEY`, `DEEPSEEK_BASE_URL`, `DEEPSEEK_MODEL` (https://github.com/weaviate/Verba/pull/395)
+- **LM Studio integration** — `LMStudioEmbedder` and `LMStudioGenerator` for running fully local models via LM Studio's OpenAI-compatible API (`http://localhost:1234/v1` by default). No API key required. Env vars: `LMSTUDIO_BASE_URL`, `LMSTUDIO_API_KEY`, `LMSTUDIO_MODEL`, `LMSTUDIO_EMBEDDER_MODEL` (https://github.com/weaviate/Verba/pull/391)
 
 ## Fixed
 
-- Chunk deserialization from JSON: `doc_uuid` was stored as a tuple instead of a string; `title`, `labels`, and `pca` were dropped on round-trip (https://github.com/weaviate/Verba/pull/398)
-- CORS misconfiguration: `allow_credentials=True` with `allow_origins=["*"]` is rejected by browsers per spec (fixes https://github.com/weaviate/Verba/issues/393)
+- Chunk deserialization from JSON: `doc_uuid` was stored as a tuple due to a stray trailing comma; `title`, `labels`, and `pca` were silently dropped on round-trip. Includes a full serialization round-trip test. (https://github.com/weaviate/Verba/pull/398)
+- CORS misconfiguration: `allow_credentials=True` with `allow_origins=["*"]` is rejected by browsers per the CORS spec. Access control is enforced by the existing custom same-origin middleware. (https://github.com/weaviate/Verba/issues/393)
 
 ## Changed
 
-- Automated PyPI publishing via GitHub Actions on version tag push (replaces manual `pypi_commands.sh`)
+- Automated PyPI publishing via GitHub Actions on `v*.*.*` tag push using trusted publishing — no stored API token needed (replaces manual `pypi_commands.sh`)
 - Docker image now also tagged with version (e.g. `semitechnologies/verba:v3.0.0`) in addition to `:latest`
-- Upgraded GitHub Actions Docker build to use build cache for faster CI
+- Upgraded Docker GitHub Actions to `build-push-action@v6` with GHA build cache for faster builds
+- `httpx` now explicitly declared in `setup.py` (was already used by multiple generators but only present as a transitive dependency)
 
 ## Infrastructure
 
-- Added CI workflow: pytest on Python 3.11/3.12, ruff linting, and ESLint on every PR
-- Added `ruff.toml` for Python linting and formatting config
-- Added `.pre-commit-config.yaml` (ruff, prettier, file hygiene hooks)
-- Added Dependabot for automated weekly dep updates (pip, npm, GitHub Actions)
-- Added `SECURITY.md` with responsible disclosure policy
+- CI workflow (`ci.yml`): runs pytest on Python 3.11/3.12, ruff linting, and ESLint on every PR targeting `main` or `v3`
+- `ruff.toml`: Python linting and formatting config (replaces Black)
+- `.pre-commit-config.yaml`: ruff, ruff-format, prettier for frontend, and file hygiene hooks
+- Dependabot: automated weekly dependency updates for pip, npm, and GitHub Actions
+- `SECURITY.md`: responsible disclosure policy via GitHub private vulnerability reporting
 
 ---
 
