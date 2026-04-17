@@ -47,7 +47,7 @@
     "@tailwindcss/typography": "^0.5.12",
     "@types/react-syntax-highlighter": "^15.5.7",
     "@types/react-window": "^1.8.5",
-    "daisyui": "^4.10.1",
+    "daisyui": "^5.5.19",
     "prettier": "^3.2.5",
     "raw-loader": "^4.0.2"
   }
