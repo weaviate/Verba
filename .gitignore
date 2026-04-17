@@ -1,24 +1,37 @@
+# Environment
 .env
 .env*
+
+# Python
 __pycache__
-.DS_Store
-.pytest_cache
 .python-version
 *.egg-info
+.ruff_cache
+.pytest_cache
+
+# Virtual environments
 venv
 .venv
 venv*
+
+# Build artifacts
 dist
 build
-~
+
+# Local data and config
+data/
+verba_config.json
+*_secrets.json
+cache.txt
+
+# OS
+.DS_Store
+
+# Tools
 .local
 .cache
 .verba
 .vscode
-verba_config.json
+ollama
 text-generation-inference
 test.py
-cache.txt
-.ruff_cache
-*_secrets.json
-ollama
