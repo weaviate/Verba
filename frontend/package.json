@@ -44,7 +44,7 @@
     "typewriter-effect": "^2.20.1"
   },
   "devDependencies": {
-    "@tailwindcss/typography": "^0.5.12",
+    "@tailwindcss/typography": "^0.5.19",
     "@types/react-syntax-highlighter": "^15.5.7",
     "@types/react-window": "^1.8.5",
     "daisyui": "^4.10.1",
