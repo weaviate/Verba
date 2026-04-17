@@ -51,7 +51,7 @@ setup(
     extras_require={
         "dev": ["pytest", "wheel", "twine", "black>=23.7.0", "setuptools"],
         "google": [
-            "vertexai==1.46.0",
+            "vertexai==1.71.1",
         ],
         "huggingface": [
             "sentence-transformers==3.0.1",
