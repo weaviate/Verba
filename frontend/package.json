@@ -12,7 +12,7 @@
     "@mdx-js/mdx": "^2.3.0",
     "@mdx-js/react": "^2.3.0",
     "@next/third-parties": "^14.2.3",
-    "@react-pdf/renderer": "^3.4.4",
+    "@react-pdf/renderer": "^4.5.1",
     "@react-three/drei": "^9.108.4",
     "@react-three/fiber": "^8.16.8",
     "@types/node": "20.5.0",
