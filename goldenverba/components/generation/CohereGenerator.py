@@ -76,7 +76,10 @@ class CohereGenerator(Generator):
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.post(
-                    self.url + "/chat", json=data, headers=headers
+                    self.url + "/chat",
+                    json=data,
+                    headers=headers,
+                    timeout=aiohttp.ClientTimeout(connect=10, total=300),
                 ) as response:
                     if response.status == 200:
                         async for line in response.content:

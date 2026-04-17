@@ -1,3 +1,5 @@
+import time
+
 from fastapi import WebSocket
 from goldenverba.server.types import (
     FileStatus,
@@ -7,6 +9,8 @@ from goldenverba.server.types import (
     CreateNewDocument,
 )
 from wasabi import msg
+
+_BATCH_TTL_SECONDS = 300  # abandon incomplete uploads after 5 minutes
 
 
 class LoggerManager:
@@ -45,15 +49,27 @@ class BatchManager:
     def __init__(self):
         self.batches = {}
 
+    def _evict_stale(self):
+        now = time.monotonic()
+        stale = [
+            fid
+            for fid, entry in self.batches.items()
+            if now - entry["created_at"] > _BATCH_TTL_SECONDS
+        ]
+        for fid in stale:
+            msg.warn(f"Evicting stale upload {fid} from BatchManager (TTL exceeded)")
+            del self.batches[fid]
+
     def add_batch(self, payload: DataBatchPayload) -> FileConfig:
         try:
-            # msg.info(f"Receiving Batch for {payload.fileID} : {payload.order} of {payload.total}")
+            self._evict_stale()
 
             if payload.fileID not in self.batches:
                 self.batches[payload.fileID] = {
                     "fileID": payload.fileID,
                     "total": payload.total,
                     "chunks": {},
+                    "created_at": time.monotonic(),
                 }
 
             self.batches[payload.fileID]["chunks"][payload.order] = payload.chunk

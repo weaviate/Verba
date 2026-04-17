@@ -84,7 +84,7 @@ class LMStudioGenerator(Generator):
         }
 
         try:
-            async with httpx.AsyncClient(timeout=60.0) as client:
+            async with httpx.AsyncClient(timeout=httpx.Timeout(connect=10, read=300)) as client:
                 async with client.stream(
                     "POST",
                     f"{lmstudio_url}/chat/completions",

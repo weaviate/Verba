@@ -72,7 +72,7 @@ class NovitaGenerator(Generator):
                 url=f"{novita_url}/chat/completions",
                 json=data,
                 headers=headers,
-                timeout=None,
+                timeout=aiohttp.ClientTimeout(connect=10, total=300),
             ) as response:
                 if response.status == 200:
                     async for line in response.content:

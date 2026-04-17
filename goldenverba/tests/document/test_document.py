@@ -55,10 +55,68 @@ def test_document_json_serialization():
     assert restored_doc.metadata == original_doc.metadata
 
 
+def _make_file_config(**overrides) -> FileConfig:
+    """Return a minimal valid FileConfig for testing."""
+    from goldenverba.server.types import FileStatus
+
+    defaults = dict(
+        fileID="fc-001",
+        filename="sample.txt",
+        isURL=False,
+        overwrite=False,
+        extension=".txt",
+        source="local",
+        content="Hello world",
+        labels=["tag1"],
+        rag_config={},
+        file_size=11,
+        status=FileStatus.READY,
+        metadata="some metadata",
+        status_report={},
+    )
+    defaults.update(overrides)
+    return FileConfig(**defaults)
+
+
 def test_create_document_from_file_config():
-    """Test document creation from FileConfig"""
-    # TODO: Add test
-    assert True
+    """Test document creation from FileConfig maps all fields correctly."""
+    fc = _make_file_config()
+    doc = create_document("Hello world", fc)
+
+    assert doc.title == fc.filename
+    assert doc.content == "Hello world"
+    assert doc.extension == fc.extension
+    assert doc.labels == fc.labels
+    assert doc.source == fc.source
+    assert doc.fileSize == fc.file_size
+    assert doc.metadata == fc.metadata
+    assert doc.meta == {}
+
+
+def test_create_document_empty_content():
+    """create_document with empty content should produce a Document with empty content."""
+    fc = _make_file_config(filename="empty.txt", file_size=0)
+    doc = create_document("", fc)
+
+    assert doc.content == ""
+    assert doc.title == "empty.txt"
+
+
+def test_create_document_preserves_labels():
+    """Labels from FileConfig must be forwarded to the Document unchanged."""
+    fc = _make_file_config(labels=["invoice", "2024", "finance"])
+    doc = create_document("some content", fc)
+
+    assert doc.labels == ["invoice", "2024", "finance"]
+
+
+def test_create_document_url_source():
+    """create_document should work when source is a URL string."""
+    fc = _make_file_config(source="https://example.com/doc.txt", isURL=True)
+    doc = create_document("Content from URL", fc)
+
+    assert doc.source == "https://example.com/doc.txt"
+    assert doc.content == "Content from URL"
 
 
 def test_document_with_large_content():

@@ -83,7 +83,7 @@ class OpenAIGenerator(Generator):
                 f"{openai_url}/chat/completions",
                 json=data,
                 headers=headers,
-                timeout=None,
+                timeout=httpx.Timeout(connect=10, read=300),
             ) as response:
                 async for line in response.aiter_lines():
                     if line.startswith("data: "):

@@ -1,5 +1,5 @@
-from typing import Literal
-from pydantic import BaseModel
+from typing import Annotated, Literal
+from pydantic import BaseModel, Field
 from enum import Enum
 
 
@@ -166,7 +166,7 @@ class DocumentFilter(BaseModel):
 
 
 class GetSuggestionsPayload(BaseModel):
-    query: str
+    query: Annotated[str, Field(max_length=50_000)]
     limit: int
     credentials: Credentials
 
@@ -183,7 +183,7 @@ class GetAllSuggestionsPayload(BaseModel):
 
 
 class QueryPayload(BaseModel):
-    query: str
+    query: Annotated[str, Field(max_length=50_000)]
     RAG: dict[str, RAGComponentClass]
     labels: list[str]
     documentFilter: list[DocumentFilter]
@@ -227,9 +227,9 @@ class GetContentPayload(BaseModel):
 
 
 class GeneratePayload(BaseModel):
-    query: str
-    context: str
-    conversation: list[ConversationItem]
+    query: Annotated[str, Field(max_length=50_000)]
+    context: Annotated[str, Field(max_length=500_000)]
+    conversation: Annotated[list[ConversationItem], Field(max_length=100)]
     rag_config: dict[str, RAGComponentClass]
 
 

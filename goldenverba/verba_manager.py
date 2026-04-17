@@ -95,8 +95,10 @@ class VerbaManager:
     # Import
 
     async def import_document(
-        self, client, fileConfig: FileConfig, logger: LoggerManager = LoggerManager()
+        self, client, fileConfig: FileConfig, logger: LoggerManager = None
     ):
+        if logger is None:
+            logger = LoggerManager()
         try:
             loop = asyncio.get_running_loop()
             start_time = loop.time()
@@ -212,28 +214,22 @@ class VerbaManager:
             elif duplicate_uuid is not None and currentFileConfig.overwrite:
                 await self.weaviate_manager.delete_document(client, duplicate_uuid)
 
-            chunk_task = asyncio.create_task(
-                self.chunker_manager.chunk(
-                    currentFileConfig.rag_config["Chunker"].selected,
-                    currentFileConfig,
-                    [document],
-                    self.embedder_manager.embedders[
-                        currentFileConfig.rag_config["Embedder"].selected
-                    ],
-                    logger,
-                )
+            chunked_documents = await self.chunker_manager.chunk(
+                currentFileConfig.rag_config["Chunker"].selected,
+                currentFileConfig,
+                [document],
+                self.embedder_manager.embedders[
+                    currentFileConfig.rag_config["Embedder"].selected
+                ],
+                logger,
             )
-            chunked_documents = await chunk_task
 
-            embedding_task = asyncio.create_task(
-                self.embedder_manager.vectorize(
-                    currentFileConfig.rag_config["Embedder"].selected,
-                    currentFileConfig,
-                    chunked_documents,
-                    logger,
-                )
+            vectorized_documents = await self.embedder_manager.vectorize(
+                currentFileConfig.rag_config["Embedder"].selected,
+                currentFileConfig,
+                chunked_documents,
+                logger,
             )
-            vectorized_documents = await embedding_task
 
             for document in vectorized_documents:
                 ingesting_task = asyncio.create_task(
@@ -739,11 +735,13 @@ class VerbaManager:
         conversation: list[dict],
     ):
 
-        full_text = ""
+        full_text_parts: list[str] = []
         async for result in self.generator_manager.generate_stream(
             rag_config, query, context, conversation
         ):
-            full_text += result["message"]
+            full_text_parts.append(result["message"])
+            if result.get("finish_reason") == "stop":
+                result["full_text"] = "".join(full_text_parts)
             yield result
 
 
@@ -759,8 +757,9 @@ class ClientManager:
         return hashlib.sha256(cred_string.encode()).hexdigest()
 
     def get_or_create_lock(self, cred_hash: str) -> asyncio.Lock:
-        if cred_hash not in self.locks:
-            self.locks[cred_hash] = asyncio.Lock()
+        # setdefault is atomic for dict operations, preventing a race where two
+        # coroutines both see the key missing and create separate locks
+        self.locks.setdefault(cred_hash, asyncio.Lock())
         return self.locks[cred_hash]
 
     def heartbeat(self):
@@ -802,26 +801,30 @@ class ClientManager:
 
     async def disconnect(self):
         msg.warn("Disconnecting Clients!")
-        for cred_hash, client in self.clients.items():
-            await self.manager.disconnect(client["client"])
+        # Snapshot keys to avoid mutating dict during iteration
+        for cred_hash in list(self.clients.keys()):
+            await self.manager.disconnect(self.clients[cred_hash]["client"])
 
     async def clean_up(self):
         msg.info("Cleaning Clients Cache")
         current_time = datetime.now()
         clients_to_remove = []
 
-        for cred_hash, client_data in self.clients.items():
+        # Iterate over a snapshot to avoid RuntimeError if dict changes concurrently
+        for cred_hash, client_data in list(self.clients.items()):
             time_difference = current_time - client_data["timestamp"]
             if time_difference.total_seconds() / 60 > self.max_time:
                 clients_to_remove.append(cred_hash)
+                continue
             client: WeaviateAsyncClient = client_data["client"]
             if not await client.is_ready():
                 clients_to_remove.append(cred_hash)
 
         for cred_hash in clients_to_remove:
-            await self.manager.disconnect(self.clients[cred_hash]["client"])
-            del self.clients[cred_hash]
-            msg.warn(f"Removed client: {cred_hash}")
+            if cred_hash in self.clients:
+                await self.manager.disconnect(self.clients[cred_hash]["client"])
+                del self.clients[cred_hash]
+                msg.warn(f"Removed client: {cred_hash}")
 
         msg.info(f"Cleaned up {len(clients_to_remove)} clients")
         self.heartbeat()

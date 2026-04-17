@@ -1,10 +1,12 @@
+import asyncio
+
 from goldenverba.components.interfaces import Embedding
 from goldenverba.components.types import InputConfig
 
 try:
     from sentence_transformers import SentenceTransformer
-except Exception as e:
-    pass
+except ImportError:
+    SentenceTransformer = None
 
 
 class SentenceTransformersEmbedder(Embedding):
@@ -32,12 +34,26 @@ class SentenceTransformersEmbedder(Embedding):
                 ],
             ),
         }
+        # Cache loaded models by name to avoid reloading from disk on every call
+        self._model_cache: dict = {}
 
-    async def vectorize(self, config: dict, content: list[str]) -> list[float]:
+    def _get_model(self, model_name: str):
+        if SentenceTransformer is None:
+            raise ImportError(
+                "sentence_transformers is not installed. "
+                "Install it with: pip install goldenverba[huggingface]"
+            )
+        if model_name not in self._model_cache:
+            self._model_cache[model_name] = SentenceTransformer(model_name)
+        return self._model_cache[model_name]
+
+    async def vectorize(self, config: dict, content: list[str]) -> list[list[float]]:
         try:
             model_name = config.get("Model").value
-            model = SentenceTransformer(model_name)
-            embeddings = model.encode(content).tolist()
-            return embeddings
+            model = self._get_model(model_name)
+            # model.encode() is synchronous and CPU-bound — run in thread pool
+            # to avoid blocking the async event loop
+            embeddings = await asyncio.to_thread(model.encode, content)
+            return embeddings.tolist()
         except Exception as e:
             raise Exception(f"Failed to vectorize chunks: {str(e)}")

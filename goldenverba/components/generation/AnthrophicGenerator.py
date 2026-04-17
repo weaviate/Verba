@@ -72,6 +72,7 @@ class AnthropicGenerator(Generator):
                 self.url,
                 json=data,
                 headers=headers,
+                timeout=aiohttp.ClientTimeout(connect=10, total=300),
             ) as response:
                 if response.status != 200:
                     error_json = await response.json()
