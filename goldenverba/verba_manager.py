@@ -232,17 +232,14 @@ class VerbaManager:
             )
 
             for document in vectorized_documents:
-                ingesting_task = asyncio.create_task(
-                    self.weaviate_manager.import_document(
-                        client,
-                        document,
-                        currentFileConfig.rag_config["Embedder"]
-                        .components[fileConfig.rag_config["Embedder"].selected]
-                        .config["Model"]
-                        .value,
-                    )
+                await self.weaviate_manager.import_document(
+                    client,
+                    document,
+                    currentFileConfig.rag_config["Embedder"]
+                    .components[fileConfig.rag_config["Embedder"].selected]
+                    .config["Model"]
+                    .value,
                 )
-                await ingesting_task
 
             await logger.send_report(
                 currentFileConfig.fileID,
@@ -389,64 +386,56 @@ class VerbaManager:
 
     def verify_config(self, a: dict, b: dict) -> bool:
         # Check Settings ( RAG & Settings )
+        # b is the authoritative (freshly generated) config; a is the stored config.
+        # Use set-based key comparison at every level so that zip() truncation cannot
+        # silently pass an outdated config when components are added or removed.
         try:
             if os.getenv("VERBA_PRODUCTION") == "Demo":
                 return True
-            for a_component_key, b_component_key in zip(a, b):
-                if a_component_key != b_component_key:
+
+            if set(a.keys()) != set(b.keys()):
+                msg.fail(
+                    f"Config Validation Failed, category mismatch: {set(a.keys())} != {set(b.keys())}"
+                )
+                return False
+
+            for category_key in b:
+                a_components = a[category_key]["components"]
+                b_components = b[category_key]["components"]
+
+                if set(a_components.keys()) != set(b_components.keys()):
                     msg.fail(
-                        f"Config Validation Failed, component name mismatch: {a_component_key} != {b_component_key}"
+                        f"Config Validation Failed, {category_key} component mismatch: "
+                        f"{set(a_components.keys())} != {set(b_components.keys())}"
                     )
                     return False
 
-                a_component = a[a_component_key]["components"]
-                b_component = b[b_component_key]["components"]
+                for component_key in b_components:
+                    a_config = a_components[component_key]["config"]
+                    b_config = b_components[component_key]["config"]
 
-                if len(a_component) != len(b_component):
-                    msg.fail(
-                        f"Config Validation Failed, {a_component_key} component count mismatch: {len(a_component)} != {len(b_component)}"
-                    )
-                    return False
-
-                for a_rag_component_key, b_rag_component_key in zip(
-                    a_component, b_component
-                ):
-                    if a_rag_component_key != b_rag_component_key:
+                    if set(a_config.keys()) != set(b_config.keys()):
                         msg.fail(
-                            f"Config Validation Failed, component name mismatch: {a_rag_component_key} != {b_rag_component_key}"
-                        )
-                        return False
-                    a_rag_component = a_component[a_rag_component_key]
-                    b_rag_component = b_component[b_rag_component_key]
-
-                    a_config = a_rag_component["config"]
-                    b_config = b_rag_component["config"]
-
-                    if len(a_config) != len(b_config):
-                        msg.fail(
-                            f"Config Validation Failed, component config count mismatch: {len(a_config)} != {len(b_config)}"
+                            f"Config Validation Failed, {component_key} config key mismatch: "
+                            f"{set(a_config.keys())} != {set(b_config.keys())}"
                         )
                         return False
 
-                    for a_config_key, b_config_key in zip(a_config, b_config):
-                        if a_config_key != b_config_key:
-                            msg.fail(
-                                f"Config Validation Failed, component name mismatch: {a_config_key} != {b_config_key}"
-                            )
-                            return False
-
-                        a_setting = a_config[a_config_key]
-                        b_setting = b_config[b_config_key]
+                    for config_key in b_config:
+                        a_setting = a_config[config_key]
+                        b_setting = b_config[config_key]
 
                         if a_setting["description"] != b_setting["description"]:
                             msg.fail(
-                                f"Config Validation Failed, description mismatch: {a_setting['description']} != {b_setting['description']}"
+                                f"Config Validation Failed, description mismatch: "
+                                f"{a_setting['description']} != {b_setting['description']}"
                             )
                             return False
 
                         if sorted(a_setting["values"]) != sorted(b_setting["values"]):
                             msg.fail(
-                                f"Config Validation Failed, values mismatch: {a_setting['values']} != {b_setting['values']}"
+                                f"Config Validation Failed, values mismatch: "
+                                f"{a_setting['values']} != {b_setting['values']}"
                             )
                             return False
 

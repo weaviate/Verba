@@ -173,10 +173,13 @@ class WeaviateManager:
         self.config_collection_name = "VERBA_CONFIGURATION"
         self.suggestion_collection_name = "VERBA_SUGGESTIONS"
         self.embedding_table = {}
+        # Separate table for cache collections so verify_cache_collection and
+        # verify_embedding_collection never clobber each other's entries.
+        self.cache_table = {}
 
     ### Connection Handling
 
-    async def connect_to_cluster(self, w_url, w_key):
+    def connect_to_cluster(self, w_url, w_key):
         if w_url is not None and w_key is not None:
             msg.info(f"Connecting to Weaviate Cluster {w_url} with Auth")
             return weaviate.use_async_with_weaviate_cloud(
@@ -189,7 +192,7 @@ class WeaviateManager:
         else:
             raise Exception("No URL or API Key provided")
 
-    async def connect_to_docker(self, w_url):
+    def connect_to_docker(self, w_url):
         msg.info(f"Connecting to Weaviate Docker")
         return weaviate.use_async_with_local(
             host=w_url,
@@ -198,8 +201,7 @@ class WeaviateManager:
             ),
         )
 
-    async def connect_to_custom(self, host, w_key, port):
-        # Extract the port from the host
+    def connect_to_custom(self, host, w_key, port):
         msg.info(f"Connecting to Weaviate Custom")
 
         if host is None or host == "":
@@ -225,7 +227,7 @@ class WeaviateManager:
                 ),
             )
 
-    async def connect_to_embedded(self):
+    def connect_to_embedded(self):
         msg.info(f"Connecting to Weaviate Embedded")
         return weaviate.use_async_with_embedded(
             additional_config=AdditionalConfig(
@@ -335,11 +337,12 @@ class WeaviateManager:
             return True
 
     async def verify_cache_collection(self, client: WeaviateAsyncClient, embedder):
-        if embedder not in self.embedding_table:
-            self.embedding_table[embedder] = "VERBA_Cache_" + re.sub(
+        # Use a separate cache_table so this never collides with embedding_table entries
+        if embedder not in self.cache_table:
+            self.cache_table[embedder] = "VERBA_Cache_" + re.sub(
                 r"[^a-zA-Z0-9]", "_", embedder
             )
-            return await self.verify_collection(client, self.embedding_table[embedder])
+            return await self.verify_collection(client, self.cache_table[embedder])
         else:
             return True
 
@@ -480,10 +483,18 @@ class WeaviateManager:
                 return
 
             document_obj = await document_collection.query.fetch_object_by_id(uuid)
-            embedding_config = json.loads(document_obj.properties.get("meta"))[
-                "Embedder"
-            ]
-            embedder = embedding_config["config"]["Model"]["value"]
+            meta_raw = document_obj.properties.get("meta")
+            if not meta_raw:
+                await document_collection.data.delete_by_id(uuid)
+                return
+            try:
+                embedding_config = json.loads(meta_raw)["Embedder"]
+                embedder = embedding_config["config"]["Model"]["value"]
+            except (json.JSONDecodeError, KeyError):
+                # meta is malformed or missing Embedder key — delete the document
+                # record but skip trying to clean up chunks we can't identify
+                await document_collection.data.delete_by_id(uuid)
+                return
 
             if await self.verify_embedding_collection(client, embedder):
                 if await document_collection.data.delete_by_id(uuid):
@@ -701,31 +712,48 @@ class WeaviateManager:
 
             # Generate PCA for all embeddings
             else:
-                vector_map = {}
+                # First pass: stream all items into memory
+                all_items = []
+                dimensions = 0
+                async for item in embedder_collection.iterator(include_vector=True):
+                    all_items.append(item)
+                    dimensions = len(item.vector["default"])
+
+                if not all_items:
+                    return {"embedder": embedder, "dimensions": 0, "groups": []}
+
+                # Batch-fetch all unique documents concurrently instead of one
+                # sequential get_document() call per unique doc_uuid inside the loop
+                unique_doc_uuids = list(
+                    {str(item.properties["doc_uuid"]) for item in all_items}
+                )
+                doc_results = await asyncio.gather(
+                    *[
+                        self.get_document(client, doc_uuid, properties=["title"])
+                        for doc_uuid in unique_doc_uuids
+                    ],
+                    return_exceptions=True,
+                )
+                vector_map = {
+                    doc_uuid: {"name": doc["title"], "chunks": []}
+                    for doc_uuid, doc in zip(unique_doc_uuids, doc_results)
+                    if doc and not isinstance(doc, Exception)
+                }
+
+                # Second pass: collect vectors for successfully-fetched documents
                 vector_list, vector_ids, vector_chunk_uuids, vector_chunk_ids = (
                     [],
                     [],
                     [],
                     [],
                 )
-                dimensions = 0
-
-                async for item in embedder_collection.iterator(include_vector=True):
-                    doc_uuid = item.properties["doc_uuid"]
-                    chunk_uuid = item.uuid
+                for item in all_items:
+                    doc_uuid = str(item.properties["doc_uuid"])
                     if doc_uuid not in vector_map:
-                        _document = await self.get_document(client, doc_uuid)
-                        if _document:
-                            vector_map[doc_uuid] = {
-                                "name": _document["title"],
-                                "chunks": [],
-                            }
-                        else:
-                            continue
+                        continue
                     vector_list.append(item.vector["default"])
-                    dimensions = len(item.vector["default"])
                     vector_ids.append(doc_uuid)
-                    vector_chunk_uuids.append(chunk_uuid)
+                    vector_chunk_uuids.append(item.uuid)
                     vector_chunk_ids.append(item.properties["chunk_id"])
 
                 if len(vector_ids) > 3:
@@ -844,17 +872,13 @@ class WeaviateManager:
             suggestion_collection = client.collections.get(
                 self.suggestion_collection_name
             )
-            aggregation = await suggestion_collection.aggregate.over_all(
-                total_count=True
+            # One query suffices — if the collection is empty the filter returns 0
+            # results regardless, so a prior aggregate.over_all() is redundant.
+            existing = await suggestion_collection.query.fetch_objects(
+                filters=Filter.by_property("query").equal(query)
             )
-            if aggregation.total_count > 0:
-                does_suggestion_exists = (
-                    await suggestion_collection.query.fetch_objects(
-                        filters=Filter.by_property("query").equal(query)
-                    )
-                )
-                if len(does_suggestion_exists.objects) > 0:
-                    return
+            if len(existing.objects) > 0:
+                return
             await suggestion_collection.data.insert(
                 {"query": query, "timestamp": datetime.now().isoformat()}
             )
