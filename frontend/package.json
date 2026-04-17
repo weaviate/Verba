@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@mdx-js/mdx": "^2.3.0",
-    "@mdx-js/react": "^2.3.0",
+    "@mdx-js/react": "^3.1.1",
     "@next/third-parties": "^14.2.3",
     "@react-pdf/renderer": "^3.4.4",
     "@react-three/drei": "^9.108.4",
