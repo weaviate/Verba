@@ -72,6 +72,8 @@ from goldenverba.components.generation.GroqGenerator import GroqGenerator
 from goldenverba.components.generation.NovitaGenerator import NovitaGenerator
 from goldenverba.components.generation.UpstageGenerator import UpstageGenerator
 from goldenverba.components.generation.DeepSeekGenerator import DeepSeekGenerator
+from goldenverba.components.generation.LMStudioGenerator import LMStudioGenerator
+from goldenverba.components.embedding.LMStudioEmbedder import LMStudioEmbedder
 
 try:
     import tiktoken
@@ -109,6 +111,7 @@ if production != "Production":
         VoyageAIEmbedder(),
         CohereEmbedder(),
         OpenAIEmbedder(),
+        LMStudioEmbedder(),
     ]
     retrievers = [WindowRetriever()]
     generators = [
@@ -120,6 +123,7 @@ if production != "Production":
         NovitaGenerator(),
         UpstageGenerator(),
         DeepSeekGenerator(),
+        LMStudioGenerator(),
     ]
 else:
     readers = [
@@ -147,6 +151,7 @@ else:
         UpstageEmbedder(),
         CohereEmbedder(),
         OpenAIEmbedder(),
+        LMStudioEmbedder(),
     ]
     retrievers = [WindowRetriever()]
     generators = [
@@ -155,6 +160,7 @@ else:
         CohereGenerator(),
         UpstageGenerator(),
         DeepSeekGenerator(),
+        LMStudioGenerator(),
     ]
 
 

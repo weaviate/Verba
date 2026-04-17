@@ -42,6 +42,7 @@ setup(
         "langchain-text-splitters==0.2.2",
         "spacy==3.7.5",
         "aiohttp==3.9.5",
+        "httpx>=0.27.0",
         "markdownify==0.13.1",
         "aiofiles==24.1.0",
         "assemblyai==0.33.0",
