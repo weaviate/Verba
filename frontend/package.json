@@ -15,7 +15,7 @@
     "@react-pdf/renderer": "^3.4.4",
     "@react-three/drei": "^9.108.4",
     "@react-three/fiber": "^8.16.8",
-    "@types/node": "20.5.0",
+    "@types/node": "25.6.0",
     "@types/react": "18.2.20",
     "@types/react-dom": "18.2.7",
     "@types/three": "^0.166.0",
