@@ -48,7 +48,7 @@
     "@types/react-syntax-highlighter": "^15.5.7",
     "@types/react-window": "^1.8.5",
     "daisyui": "^4.10.1",
-    "prettier": "^3.2.5",
+    "prettier": "^3.8.3",
     "raw-loader": "^4.0.2"
   }
 }
