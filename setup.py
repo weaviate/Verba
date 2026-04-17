@@ -27,7 +27,7 @@ setup(
         "weaviate-client==4.9.6",
         "python-dotenv==1.0.0",
         "openpyxl==3.1.5",
-        "wasabi==1.1.2",
+        "wasabi==1.1.3",
         "fastapi==0.111.1",
         "uvicorn[standard]==0.29.0",
         "gunicorn==22.0.0",
