@@ -33,7 +33,7 @@
     "react-dom": "^18.3.1",
     "react-icons": "^4.11.0",
     "react-markdown": "^8.0.7",
-    "react-spinners": "^0.13.8",
+    "react-spinners": "^0.17.0",
     "react-syntax-highlighter": "^15.5.0",
     "react-virtuoso": "^4.6.2",
     "react-window": "^1.8.9",
