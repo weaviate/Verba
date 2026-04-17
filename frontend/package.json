@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@mdx-js/mdx": "^2.3.0",
+    "@mdx-js/mdx": "^3.1.1",
     "@mdx-js/react": "^2.3.0",
     "@next/third-parties": "^14.2.3",
     "@react-pdf/renderer": "^3.4.4",
