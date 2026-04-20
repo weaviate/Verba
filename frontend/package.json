@@ -21,7 +21,7 @@
     "@types/three": "^0.166.0",
     "autoprefixer": "10.4.15",
     "date-fns": "^3.6.0",
-    "eslint": "8.47.0",
+    "eslint": "10.2.1",
     "eslint-config-next": "^14.2.6",
     "framer-motion": "^11.3.31",
     "lil-gui": "^0.19.2",
