@@ -36,7 +36,7 @@
     "react-spinners": "^0.13.8",
     "react-syntax-highlighter": "^15.5.0",
     "react-virtuoso": "^4.6.2",
-    "react-window": "^1.8.9",
+    "react-window": "^2.2.7",
     "tailwindcss": "3.3.3",
     "three": "^0.166.1",
     "three-custom-shader-material": "5.4",
@@ -46,7 +46,7 @@
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.12",
     "@types/react-syntax-highlighter": "^15.5.7",
-    "@types/react-window": "^1.8.5",
+    "@types/react-window": "^2.0.0",
     "daisyui": "^4.10.1",
     "prettier": "^3.2.5",
     "raw-loader": "^4.0.2"
