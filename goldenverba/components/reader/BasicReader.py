@@ -165,7 +165,10 @@ class BasicReader(Reader):
             raise ImportError("pypdf is not installed. Cannot process PDF files.")
         pdf_bytes = io.BytesIO(decoded_bytes)
         reader = PdfReader(pdf_bytes)
-        return "\n\n".join(page.extract_text() for page in reader.pages)
+        # extract_text() returns None on image-only or corrupt pages; filter those out
+        return "\n\n".join(
+            text for page in reader.pages if (text := page.extract_text())
+        )
 
     async def load_docx_file(self, decoded_bytes: bytes) -> str:
         """Load and extract text from a DOCX file."""

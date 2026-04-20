@@ -6,6 +6,16 @@ All notable changes to this project will be documented in this file.
 
 ## Added
 
+- **WhisperReader** — local audio/video transcription via `faster-whisper`. Replaces the AssemblyAI reader with a zero-cost, offline alternative. Supports 35+ formats (`.mp3`, `.wav`, `.m4a`, `.flac`, `.ogg`, `.mp4`, `.mov`, `.webm`, …). No API key required; model is downloaded automatically on first use. Configurable model size (`tiny` → `large-v3`) and compute device (`cpu` / `cuda` / `auto`).
+
+## Removed
+
+- **FirecrawlReader** — removed due to high maintenance surface (async job polling, versioned API endpoints, paid usage-based pricing). HTMLReader covers the primary use case (static site scraping). Users needing JavaScript rendering should run a local Playwright/Puppeteer setup.
+- **UpstageDocumentParse reader** — removed as redundant with UnstructuredAPI for complex PDF parsing. Upstage embedding and generation models are unaffected and remain available.
+- **AssemblyAI reader** — replaced by the new local WhisperReader. Removes a paid-per-minute external dependency while providing the same audio/video transcription capability.
+
+## Added
+
 - **DeepSeek generator** with reasoning model (R1) support — supports `deepseek-chat` and `deepseek-reasoner` via DeepSeek's OpenAI-compatible API. R1 thinking process shown in a collapsible section with a "Show Reasoning" toggle. Dynamic model discovery at startup. Env vars: `DEEPSEEK_API_KEY`, `DEEPSEEK_BASE_URL`, `DEEPSEEK_MODEL` (https://github.com/weaviate/Verba/pull/395)
 - **LM Studio integration** — `LMStudioEmbedder` and `LMStudioGenerator` for running fully local models via LM Studio's OpenAI-compatible API (`http://localhost:1234/v1` by default). No API key required. Env vars: `LMSTUDIO_BASE_URL`, `LMSTUDIO_API_KEY`, `LMSTUDIO_MODEL`, `LMSTUDIO_EMBEDDER_MODEL` (https://github.com/weaviate/Verba/pull/391)
 - **Test suite** — 71 tests covering `BatchManager` (including TTL eviction), `LoggerManager`, all three chunkers (`TokenChunker`, `SentenceChunker`, `MarkdownChunker`), and the `Document` class

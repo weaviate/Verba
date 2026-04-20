@@ -69,7 +69,8 @@ class HTMLReader(Reader):
         documents = []
         processed_urls = set()
 
-        async with aiohttp.ClientSession() as session:
+        timeout = aiohttp.ClientTimeout(total=60)
+        async with aiohttp.ClientSession(timeout=timeout) as session:
             for url in urls:
                 try:
                     await self.process_url(
@@ -80,6 +81,7 @@ class HTMLReader(Reader):
                         0,
                         session,
                         reader,
+                        config,
                         fileConfig,
                         documents,
                         processed_urls,
@@ -98,6 +100,7 @@ class HTMLReader(Reader):
         current_depth: int,
         session: aiohttp.ClientSession,
         reader: BasicReader,
+        config: dict,
         fileConfig: FileConfig,
         documents: List[Document],
         processed_urls: set,
@@ -126,7 +129,7 @@ class HTMLReader(Reader):
                 status_report=fileConfig.status_report,
                 metadata=fileConfig.metadata,
             )
-            document = await reader.load(self.config, new_file_config)
+            document = await reader.load(config, new_file_config)
             documents.extend(document)
 
             if recursive and current_depth < max_depth:
@@ -140,6 +143,7 @@ class HTMLReader(Reader):
                         current_depth + 1,
                         session,
                         reader,
+                        config,
                         fileConfig,
                         documents,
                         processed_urls,

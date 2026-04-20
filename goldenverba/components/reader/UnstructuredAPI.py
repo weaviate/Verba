@@ -2,7 +2,6 @@ import base64
 import io
 import os
 
-import requests
 from wasabi import msg
 import aiohttp
 
@@ -89,7 +88,8 @@ class UnstructuredReader(Reader):
         )
 
         try:
-            async with aiohttp.ClientSession() as session:
+            timeout = aiohttp.ClientTimeout(total=120)
+            async with aiohttp.ClientSession(timeout=timeout) as session:
                 async with session.post(
                     api_url, headers=headers, data=file_data
                 ) as response:
@@ -105,7 +105,7 @@ class UnstructuredReader(Reader):
 
                     return [create_document(file_content, fileConfig)]
 
-        except requests.RequestException as e:
+        except aiohttp.ClientError as e:
             raise Exception(
                 f"Unstructured API request failed for {fileConfig.filename}: {str(e)}"
             )

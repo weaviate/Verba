@@ -21,7 +21,7 @@ pip install goldenverba
   - [Weaviate](#weaviate)
   - [Ollama](#ollama)
   - [Unstructured](#unstructured)
-  - [AssemblyAI](#assemblyai)
+  - [Whisper (Audio/Video)](#whisper-audiovideo)
   - [OpenAI](#openai)
   - [HuggingFace](#huggingface)
   - [Groq](#groq)
@@ -74,16 +74,14 @@ Verba is a fully-customizable personal assistant utilizing [Retrieval Augmented 
 | OpenAI               | ✅          | Embedding Models by OpenAI                         |
 | Upstage              | ✅          | Embedding Models by Upstage                        |
 
-| 📁 Data Support                                          | Implemented | Description                                    |
-| -------------------------------------------------------- | ----------- | ---------------------------------------------- |
-| [UnstructuredIO](https://docs.unstructured.io/welcome)   | ✅          | Import Data through Unstructured               |
-| [Firecrawl](https://www.firecrawl.dev/)                  | ✅          | Scrape and Crawl URL through Firecrawl         |
-| [UpstageDocumentParse](https://upstage.ai/)              | ✅          | Parse Documents through Upstage Document AI    |
-| PDF Ingestion                                            | ✅          | Import PDF into Verba                          |
-| GitHub & GitLab                                          | ✅          | Import Files from Github and GitLab            |
-| CSV/XLSX Ingestion                                       | ✅          | Import Table Data into Verba                   |
-| .DOCX                                                    | ✅          | Import .docx files                             |
-| Multi-Modal (using [AssemblyAI](https://assemblyai.com)) | ✅          | Import and Transcribe Audio through AssemblyAI |
+| 📁 Data Support                                          | Implemented | Description                                                  |
+| -------------------------------------------------------- | ----------- | ------------------------------------------------------------ |
+| [UnstructuredIO](https://docs.unstructured.io/welcome)   | ✅          | Import Data through Unstructured (great for scanned PDFs)    |
+| PDF Ingestion                                            | ✅          | Import PDF into Verba                                        |
+| GitHub & GitLab                                          | ✅          | Import Files from Github and GitLab                          |
+| CSV/XLSX Ingestion                                       | ✅          | Import Table Data into Verba                                 |
+| .DOCX                                                    | ✅          | Import .docx files                                           |
+| Audio/Video (via [Whisper](https://github.com/guillaumekln/faster-whisper)) | ✅ | Transcribe audio and video locally — no API key required |
 
 | ✨ RAG Features         | Implemented     | Description                                                               |
 | ----------------------- | --------------- | ------------------------------------------------------------------------- |
@@ -191,15 +189,12 @@ Below is a comprehensive list of the API keys and variables you may require:
 | OLLAMA_URL             | URL to your Ollama instance (e.g. http://localhost:11434 ) | Get Access to [Ollama](https://ollama.com/) Models                                                                            |
 | UNSTRUCTURED_API_KEY   | Your API Key                                               | Get Access to [Unstructured](https://docs.unstructured.io/welcome) Data Ingestion                                             |
 | UNSTRUCTURED_API_URL   | URL to Unstructured Instance                               | Get Access to [Unstructured](https://docs.unstructured.io/welcome) Data Ingestion                                             |
-| ASSEMBLYAI_API_KEY     | Your API Key                                               | Get Access to [AssemblyAI](https://assemblyai.com) Data Ingestion                                                             |
 | GITHUB_TOKEN           | Your GitHub Token                                          | Get Access to Data Ingestion via GitHub                                                                                       |
 | GITLAB_TOKEN           | Your GitLab Token                                          | Get Access to Data Ingestion via GitLab                                                                                       |
-| FIRECRAWL_API_KEY      | Your Firecrawl API Key                                     | Get Access to Data Ingestion via Firecrawl                                                                                    |
 | VOYAGE_API_KEY         | Your VoyageAI API Key                                      | Get Access to Embedding Models via VoyageAI                                                                                   |
 | EMBEDDING_SERVICE_URL  | URL to your Embedding Service Instance                     | Get Access to Embedding Models via [Weaviate Embedding Service](https://weaviate.io/developers/wcs/embeddings)                |
 | EMBEDDING_SERVICE_KEY  | Your Embedding Service Key                                 | Get Access to Embedding Models via [Weaviate Embedding Service](https://weaviate.io/developers/wcs/embeddings)                |
-| UPSTAGE_API_KEY        | Your Upstage API Key                                       | Get Access to [Upstage](https://upstage.ai/) Models                                                                           |
-| UPSTAGE_BASE_URL       | URL to Upstage instance                                    | Models                                                                                                                        |
+| UPSTAGE_API_KEY        | Your Upstage API Key                                       | Get Access to [Upstage](https://upstage.ai/) Embedding and Generation Models                                                  |
 | DEFAULT_DEPLOYMENT     | Local, Weaviate, Custom, Docker                            | Set the default deployment mode                                                                                               |
 | SYSYEM_MESSAGE_PROMPT     | Prompt text value                            | Default value starts with: "You are Verba, a chatbot for..."                                                                                               |
 | OLLAMA_MODEL           | Your Ollama Model                                          | Set the default Ollama model to use                                                                                           |
@@ -251,9 +246,9 @@ Verba supports importing documents through Unstructured IO (e.g plain text, .pdf
 
 > UNSTRUCTURED_API_URL is set to `https://api.unstructuredapp.io/general/v0/general` by default
 
-## AssemblyAI
+## Whisper (Audio/Video)
 
-Verba supports importing documents through AssemblyAI (audio files or audio from video files). To use them you need the `ASSEMBLYAI_API_KEY` environment variable. You can get it from [AssemblyAI](https://assemblyai.com)
+Verba supports importing audio and video files (`.mp3`, `.wav`, `.m4a`, `.flac`, `.ogg`, `.mp4`, `.mov`, `.webm`, and more) via [faster-whisper](https://github.com/guillaumekln/faster-whisper), which runs locally with no API key or internet connection required. Install it with `pip install faster-whisper`. The model is downloaded automatically on first use (model files range from ~150 MB for `tiny` to ~3 GB for `large-v3`).
 
 ## OpenAI
 
@@ -468,7 +463,7 @@ Your contributions are always welcome! Feel free to contribute ideas, feedback, 
 
 ### Project Architecture
 
-You can learn more about Verba's architecture and implementation in its [technical documentation](./TECHNICAL.md) and [frontend documentation](./FRONTEND.md). It's recommended to have a look at them before making any contributions.
+You can learn more about Verba's architecture and implementation in its [backend documentation](./goldenverba/README.md) and [frontend documentation](./FRONTEND.md). It's recommended to have a look at them before making any contributions.
 
 ## Known Issues
 

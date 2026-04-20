@@ -24,7 +24,7 @@ setup(
     ],
     include_package_data=True,
     install_requires=[
-        "weaviate-client==4.9.6",
+        "weaviate-client>=4.20.5",
         "python-dotenv==1.0.0",
         "openpyxl==3.1.5",
         "wasabi==1.1.2",
@@ -44,7 +44,7 @@ setup(
         "httpx>=0.27.0",
         "markdownify==0.13.1",
         "aiofiles==24.1.0",
-        "assemblyai==0.33.0",
+        "faster-whisper>=1.0.0",
         "beautifulsoup4==4.12.3",
         "langdetect==1.0.9",
     ],
