@@ -57,7 +57,7 @@ setup(
             "sentence-transformers==3.0.1",
         ],
         "litellm": [
-            "litellm",
+            "litellm>=1.60,<1.85",
         ],
     },
 )
