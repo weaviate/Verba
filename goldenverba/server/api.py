@@ -230,7 +230,7 @@ async def websocket_generate_stream(websocket: WebSocket):
         except Exception as e:
             msg.fail(f"WebSocket Error: {str(e)}")
             await websocket.send_json(
-                {"message": e, "finish_reason": "stop", "full_text": str(e)}
+                {"message": str(e), "finish_reason": "stop", "full_text": str(e)}
             )
         msg.good("Succesfully streamed answer")
 

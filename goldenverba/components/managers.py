@@ -67,6 +67,7 @@ from goldenverba.components.retriever.WindowRetriever import WindowRetriever
 from goldenverba.components.generation.CohereGenerator import CohereGenerator
 from goldenverba.components.generation.AnthrophicGenerator import AnthropicGenerator
 from goldenverba.components.generation.OllamaGenerator import OllamaGenerator
+from goldenverba.components.generation.AtlasCloudGenerator import AtlasCloudGenerator
 from goldenverba.components.generation.OpenAIGenerator import OpenAIGenerator
 from goldenverba.components.generation.GroqGenerator import GroqGenerator
 from goldenverba.components.generation.NovitaGenerator import NovitaGenerator
@@ -112,6 +113,7 @@ if production != "Production":
     retrievers = [WindowRetriever()]
     generators = [
         OllamaGenerator(),
+        AtlasCloudGenerator(),
         OpenAIGenerator(),
         AnthropicGenerator(),
         CohereGenerator(),
@@ -148,6 +150,7 @@ else:
     ]
     retrievers = [WindowRetriever()]
     generators = [
+        AtlasCloudGenerator(),
         OpenAIGenerator(),
         AnthropicGenerator(),
         CohereGenerator(),
