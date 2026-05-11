@@ -1,0 +1,24 @@
+target-version = "py310"
+line-length = 100
+
+[lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+]
+ignore = [
+    "E501",  # line too long (handled by formatter)
+    "B008",  # do not perform function calls in argument defaults (common in FastAPI)
+    "B904",  # raise from within except (can be addressed incrementally)
+]
+
+[lint.isort]
+known-first-party = ["goldenverba"]
+
+[format]
+quote-style = "double"
+indent-style = "space"

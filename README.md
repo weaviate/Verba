@@ -5,7 +5,7 @@
 [![Weaviate](https://img.shields.io/static/v1?label=powered%20by&message=Weaviate%20%E2%9D%A4&color=green&style=flat-square)](https://weaviate.io/)
 [![PyPi downloads](https://static.pepy.tech/personalized-badge/goldenverba?period=total&units=international_system&left_color=grey&right_color=orange&left_text=pip%20downloads)](https://pypi.org/project/goldenverba/) [![Docker support](https://img.shields.io/badge/Docker_support-%E2%9C%93-4c1?style=flat-square&logo=docker&logoColor=white)](https://docs.docker.com/get-started/) [![Demo](https://img.shields.io/badge/Check%20out%20the%20demo!-yellow?&style=flat-square&logo=react&logoColor=white)](https://verba.weaviate.io/)
 
-Welcome to Verba: The Golden RAGtriever, an community-driven open-source application designed to offer an end-to-end, streamlined, and user-friendly interface for Retrieval-Augmented Generation (RAG) out of the box. In just a few easy steps, explore your datasets and extract insights with ease, either locally with Ollama and Huggingface or through LLM providers such as Anthrophic, Cohere, and OpenAI. This project is built with and for the community, please be aware that it might not be maintained with the same urgency as other Weaviate production applications. Feel free to contribute to the project and help us make Verba even better! <3
+Welcome to Verba: The Golden RAGtriever, a community-driven open-source application designed to offer an end-to-end, streamlined, and user-friendly interface for Retrieval-Augmented Generation (RAG) out of the box. In just a few easy steps, explore your datasets and extract insights with ease, either locally with Ollama, HuggingFace, or LM Studio, or through LLM providers such as Anthropic, Cohere, OpenAI, DeepSeek, and more. This project is built with and for the community — feel free to contribute and help us make Verba even better! <3
 
 ```
 pip install goldenverba
@@ -21,11 +21,13 @@ pip install goldenverba
   - [Weaviate](#weaviate)
   - [Ollama](#ollama)
   - [Unstructured](#unstructured)
-  - [AssemblyAI](#assemblyai)
+  - [Whisper (Audio/Video)](#whisper-audiovideo)
   - [OpenAI](#openai)
   - [HuggingFace](#huggingface)
   - [Groq](#groq)
-  - [Novita AI](#novitaai)
+  - [Novita AI](#novita)
+  - [DeepSeek](#deepseek)
+  - [LM Studio](#lm-studio)
 - [Quickstart: Deploy with pip](#how-to-deploy-with-pip)
 - [Quickstart: Build from Source](#how-to-build-from-source)
 - [Quickstart: Deploy with Docker](#how-to-install-verba-with-docker)
@@ -48,37 +50,38 @@ Verba is a fully-customizable personal assistant utilizing [Retrieval Augmented 
 
 ## Feature Lists
 
-| 🤖 Model Support                  | Implemented | Description                                             |
-| --------------------------------- | ----------- | ------------------------------------------------------- |
-| Ollama (e.g. Llama3)              | ✅          | Local Embedding and Generation Models powered by Ollama |
-| HuggingFace (e.g. MiniLMEmbedder) | ✅          | Local Embedding Models powered by HuggingFace           |
-| Cohere (e.g. Command R+)          | ✅          | Embedding and Generation Models by Cohere               |
-| Anthrophic (e.g. Claude Sonnet)   | ✅          | Embedding and Generation Models by Anthrophic           |
-| OpenAI (e.g. GPT4)                | ✅          | Embedding and Generation Models by OpenAI               |
-| Groq (e.g. Llama3)                | ✅          | Generation Models by Groq (LPU inference)               |
-| Novita AI (e.g. Llama3.3)         | ✅          | Generation Models by Novita AI                          |
-| Upstage (e.g. Solar)              | ✅          | Embedding and Generation Models by Upstage              |
+| 🤖 Model Support                  | Implemented | Description                                                          |
+| --------------------------------- | ----------- | -------------------------------------------------------------------- |
+| Ollama (e.g. Llama3)              | ✅          | Local Embedding and Generation Models powered by Ollama              |
+| LM Studio                         | ✅          | Local Embedding and Generation Models via LM Studio (no API key)     |
+| HuggingFace (e.g. MiniLMEmbedder) | ✅          | Local Embedding Models powered by HuggingFace                        |
+| Cohere (e.g. Command R+)          | ✅          | Embedding and Generation Models by Cohere                            |
+| Anthropic (e.g. Claude Sonnet)    | ✅          | Generation Models by Anthropic                                       |
+| OpenAI (e.g. GPT4o)               | ✅          | Embedding and Generation Models by OpenAI                            |
+| DeepSeek (e.g. DeepSeek-R1)       | ✅          | Generation Models by DeepSeek, including R1 reasoning with chain-of-thought display |
+| Groq (e.g. Llama3)                | ✅          | Generation Models by Groq (LPU inference)                            |
+| Novita AI (e.g. Llama3.3)         | ✅          | Generation Models by Novita AI                                       |
+| Upstage (e.g. Solar)              | ✅          | Embedding and Generation Models by Upstage                           |
 
-| 🤖 Embedding Support | Implemented | Description                              |
-| -------------------- | ----------- | ---------------------------------------- |
-| Weaviate             | ✅          | Embedding Models powered by Weaviate     |
-| Ollama               | ✅          | Local Embedding Models powered by Ollama |
-| SentenceTransformers | ✅          | Embedding Models powered by HuggingFace  |
-| Cohere               | ✅          | Embedding Models by Cohere               |
-| VoyageAI             | ✅          | Embedding Models by VoyageAI             |
-| OpenAI               | ✅          | Embedding Models by OpenAI               |
-| Upstage              | ✅          | Embedding Models by Upstage              |
+| 🤖 Embedding Support | Implemented | Description                                        |
+| -------------------- | ----------- | -------------------------------------------------- |
+| Weaviate             | ✅          | Embedding Models powered by Weaviate               |
+| Ollama               | ✅          | Local Embedding Models powered by Ollama           |
+| LM Studio            | ✅          | Local Embedding Models via LM Studio (no API key)  |
+| SentenceTransformers | ✅          | Embedding Models powered by HuggingFace            |
+| Cohere               | ✅          | Embedding Models by Cohere                         |
+| VoyageAI             | ✅          | Embedding Models by VoyageAI                       |
+| OpenAI               | ✅          | Embedding Models by OpenAI                         |
+| Upstage              | ✅          | Embedding Models by Upstage                        |
 
-| 📁 Data Support                                          | Implemented | Description                                    |
-| -------------------------------------------------------- | ----------- | ---------------------------------------------- |
-| [UnstructuredIO](https://docs.unstructured.io/welcome)   | ✅          | Import Data through Unstructured               |
-| [Firecrawl](https://www.firecrawl.dev/)                  | ✅          | Scrape and Crawl URL through Firecrawl         |
-| [UpstageDocumentParse](https://upstage.ai/)              | ✅          | Parse Documents through Upstage Document AI    |
-| PDF Ingestion                                            | ✅          | Import PDF into Verba                          |
-| GitHub & GitLab                                          | ✅          | Import Files from Github and GitLab            |
-| CSV/XLSX Ingestion                                       | ✅          | Import Table Data into Verba                   |
-| .DOCX                                                    | ✅          | Import .docx files                             |
-| Multi-Modal (using [AssemblyAI](https://assemblyai.com)) | ✅          | Import and Transcribe Audio through AssemblyAI |
+| 📁 Data Support                                          | Implemented | Description                                                  |
+| -------------------------------------------------------- | ----------- | ------------------------------------------------------------ |
+| [UnstructuredIO](https://docs.unstructured.io/welcome)   | ✅          | Import Data through Unstructured (great for scanned PDFs)    |
+| PDF Ingestion                                            | ✅          | Import PDF into Verba                                        |
+| GitHub & GitLab                                          | ✅          | Import Files from Github and GitLab                          |
+| CSV/XLSX Ingestion                                       | ✅          | Import Table Data into Verba                                 |
+| .DOCX                                                    | ✅          | Import .docx files                                           |
+| Audio/Video (via [Whisper](https://github.com/guillaumekln/faster-whisper)) | ✅ | Transcribe audio and video locally — no API key required |
 
 | ✨ RAG Features         | Implemented     | Description                                                               |
 | ----------------------- | --------------- | ------------------------------------------------------------------------- |
@@ -176,18 +179,22 @@ Below is a comprehensive list of the API keys and variables you may require:
 | COHERE_API_KEY         | Your API Key                                               | Get Access to [Cohere](https://cohere.com/) Models                                                                            |
 | GROQ_API_KEY           | Your Groq API Key                                          | Get Access to [Groq](https://groq.com/) Models                                                                                |
 | NOVITA_API_KEY         | Your Novita API Key                                        | Get Access to [Novita AI](https://novita.ai?utm_source=github_verba&utm_medium=github_readme&utm_campaign=github_link) Models |
+| DEEPSEEK_API_KEY       | Your DeepSeek API Key                                      | Get Access to [DeepSeek](https://platform.deepseek.com/) Models                                                               |
+| DEEPSEEK_BASE_URL      | URL to DeepSeek instance (default: https://api.deepseek.com/v1) | Override the DeepSeek API endpoint                                                                                      |
+| DEEPSEEK_MODEL         | Model name (default: deepseek-chat)                        | Use `deepseek-chat` or `deepseek-reasoner` (R1)                                                                               |
+| LMSTUDIO_BASE_URL      | URL to LM Studio (default: http://localhost:1234/v1)       | Get Access to local models via [LM Studio](https://lmstudio.ai/)                                                             |
+| LMSTUDIO_API_KEY       | API key for LM Studio (optional)                           | Usually not required for local LM Studio                                                                                      |
+| LMSTUDIO_MODEL         | Generator model loaded in LM Studio                        | E.g. `lmstudio-community/Meta-Llama-3-8B-Instruct-GGUF`                                                                      |
+| LMSTUDIO_EMBEDDER_MODEL | Embedding model loaded in LM Studio                       | E.g. `nomic-ai/nomic-embed-text-v1.5-GGUF`                                                                                   |
 | OLLAMA_URL             | URL to your Ollama instance (e.g. http://localhost:11434 ) | Get Access to [Ollama](https://ollama.com/) Models                                                                            |
 | UNSTRUCTURED_API_KEY   | Your API Key                                               | Get Access to [Unstructured](https://docs.unstructured.io/welcome) Data Ingestion                                             |
 | UNSTRUCTURED_API_URL   | URL to Unstructured Instance                               | Get Access to [Unstructured](https://docs.unstructured.io/welcome) Data Ingestion                                             |
-| ASSEMBLYAI_API_KEY     | Your API Key                                               | Get Access to [AssemblyAI](https://assemblyai.com) Data Ingestion                                                             |
 | GITHUB_TOKEN           | Your GitHub Token                                          | Get Access to Data Ingestion via GitHub                                                                                       |
 | GITLAB_TOKEN           | Your GitLab Token                                          | Get Access to Data Ingestion via GitLab                                                                                       |
-| FIRECRAWL_API_KEY      | Your Firecrawl API Key                                     | Get Access to Data Ingestion via Firecrawl                                                                                    |
 | VOYAGE_API_KEY         | Your VoyageAI API Key                                      | Get Access to Embedding Models via VoyageAI                                                                                   |
 | EMBEDDING_SERVICE_URL  | URL to your Embedding Service Instance                     | Get Access to Embedding Models via [Weaviate Embedding Service](https://weaviate.io/developers/wcs/embeddings)                |
 | EMBEDDING_SERVICE_KEY  | Your Embedding Service Key                                 | Get Access to Embedding Models via [Weaviate Embedding Service](https://weaviate.io/developers/wcs/embeddings)                |
-| UPSTAGE_API_KEY        | Your Upstage API Key                                       | Get Access to [Upstage](https://upstage.ai/) Models                                                                           |
-| UPSTAGE_BASE_URL       | URL to Upstage instance                                    | Models                                                                                                                        |
+| UPSTAGE_API_KEY        | Your Upstage API Key                                       | Get Access to [Upstage](https://upstage.ai/) Embedding and Generation Models                                                  |
 | DEFAULT_DEPLOYMENT     | Local, Weaviate, Custom, Docker                            | Set the default deployment mode                                                                                               |
 | SYSYEM_MESSAGE_PROMPT     | Prompt text value                            | Default value starts with: "You are Verba, a chatbot for..."                                                                                               |
 | OLLAMA_MODEL           | Your Ollama Model                                          | Set the default Ollama model to use                                                                                           |
@@ -239,9 +246,9 @@ Verba supports importing documents through Unstructured IO (e.g plain text, .pdf
 
 > UNSTRUCTURED_API_URL is set to `https://api.unstructuredapp.io/general/v0/general` by default
 
-## AssemblyAI
+## Whisper (Audio/Video)
 
-Verba supports importing documents through AssemblyAI (audio files or audio from video files). To use them you need the `ASSEMBLYAI_API_KEY` environment variable. You can get it from [AssemblyAI](https://assemblyai.com)
+Verba supports importing audio and video files (`.mp3`, `.wav`, `.m4a`, `.flac`, `.ogg`, `.mp4`, `.mov`, `.webm`, and more) via [faster-whisper](https://github.com/guillaumekln/faster-whisper), which runs locally with no API key or internet connection required. Install it with `pip install faster-whisper`. The model is downloaded automatically on first use (model files range from ~150 MB for `tiny` to ~3 GB for `large-v3`).
 
 ## OpenAI
 
@@ -283,6 +290,29 @@ To use Groq LPUs as generation engine, you need to get an API key from [Groq](ht
 ## Novita
 
 To use Novita AI as generation engine, you need to get an API key from [Novita AI](https://novita.ai/settings/key-management?utm_source=github_verba&utm_medium=github_readme&utm_campaign=github_link).
+
+## DeepSeek
+
+Verba supports DeepSeek's models including the DeepSeek-R1 reasoning model. Get an API key from [DeepSeek Platform](https://platform.deepseek.com/).
+
+Set the `DEEPSEEK_API_KEY` environment variable, and optionally `DEEPSEEK_MODEL` to choose between `deepseek-chat` (default) and `deepseek-reasoner` (R1). When using `deepseek-reasoner`, the chain-of-thought reasoning process is displayed in a collapsible "Show Reasoning" section in the chat UI.
+
+```
+DEEPSEEK_API_KEY=your-deepseek-api-key
+DEEPSEEK_MODEL=deepseek-reasoner   # optional, defaults to deepseek-chat
+```
+
+## LM Studio
+
+Verba supports [LM Studio](https://lmstudio.ai/) for fully local inference with no API key required. Start LM Studio, load a model, and enable the local server (default: `http://localhost:1234/v1`).
+
+Both `LMStudioGenerator` and `LMStudioEmbedder` are available. Set environment variables to configure the endpoint and model names:
+
+```
+LMSTUDIO_BASE_URL=http://localhost:1234/v1   # optional, this is the default
+LMSTUDIO_MODEL=your-loaded-chat-model
+LMSTUDIO_EMBEDDER_MODEL=your-loaded-embedding-model
+```
 
 # How to deploy with pip
 
@@ -433,7 +463,7 @@ Your contributions are always welcome! Feel free to contribute ideas, feedback, 
 
 ### Project Architecture
 
-You can learn more about Verba's architecture and implementation in its [technical documentation](./TECHNICAL.md) and [frontend documentation](./FRONTEND.md). It's recommended to have a look at them before making any contributions.
+You can learn more about Verba's architecture and implementation in its [backend documentation](./goldenverba/README.md) and [frontend documentation](./FRONTEND.md). It's recommended to have a look at them before making any contributions.
 
 ## Known Issues
 

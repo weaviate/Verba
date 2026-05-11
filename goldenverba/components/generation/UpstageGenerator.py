@@ -87,7 +87,7 @@ class UpstageGenerator(Generator):
                 f"{base_url}/chat/completions",
                 json=data,
                 headers=headers,
-                timeout=None,
+                timeout=httpx.Timeout(connect=10, read=300),
             ) as response:
                 response.raise_for_status()
                 async for line in response.aiter_lines():

@@ -47,7 +47,11 @@ class OllamaGenerator(Generator):
 
         try:
             async with aiohttp.ClientSession() as session:
-                async with session.post(urljoin(self.url, "/api/chat"), json=data) as response:
+                async with session.post(
+                    urljoin(self.url, "/api/chat"),
+                    json=data,
+                    timeout=aiohttp.ClientTimeout(connect=10, total=300),
+                ) as response:
                     async for line in response.content:
                         if line.strip():
                             yield self._process_response(line)

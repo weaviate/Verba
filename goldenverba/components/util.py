@@ -33,13 +33,9 @@ def transform_data(X, components):
 
 # Function to perform PCA
 def pca(X, k):
-    print(X[:10])
     X_standardized = standardize_data(X)
-    print(X_standardized[:10])
     covariance_matrix = compute_covariance_matrix(X_standardized)
-    print(covariance_matrix)
     eigenvalues, eigenvectors = eigen_decomposition(covariance_matrix)
-    print(eigenvalues, eigenvectors)
     sorted_eigenvalues, sorted_eigenvectors = sort_eigenvalues_eigenvectors(eigenvalues, eigenvectors)
     top_k_components = select_top_k_components(sorted_eigenvectors, k)
     X_pca = transform_data(X_standardized, top_k_components)

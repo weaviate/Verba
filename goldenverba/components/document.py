@@ -39,7 +39,7 @@ def detect_language(text: str) -> str:
         elif detected_lang == "zh-tw" or detected_lang == "zh-hk":
             return "zh-hant"
         return detected_lang
-    except:
+    except Exception:
         return "unknown"
 
 

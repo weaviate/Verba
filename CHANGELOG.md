@@ -2,6 +2,64 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.0.0] - Unreleased
+
+## Added
+
+- **WhisperReader** — local audio/video transcription via `faster-whisper`. Replaces the AssemblyAI reader with a zero-cost, offline alternative. Supports 35+ formats (`.mp3`, `.wav`, `.m4a`, `.flac`, `.ogg`, `.mp4`, `.mov`, `.webm`, …). No API key required; model is downloaded automatically on first use. Configurable model size (`tiny` → `large-v3`) and compute device (`cpu` / `cuda` / `auto`).
+
+## Removed
+
+- **FirecrawlReader** — removed due to high maintenance surface (async job polling, versioned API endpoints, paid usage-based pricing). HTMLReader covers the primary use case (static site scraping). Users needing JavaScript rendering should run a local Playwright/Puppeteer setup.
+- **UpstageDocumentParse reader** — removed as redundant with UnstructuredAPI for complex PDF parsing. Upstage embedding and generation models are unaffected and remain available.
+- **AssemblyAI reader** — replaced by the new local WhisperReader. Removes a paid-per-minute external dependency while providing the same audio/video transcription capability.
+
+## Added
+
+- **DeepSeek generator** with reasoning model (R1) support — supports `deepseek-chat` and `deepseek-reasoner` via DeepSeek's OpenAI-compatible API. R1 thinking process shown in a collapsible section with a "Show Reasoning" toggle. Dynamic model discovery at startup. Env vars: `DEEPSEEK_API_KEY`, `DEEPSEEK_BASE_URL`, `DEEPSEEK_MODEL` (https://github.com/weaviate/Verba/pull/395)
+- **LM Studio integration** — `LMStudioEmbedder` and `LMStudioGenerator` for running fully local models via LM Studio's OpenAI-compatible API (`http://localhost:1234/v1` by default). No API key required. Env vars: `LMSTUDIO_BASE_URL`, `LMSTUDIO_API_KEY`, `LMSTUDIO_MODEL`, `LMSTUDIO_EMBEDDER_MODEL` (https://github.com/weaviate/Verba/pull/391)
+- **Test suite** — 71 tests covering `BatchManager` (including TTL eviction), `LoggerManager`, all three chunkers (`TokenChunker`, `SentenceChunker`, `MarkdownChunker`), and the `Document` class
+- **BACKEND.md** — developer guide covering architecture, component plugin system, step-by-step guides for adding new Generators/Embedders/Readers/Chunkers, WebSocket protocol, config system, and local dev setup
+
+## Fixed
+
+- Chunk deserialization from JSON: `doc_uuid` was stored as a tuple due to a stray trailing comma; `title`, `labels`, and `pca` were silently dropped on round-trip. Includes a full serialization round-trip test. (https://github.com/weaviate/Verba/pull/398)
+- CORS misconfiguration: `allow_credentials=True` with `allow_origins=["*"]` is rejected by browsers per the CORS spec. Access control is enforced by the existing custom same-origin middleware. (https://github.com/weaviate/Verba/issues/393)
+- **Mutable default argument** in `import_document()` — `LoggerManager()` was instantiated once at definition time and shared across concurrent imports, causing them to clobber each other's WebSocket reference
+- **Lock creation race** in `ClientManager.get_or_create_lock()` — two coroutines could both see an absent key and create duplicate locks; fixed with `setdefault()`
+- **Dict mutation during iteration** in `ClientManager.clean_up()` and `disconnect()` — iterating over a live dict while deleting entries raises `RuntimeError`; fixed by iterating over a snapshot
+- **Exception object sent to WebSocket** — `send_json({"message": e})` where `e` is an `Exception` object fails JSON serialization; changed to `str(e)`
+- **`msg.good()` fired after exceptions** — success log was outside the `try` block and ran unconditionally even when the streaming failed
+- **`asyncio.create_task()` immediately awaited** — pattern `task = create_task(fn()); result = await task` is equivalent to `await fn()` but with extra overhead; simplified to direct `await`
+- **O(n²) string concatenation** in streaming loop — `full_text += chunk["message"]` in a hot loop replaced with list accumulation and `"".join()` at the end
+- **`SentenceTransformer` model reloaded on every call** — `SentenceTransformer(model_name)` was called inside `vectorize()`, loading ~300 MB from disk on every embedding request; model is now cached by name in `_model_cache`
+- **`model.encode()` blocking the event loop** — synchronous CPU-bound call now wrapped with `asyncio.to_thread()`
+- **Streaming timeout `None`** on all generators — a hung upstream API would hold a WebSocket connection open forever; all generators now use `httpx.Timeout(connect=10, read=300)` or `aiohttp.ClientTimeout(connect=10, total=300)`
+- **Debug `print()` statements** in `util.py` `pca()` — four statements printing raw matrices to stdout in production removed
+- **Bare `except:` clauses** — `except:` in `GeminiGenerator.py` (import guard) and `document.py` (language detection) changed to `except ImportError` and `except Exception` respectively
+- **Deprecated `asyncio==3.4.3`** in `setup.py` — the PyPI `asyncio` package conflicts with the stdlib module present since Python 3.4; entry removed
+
+## Changed
+
+- **Payload size limits** — `GeneratePayload` and `QueryPayload` now enforce Pydantic `max_length` validators: query ≤ 50,000 chars, context ≤ 500,000 chars, conversation ≤ 100 items
+- **`BatchManager` TTL eviction** — abandoned incomplete uploads are now evicted after 5 minutes (previously leaked memory indefinitely)
+- Automated PyPI publishing via GitHub Actions on `v*.*.*` tag push using trusted publishing — no stored API token needed (replaces manual `pypi_commands.sh`)
+- Docker image now also tagged with version (e.g. `semitechnologies/verba:v3.0.0`) in addition to `:latest`
+- Upgraded Docker GitHub Actions to `build-push-action@v6` with GHA build cache for faster builds
+- `httpx` now explicitly declared in `setup.py` (was already used by multiple generators but only present as a transitive dependency)
+
+## Infrastructure
+
+- CI workflow (`ci.yml`): runs pytest on Python 3.11/3.12, ruff linting, and ESLint on every PR targeting `main` or `v3`
+- `ruff.toml`: Python linting and formatting config (replaces Black)
+- `.pre-commit-config.yaml`: ruff, ruff-format, prettier for frontend, and file hygiene hooks
+- Dependabot: automated weekly dependency updates for pip, npm, and GitHub Actions (grouped into one PR per ecosystem)
+- `SECURITY.md`: responsible disclosure policy via GitHub private vulnerability reporting
+- `CODE_OF_CONDUCT.md`: Contributor Covenant 2.1
+- `.github/PULL_REQUEST_TEMPLATE.md`: PR checklist for contributors
+
+---
+
 ## [2.1.3] More data types
 
 ## Added

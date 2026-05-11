@@ -95,8 +95,10 @@ class VerbaManager:
     # Import
 
     async def import_document(
-        self, client, fileConfig: FileConfig, logger: LoggerManager = LoggerManager()
+        self, client, fileConfig: FileConfig, logger: LoggerManager = None
     ):
+        if logger is None:
+            logger = LoggerManager()
         try:
             loop = asyncio.get_running_loop()
             start_time = loop.time()
@@ -212,41 +214,32 @@ class VerbaManager:
             elif duplicate_uuid is not None and currentFileConfig.overwrite:
                 await self.weaviate_manager.delete_document(client, duplicate_uuid)
 
-            chunk_task = asyncio.create_task(
-                self.chunker_manager.chunk(
-                    currentFileConfig.rag_config["Chunker"].selected,
-                    currentFileConfig,
-                    [document],
-                    self.embedder_manager.embedders[
-                        currentFileConfig.rag_config["Embedder"].selected
-                    ],
-                    logger,
-                )
+            chunked_documents = await self.chunker_manager.chunk(
+                currentFileConfig.rag_config["Chunker"].selected,
+                currentFileConfig,
+                [document],
+                self.embedder_manager.embedders[
+                    currentFileConfig.rag_config["Embedder"].selected
+                ],
+                logger,
             )
-            chunked_documents = await chunk_task
 
-            embedding_task = asyncio.create_task(
-                self.embedder_manager.vectorize(
-                    currentFileConfig.rag_config["Embedder"].selected,
-                    currentFileConfig,
-                    chunked_documents,
-                    logger,
-                )
+            vectorized_documents = await self.embedder_manager.vectorize(
+                currentFileConfig.rag_config["Embedder"].selected,
+                currentFileConfig,
+                chunked_documents,
+                logger,
             )
-            vectorized_documents = await embedding_task
 
             for document in vectorized_documents:
-                ingesting_task = asyncio.create_task(
-                    self.weaviate_manager.import_document(
-                        client,
-                        document,
-                        currentFileConfig.rag_config["Embedder"]
-                        .components[fileConfig.rag_config["Embedder"].selected]
-                        .config["Model"]
-                        .value,
-                    )
+                await self.weaviate_manager.import_document(
+                    client,
+                    document,
+                    currentFileConfig.rag_config["Embedder"]
+                    .components[fileConfig.rag_config["Embedder"].selected]
+                    .config["Model"]
+                    .value,
                 )
-                await ingesting_task
 
             await logger.send_report(
                 currentFileConfig.fileID,
@@ -393,64 +386,56 @@ class VerbaManager:
 
     def verify_config(self, a: dict, b: dict) -> bool:
         # Check Settings ( RAG & Settings )
+        # b is the authoritative (freshly generated) config; a is the stored config.
+        # Use set-based key comparison at every level so that zip() truncation cannot
+        # silently pass an outdated config when components are added or removed.
         try:
             if os.getenv("VERBA_PRODUCTION") == "Demo":
                 return True
-            for a_component_key, b_component_key in zip(a, b):
-                if a_component_key != b_component_key:
+
+            if set(a.keys()) != set(b.keys()):
+                msg.fail(
+                    f"Config Validation Failed, category mismatch: {set(a.keys())} != {set(b.keys())}"
+                )
+                return False
+
+            for category_key in b:
+                a_components = a[category_key]["components"]
+                b_components = b[category_key]["components"]
+
+                if set(a_components.keys()) != set(b_components.keys()):
                     msg.fail(
-                        f"Config Validation Failed, component name mismatch: {a_component_key} != {b_component_key}"
+                        f"Config Validation Failed, {category_key} component mismatch: "
+                        f"{set(a_components.keys())} != {set(b_components.keys())}"
                     )
                     return False
 
-                a_component = a[a_component_key]["components"]
-                b_component = b[b_component_key]["components"]
+                for component_key in b_components:
+                    a_config = a_components[component_key]["config"]
+                    b_config = b_components[component_key]["config"]
 
-                if len(a_component) != len(b_component):
-                    msg.fail(
-                        f"Config Validation Failed, {a_component_key} component count mismatch: {len(a_component)} != {len(b_component)}"
-                    )
-                    return False
-
-                for a_rag_component_key, b_rag_component_key in zip(
-                    a_component, b_component
-                ):
-                    if a_rag_component_key != b_rag_component_key:
+                    if set(a_config.keys()) != set(b_config.keys()):
                         msg.fail(
-                            f"Config Validation Failed, component name mismatch: {a_rag_component_key} != {b_rag_component_key}"
-                        )
-                        return False
-                    a_rag_component = a_component[a_rag_component_key]
-                    b_rag_component = b_component[b_rag_component_key]
-
-                    a_config = a_rag_component["config"]
-                    b_config = b_rag_component["config"]
-
-                    if len(a_config) != len(b_config):
-                        msg.fail(
-                            f"Config Validation Failed, component config count mismatch: {len(a_config)} != {len(b_config)}"
+                            f"Config Validation Failed, {component_key} config key mismatch: "
+                            f"{set(a_config.keys())} != {set(b_config.keys())}"
                         )
                         return False
 
-                    for a_config_key, b_config_key in zip(a_config, b_config):
-                        if a_config_key != b_config_key:
-                            msg.fail(
-                                f"Config Validation Failed, component name mismatch: {a_config_key} != {b_config_key}"
-                            )
-                            return False
-
-                        a_setting = a_config[a_config_key]
-                        b_setting = b_config[b_config_key]
+                    for config_key in b_config:
+                        a_setting = a_config[config_key]
+                        b_setting = b_config[config_key]
 
                         if a_setting["description"] != b_setting["description"]:
                             msg.fail(
-                                f"Config Validation Failed, description mismatch: {a_setting['description']} != {b_setting['description']}"
+                                f"Config Validation Failed, description mismatch: "
+                                f"{a_setting['description']} != {b_setting['description']}"
                             )
                             return False
 
                         if sorted(a_setting["values"]) != sorted(b_setting["values"]):
                             msg.fail(
-                                f"Config Validation Failed, values mismatch: {a_setting['values']} != {b_setting['values']}"
+                                f"Config Validation Failed, values mismatch: "
+                                f"{a_setting['values']} != {b_setting['values']}"
                             )
                             return False
 
@@ -739,11 +724,13 @@ class VerbaManager:
         conversation: list[dict],
     ):
 
-        full_text = ""
+        full_text_parts: list[str] = []
         async for result in self.generator_manager.generate_stream(
             rag_config, query, context, conversation
         ):
-            full_text += result["message"]
+            full_text_parts.append(result["message"])
+            if result.get("finish_reason") == "stop":
+                result["full_text"] = "".join(full_text_parts)
             yield result
 
 
@@ -759,8 +746,9 @@ class ClientManager:
         return hashlib.sha256(cred_string.encode()).hexdigest()
 
     def get_or_create_lock(self, cred_hash: str) -> asyncio.Lock:
-        if cred_hash not in self.locks:
-            self.locks[cred_hash] = asyncio.Lock()
+        # setdefault is atomic for dict operations, preventing a race where two
+        # coroutines both see the key missing and create separate locks
+        self.locks.setdefault(cred_hash, asyncio.Lock())
         return self.locks[cred_hash]
 
     def heartbeat(self):
@@ -802,26 +790,30 @@ class ClientManager:
 
     async def disconnect(self):
         msg.warn("Disconnecting Clients!")
-        for cred_hash, client in self.clients.items():
-            await self.manager.disconnect(client["client"])
+        # Snapshot keys to avoid mutating dict during iteration
+        for cred_hash in list(self.clients.keys()):
+            await self.manager.disconnect(self.clients[cred_hash]["client"])
 
     async def clean_up(self):
         msg.info("Cleaning Clients Cache")
         current_time = datetime.now()
         clients_to_remove = []
 
-        for cred_hash, client_data in self.clients.items():
+        # Iterate over a snapshot to avoid RuntimeError if dict changes concurrently
+        for cred_hash, client_data in list(self.clients.items()):
             time_difference = current_time - client_data["timestamp"]
             if time_difference.total_seconds() / 60 > self.max_time:
                 clients_to_remove.append(cred_hash)
+                continue
             client: WeaviateAsyncClient = client_data["client"]
             if not await client.is_ready():
                 clients_to_remove.append(cred_hash)
 
         for cred_hash in clients_to_remove:
-            await self.manager.disconnect(self.clients[cred_hash]["client"])
-            del self.clients[cred_hash]
-            msg.warn(f"Removed client: {cred_hash}")
+            if cred_hash in self.clients:
+                await self.manager.disconnect(self.clients[cred_hash]["client"])
+                del self.clients[cred_hash]
+                msg.warn(f"Removed client: {cred_hash}")
 
         msg.info(f"Cleaned up {len(clients_to_remove)} clients")
         self.heartbeat()

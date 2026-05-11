@@ -117,6 +117,7 @@ class GitReader(Reader):
                         file_size=size,
                         status=fileConfig.status,
                         status_report=fileConfig.status_report,
+                        metadata=fileConfig.metadata,
                     )
                     document = await reader.load(config, new_file_config)
                     documents.append(document[0])
@@ -135,7 +136,8 @@ class GitReader(Reader):
         self, url: str, folder: str, token: str, reader: Reader
     ) -> list[str]:
         headers = self.get_headers(token, "GitHub")
-        async with aiohttp.ClientSession() as session:
+        timeout = aiohttp.ClientTimeout(total=30)
+        async with aiohttp.ClientSession(timeout=timeout) as session:
             async with session.get(url, headers=headers) as response:
                 response.raise_for_status()
                 data = await response.json()
@@ -148,7 +150,8 @@ class GitReader(Reader):
 
     async def fetch_docs_gitlab(self, url: str, token: str, reader: Reader) -> list:
         headers = self.get_headers(token, "GitLab")
-        async with aiohttp.ClientSession() as session:
+        timeout = aiohttp.ClientTimeout(total=30)
+        async with aiohttp.ClientSession(timeout=timeout) as session:
             async with session.get(url, headers=headers) as response:
                 response.raise_for_status()
                 data = await response.json()
@@ -166,7 +169,8 @@ class GitReader(Reader):
             f"https://api.github.com/repos/{owner}/{name}/contents/{path}?ref={branch}"
         )
         headers = self.get_headers(token, "GitHub")
-        async with aiohttp.ClientSession() as session:
+        timeout = aiohttp.ClientTimeout(total=30)
+        async with aiohttp.ClientSession(timeout=timeout) as session:
             async with session.get(url, headers=headers) as response:
                 response.raise_for_status()
                 data = await response.json()
@@ -183,7 +187,8 @@ class GitReader(Reader):
         url = f"https://gitlab.com/api/v4/projects/{project_id}/repository/files/{urllib.parse.quote(file_path, safe='')}/raw?ref={branch}"
         headers = {"PRIVATE-TOKEN": token}
 
-        async with aiohttp.ClientSession() as session:
+        timeout = aiohttp.ClientTimeout(total=30)
+        async with aiohttp.ClientSession(timeout=timeout) as session:
             async with session.get(url, headers=headers) as response:
                 if response.status == 200:
                     content = await response.read()

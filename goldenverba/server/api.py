@@ -59,9 +59,18 @@ client_manager = verba_manager.ClientManager()
 ### Lifespan
 
 
+async def _periodic_cleanup():
+    """Run ClientManager cleanup every 5 minutes in the background."""
+    while True:
+        await asyncio.sleep(300)
+        await client_manager.clean_up()
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    cleanup_task = asyncio.create_task(_periodic_cleanup())
     yield
+    cleanup_task.cancel()
     await client_manager.disconnect()
 
 
@@ -211,17 +220,14 @@ async def websocket_generate_stream(websocket: WebSocket):
 
             msg.good(f"Received generate stream call for {payload.query}")
 
-            full_text = ""
             async for chunk in manager.generate_stream_answer(
                 payload.rag_config,
                 payload.query,
                 payload.context,
                 payload.conversation,
             ):
-                full_text += chunk["message"]
-                if chunk["finish_reason"] == "stop":
-                    chunk["full_text"] = full_text
                 await websocket.send_json(chunk)
+            msg.good("Successfully streamed answer")
 
         except WebSocketDisconnect:
             msg.warn("WebSocket connection closed by client.")
@@ -230,9 +236,8 @@ async def websocket_generate_stream(websocket: WebSocket):
         except Exception as e:
             msg.fail(f"WebSocket Error: {str(e)}")
             await websocket.send_json(
-                {"message": e, "finish_reason": "stop", "full_text": str(e)}
+                {"message": str(e), "finish_reason": "stop", "full_text": str(e)}
             )
-        msg.good("Succesfully streamed answer")
 
 
 @app.websocket("/ws/import_files")
