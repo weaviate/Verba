@@ -8,7 +8,7 @@ Open source is at the heart of Verba. We appreciate feedback, ideas, and enhance
 
 ## 📚 Before You Begin
 
-Before contributing, please take a moment to read through the [README](https://github.com/weaviate/Verba/README.md) and the [Technical Documentation](https://github.com/weaviate/Verba/TECHNICAL.md). These documents provide a comprehensive understanding of the project and are essential reading to ensure that we're all on the same page. Please note that the technical documentation is a work in progress and will be updated as we progress.
+Before contributing, please take a moment to read through the [README](https://github.com/weaviate/Verba/README.md) and the [Backend Documentation](https://github.com/weaviate/Verba/goldenverba/README.md). These documents provide a comprehensive understanding of the project and are essential reading to ensure that we're all on the same page.
 
 ## 🐛 Reporting Issues
 

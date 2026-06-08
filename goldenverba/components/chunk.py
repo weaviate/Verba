@@ -1,6 +1,3 @@
-from spacy.tokens import Doc, Span
-
-
 class Chunk:
     def __init__(
         self,

@@ -3,7 +3,7 @@ import uvicorn
 import os
 from dotenv import load_dotenv
 
-from goldenverba import verba_manager
+from goldenverba.components import verba_manager
 from goldenverba.server.types import Credentials
 
 load_dotenv()

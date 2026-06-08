@@ -15,7 +15,8 @@ from dotenv import load_dotenv
 from starlette.websockets import WebSocketDisconnect
 from wasabi import msg  # type: ignore[import]
 
-from goldenverba import verba_manager
+from goldenverba.components import verba_manager
+from goldenverba.components.client_manager import ClientManager
 
 from goldenverba.server.types import (
     ResetPayload,
@@ -54,7 +55,7 @@ else:
 
 manager = verba_manager.VerbaManager()
 
-client_manager = verba_manager.ClientManager()
+client_manager = ClientManager()
 
 ### Lifespan
 

@@ -5,26 +5,39 @@ updates:
     schedule:
       interval: weekly
       day: monday
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 3
     labels:
       - dependencies
       - python
+    groups:
+      python-deps:
+        patterns:
+          - "*"
 
   - package-ecosystem: npm
     directory: "/frontend"
     schedule:
       interval: weekly
       day: monday
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 3
     labels:
       - dependencies
       - javascript
+    groups:
+      npm-deps:
+        patterns:
+          - "*"
 
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
       interval: weekly
       day: monday
+    open-pull-requests-limit: 1
     labels:
       - dependencies
       - github-actions
+    groups:
+      github-actions:
+        patterns:
+          - "*"
