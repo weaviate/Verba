@@ -71,6 +71,7 @@ from goldenverba.components.generation.AtlasCloudGenerator import AtlasCloudGene
 from goldenverba.components.generation.OpenAIGenerator import OpenAIGenerator
 from goldenverba.components.generation.GroqGenerator import GroqGenerator
 from goldenverba.components.generation.NovitaGenerator import NovitaGenerator
+from goldenverba.components.generation.AnyAPIGenerator import AnyAPIGenerator
 from goldenverba.components.generation.UpstageGenerator import UpstageGenerator
 
 try:
@@ -119,6 +120,7 @@ if production != "Production":
         CohereGenerator(),
         GroqGenerator(),
         NovitaGenerator(),
+        AnyAPIGenerator(),
         UpstageGenerator(),
     ]
 else:
@@ -154,6 +156,7 @@ else:
         OpenAIGenerator(),
         AnthropicGenerator(),
         CohereGenerator(),
+        AnyAPIGenerator(),
         UpstageGenerator(),
     ]
 
