@@ -56,5 +56,8 @@ setup(
         "huggingface": [
             "sentence-transformers==3.0.1",
         ],
+        "litellm": [
+            "litellm>=1.60,<1.85",
+        ],
     },
 )
