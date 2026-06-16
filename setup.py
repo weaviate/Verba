@@ -30,7 +30,7 @@ setup(
         "wasabi==1.1.2",
         "fastapi==0.111.1",
         "uvicorn[standard]==0.29.0",
-        "gunicorn==22.0.0",
+        "gunicorn==25.3.0",
         "click==8.1.7",
         "xlrd==2.0.2",
         "asyncio==3.4.3",
