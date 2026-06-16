@@ -34,7 +34,7 @@ setup(
         "click==8.1.7",
         "xlrd==2.0.2",
         "asyncio==3.4.3",
-        "tiktoken==0.6.0",
+        "tiktoken==0.12.0",
         "requests==2.31.0",
         "pypdf==4.3.1",
         "python-docx==1.1.2",
