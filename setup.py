@@ -29,7 +29,7 @@ setup(
         "openpyxl==3.1.5",
         "wasabi==1.1.2",
         "fastapi==0.111.1",
-        "uvicorn[standard]==0.29.0",
+        "uvicorn[standard]==0.44.0",
         "gunicorn==22.0.0",
         "click==8.1.7",
         "xlrd==2.0.2",
