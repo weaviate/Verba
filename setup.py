@@ -54,7 +54,7 @@ setup(
             "vertexai==1.46.0",
         ],
         "huggingface": [
-            "sentence-transformers==3.0.1",
+            "sentence-transformers==5.4.1",
         ],
     },
 )
