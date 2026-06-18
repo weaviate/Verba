@@ -24,7 +24,7 @@ setup(
     ],
     include_package_data=True,
     install_requires=[
-        "weaviate-client==4.9.6",
+        "weaviate-client==4.20.5",
         "python-dotenv==1.0.0",
         "openpyxl==3.1.5",
         "wasabi==1.1.2",
